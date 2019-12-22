@@ -2,14 +2,19 @@ import XCTest
 @testable import xLib6000
 
 final class xLib6000Tests: XCTestCase {
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        XCTAssertEqual(xLib6000().text, "Hello, World!")
-    }
+  
+  func testMode() {
+    XCTAssertEqual(Api.sharedInstance.testerModeEnabled, false)
+  }
 
-    static var allTests = [
-        ("testExample", testExample),
-    ]
+  func testDiscovery() {
+    XCTAssertNotNil(Discovery.sharedInstance)
+    sleep(2)
+    XCTAssertGreaterThan(Discovery.sharedInstance.discoveredRadios.count, 0, "No Radios discovered")
+  }
+
+  static var allTests = [
+    ("testMode", testMode),
+    ("testDiscovery", testDiscovery)
+  ]
 }

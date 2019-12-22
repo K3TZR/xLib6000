@@ -593,11 +593,11 @@ public func isForThisClient(_ properties: KeyValuesArray) -> Bool {
 @propertyWrapper
 /// Protect a property using a concurrent queue and a barrier for writes
 ///
-struct Barrier<Element> {
+public struct Barrier<Element> {
   private var _value      : Element
   private let _q          : DispatchQueue
   
-  var wrappedValue: Element {
+  public var wrappedValue: Element {
     get { return _q.sync { _value }}
     set { _q.sync(flags: .barrier) { _value = newValue }}
   }

@@ -26,6 +26,17 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   
   public private(set) var number            : MeterNumber = ""              // Number that uniquely identifies this Meter
 
+  @Barrier("", Api.objectQ) @objc dynamic public  var desc
+  @Barrier(0, Api.objectQ) @objc dynamic public   var fps
+  @Barrier(0.0, Api.objectQ) @objc dynamic public var high: Float
+  @Barrier(0.0, Api.objectQ) @objc dynamic public var low: Float
+  @Barrier("", Api.objectQ) @objc dynamic public  var group
+  @Barrier("", Api.objectQ) @objc dynamic public  var name
+  @Barrier(0.0, Api.objectQ) @objc dynamic public var peak: Float
+  @Barrier("", Api.objectQ) @objc dynamic public  var source
+  @Barrier("", Api.objectQ) @objc dynamic public  var units
+  @Barrier(0.0, Api.objectQ) @objc dynamic public var value: Float
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -39,16 +50,16 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
-  private var _desc                         = ""                            // long description
-  private var _fps                          = 0                             // frames per second
-  private var _high: Float                  = 0.0                           // high limit
-  private var _low: Float                   = 0.0                           // low limit
-  private var _group                        = ""                            // group
-  private var _name                         = ""                            // abbreviated description
-  private var _peak                         : Float = 0.0                   // peak value
-  private var _source                       = ""                            // source
-  private var _units                        = ""                            // value units
-  private var _value                        : Float = 0.0                   // value
+//  private var _desc                         = ""                            // long description
+//  private var _fps                          = 0                             // frames per second
+//  private var _high: Float                  = 0.0                           // high limit
+//  private var _low: Float                   = 0.0                           // low limit
+//  private var _group                        = ""                            // group
+//  private var _name                         = ""                            // abbreviated description
+//  private var _peak                         : Float = 0.0                   // peak value
+//  private var _source                       = ""                            // source
+//  private var _units                        = ""                            // value units
+//  private var _value                        : Float = 0.0                   // value
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
@@ -321,45 +332,45 @@ extension Meter {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
   
-  @objc dynamic public var desc: String {
-    get { return Api.objectQ.sync { _desc } }
-    set { Api.objectQ.sync(flags: .barrier) { _desc = newValue } } }
-  
-  @objc dynamic public var fps: Int {
-    get { return Api.objectQ.sync { _fps } }
-    set { Api.objectQ.sync(flags: .barrier) { _fps = newValue } } }
-  
-  @objc dynamic public var high: Float {
-    get { return Api.objectQ.sync { _high } }
-    set { Api.objectQ.sync(flags: .barrier) { _high = newValue } } }
-  
-  @objc dynamic public var low: Float {
-    get { return Api.objectQ.sync { _low } }
-    set { Api.objectQ.sync(flags: .barrier) { _low = newValue } } }
-  
-  @objc dynamic public var name: String {
-    get { return Api.objectQ.sync { _name } }
-    set { Api.objectQ.sync(flags: .barrier) { _name = newValue } } }
-  
-  @objc dynamic public var group: String {
-    get { return Api.objectQ.sync { _group } }
-    set { Api.objectQ.sync(flags: .barrier) { _group = newValue } } }
-  
-  @objc dynamic public var peak: Float {
-    get { return Api.objectQ.sync { _peak } }
-    set { Api.objectQ.sync(flags: .barrier) { _peak = newValue } } }
-  
-  @objc dynamic public var source: String {
-    get { return Api.objectQ.sync { _source } }
-    set { Api.objectQ.sync(flags: .barrier) { _source = newValue } } }
-  
-  @objc dynamic public var units: String {
-    get { return Api.objectQ.sync { _units } }
-    set { Api.objectQ.sync(flags: .barrier) { _units = newValue } } }
-  
-  @objc dynamic public var value: Float {
-    get { return Api.objectQ.sync { _value } }
-    set { Api.objectQ.sync(flags: .barrier) { _value = newValue } } }
+//  @objc dynamic public var desc: String {
+//    get { return Api.objectQ.sync { _desc } }
+//    set { Api.objectQ.sync(flags: .barrier) { _desc = newValue } } }
+//  
+//  @objc dynamic public var fps: Int {
+//    get { return Api.objectQ.sync { _fps } }
+//    set { Api.objectQ.sync(flags: .barrier) { _fps = newValue } } }
+//  
+//  @objc dynamic public var high: Float {
+//    get { return Api.objectQ.sync { _high } }
+//    set { Api.objectQ.sync(flags: .barrier) { _high = newValue } } }
+//  
+//  @objc dynamic public var low: Float {
+//    get { return Api.objectQ.sync { _low } }
+//    set { Api.objectQ.sync(flags: .barrier) { _low = newValue } } }
+//  
+//  @objc dynamic public var name: String {
+//    get { return Api.objectQ.sync { _name } }
+//    set { Api.objectQ.sync(flags: .barrier) { _name = newValue } } }
+//  
+//  @objc dynamic public var group: String {
+//    get { return Api.objectQ.sync { _group } }
+//    set { Api.objectQ.sync(flags: .barrier) { _group = newValue } } }
+//  
+//  @objc dynamic public var peak: Float {
+//    get { return Api.objectQ.sync { _peak } }
+//    set { Api.objectQ.sync(flags: .barrier) { _peak = newValue } } }
+//  
+//  @objc dynamic public var source: String {
+//    get { return Api.objectQ.sync { _source } }
+//    set { Api.objectQ.sync(flags: .barrier) { _source = newValue } } }
+//  
+//  @objc dynamic public var units: String {
+//    get { return Api.objectQ.sync { _units } }
+//    set { Api.objectQ.sync(flags: .barrier) { _units = newValue } } }
+//  
+//  @objc dynamic public var value: Float {
+//    get { return Api.objectQ.sync { _value } }
+//    set { Api.objectQ.sync(flags: .barrier) { _value = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Tokens

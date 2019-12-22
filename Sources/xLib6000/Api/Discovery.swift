@@ -17,30 +17,25 @@ import CocoaAsyncSocket
 public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegate {
   
   typealias IpAddress                       = String                        // dotted decimal form
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+
+  // GCD Queues
+  static let udpQ                           = DispatchQueue(label: "Discovery" + ".udpQ")
+  static let timerQ                         = DispatchQueue(label: "Discovery" + ".timerQ")
+  static let radiosQ                        = DispatchQueue(label: "Discovery" + ".radiosQ", attributes: .concurrent)
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var discoveredRadios: [DiscoveredRadio] {
-    get { return _radiosQ.sync { _discoveredRadios } }
-    set { _radiosQ.sync(flags: .barrier) { _discoveredRadios = newValue } } }
-
+  @Barrier([], radiosQ) public var discoveredRadios: [DiscoveredRadio]
+  
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
   private var _udpSocket                    : GCDAsyncUdpSocket?            // socket to receive broadcasts
   private var _timeoutTimer                 : DispatchSourceTimer!          // timer fired every "checkInterval"
-  
-  // GCD Queues
-  private let _udpQ                         = DispatchQueue(label: "Discovery" + ".udpQ")
-  private var _timerQ                       = DispatchQueue(label: "Discovery" + ".timerQ")
-  private let _radiosQ                      = DispatchQueue(label: "Discovery" + ".radiosQ", attributes: .concurrent)
-
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS -----
-  //
-  private var _discoveredRadios              = [DiscoveredRadio]()          // Array of Discovered Radios
-  //
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS -----
   
   // ----------------------------------------------------------------------------
   // MARK: - Singleton
@@ -60,7 +55,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     super.init()
     
     // create a Udp socket
-    _udpSocket = GCDAsyncUdpSocket( delegate: self, delegateQueue: _udpQ )
+    _udpSocket = GCDAsyncUdpSocket( delegate: self, delegateQueue: Discovery.udpQ )
     
     // if created
     if let sock = _udpSocket {
@@ -91,7 +86,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         try sock.beginReceiving()
         
         // create the timer's dispatch source
-        _timeoutTimer = DispatchSource.makeTimerSource(flags: [.strict], queue: _timerQ)
+        _timeoutTimer = DispatchSource.makeTimerSource(flags: [.strict], queue: Discovery.timerQ)
         
         // Set timer with 100 millisecond leeway
         _timeoutTimer.schedule(deadline: DispatchTime.now(), repeating: checkInterval, leeway: .milliseconds(100))      // Every second +/- 10%
@@ -102,9 +97,9 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
           var deleteList = [Int]()
           
           // check the timestamps of the Discovered radios
-          for i in 0..<self._discoveredRadios.count {
+          for i in 0..<self.discoveredRadios.count {
             
-            let interval = abs(self._discoveredRadios[i].lastSeen.timeIntervalSinceNow)
+            let interval = abs(self.discoveredRadios[i].lastSeen.timeIntervalSinceNow)
             
             // is it past expiration?
             if interval > notSeenInterval {
@@ -114,7 +109,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
               
             } else {
               // NO, update the timestamp
-              self._discoveredRadios[i].lastSeen = Date()
+              self.discoveredRadios[i].lastSeen = Date()
             }
           }
           // are there any deletions?
@@ -123,7 +118,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
             // YES, remove the Radio(s)
             for index in deleteList.reversed() {
               // remove a Radio
-              self._discoveredRadios.remove(at: index)
+              self.discoveredRadios.remove(at: index)
             }
             // send the list of radios to all observers
             NC.post(.discoveredRadios, object: self.discoveredRadios as Any?)
