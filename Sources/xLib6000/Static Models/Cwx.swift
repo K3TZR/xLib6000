@@ -98,7 +98,7 @@ public final class Cwx                      : NSObject, StaticModel {
   ///   - responseValue:  the response value
   ///   - reply:          the reply
   ///
-  func replyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
+  func replyHandler(_ command: String, seqNum: UInt, responseValue: String, reply: String) {
     
     // if a block was specified for the "cwx send" command the response is "charPos,block"
     // if no block was given the response is "charPos"

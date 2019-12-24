@@ -6,6 +6,8 @@
 //  Copyright © 2017 Douglas Adams & Mario Illgen. All rights reserved.
 //
 
+public typealias DaxTxStreamId = StreamId
+
 import Cocoa
 
 /// DaxTxAudioStream Class implementation
@@ -21,8 +23,9 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var streamId : StreamId = 0 // Stream Id
-  
+  public let radio                  : Radio
+  public let streamId               : DaxTxStreamId
+
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -39,7 +42,6 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   private var _txSeq = 0            // Tx sequence number (modulo 16)
 
   private let _log = Log.sharedInstance
-  private let _radio : Radio
 
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
@@ -57,20 +59,20 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   class func parseStatus(_ properties: KeyValuesArray, radio: Radio, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_tx"> <"client_handle", handle> <"dax_tx", isTransmitChannel>
     
-    //get the StreamId
-    if let streamId = properties[0].key.streamId {
+    //get the Id
+    if let daxTxStreamId = properties[0].key.streamId {
       
       // does the Stream exist?
-      if radio.daxTxAudioStreams[streamId] == nil {
+      if radio.daxTxAudioStreams[daxTxStreamId] == nil {
         
         // exit if this stream is not for this client
         if isForThisClient( properties ) == false { return }
         
         // create a new Stream & add it to the collection
-        radio.daxTxAudioStreams[streamId] = DaxTxAudioStream(streamId: streamId, radio: radio)
+        radio.daxTxAudioStreams[daxTxStreamId] = DaxTxAudioStream(radio: radio, streamId: daxTxStreamId)
       }
-      // pass the remaining key values to parsing
-      radio.daxTxAudioStreams[streamId]!.parseProperties( Array(properties.dropFirst(1)) )
+      // pass the remaining key values parsing (dropping the Id)
+      radio.daxTxAudioStreams[daxTxStreamId]!.parseProperties( Array(properties.dropFirst(1)) )
     }
   }
   
@@ -83,10 +85,10 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   ///   - id:                 Dax stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(streamId: StreamId, radio: Radio) {
+  init(radio: Radio, streamId: DaxTxStreamId) {
     
+    self.radio = radio
     self.streamId = streamId
-    _radio = radio
     super.init()
   }
   
@@ -159,7 +161,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       if let data = Vita.encodeAsData(_vita!) {
         
         // send packet to radio
-        _radio.sendVita(data)
+        radio.sendVita(data)
       }
       // increment the sequence number (mod 16)
       _txSeq = (_txSeq + 1) % 16

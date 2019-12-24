@@ -40,13 +40,13 @@ extension Tnf {
   public func remove(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove the Tnf
-    _radio.sendCommand("tnf remove " + " \(id)", replyTo: callback)
+    radio.sendCommand("tnf remove " + " \(tnfId)", replyTo: callback)
     
     // notify all observers
     NC.post(.tnfWillBeRemoved, object: self as Any?)
     
     // remove the Tnf
-    Api.sharedInstance.radio!.tnfs[self.id] = nil
+    Api.sharedInstance.radio!.tnfs[tnfId] = nil
   }
 
   // ----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ extension Tnf {
   ///
   private func tnfCmd(_ token: Token, _ value: Any) {
     
-    _radio.sendCommand("tnf set " + "\(id) " + token.rawValue + "=\(value)")
+    radio.sendCommand("tnf set " + "\(tnfId) " + token.rawValue + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------

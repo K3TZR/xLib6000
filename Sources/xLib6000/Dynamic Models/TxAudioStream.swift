@@ -6,6 +6,8 @@
 //  Copyright © 2017 Douglas Adams & Mario Illgen. All rights reserved.
 //
 
+public typealias TxStreamId = StreamId
+
 import Cocoa
 
 /// TxAudioStream Class implementation
@@ -20,7 +22,8 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var streamId         : DaxStreamId = 0                // TX Audio streamId
+  public let radio                        : Radio
+  public let streamId                     : TxStreamId
   
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -36,7 +39,6 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _radio                        : Radio
   private var _log                          = Log.sharedInstance
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -58,34 +60,34 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
     // Format:  <streamId, > <"dax_tx", channel> <"in_use", 1|0> <"ip", ip> <"port", port>
     
-    //get the AudioStreamId (remove the "0x" prefix)
-    if let streamId =  UInt32(String(keyValues[0].key.dropFirst(2)), radix: 16) {
+    //get the Id
+    if let txAudioStreamId =  keyValues[0].key.streamId {
       
-      // is the TX Audio Stream in use?
+      // is the Stream in use?
       if inUse {
         
-        // YES, does the AudioStream exist?
-        if radio.txAudioStreams[streamId] == nil {
+        // In use, does the object exist?
+        if radio.txAudioStreams[txAudioStreamId] == nil {
           
-          // NO, is this stream for this client?
+          // NO, is the stream for this client?
           if !AudioStream.isStatusForThisClient(keyValues) { return }
           
-          // create a new AudioStream & add it to the AudioStreams collection
-          radio.txAudioStreams[streamId] = TxAudioStream(radio: radio, streamId: streamId)
+          // create a new object & add it to the collection
+          radio.txAudioStreams[txAudioStreamId] = TxAudioStream(radio: radio, streamId: txAudioStreamId)
         }
-        // pass the remaining key values to the AudioStream for parsing (dropping the Id)
-        radio.txAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        // pass the remaining key values for parsing (dropping the Id)
+        radio.txAudioStreams[txAudioStreamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
         
       } else {
         
-        // does the stream exist?
-        if let stream = radio.txAudioStreams[streamId] {
+        // NOT in use, does the object exist?
+        if let stream = radio.txAudioStreams[txAudioStreamId] {
           
-          // notify all observers
+          // YES, notify all observers
           NC.post(.txAudioStreamWillBeRemoved, object: stream as Any?)
           
-          // remove the stream object
-          radio.txAudioStreams[streamId] = nil
+          // remove the object
+          radio.txAudioStreams[txAudioStreamId] = nil
         }
       }
     }
@@ -100,9 +102,9 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   ///   - id:                 Dax stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: DaxStreamId) {
+  init(radio: Radio, streamId: TxStreamId) {
     
-    _radio = radio
+    self.radio = radio
     self.streamId = streamId
     super.init()
   }
@@ -177,7 +179,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
         
         // send packet to radio
 //        _api.sendVitaData(data)
-        _radio.sendVita(data)
+        radio.sendVita(data)
       }
       // increment the sequence number (mod 16)
       _txSeq = (_txSeq + 1) % 16

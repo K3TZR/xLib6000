@@ -28,7 +28,8 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var streamId : DaxStreamId = 0  // Stream Id
+  public let radio                          : Radio
+  public let streamId                       : DaxIqStreamId
   public private(set) var rxLostPacketCount = 0       // Rx lost packet count
   
   // ------------------------------------------------------------------------------
@@ -39,7 +40,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   @Barrier(0, Api.objectQ)      var _daxIqChannel : DaxIqChannel  // Channel in use (1 - 4)
   @Barrier(false, Api.objectQ)  var _inUse                        // true = in use
   @Barrier("", Api.objectQ)     var _ip                           // Ip Address
-  @Barrier(0, Api.objectQ)      var _pan : PanadapterId           // Source Panadapter
+  @Barrier(0, Api.objectQ)      var _pan : PanadapterStreamId     // Source Panadapter
   @Barrier(0, Api.objectQ)      var _port                         // Port number
   @Barrier(0, Api.objectQ)      var _rate                         // Stream rate
   @Barrier(false, Api.objectQ)  var _streaming                    // Stream state
@@ -54,7 +55,6 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   private      var _kOneOverZeroDBfs : Float = 1.0 / pow(2.0, 15.0)
 
   private      let _log              = Log.sharedInstance
-  private      let _radio            : Radio
   
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
@@ -72,34 +72,34 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
     // Format: <streamId, > <"daxiq", value> <"pan", panStreamId> <"rate", value> <"ip", ip> <"port", port> <"streaming", 1|0> ,"capacity", value> <"available", value>
     
-    //get the StreamId (remove the "0x" prefix)
-    if let streamId =  UInt32(String(keyValues[0].key.dropFirst(2)), radix: 16) {
+    //get the Id
+    if let daxIqStreamId =  keyValues[0].key.streamId {
       
       // is the Stream in use?
       if inUse {
         
-        // YES, does the Stream exist?
-        if radio.iqStreams[streamId] == nil {
+        // YES, does the object exist?
+        if radio.iqStreams[daxIqStreamId] == nil {
           
           // NO, is this stream for this client?
           if !AudioStream.isStatusForThisClient(keyValues) { return }
           
-          // create a new Stream & add it to the Streams collection
-          radio.iqStreams[streamId] = IqStream(radio: radio, streamId: streamId)
+          // create a new object & add it to the collection
+          radio.iqStreams[daxIqStreamId] = IqStream(radio: radio, id: daxIqStreamId)
         }
-        // pass the remaining key values to the IqStream for parsing (dropping the Id)
-        radio.iqStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        // pass the remaining key values for parsing (dropping the Id)
+        radio.iqStreams[daxIqStreamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
         
       } else {
         
-        // does the stream exist?
-        if let stream = radio.iqStreams[streamId] {
+        // does the object exist?
+        if let stream = radio.iqStreams[daxIqStreamId] {
           
           // notify all observers
           NC.post(.iqStreamWillBeRemoved, object: stream as Any?)
           
-          // remove the stream object
-          radio.iqStreams[streamId] = nil
+          // remove the object
+          radio.iqStreams[daxIqStreamId] = nil
         }
       }
     }
@@ -108,21 +108,21 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
-  /// Find the IQ Stream for a DaxIqChannel
-  ///
-  /// - Parameters:
-  ///   - daxIqChannel:   a Dax IQ channel number
-  /// - Returns:          an IQ Stream reference (or nil)
-  ///
-  public class func find(on radio: Radio, with daxIqChannel: DaxIqChannel) -> IqStream? {
-
-    // find the IQ Streams with the specified Channel (if any)
-    let streams = radio.iqStreams.values.filter { $0.daxIqChannel == daxIqChannel }
-    guard streams.count >= 1 else { return nil }
-    
-    // return the first one
-    return streams[0]
-  }
+//  /// Find the IQ Stream for a DaxIqChannel
+//  ///
+//  /// - Parameters:
+//  ///   - daxIqChannel:   a Dax IQ channel number
+//  /// - Returns:          an IQ Stream reference (or nil)
+//  ///
+//  public class func find(on radio: Radio, with daxIqChannel: DaxIqChannel) -> IqStream? {
+//
+//    // find the IQ Streams with the specified Channel (if any)
+//    let streams = radio.iqStreams.values.filter { $0.daxIqChannel == daxIqChannel }
+//    guard streams.count >= 1 else { return nil }
+//    
+//    // return the first one
+//    return streams[0]
+//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -133,10 +133,10 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   ///   - id:                 the Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: DaxStreamId) {
+  init(radio: Radio, id: DaxIqStreamId) {
     
-    _radio = radio
-    self.streamId = streamId
+    self.radio = radio
+    self.streamId = id
     super.init()
   }
 
@@ -304,7 +304,7 @@ extension IqStream {
   @objc dynamic public var port: Int {
     return _port  }
   
-  @objc dynamic public var pan: PanadapterId {
+  @objc dynamic public var pan: PanadapterStreamId {
     return _pan }
   
   @objc dynamic public var streaming: Bool {

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias WaterfallId = StreamId
+public typealias WaterfallStreamId = StreamId
 
 /// Waterfall Class implementation
 ///
@@ -23,8 +23,8 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
     
-  public              let radio : Radio
-  public              let streamId : WaterfallId
+  public              let radio             : Radio
+  public              let streamId          : WaterfallStreamId
 
   public private(set) var packetFrame       = -1            // Frame index of next Vita payload
   public private(set) var droppedPackets    = 0             // Number of dropped (out of sequence) packets
@@ -40,7 +40,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   @Barrier(0, Api.objectQ)      var _colorGain
   @Barrier(0, Api.objectQ)      var _gradientIndex
   @Barrier(0, Api.objectQ)      var _lineDuration
-  @Barrier(0, Api.objectQ)      var _panadapterId : PanadapterId
+  @Barrier(0, Api.objectQ)      var _panadapterId : PanadapterStreamId
 
   private weak var _delegate : StreamHandler?
 
@@ -79,31 +79,31 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
     //      OR
     // Format: <"waterfall", ""> <streamId, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
     
-    // get the streamId
-    if let streamId = keyValues[1].key.streamId {
+    // get the Id
+    if let waterfallStreamId = keyValues[1].key.streamId {
       
       // is the Waterfall in use?
       if inUse {
         
         // YES, does it exist?
-        if radio.waterfalls[streamId] == nil {
+        if radio.waterfalls[waterfallStreamId] == nil {
           
           // NO, Create a Waterfall & add it to the Waterfalls collection
-          radio.waterfalls[streamId] = Waterfall(radio: radio, streamId: streamId)
+          radio.waterfalls[waterfallStreamId] = Waterfall(radio: radio, streamId: waterfallStreamId)
         }
         // pass the key values to the Waterfall for parsing (dropping the Type and Id)
-        radio.waterfalls[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
+        radio.waterfalls[waterfallStreamId]!.parseProperties(Array(keyValues.dropFirst(2)))
         
       } else {
         
         // notify all observers
-        NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[streamId] as Any?)
+        NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[waterfallStreamId] as Any?)
         
         // remove the associated Panadapter
-        radio.panadapters[radio.waterfalls[streamId]!.panadapterId] = nil
+        radio.panadapters[radio.waterfalls[waterfallStreamId]!.panadapterId] = nil
         
         // remove the Waterfall
-        radio.waterfalls[streamId] = nil
+        radio.waterfalls[waterfallStreamId] = nil
       }
     }
   }
@@ -117,7 +117,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   ///   - radio:      the Radio instance
   ///   - streamId:           a Waterfall Id
   ///
-  public init(radio: Radio, streamId: WaterfallId) {
+  public init(radio: Radio, streamId: WaterfallStreamId) {
     
     self.streamId = streamId
     self.radio = radio
@@ -233,7 +233,7 @@ extension Waterfall {
   @objc dynamic public var clientHandle: Handle {         // (V3 only)
     return _clientHandle }
   
-  @objc dynamic public var panadapterId: PanadapterId {
+  @objc dynamic public var panadapterId: PanadapterStreamId {
     return _panadapterId }
   
   // ----------------------------------------------------------------------------

@@ -9,7 +9,7 @@
 import Foundation
 import simd
 
-public typealias PanadapterId = StreamId
+public typealias PanadapterStreamId = StreamId
 
 /// Panadapter implementation
 ///
@@ -34,7 +34,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public                let radio : Radio
-  public                let streamId : PanadapterId
+  public                let streamId : PanadapterStreamId
 
   public                var isStreaming       = false
   public private(set)   var packetFrame       = -1                            // Frame index of next Vita payload
@@ -74,7 +74,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @Barrier("", Api.objectQ)         var _rfGainValues
   @Barrier("", Api.objectQ)         var _rxAnt
   @Barrier(false, Api.objectQ)      var _segmentZoomEnabled
-  @Barrier(0, Api.objectQ)          var _waterfallId : WaterfallId
+  @Barrier(0, Api.objectQ)          var _waterfallId : WaterfallStreamId
   @Barrier(false, Api.objectQ)      var _weightedAverageEnabled
   @Barrier(false, Api.objectQ)      var _wide
   @Barrier(false, Api.objectQ)      var _wnbEnabled
@@ -152,34 +152,34 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
-  /// Find the active Panadapter
-  ///
-  /// - Returns:      a reference to a Panadapter (or nil)
-  ///
-  public class func findActive(on radio: Radio) -> Panadapter? {
-
-    // find the Panadapters with an active Slice (if any)
-    let panadapters = radio.panadapters.values.filter { xLib6000.Slice.findActive(on: radio, and: $0.streamId) != nil }
-    guard panadapters.count >= 1 else { return nil }
-
-    // return the first one
-    return panadapters[0]
-  }
-  /// Find the Panadapter for a DaxIqChannel
-  ///
-  /// - Parameters:
-  ///   - daxIqChannel:   a Dax channel number
-  /// - Returns:          a Panadapter reference (or nil)
-  ///
-  public class func find(with channel: DaxIqChannel) -> Panadapter? {
-
-    // find the Panadapters with the specified Channel (if any)
-    let panadapters = Api.sharedInstance.radio!.panadapters.values.filter { $0.daxIqChannel == channel }
-    guard panadapters.count >= 1 else { return nil }
-    
-    // return the first one
-    return panadapters[0]
-  }
+//  /// Find the active Panadapter
+//  ///
+//  /// - Returns:      a reference to a Panadapter (or nil)
+//  ///
+//  public class func findActive(on radio: Radio) -> Panadapter? {
+//
+//    // find the Panadapters with an active Slice (if any)
+//    let panadapters = radio.panadapters.values.filter { radio.findActiveSlice(on: $0.streamId) != nil }
+//    guard panadapters.count >= 1 else { return nil }
+//
+//    // return the first one
+//    return panadapters[0]
+//  }
+//  /// Find the Panadapter for a DaxIqChannel
+//  ///
+//  /// - Parameters:
+//  ///   - daxIqChannel:   a Dax channel number
+//  /// - Returns:          a Panadapter reference (or nil)
+//  ///
+//  public class func find(with channel: DaxIqChannel) -> Panadapter? {
+//
+//    // find the Panadapters with the specified Channel (if any)
+//    let panadapters = Api.sharedInstance.radio!.panadapters.values.filter { $0.daxIqChannel == channel }
+//    guard panadapters.count >= 1 else { return nil }
+//    
+//    // return the first one
+//    return panadapters[0]
+//  }
 
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
@@ -190,7 +190,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - streamId:           a Panadapter Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: PanadapterId) {
+  init(radio: Radio, streamId: PanadapterStreamId) {
     
     self.radio = radio
     self.streamId = streamId
@@ -215,7 +215,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - responseValue:  the response value
   ///   - reply:          the reply
   ///
-  func replyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
+  func rfGainReplyHandler(_ command: String, sequenceNumber: SequenceNumber, responseValue: String, reply: String) {
 
     // Anything other than 0 is an error
     guard responseValue == Api.kNoError else {

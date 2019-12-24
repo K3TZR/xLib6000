@@ -14,6 +14,7 @@ public typealias KeyValuesArray = [(key:String, value:String)]
 public typealias ValuesArray = [String]
 public typealias StreamId = UInt32
 public typealias Handle = UInt32
+public typealias ObjectId = UInt16
 
 
 public extension Date {
@@ -111,18 +112,25 @@ public extension Sequence {
 
 public extension String {
   
-  /// Convert a String to a UInt32
+  /// Convert a String to a UInt16
   ///
-  /// - Returns:      the UInt32 equivalent or nil
+  /// - Returns:      the UInt6 equivalent or nil
   ///
-  var handle: Handle? {
-    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16)
+  var objectId: ObjectId? {
+    return UInt16(self, radix: 10)
   }
   /// Convert a String to a UInt32
   ///
   /// - Returns:      the UInt32 equivalent or nil
   ///
   var streamId: StreamId? {
+    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16)
+  }
+  /// Convert a String to a UInt32
+  ///
+  /// - Returns:      the UInt32 equivalent or nil
+  ///
+  var handle: Handle? {
     return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16)
   }
   /// Convert a Mhz string to a Hz Int
@@ -138,6 +146,13 @@ public extension String {
   ///
   var mhzToHzUInt : UInt {
     return UInt( (Double(self) ?? 0) * 1_000_000 )
+  }
+  /// Convert a String to a UInt16
+  ///
+  /// - Returns:      the UInt6 equivalent or nil
+  ///
+  var sequenceNumber: SequenceNumber {
+    return UInt(self, radix: 10) ?? 0
   }
   /// Return the Integer value (or 0 if invalid)
   ///
@@ -427,6 +442,10 @@ public extension UInt {
     return String(format: "%02.6f", Float(self) / 1_000_000.0)
   }
 }
+
+//public extension UInt16 {
+//  var 
+//}
 
 public extension UInt32 {
   

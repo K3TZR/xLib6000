@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias DaxStreamId = StreamId
+public typealias AudioStreamId = StreamId
 //public typealias DaxChannel = Int
 //public typealias DaxIqChannel = Int
 
@@ -31,8 +31,10 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var streamId : DaxStreamId = 0  // The Audio stream id
-  public private(set) var rxLostPacketCount = 0       // Rx lost packet count
+  public let radio                          : Radio
+  public let streamId                       : AudioStreamId
+  
+  public private(set) var rxLostPacketCount = 0
   
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -54,7 +56,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   private      var _rxSeq : Int?                    // Rx sequence number
 
   private      let _log = Log.sharedInstance
-  private      let _radio : Radio
 
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
@@ -72,34 +73,34 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
     // Format:  <streamId, > <"dax", channel> <"in_use", 1|0> <"slice", number> <"ip", ip> <"port", port>
     
-    //get the AudioStreamId
-    if let streamId =  keyValues[0].key.streamId {
+    //get the Id
+    if let audioStreamId =  keyValues[0].key.streamId {
       
       // is the AudioStream in use?
       if inUse {
         
-        // YES, does the AudioStream exist?
-        if radio.audioStreams[streamId] == nil {
+        // YES, does the object exist?
+        if radio.audioStreams[audioStreamId] == nil {
           
           // NO, is this stream for this client?
           if !AudioStream.isStatusForThisClient(keyValues) { return }
           
-          // create a new AudioStream & add it to the AudioStreams collection
-          radio.audioStreams[streamId] = AudioStream(radio: radio, streamId: streamId)
+          // create a new object & add it to the collection
+          radio.audioStreams[audioStreamId] = AudioStream(radio: radio, streamId: audioStreamId)
         }
-        // pass the remaining key values to the AudioStream for parsing
-        radio.audioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        // pass the remaining key values for parsing (dropping the Id)
+        radio.audioStreams[audioStreamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
         
       } else {
         
-        // does the stream exist?
-        if let stream = radio.audioStreams[streamId] {
+        // does the object exist?
+        if let stream = radio.audioStreams[audioStreamId] {
           
           // notify all observers
           NC.post(.audioStreamWillBeRemoved, object: stream as Any?)
           
-          // remove the stream object
-          radio.audioStreams[streamId] = nil
+          // remove the object
+          radio.audioStreams[audioStreamId] = nil
         }
       }
     }
@@ -187,9 +188,9 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   ///   - id:                 the Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: DaxStreamId) {
+  init(radio: Radio, streamId: AudioStreamId) {
     
-    _radio = radio
+    self.radio = radio
     self.streamId = streamId
     super.init()
   }
@@ -240,7 +241,9 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
         update(&_port, to: property.value.iValue, signal: \.port)
 
       case .slice:
-        update(&_slice, to: _radio.slices[property.value], signal: \.slice)
+        if let sliceId = property.value.objectId {
+          update(&_slice, to: radio.slices[sliceId], signal: \.slice)
+        }
 
         let gain = _rxGain
         _rxGain = 0
@@ -336,7 +339,7 @@ extension AudioStream {
       if _daxChannel != newValue {
         _daxChannel = newValue
 //        if _radio != nil {
-          slice = xLib6000.Slice.find(on: _radio, with: _daxChannel)
+        _slice = radio.findSlice(using: _daxChannel)
 //        }
       }
     }

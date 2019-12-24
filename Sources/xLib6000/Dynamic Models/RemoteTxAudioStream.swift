@@ -33,8 +33,9 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
+  public let radio                          : Radio
+  public let streamId                       : RemoteTxStreamId
   public var isStreaming                    = false
-  public private(set) var streamId          : RemoteTxStreamId              // The TxRemoteAudioStream StreamId
   
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -48,7 +49,6 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _radio                        : Radio
   private let _log                          = Log.sharedInstance
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -75,20 +75,20 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   class func parseStatus(_ properties: KeyValuesArray, radio: Radio, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "remote_audio_tx"> <"compression", "1"|"0"> <"client_handle", handle> <"ip", value>
 
-    // get the Stream Id
-    if let streamId =  properties[0].key.streamId {
+    // get the Id
+    if let remoteRxStreamId =  properties[0].key.streamId {
       
-      // does the Stream exist?
-      if radio.remoteTxAudioStreams[streamId] == nil {
+      // does the object exist?
+      if radio.remoteTxAudioStreams[remoteRxStreamId] == nil {
         
-        // exit if this stream is not for this client
+        // exit if the stream is not for this client
         if isForThisClient( properties ) == false { return }
 
-        // create a new Stream & add it to the collection
-        radio.remoteTxAudioStreams[streamId] = RemoteTxAudioStream(streamId: streamId, radio: radio)
+        // create a new object & add it to the collection
+        radio.remoteTxAudioStreams[remoteRxStreamId] = RemoteTxAudioStream(radio: radio, streamId: remoteRxStreamId)
       }
-      // pass the remaining key values to parsing
-      radio.remoteTxAudioStreams[streamId]!.parseProperties( Array(properties.dropFirst(2)) )
+      // pass the remaining key values for parsing (dropping the Id & Type)
+      radio.remoteTxAudioStreams[remoteRxStreamId]!.parseProperties( Array(properties.dropFirst(2)) )
     }
   }
 
@@ -101,10 +101,10 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   ///   - id:                 an Opus Stream id
   ///   - queue:              Concurrent queue
   ///
-  init(streamId: RemoteTxStreamId, radio: Radio) {
+  init(radio: Radio, streamId: RemoteTxStreamId) {
     
     self.streamId = streamId
-    _radio = radio
+    self.radio = radio
     super.init()
     
     isStreaming = false
@@ -121,7 +121,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   ///
   public func sendRemoteTxAudioStream(buffer: [UInt8], samples: Int) {
     
-    if _radio.interlock.state == "TRANSMITTING" {
+    if radio.interlock.state == "TRANSMITTING" {
     
       // get an OpusTx Vita
       if _vita == nil { _vita = Vita(type: .opusTx, streamId: streamId) }
@@ -140,7 +140,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       if let data = Vita.encodeAsData(_vita!) {
         
         // send packet to radio
-        _radio.sendVita(data)
+        radio.sendVita(data)
       }
       // increment the sequence number (mod 16)
       _txSeq = (_txSeq + 1) % 16

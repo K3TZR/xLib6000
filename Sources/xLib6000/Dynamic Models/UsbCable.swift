@@ -35,24 +35,24 @@ public final class UsbCable                 : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(false, Api.objectQ) var _autoReport                         //
-  @Barrier("", Api.objectQ)    var _band                             //
-  @Barrier(0, Api.objectQ)     var _dataBits                             //
-  @Barrier(false, Api.objectQ) var _enable                         //
-  @Barrier("", Api.objectQ)    var _flowControl                            //
-  @Barrier("", Api.objectQ)    var _name                            //
-  @Barrier("", Api.objectQ)    var _parity                           //
-  @Barrier(false, Api.objectQ) var _pluggedIn                         //
-  @Barrier("", Api.objectQ)    var _polarity                            //
-  @Barrier("", Api.objectQ)    var _preamp                             //
-  @Barrier("", Api.objectQ)    var _source                            //
-  @Barrier("", Api.objectQ)    var _sourceRxAnt                            //
-  @Barrier(0, Api.objectQ)     var _sourceSlice                             //
-  @Barrier("", Api.objectQ)    var _sourceTxAnt                            //
-  @Barrier(0, Api.objectQ)     var _speed                              //
-  @Barrier(0, Api.objectQ)     var _stopBits                             //
-  @Barrier(false, Api.objectQ) var _usbLog                         //
-  @Barrier("", Api.objectQ)    var _usbLogLine                           //
+  @Barrier(false, Api.objectQ) var _autoReport
+  @Barrier("", Api.objectQ)    var _band
+  @Barrier(0, Api.objectQ)     var _dataBits
+  @Barrier(false, Api.objectQ) var _enable
+  @Barrier("", Api.objectQ)    var _flowControl
+  @Barrier("", Api.objectQ)    var _name
+  @Barrier("", Api.objectQ)    var _parity
+  @Barrier(false, Api.objectQ) var _pluggedIn
+  @Barrier("", Api.objectQ)    var _polarity
+  @Barrier("", Api.objectQ)    var _preamp
+  @Barrier("", Api.objectQ)    var _source
+  @Barrier("", Api.objectQ)    var _sourceRxAnt
+  @Barrier(0, Api.objectQ)     var _sourceSlice
+  @Barrier("", Api.objectQ)    var _sourceTxAnt
+  @Barrier(0, Api.objectQ)     var _speed
+  @Barrier(0, Api.objectQ)     var _stopBits
+  @Barrier(false, Api.objectQ) var _usbLog
+  @Barrier("", Api.objectQ)    var _usbLogLine                           
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias MeterNumber = String
+public typealias MeterId = ObjectId
 public typealias MeterName = String
 
 /// Meter Class implementation
@@ -24,7 +24,8 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var number            : MeterNumber = ""              // Number that uniquely identifies this Meter
+  public let radio                          : Radio
+  public let id                             : MeterId
 
   @Barrier("", Api.objectQ) @objc dynamic public  var desc
   @Barrier(0, Api.objectQ) @objc dynamic public   var fps
@@ -104,7 +105,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
         
         // find the meter (if present) & update it
 //        if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", number)] {
-          if let meter = radio?.meters[String(format: "%i", number)] {
+          if let meter = radio?.meters[number] {
 
 //          // interpret it as a signed value
 //          meter.streamHandler( Int16(bitPattern: value) )
@@ -137,31 +138,33 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       if components.count != 2 {return }
       
       // the Meter Number is the 0th item
-      let number = components[0]
-      
-      // does the meter exist?
-      if radio.meters[number] == nil {
+      if let meterId = components[0].objectId {
         
-        // DOES NOT EXIST, create a new Meter & add it to the Meters collection
-        radio.meters[number] = Meter(number: number)
+        // does the meter exist?
+        if radio.meters[meterId] == nil {
+          
+          // DOES NOT EXIST, create a new Meter & add it to the Meters collection
+          radio.meters[meterId] = Meter(radio: radio, id: meterId)
+        }
+        
+        // pass the key values to the Meter for parsing
+        radio.meters[meterId]!.parseProperties( keyValues )
       }
-      
-      // pass the key values to the Meter for parsing
-      radio.meters[number]!.parseProperties( keyValues )
       
     } else {
       
-      // NOT IN USE, extract the Meter Number
-      let number = keyValues[0].key.components(separatedBy: " ")[0]
-      
-      // does it exist?
-      if let meter = radio.meters[number] {
+      // NOT IN USE, extract the Meter Id
+      if let meterId = keyValues[0].key.components(separatedBy: " ")[0].objectId {
         
-        // notify all observers
-        NC.post(.meterWillBeRemoved, object: meter as Any?)
-        
-        // remove it
-        radio.meters[number] = nil
+        // does it exist?
+        if let meter = radio.meters[meterId] {
+          
+          // notify all observers
+          NC.post(.meterWillBeRemoved, object: meter as Any?)
+          
+          // remove it
+          radio.meters[meterId] = nil
+        }
       }
     }
   }
@@ -169,34 +172,32 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
-  /// Find Meters by a Slice Id
-  ///
-  /// - Parameters:
-  ///   - sliceId:    a Slice id
-  /// - Returns:      an array of Meters
-  ///
-  public class func findBy(sliceId: SliceId, radio: Radio) -> [Meter] {
-    
-    // find the Meters on the specified Slice (if any)
-//    return Api.sharedInstance.radio!.meters.values.filter { $0.source == "slc" && $0.group == sliceId }
-    return radio.meters.values.filter { $0.source == "slc" && $0.group == sliceId }
-  }
-  /// Find a Meter by its ShortName
-  ///
-  /// - Parameters:
-  ///   - name:       Short Name of a Meter
-  /// - Returns:      a Meter reference
-  ///
-  public class func findBy(shortName name: MeterName, radio: Radio) -> Meter? {
-
-    // find the Meters with the specified Name (if any)
-//    let meters = Api.sharedInstance.radio!.meters.values.filter { $0.name == name }
-    let meters = radio.meters.values.filter { $0.name == name }
-    guard meters.count >= 1 else { return nil }
-    
-    // return the first one
-    return meters[0]
-  }
+//  /// Find Meters by a Slice Id
+//  ///
+//  /// - Parameters:
+//  ///   - sliceId:    a Slice id
+//  /// - Returns:      an array of Meters
+//  ///
+//  public class func findBy(sliceId: SliceId, radio: Radio) -> [Meter] {
+//    
+//    // find the Meters on the specified Slice (if any)
+//    return radio.meters.values.filter { $0.source == "slc" && $0.group.objectId == sliceId }
+//  }
+//  /// Find a Meter by its ShortName
+//  ///
+//  /// - Parameters:
+//  ///   - name:       Short Name of a Meter
+//  /// - Returns:      a Meter reference
+//  ///
+//  public class func findBy(shortName name: MeterName, radio: Radio) -> Meter? {
+//
+//    // find the Meters with the specified Name (if any)
+//    let meters = radio.meters.values.filter { $0.name == name }
+//    guard meters.count >= 1 else { return nil }
+//    
+//    // return the first one
+//    return meters[0]
+//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -208,9 +209,10 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   ///   - queue:              Concurrent queue
   ///   - log:                logging instance
   ///
-  public init(number: MeterNumber) {
+  public init(radio: Radio, id: MeterId) {
     
-    self.number = number
+    self.radio = radio
+    self.id = id
     
     // FIXME:
     

@@ -27,18 +27,18 @@ public final class Xvtr                     : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier("", Api.objectQ) var _name                                                    // Xvtr Name
-  @Barrier(0, Api.objectQ) var _ifFrequency                                              // If Frequency
-  @Barrier(false, Api.objectQ) var _inUse                                                //
-  @Barrier(false, Api.objectQ) var _isValid                                              //
-  @Barrier(0, Api.objectQ) var _loError                                                  //
-  @Barrier(0, Api.objectQ) var _maxPower                                                //
-  @Barrier(0, Api.objectQ) var _order                                                    //
-  @Barrier(false, Api.objectQ) var _preferred                                            //
-  @Barrier(0, Api.objectQ) var _rfFrequency                                              //
-  @Barrier(0, Api.objectQ) var _rxGain                                                   //
-  @Barrier(false, Api.objectQ) var _rxOnly                                               //
-  @Barrier(0, Api.objectQ) var _twoMeterInt                                              //
+  @Barrier("", Api.objectQ)     var _name
+  @Barrier(0, Api.objectQ)      var _ifFrequency
+  @Barrier(false, Api.objectQ)  var _inUse
+  @Barrier(false, Api.objectQ)  var _isValid
+  @Barrier(0, Api.objectQ)      var _loError
+  @Barrier(0, Api.objectQ)      var _maxPower
+  @Barrier(0, Api.objectQ)      var _order
+  @Barrier(false, Api.objectQ)  var _preferred
+  @Barrier(0, Api.objectQ)      var _rfFrequency
+  @Barrier(0, Api.objectQ)      var _rxGain
+  @Barrier(false, Api.objectQ)  var _rxOnly
+  @Barrier(0, Api.objectQ)      var _twoMeterInt
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

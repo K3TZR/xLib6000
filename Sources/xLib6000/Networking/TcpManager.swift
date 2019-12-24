@@ -9,8 +9,8 @@
 import Foundation
 import CocoaAsyncSocket
 
-public typealias ReplyHandler = (_ command: String, _ seqNum: String, _ responseValue: String, _ reply: String) -> Void
-public typealias SequenceId = String
+public typealias SequenceNumber = UInt
+public typealias ReplyHandler = (_ command: String, _ seqNumber: SequenceNumber, _ responseValue: String, _ reply: String) -> Void
 public typealias ReplyTuple = (replyTo: ReplyHandler?, command: String)
 
 ///  TcpManager Class implementation
@@ -36,23 +36,9 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   private var _tcpSocket                    : GCDAsyncSocket!               // GCDAsync TCP socket object
   private var _timeout                      = 0.0                           // timeout in seconds
 
-  private let _objectQ                      = DispatchQueue(label: Api.kName + ".tcpObjects")
+  @Barrier(false, Api.objectQ)  private var _isWan
+  @Barrier(0, Api.objectQ)      private var _seqNum : UInt
 
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
-  //
-  private var __isWan                       = false                         // is a TLS connection needed
-  private var __seqNum                      = 0                             // Sequence number
-  //
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
-
-  private var _isWan: Bool {
-    get { return _objectQ.sync { __isWan } }
-    set { _objectQ.sync( flags: .barrier){ __isWan = newValue } } }
-
-  private var _seqNum: Int {
-    get { return _objectQ.sync { __seqNum } }
-    set { _objectQ.sync( flags: .barrier){ __seqNum = newValue } } }
-  
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -153,16 +139,15 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
     // tell the socket to close
     _tcpSocket.disconnect()
   }
-  /// Send a Command to the Radio (hardware), optionally register to be Notified upon receipt of a Reply
+  /// Send a Command to the Radio (hardware)
   ///
   /// - Parameters:
   ///   - cmd:            a Command string
   ///   - diagnostic:     whether to add "D" suffix
-  ///   - replyTo:        ReplyHandler (if any)
   /// - Returns:          the Sequence Number of the Command
   ///
-  func send(_ cmd: String, diagnostic: Bool = false) -> Int {
-    var lastSeqNum = 0
+  func send(_ cmd: String, diagnostic: Bool = false) -> UInt {
+    var lastSeqNum : UInt = 0
     var command = ""
     
     _tcpSendQ.sync {
@@ -171,7 +156,7 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
       command =  "C" + "\(diagnostic ? "D" : "")" + "\(self._seqNum)|" + cmd + "\n"
       
       // send it, no timeout, tag = segNum
-      self._tcpSocket.write(command.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withTimeout: -1, tag: self._seqNum)
+      self._tcpSocket.write(command.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withTimeout: -1, tag: Int(self._seqNum))
       
       lastSeqNum = _seqNum
       

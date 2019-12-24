@@ -10,6 +10,7 @@ import Foundation
 
 public typealias DaxChannel = Int
 public typealias DaxIqChannel = Int
+public typealias DaxRxStreamId = StreamId
 
 /// DaxRxAudioStream Class implementation
 ///
@@ -24,8 +25,10 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var streamId : StreamId = 0 // The Audio stream id
-  public private(set) var rxLostPacketCount = 0   // Rx lost packet count
+  public let radio                  : Radio
+  public let streamId               : DaxRxStreamId
+  
+  public private(set) var rxLostPacketCount = 0
   
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -44,7 +47,6 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   private      var _initialized = false       // True if initialized by Radio hardware
   private      var _rxSeq : Int?              // Rx sequence number
 
-  private      let _radio : Radio
   private      let _log = Log.sharedInstance
 
   // ------------------------------------------------------------------------------
@@ -64,19 +66,19 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
     // Format:  <streamId, > <"type", "dax_rx"> <"dax_channel", channel> <"slice", sliceNumber> <"dax_clients", number> <"client_handle", handle>
     
     //get the StreamId
-    if let streamId =  properties[0].key.streamId {
+    if let daxRxStreamId =  properties[0].key.streamId {
       
       // does the Stream exist?
-      if radio.daxRxAudioStreams[streamId] == nil {
+      if radio.daxRxAudioStreams[daxRxStreamId] == nil {
         
         // exit if this stream is not for this client
         if isForThisClient( properties ) == false { return }
 
         // create a new Stream & add it to the collection
-        radio.daxRxAudioStreams[streamId] = DaxRxAudioStream(radio: radio, streamId: streamId)
+        radio.daxRxAudioStreams[daxRxStreamId] = DaxRxAudioStream(radio: radio, streamId: daxRxStreamId)
       }
-      // pass the remaining key values to parsing
-      radio.daxRxAudioStreams[streamId]!.parseProperties( Array(properties.dropFirst(2)) )
+      // pass the remaining key values for parsing (dropping the Id & Type)
+      radio.daxRxAudioStreams[daxRxStreamId]!.parseProperties( Array(properties.dropFirst(2)) )
     }
   }
   
@@ -129,10 +131,10 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   ///   - id:                 the Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: StreamId) {
+  init(radio: Radio, streamId: DaxRxStreamId) {
     
+    self.radio = radio
     self.streamId = streamId
-    _radio = radio
     super.init()
   }
 
@@ -176,7 +178,9 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
         update(&_daxClients, to: property.value.iValue, signal: \.daxClients)
 
       case .slice:
-        update(&_slice, to: _radio.slices[property.value], signal: \.slice)
+        if let sliceId = property.value.objectId {
+          update(&_slice, to: radio.slices[sliceId], signal: \.slice)
+        }
 
         let gain = _rxGain
         _rxGain = 0
@@ -276,7 +280,7 @@ extension DaxRxAudioStream {
       if _daxChannel != newValue {
         _daxChannel = newValue
 //        if _radio != nil {
-          slice = xLib6000.Slice.find(on: _radio, with: _daxChannel)
+        slice = radio.findSlice(using: _daxChannel)
 //        }
       }
     }

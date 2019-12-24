@@ -76,7 +76,7 @@ extension Panadapter {
   /// Request Rf Gain values
   ///
   public func requestRfGainInfo() {
-    Api.sharedInstance.send(Panadapter.kCmd + "rf_gain_info " + "\(streamId.hex)", replyTo: replyHandler)
+    Api.sharedInstance.send(Panadapter.kCmd + "rf_gain_info " + "\(streamId.hex)", replyTo: rfGainReplyHandler)
   }
 
   // ----------------------------------------------------------------------------

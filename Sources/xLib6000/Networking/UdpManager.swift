@@ -21,6 +21,11 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   static let kUdpSendPort                   : UInt16 = 4991
 
   // ----------------------------------------------------------------------------
+  // MARK: - Internal properties
+  
+  @Barrier(false, Api.objectQ) var udpSuccessfulRegistration
+  
+  // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
   private weak var _delegate                : UdpManagerDelegate?           // class to receive UDP data
@@ -39,18 +44,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   private let kRegisterCmd                  = "client udp_register handle"
   private let kRegistrationDelay            : UInt32 = 50_000
 
-  private let _objectQ                      = DispatchQueue(label: Api.kName + ".udpObjects")
   private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
-
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
-  //
-  private var __udpSuccessfulRegistration   = false
-  //
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
-  
-  private var _udpSuccessfulRegistration: Bool {
-    get { return _objectQ.sync { __udpSuccessfulRegistration } }
-    set { _objectQ.sync( flags: .barrier){ __udpSuccessfulRegistration = newValue } } }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -210,7 +204,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     // register & keep open the router (on a background queue)
     _udpRegisterQ.async { [unowned self] in
       
-      while self._udpSocket != nil && !self._udpSuccessfulRegistration && self._udpBound {
+      while self._udpSocket != nil && !self.udpSuccessfulRegistration && self._udpBound {
         
         // send a Registration command
         let cmd = self.kRegisterCmd + "=" + clientHandle!.hex
@@ -265,7 +259,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       guard CFSwapInt32BigToHost(vitaHeader.oui) == Vita.kFlexOui else { return }
 
       // we got a VITA packet which means registration was successful
-      self?._udpSuccessfulRegistration = true
+      self?.udpSuccessfulRegistration = true
 
       let packetType = (vitaHeader.packetDesc & 0xf0) >> 4
 

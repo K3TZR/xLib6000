@@ -55,7 +55,7 @@ final class Pinger {
   
   /// Process the Response to a Ping
   ///
-  func pingReply(_ command: String, seqNum: String, responseValue: String, reply: String) {
+  func pingReply(_ command: String, seqNum: UInt, responseValue: String, reply: String) {
     
     // notification can be used to signal that the Radio is now fully initialized
     if _pingFirstResponse { _pingFirstResponse = false ; NC.post(.tcpPingFirstResponse, object: nil) }

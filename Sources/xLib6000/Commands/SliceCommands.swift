@@ -49,7 +49,7 @@ extension Slice {
   ///
   public class func removeSlice(id: SliceId) {
     // tell the Radio to remove the Slice
-    Api.sharedInstance.send("slice remove " + id)
+    Api.sharedInstance.send("slice remove \(id)")
   }
 
   // ----------------------------------------------------------------------------

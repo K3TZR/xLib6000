@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias SliceId = String
+public typealias SliceId = ObjectId
 
 /// Slice Class implementation
 ///
@@ -86,7 +86,7 @@ public final class Slice                    : NSObject, DynamicModel {
   @Barrier(false, Api.objectQ)                    var _nrEnabled
   @Barrier(0, Api.objectQ)                        var _nr2
   @Barrier(0, Api.objectQ)                        var _owner
-  @Barrier(0, Api.objectQ)                        var _panadapterId : PanadapterId
+  @Barrier(0, Api.objectQ)                        var _panadapterId : PanadapterStreamId
   @Barrier(false, Api.objectQ)                    var _playbackEnabled
   @Barrier(false, Api.objectQ)                    var _postDemodBypassEnabled
   @Barrier(0, Api.objectQ)                        var _postDemodHigh
@@ -142,7 +142,7 @@ public final class Slice                    : NSObject, DynamicModel {
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
     
     // get the Slice Id
-    let sliceId = keyValues[0].key
+    if let sliceId = keyValues[0].key.objectId {
     
     // is the Slice in use?
     if inUse {
@@ -176,100 +176,101 @@ public final class Slice                    : NSObject, DynamicModel {
       radio.slices[sliceId] = nil
       
     }
+    }
   }
   
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
-  /// Disable all TxEnabled
-  ///
-  public class func disableTx(on radio: Radio) {
-    
-    // for all Slices, turn off txEnabled
-    for (_, slice) in radio.slices where slice.txEnabled {
-      
-      slice.txEnabled = false
-    }
-  }
-  /// Return references to all Slices on the specified Panadapter
-  ///
-  /// - Parameters:
-  ///   - pan:        a Panadapter Id
-  /// - Returns:      an array of Slices (may be empty)
-  ///
-  public class func findAll(on radio: Radio, and id: PanadapterId) -> [xLib6000.Slice] {
-    var sliceValues = [xLib6000.Slice]()
-    
-    // for all Slices on the specified Panadapter
-    for (_, slice) in radio.slices where slice.panadapterId == id {
-      
-      // append to the result
-      sliceValues.append(slice)
-    }
-    return sliceValues
-  }
-  /// Given a Frequency, return the Slice on the specified Panadapter containing it (if any)
-  ///
-  /// - Parameters:
-  ///   - pan:        a reference to A Panadapter
-  ///   - freq:       a Frequency (in hz)
-  /// - Returns:      a reference to a Slice (or nil)
-  ///
-  public class func find(on radio: Radio, and id: PanadapterId, byFrequency freq: Int, minWidth: Int) -> xLib6000.Slice? {
-    
-    // find the Slices on the Panadapter (if any)
-    let slices = radio.slices.values.filter { $0.panadapterId == id }
-    guard slices.count >= 1 else { return nil }
-    
-    // find the ones in the frequency range
-    let selected = slices.filter { freq >= $0.frequency + min(-minWidth/2, $0.filterLow) && freq <= $0.frequency + max(minWidth/2, $0.filterHigh)}
-    guard selected.count >= 1 else { return nil }
-    
-    // return the first one
-    return selected[0]
-  }
-  /// Return the Active Slice (if any)
-  ///
-  /// - Returns:      a Slice reference (or nil)
-  ///
-  public class func findActive(on radio: Radio) -> xLib6000.Slice? {
-
-    // find the active Slices (if any)
-    let slices = radio.slices.values.filter { $0.active }
-    guard slices.count >= 1 else { return nil }
-    
-    // return the first one
-    return slices[0]
-  }
-  /// Return the Active Slice on the specified Panadapter (if any)
-  ///
-  /// - Parameters:
-  ///   - pan:        a Panadapter reference
-  /// - Returns:      a Slice reference (or nil)
-  ///
-  public class func findActive(on radio: Radio, and id: PanadapterId) -> xLib6000.Slice? {
-    
-    // find the active Slices on the specified Panadapter (if any)
-    let slices = Api.sharedInstance.radio!.slices.values.filter { $0.active && $0.panadapterId == id }
-    guard slices.count >= 1 else { return nil }
-    
-    // return the first one
-    return slices[0]
-  }
-  /// Find a Slice by DAX Channel
-  ///
-  /// - Parameter channel:    Dax channel number
-  /// - Returns:              a Slice (if any)
-  ///
-  public class func find(on radio: Radio, with channel: DaxChannel) -> xLib6000.Slice? {
-
-    // find the Slices with the specified Channel (if any)
-    let slices = radio.slices.values.filter { $0.daxChannel == channel }
-    guard slices.count >= 1 else { return nil }
-    
-    // return the first one
-    return slices[0]
-  }
+//  /// Disable all TxEnabled
+//  ///
+//  public class func disableTx(on radio: Radio) {
+//    
+//    // for all Slices, turn off txEnabled
+//    for (_, slice) in radio.slices where slice.txEnabled {
+//      
+//      slice.txEnabled = false
+//    }
+//  }
+//  /// Return references to all Slices on the specified Panadapter
+//  ///
+//  /// - Parameters:
+//  ///   - pan:        a Panadapter Id
+//  /// - Returns:      an array of Slices (may be empty)
+//  ///
+//  public class func findAll(on radio: Radio, and id: PanadapterStreamId) -> [xLib6000.Slice] {
+//    var sliceValues = [xLib6000.Slice]()
+//    
+//    // for all Slices on the specified Panadapter
+//    for (_, slice) in radio.slices where slice.panadapterId == id {
+//      
+//      // append to the result
+//      sliceValues.append(slice)
+//    }
+//    return sliceValues
+//  }
+//  /// Given a Frequency, return the Slice on the specified Panadapter containing it (if any)
+//  ///
+//  /// - Parameters:
+//  ///   - pan:        a reference to A Panadapter
+//  ///   - freq:       a Frequency (in hz)
+//  /// - Returns:      a reference to a Slice (or nil)
+//  ///
+//  public class func find(on radio: Radio, and id: PanadapterStreamId, byFrequency freq: Int, minWidth: Int) -> xLib6000.Slice? {
+//    
+//    // find the Slices on the Panadapter (if any)
+//    let slices = radio.slices.values.filter { $0.panadapterId == id }
+//    guard slices.count >= 1 else { return nil }
+//    
+//    // find the ones in the frequency range
+//    let selected = slices.filter { freq >= $0.frequency + min(-minWidth/2, $0.filterLow) && freq <= $0.frequency + max(minWidth/2, $0.filterHigh)}
+//    guard selected.count >= 1 else { return nil }
+//    
+//    // return the first one
+//    return selected[0]
+//  }
+//  /// Return the Active Slice (if any)
+//  ///
+//  /// - Returns:      a Slice reference (or nil)
+//  ///
+//  public class func findActive(on radio: Radio) -> xLib6000.Slice? {
+//
+//    // find the active Slices (if any)
+//    let slices = radio.slices.values.filter { $0.active }
+//    guard slices.count >= 1 else { return nil }
+//    
+//    // return the first one
+//    return slices[0]
+//  }
+//  /// Return the Active Slice on the specified Panadapter (if any)
+//  ///
+//  /// - Parameters:
+//  ///   - pan:        a Panadapter reference
+//  /// - Returns:      a Slice reference (or nil)
+//  ///
+//  public class func findActive(on radio: Radio, and id: PanadapterStreamId) -> xLib6000.Slice? {
+//    
+//    // find the active Slices on the specified Panadapter (if any)
+//    let slices = Api.sharedInstance.radio!.slices.values.filter { $0.active && $0.panadapterId == id }
+//    guard slices.count >= 1 else { return nil }
+//    
+//    // return the first one
+//    return slices[0]
+//  }
+//  /// Find a Slice by DAX Channel
+//  ///
+//  /// - Parameter channel:    Dax channel number
+//  /// - Returns:              a Slice (if any)
+//  ///
+//  public class func find(on radio: Radio, with channel: DaxChannel) -> xLib6000.Slice? {
+//
+//    // find the Slices with the specified Channel (if any)
+//    let slices = radio.slices.values.filter { $0.daxChannel == channel }
+//    guard slices.count >= 1 else { return nil }
+//    
+//    // return the first one
+//    return slices[0]
+//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -740,7 +741,7 @@ extension Slice {
     get { return _owner }
     set { if _owner != newValue { _owner = newValue } } }
   
-  @objc dynamic public var panadapterId: PanadapterId {
+  @objc dynamic public var panadapterId: PanadapterStreamId {
     get { return _panadapterId }
     set {if _panadapterId != newValue {  _panadapterId = newValue } } }
   

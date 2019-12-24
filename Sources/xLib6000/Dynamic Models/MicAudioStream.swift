@@ -20,7 +20,8 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var streamId          : DaxStreamId = 0               // Mic Audio streamId
+  public let radio                          : Radio
+  public let streamId                       : DaxMicStreamId
   public var rxLostPacketCount              = 0                             // Rx lost packet count
   
   // ------------------------------------------------------------------------------
@@ -65,33 +66,33 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
     // Format:  <streamId, > <"in_use", 1|0> <"ip", ip> <"port", port>
     
     //get the MicAudioStreamId (remove the "0x" prefix)
-    if let streamId =  keyValues[0].key.streamId {
+    if let daxMicStreamId =  keyValues[0].key.streamId {
       
       // is the Stream in use?
       if inUse {
         
-        // YES, does the MicAudioStream exist?
-        if radio.micAudioStreams[streamId] == nil {
+        // YES, does the object exist?
+        if radio.micAudioStreams[daxMicStreamId] == nil {
           
           // NO, is this stream for this client?
           if !AudioStream.isStatusForThisClient(keyValues) { return }
           
-          // create a new MicAudioStream & add it to the MicAudioStreams collection
-          radio.micAudioStreams[streamId] = MicAudioStream(streamId: streamId)
+          // create a new object & add it to the collection
+          radio.micAudioStreams[daxMicStreamId] = MicAudioStream(radio: radio, id: daxMicStreamId)
         }
-        // pass the remaining key values to the MicAudioStream for parsing (dropping the Id)
-        radio.micAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        // pass the remaining key values for parsing (dropping the Id)
+        radio.micAudioStreams[daxMicStreamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
         
       } else {
         
-        // does the stream exist?
-        if let stream = radio.micAudioStreams[streamId] {
+        // does the object exist?
+        if let stream = radio.micAudioStreams[daxMicStreamId] {
           
           // notify all observers
           NC.post(.micAudioStreamWillBeRemoved, object: stream as Any?)
           
-          // remove the stream object
-          radio.micAudioStreams[streamId] = nil
+          // remove the object
+          radio.micAudioStreams[daxMicStreamId] = nil
         }
       }
     }
@@ -106,9 +107,10 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   ///   - id:                 a Dax Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(streamId: DaxStreamId) {
+  init(radio: Radio, id: DaxMicStreamId) {
     
-    self.streamId = streamId
+    self.radio = radio
+    streamId = id
     super.init()
   }
   

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias TnfId = UInt
+public typealias TnfId = ObjectId
 
 /// TNF Class implementation
 ///
@@ -28,13 +28,12 @@ public final class Tnf                      : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                             : TnfId                         // Id that uniquely identifies this Tnf
+  public let radio                          : Radio
+  public let tnfId                          : TnfId
 
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  let _radio                                : Radio
-
   @BarrierClamped(0, Api.objectQ, range: kWidthMin...kWidthMax) var _width : UInt
   @BarrierClamped(Tnf.Depth.normal.rawValue, Api.objectQ, range: Depth.normal.rawValue...Depth.veryDeep.rawValue)  var _depth : UInt
 
@@ -63,49 +62,50 @@ public final class Tnf                      : NSObject, DynamicModel {
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
     
     // get the Tnf Id as a UInt
-    let tnfId = keyValues[0].key.uValue
-    
-    // is the Tnf in use?
-    if inUse {
+    if let tnfId = keyValues[0].key.objectId {
       
-      // does the TNF exist?
-      if radio.tnfs[tnfId] == nil {
+      // is the Tnf in use?
+      if inUse {
         
-        // NO, create a new Tnf & add it to the Tnfs collection
-        radio.tnfs[tnfId] = Tnf(radio: radio, id: tnfId)
+        // does the TNF exist?
+        if radio.tnfs[tnfId] == nil {
+          
+          // NO, create a new Tnf & add it to the Tnfs collection
+          radio.tnfs[tnfId] = Tnf(radio: radio, id: tnfId)
+        }
+        // pass the remaining key values to the Tnf for parsing (dropping the Id)
+        radio.tnfs[tnfId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        
+      } else {
+        
+        // NO, notify all observers
+        NC.post(.tnfWillBeRemoved, object: radio.tnfs[tnfId] as Any?)
+        
+        // remove it
+        radio.tnfs[tnfId]  = nil
       }
-      // pass the remaining key values to the Tnf for parsing (dropping the Id)
-      radio.tnfs[tnfId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-
-    } else {
-      
-      // NO, notify all observers
-      NC.post(.tnfWillBeRemoved, object: radio.tnfs[tnfId] as Any?)
-      
-      // remove it
-      radio.tnfs[tnfId]  = nil
     }
   }
   
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
-  /// Given a Frequency, return a reference to the Tnf containing it (if any)
-  ///
-  /// - Parameters:
-  ///   - freq:       a Frequency (in hz)
-  ///   - bandwidth:  panadapter bandwidth (hz)
-  /// - Returns:      a Tnf reference (or nil)
-  ///
-  class public func findBy(frequency freq: UInt, minWidth: UInt) -> Tnf? {
-
-    // return the Tnfs within the specified Frequency / minimum width (if any)
-    let tnfs = Api.sharedInstance.radio!.tnfs.values.filter { freq >= ($0.frequency - max(minWidth, $0.width/2)) && freq <= ($0.frequency + max(minWidth, $0.width/2)) }
-    guard tnfs.count >= 1 else { return nil }
-    
-    // return the first one
-    return tnfs[0]
-  }
+//  /// Given a Frequency, return a reference to the Tnf containing it (if any)
+//  ///
+//  /// - Parameters:
+//  ///   - freq:       a Frequency (in hz)
+//  ///   - bandwidth:  panadapter bandwidth (hz)
+//  /// - Returns:      a Tnf reference (or nil)
+//  ///
+//  class public func findBy(frequency freq: UInt, minWidth: UInt) -> Tnf? {
+//
+//    // return the Tnfs within the specified Frequency / minimum width (if any)
+//    let tnfs = radio.tnfs.values.filter { freq >= ($0.frequency - max(minWidth, $0.width/2)) && freq <= ($0.frequency + max(minWidth, $0.width/2)) }
+//    guard tnfs.count >= 1 else { return nil }
+//    
+//    // return the first one
+//    return tnfs[0]
+//  }
 
   // FIXME: should this be a class func ???
 
@@ -175,43 +175,15 @@ public final class Tnf                      : NSObject, DynamicModel {
   /// Initialize a Tnf
   ///
   /// - Parameters:
+  ///   - radio:              radio containing Tnf
   ///   - id:                 a Tnf Id
-  ///   - queue:              Concurrent queue
   ///
-  public convenience init(radio: Radio, id: TnfId) {
-    self.init(radio: radio, id: id, frequency: 0, depth: Tnf.Depth.normal.rawValue, width: 0, permanent: false)
-  }
-  /// Initialize a Tnf
-  ///
-  /// - Parameters:
-  ///   - id:                 a Tnf Id
-  ///   - frequency:          Tnf frequency (Hz)
-  ///   - queue:              Concurrent queue
-  ///
-  public convenience init(radio: Radio, id: TnfId, frequency: UInt) {
-    self.init(radio: radio, id: id, frequency: frequency, depth: Tnf.Depth.normal.rawValue, width: 0, permanent: false)
-  }
-  /// Initialize a Tnf
-  ///
-  /// - Parameters:
-  ///   - id:                 a Tnf Id
-  ///   - frequency:          Tnf frequency (Hz)
-  ///   - depth:              a Depth value
-  ///   - width:              a Width value
-  ///   - permanent:          true = permanent
-  ///   - queue:              Concurrent queue
-  ///
-  public init(radio: Radio, id: TnfId, frequency: UInt, depth: UInt, width: UInt, permanent: Bool) {
+  public init(radio: Radio, id: TnfId) {
     
-    _radio = radio
-    self.id = id
+    self.radio = radio
+    self.tnfId = id
     
     super.init()
-    
-    self.frequency = frequency
-    self.depth = depth
-    self.width = width
-    self.permanent = permanent
   }
   
   // ------------------------------------------------------------------------------

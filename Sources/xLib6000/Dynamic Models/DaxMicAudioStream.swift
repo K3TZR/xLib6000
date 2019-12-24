@@ -6,6 +6,8 @@
 //  Copyright © 2017 Douglas Adams & Mario Illgen. All rights reserved.
 //
 
+public typealias DaxMicStreamId = StreamId
+
 import Cocoa
 
 /// DaxMicAudioStream Class implementation
@@ -16,12 +18,14 @@ import Cocoa
 ///      objects periodically receive Mic Audio in a UDP stream. They are collected
 ///      in the daxMicAudioStreams collection on the Radio object.
 ///
-public final class DaxMicAudioStream : NSObject, DynamicModelWithStream {
+public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var streamId : StreamId = 0 // The Mic Audio stream id
+  public let radio                    : Radio
+  public let streamId                 : DaxMicStreamId
+  
   public              var rxLostPacketCount  = 0  // Rx lost packet count
   
   // ------------------------------------------------------------------------------
@@ -57,20 +61,20 @@ public final class DaxMicAudioStream : NSObject, DynamicModelWithStream {
   class func parseStatus(_ properties: KeyValuesArray, radio: Radio, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_mic"> <"client_handle", handle>
     
-    // get the StreamId
-    if let streamId = properties[0].key.streamId {
+    // get the Id
+    if let daxMicStreamId = properties[0].key.streamId {
       
-      // does the Stream exist?
-      if radio.daxMicAudioStreams[streamId] == nil {
+      // does the object exist?
+      if radio.daxMicAudioStreams[daxMicStreamId] == nil {
         
         // exit if this stream is not for this client
         if isForThisClient( properties ) == false { return }
 
-        // create a new Stream & add it to the collection
-        radio.daxMicAudioStreams[streamId] = DaxMicAudioStream(streamId: streamId)
+        // create a new object & add it to the collection
+        radio.daxMicAudioStreams[daxMicStreamId] = DaxMicAudioStream(radio: radio, streamId: daxMicStreamId)
       }
-      // pass the remaining key values to parsing
-      radio.daxMicAudioStreams[streamId]!.parseProperties( Array(properties.dropFirst(1)) )
+      // pass the remaining key values for parsing (dropping the Id)
+      radio.daxMicAudioStreams[daxMicStreamId]!.parseProperties( Array(properties.dropFirst(1)) )
     }
   }
 
@@ -83,8 +87,9 @@ public final class DaxMicAudioStream : NSObject, DynamicModelWithStream {
   ///   - id:                 a Dax Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(streamId: StreamId) {
+  init(radio: Radio, streamId: DaxMicStreamId) {
     
+    self.radio = radio
     self.streamId = streamId
     super.init()
   }

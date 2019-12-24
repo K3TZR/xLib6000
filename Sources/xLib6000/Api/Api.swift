@@ -28,6 +28,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public static let kDaxIqChannels          = ["None", "1", "2", "3", "4"]
   public static let kNoError                = "0"
 
+  static let objectQ                        = DispatchQueue(label: Api.kName + ".objectQ", attributes: [.concurrent])
   static let kTcpTimeout                    = 0.5                           // seconds
   static let kControlMin                    = 0                             // control ranges
   static let kControlMax                    = 100
@@ -45,9 +46,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var apiState                       : Api.State! {
     didSet { _log.msg( "Api state = \(apiState.rawValue)", level: .debug, function: #function, file: #file, line: #line)}}
 
-//  public var availableRadios                : [RadioParameters] {           // Radios discovered
-//    return _radioFactory.availableRadios }
-
   public var delegate                       : ApiDelegate?                  // API delegate
   public var testerModeEnabled              = false                         // Library being used by xAPITester
   public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
@@ -57,11 +55,15 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var wanConnectionHandle            = ""                            // Wan connection handle
   public var connectionHandle               : Handle?                       // Status messages handle
 
+  @Barrier("0.0.0.0", Api.objectQ)            public var localIP
+  @Barrier(0, Api.objectQ)                    public var localUDPPort: UInt16
+  @Barrier([Handle:GuiClient](), Api.objectQ) public var guiClients
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _tcp                          : TcpManager!                   // TCP connection class (commands)
-  private var _udp                          : UdpManager!                   // UDP connection class (streams)
+  internal var _tcp                          : TcpManager!                   // TCP connection class (commands)
+  internal var _udp                          : UdpManager!                   // UDP connection class (streams)
   private var _primaryCmdTypes              = [Api.Command]()               // Primary command types to be sent
   private var _secondaryCmdTypes            = [Api.Command]()               // Secondary command types to be sent
   private var _subscriptionCmdTypes         = [Api.Command]()               // Subscription command types to be sent
@@ -70,12 +72,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private var _secondaryCommands            = [CommandTuple]()              // Secondary commands to be sent
   private var _subscriptionCommands         = [CommandTuple]()              // Subscription commands to be sent
   private let _clientIpSemaphore            = DispatchSemaphore(value: 0)   // semaphore to signal that we have got the client ip
-
-  // GCD Concurrent Queue
-//  private let _objectQ                      = DispatchQueue(label: Api.kName + ".objectQ", attributes: [.concurrent])
-
-  static let objectQ                        = DispatchQueue(label: Api.kName + ".objectQ", attributes: [.concurrent])
-
   
   // GCD Serial Queues
   private let _tcpReceiveQ                  = DispatchQueue(label: Api.kName + ".tcpReceiveQ")
@@ -86,7 +82,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private let _parseQ                       = DispatchQueue(label: Api.kName + ".parseQ", qos: .userInteractive)
   private let _workerQ                      = DispatchQueue(label: Api.kName + ".workerQ")
 
-//  private var _radioFactory                 = RadioFactory()                // Radio Factory class
   private var _pinger                       : Pinger?                       // Pinger class
   private var _clientId                     : UUID?                         // Unique Id (V3 only)
   private var _clientProgram                = ""                            // Client program
@@ -95,14 +90,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private var _lowBW                        = false                         // low bandwidth connect
 
   private let _log                          = Log.sharedInstance
-
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
-  //
-  private var _localIP                      = "0.0.0.0"                     // client IP for radio
-  private var _localUDPPort                 : UInt16 = 0                    // bound UDP port
-  private var _guiClients                   = [Handle:GuiClient]()          // Dictionary of Gui Clients (V3 only)
-  //
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
 
   // ----------------------------------------------------------------------------
   // MARK: - Singleton
@@ -232,13 +219,13 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public func send(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) {
     
     // tell the TcpManager to send the command
-    let seqNumber = _tcp.send(command, diagnostic: flag)
+    let sequenceNumber = _tcp.send(command, diagnostic: flag)
 
     // register to be notified when reply received
-    delegate?.addReplyHandler( String(seqNumber), replyTuple: (replyTo: callback, command: command) )
+    delegate?.addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
     
     // pass it to xAPITester (if present)
-    testerDelegate?.addReplyHandler( String(seqNumber), replyTuple: (replyTo: callback, command: command) )
+    testerDelegate?.addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
   }
   /// Send a command to the Radio (hardware), first check that a Radio is connected
   ///
@@ -474,7 +461,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///   - responseValue:          the response contained in the Reply to the Command
   ///   - reply:                  the descriptive text contained in the Reply to the Command
   ///
-  private func clientIpReplyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
+  private func clientIpReplyHandler(_ command: String, seqNum: UInt, responseValue: String, reply: String) {
     
     // was an error code returned?
     if responseValue == Api.kNoError {
@@ -667,21 +654,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 }
 
 extension Api {
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
-  
-  public var guiClients: [Handle:GuiClient] {
-    get { return Api.objectQ.sync { _guiClients } }
-    set { Api.objectQ.sync(flags: .barrier) { _guiClients = newValue } } }
-  
-  public var localIP: String {
-    get { return Api.objectQ.sync { _localIP } }
-    set { Api.objectQ.sync(flags: .barrier) { _localIP = newValue } } }
-  
-  public var localUDPPort: UInt16 {
-    get { return Api.objectQ.sync { _localUDPPort } }
-    set { Api.objectQ.sync(flags: .barrier) { _localUDPPort = newValue } } }
 
   // ----------------------------------------------------------------------------
   // MARK: - Enums

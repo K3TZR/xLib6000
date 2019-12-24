@@ -47,10 +47,22 @@ public struct WanTestConnectionResults {
 ///      to get access to a remote Flexradio
 ///
 public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
-
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
   static let kAddress                       = "smartlink.flexradio.com"
   static let kPort                          = 443
+  static let pingQ                          = DispatchQueue(label: Api.kName + ".WanServer.pingQ")
+  static let socketQ                        = DispatchQueue(label: Api.kName + ".WanServer.socketQ")
+  
   public static let kDefaultTimeout         = 0.5
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Internal properties
+  
+  @Barrier(false, Api.objectQ)  var _isConnected
+  @Barrier("", Api.objectQ)     var _sslClientPublicIp
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -69,9 +81,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   private var _tlsSocket                    : GCDAsyncSocket!
   private var _token                        = ""
 
-  private let _objectQ                      = DispatchQueue(label: Api.kName + ".WanServer.objectQ")
-  private let _pingQ                        = DispatchQueue(label: Api.kName + ".WanServer.pingQ")
-  private let _socketQ                      = DispatchQueue(label: Api.kName + ".WanServer.socketQ")
+//  private let _objectQ                      = DispatchQueue(label: Api.kName + ".WanServer.objectQ")
 
   private let kAppConnectCmd                = "application connect serial"
   private let kAppRegisterCmd               = "application register name"
@@ -86,8 +96,8 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
-  private var __isConnected                 = false
-  private var __sslClientPublicIp           = ""                            // public IP of the radio
+//  private var __isConnected                 = false
+//  private var __sslClientPublicIp           = ""                            // public IP of the radio
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
 
@@ -102,7 +112,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     super.init()
     
     // get a WAN server socket & set it's parameters
-    _tlsSocket = GCDAsyncSocket(delegate: self, delegateQueue: _socketQ)
+    _tlsSocket = GCDAsyncSocket(delegate: self, delegateQueue: WanServer.socketQ)
     _tlsSocket.isIPv4PreferredOverIPv6 = true
     _tlsSocket.isIPv6Enabled = false
   }
@@ -524,7 +534,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   private func startPinging() {
     
     // create the timer's dispatch source
-    _pingTimer = DispatchSource.makeTimerSource(flags: [.strict], queue: _pingQ)
+    _pingTimer = DispatchSource.makeTimerSource(flags: [.strict], queue: WanServer.pingQ)
     
     // Set timer to start in 5 seconds and repeat every 10 seconds with 100 millisecond leeway
     _pingTimer?.schedule(deadline: DispatchTime.now() + DispatchTimeInterval.seconds(5), repeating: .seconds(10), leeway: .milliseconds(100))      // Every 10 seconds +/- 100ms
@@ -656,13 +666,13 @@ extension WanServer {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _isConnected: Bool {
-    get { return _objectQ.sync { __isConnected } }
-    set { _objectQ.sync(flags: .barrier) { __isConnected = newValue } } }
-  
-  private var _sslClientPublicIp: String {
-    get { return _objectQ.sync { __sslClientPublicIp } }
-    set { _objectQ.sync(flags: .barrier) { __sslClientPublicIp = newValue } } }
+//  private var _isConnected: Bool {
+//    get { return _objectQ.sync { __isConnected } }
+//    set { _objectQ.sync(flags: .barrier) { __isConnected = newValue } } }
+//
+//  private var _sslClientPublicIp: String {
+//    get { return _objectQ.sync { __sslClientPublicIp } }
+//    set { _objectQ.sync(flags: .barrier) { __sslClientPublicIp = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)

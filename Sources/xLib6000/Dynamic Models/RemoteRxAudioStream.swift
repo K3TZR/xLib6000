@@ -36,8 +36,9 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
+  public let radio                          : Radio
+  public let streamId                       : RemoteRxStreamId
   public var isStreaming                    = false
-  public private(set) var streamId          : RemoteRxStreamId              // The RxRemoteAudioStream StreamId
   
   // ------------------------------------------------------------------------------
   // MARK: - Interna; properties
@@ -77,20 +78,20 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   class func parseStatus(_ properties: KeyValuesArray, radio: Radio, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "remote_audio_rx"> <"compression", "none"|"opus"> <"client_handle", handle> <"ip", ip>
     
-    // get the Stream Id
-    if let streamId = properties[0].key.streamId {
+    // get the Id
+    if let remoteRxStreamId = properties[0].key.streamId {
       
-      // does the Stream exist?
-      if  radio.remoteRxAudioStreams[streamId] == nil {
+      // does the object exist?
+      if  radio.remoteRxAudioStreams[remoteRxStreamId] == nil {
         
         // exit if this stream is not for this client
         if isForThisClient( properties ) == false { return }
 
-        // create a new Stream & add it to the collection
-        radio.remoteRxAudioStreams[streamId] = RemoteRxAudioStream(streamId: streamId)
+        // create a new object & add it to the collection
+        radio.remoteRxAudioStreams[remoteRxStreamId] = RemoteRxAudioStream(radio: radio, streamId: remoteRxStreamId)
       }
-      // pass the remaining key values to parsing
-      radio.remoteRxAudioStreams[streamId]!.parseProperties( Array(properties.dropFirst(2)) )
+      // pass the remaining key values for parsing (dropping the Id & Type)
+      radio.remoteRxAudioStreams[remoteRxStreamId]!.parseProperties( Array(properties.dropFirst(2)) )
     }
   }
 
@@ -103,8 +104,9 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   ///   - id:                 an Opus Stream id
   ///   - queue:              Concurrent queue
   ///
-  init(streamId: RemoteRxStreamId) {
+  init(radio: Radio, streamId: RemoteRxStreamId) {
     
+    self.radio = radio
     self.streamId = streamId
     super.init()
     

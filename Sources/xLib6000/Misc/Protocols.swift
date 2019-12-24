@@ -46,7 +46,7 @@ protocol StaticModel                        : class {
 ///   Dynamic Model object properties are set in the instance's parseProperties method.
 ///
 protocol DynamicModel                       : StaticModel {
-  
+    
   /// Parse <key=value> arrays to determine object status
   ///
   /// - Parameters:
@@ -100,10 +100,10 @@ public protocol ApiDelegate {
   /// A command sent to the Radio (hardware) needs to register a Reply Handler
   ///
   /// - Parameters:
-  ///   - sequenceId:             the sequence number of the Command
+  ///   - sequenceNumber:         the sequence number of the Command
   ///   - replyTuple:             a Reply Tuple
   ///
-  func addReplyHandler(_ sequenceId: SequenceId, replyTuple: ReplyTuple)
+  func addReplyHandler(_ sequenceNumber: SequenceNumber, replyTuple: ReplyTuple)
   
   /// The default Reply Handler (to process replies to Commands sent to the Radio hardware)
   ///
@@ -113,7 +113,7 @@ public protocol ApiDelegate {
   ///   - responseValue:          the response contined in the Reply to the Command
   ///   - reply:                  the descriptive text contained in the Reply to the Command
   ///
-  func defaultReplyHandler(_ command: String, seqNum: String, responseValue: String, reply: String)
+  func defaultReplyHandler(_ command: String, sequenceNumber: SequenceNumber, responseValue: String, reply: String)
   
   /// Process received UDP Vita packets
   ///

@@ -6,6 +6,8 @@
 //  Copyright © 2017 Douglas Adams & Mario Illgen. All rights reserved.
 //
 
+public typealias DaxIqStreamId = StreamId
+
 import Foundation
 import Accelerate
 
@@ -22,15 +24,17 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var streamId          : StreamId = 0  // Stream Id
-  public private(set) var rxLostPacketCount = 0             // Rx lost packet count
+  public let radio                          : Radio
+  public let streamId                       : DaxIqStreamId
+  
+  public private(set) var rxLostPacketCount = 0
   
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
   @Barrier(0, Api.objectQ)      var _channel : DaxIqChannel
   @Barrier(0, Api.objectQ)      var _clientHandle : Handle
-  @Barrier(0, Api.objectQ)      var _pan : PanadapterId
+  @Barrier(0, Api.objectQ)      var _pan : PanadapterStreamId
   @Barrier(0, Api.objectQ)      var _rate
   @Barrier(false, Api.objectQ)  var _isActive
 
@@ -60,41 +64,41 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   class func parseStatus(_ properties: KeyValuesArray, radio: Radio, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_iq"> <"daxiq_channel", channel> <"pan", panStreamId> <"daxiq_rate", rate> <"client_handle", handle>
 
-    //get the StreamId (remove the "0x" prefix)
-    if let streamId =  properties[0].key.streamId {
+    //get the Id
+    if let daxIqStreamId =  properties[0].key.streamId {
       
       // does the Stream exist?
-      if radio.daxIqStreams[streamId] == nil {
+      if radio.daxIqStreams[daxIqStreamId] == nil {
         
         // exit if this stream is not for this client
         if isForThisClient( properties ) == false { return }
 
         // create a new Stream & add it to the collection
-        radio.daxIqStreams[streamId] = DaxIqStream(streamId: streamId)
+        radio.daxIqStreams[daxIqStreamId] = DaxIqStream(radio: radio, streamId: daxIqStreamId)
       }
-      // pass the remaining key values to parsing
-      radio.daxIqStreams[streamId]!.parseProperties( Array(properties.dropFirst(1)) )
+      // pass the remaining key values for parsing (dropping the Id)
+      radio.daxIqStreams[daxIqStreamId]!.parseProperties( Array(properties.dropFirst(1)) )
     }
   }
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
-  /// Find the IQ Stream for a DaxIqChannel
-  ///
-  /// - Parameters:
-  ///   - daxIqChannel:   a Dax IQ channel number
-  /// - Returns:          an IQ Stream reference (or nil)
-  ///
-  public class func findBy(channel: DaxIqChannel) -> DaxIqStream? {
-
-    // find the IQ Streams with the specified Channel (if any)
-    let streams = Api.sharedInstance.radio!.daxIqStreams.values.filter { $0.channel == channel }
-    guard streams.count >= 1 else { return nil }
-    
-    // return the first one
-    return streams[0]
-  }
+//  /// Find the IQ Stream for a DaxIqChannel
+//  ///
+//  /// - Parameters:
+//  ///   - daxIqChannel:   a Dax IQ channel number
+//  /// - Returns:          an IQ Stream reference (or nil)
+//  ///
+//  public class func findBy(channel: DaxIqChannel) -> DaxIqStream? {
+//
+//    // find the IQ Streams with the specified Channel (if any)
+//    let streams = Api.sharedInstance.radio!.daxIqStreams.values.filter { $0.channel == channel }
+//    guard streams.count >= 1 else { return nil }
+//    
+//    // return the first one
+//    return streams[0]
+//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -105,8 +109,9 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   ///   - id:                 the Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(streamId: StreamId) {
+  init(radio: Radio, streamId: DaxIqStreamId) {
     
+    self.radio = radio
     self.streamId = streamId
     super.init()
   }
@@ -238,7 +243,7 @@ extension DaxIqStream {
   @objc dynamic public var clientHandle: Handle {
     return _clientHandle }
   
-  @objc dynamic public var pan: PanadapterId {
+  @objc dynamic public var pan: PanadapterStreamId {
     return _pan }
   
   @objc dynamic public var isActive: Bool {

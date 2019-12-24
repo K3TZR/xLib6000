@@ -31,50 +31,49 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var uptime            = 0
-  @objc dynamic public var version          : String { return _api.activeRadio?.firmwareVersion ?? "" }
-  @objc dynamic public var serialNumber     : String { return _api.activeRadio?.serialNumber ?? "" }
+  public private(set)   var uptime                  = 0
+  @objc dynamic public  var version                 : String { return _api.activeRadio?.firmwareVersion ?? "" }
+  @objc dynamic public  var serialNumber            : String { return _api.activeRadio?.serialNumber ?? "" }
 
   // Static models
-  @objc dynamic public private(set) var atu         : Atu!                  // Atu model
-  @objc dynamic public private(set) var cwx         : Cwx!                  // Cwx model
-  @objc dynamic public private(set) var gps         : Gps!                  // Gps model
-  @objc dynamic public private(set) var interlock   : Interlock!            // Interlock model
-  @objc dynamic public private(set) var profile     : Profile!              // Profile model
-  @objc dynamic public private(set) var transmit    : Transmit!             // Transmit model
-  @objc dynamic public private(set) var wan         : Wan!                  // Wan model
-  @objc dynamic public private(set) var waveform    : Waveform!             // Waveform model
+  @objc dynamic public private(set) var atu         : Atu!
+  @objc dynamic public private(set) var cwx         : Cwx!
+  @objc dynamic public private(set) var gps         : Gps!
+  @objc dynamic public private(set) var interlock   : Interlock!
+  @objc dynamic public private(set) var transmit    : Transmit!
+  @objc dynamic public private(set) var wan         : Wan!
+  @objc dynamic public private(set) var waveform    : Waveform!
   
-  @objc dynamic public private(set) var antennaList = [AntennaPort]()       // Array of available Antenna ports
-  @objc dynamic public private(set) var micList     = [MicrophonePort]()    // Array of Microphone ports
-  @objc dynamic public private(set) var rfGainList  = [RfGainValue]()       // Array of RfGain parameters
-  @objc dynamic public private(set) var sliceList   = [SliceId]()           // Array of available Slice id's
+  @objc dynamic public private(set) var antennaList = [AntennaPort]()
+  @objc dynamic public private(set) var micList     = [MicrophonePort]()
+  @objc dynamic public private(set) var rfGainList  = [RfGainValue]()
+  @objc dynamic public private(set) var sliceList   = [SliceId]()
   
   public private(set) var sliceErrors       = [String]()                    // frequency error of a Slice (milliHz)
   
   // object collections
   @Barrier([AmplifierId: Amplifier](), Api.objectQ)                 public var amplifiers
-  @Barrier([DaxStreamId: AudioStream](), Api.objectQ)               public var audioStreams
-  @Barrier([StreamId: DaxIqStream](), Api.objectQ)                  public var daxIqStreams
-  @Barrier([StreamId: DaxMicAudioStream](), Api.objectQ)            public var daxMicAudioStreams
-  @Barrier([StreamId: DaxRxAudioStream](), Api.objectQ)             public var daxRxAudioStreams
-  @Barrier([StreamId: DaxTxAudioStream](), Api.objectQ)             public var daxTxAudioStreams
+  @Barrier([AudioStreamId: AudioStream](), Api.objectQ)             public var audioStreams
+  @Barrier([DaxIqStreamId: DaxIqStream](), Api.objectQ)             public var daxIqStreams
+  @Barrier([DaxMicStreamId: DaxMicAudioStream](), Api.objectQ)      public var daxMicAudioStreams
+  @Barrier([DaxRxStreamId: DaxRxAudioStream](), Api.objectQ)        public var daxRxAudioStreams
+  @Barrier([DaxTxStreamId: DaxTxAudioStream](), Api.objectQ)        public var daxTxAudioStreams
   @Barrier([Equalizer.EqType: Equalizer](), Api.objectQ)            public var equalizers
-  @Barrier([DaxStreamId: IqStream](), Api.objectQ)                  public var iqStreams
+  @Barrier([DaxIqStreamId: IqStream](), Api.objectQ)                public var iqStreams
   @Barrier([MemoryId: Memory](), Api.objectQ)                       public var memories
-  @Barrier([MeterNumber: Meter](), Api.objectQ)                     public var meters
-  @Barrier([DaxStreamId: MicAudioStream](), Api.objectQ)            public var micAudioStreams
+  @Barrier([MeterId: Meter](), Api.objectQ)                         public var meters
+  @Barrier([DaxMicStreamId: MicAudioStream](), Api.objectQ)         public var micAudioStreams
   @Barrier([OpusId: Opus](), Api.objectQ)                           public var opusStreams
-  @Barrier([PanadapterId: Panadapter](), Api.objectQ)               public var panadapters
+  @Barrier([PanadapterStreamId: Panadapter](), Api.objectQ)         public var panadapters
   @Barrier([ProfileId: Profile](), Api.objectQ)                     public var profiles
   @Barrier([RemoteRxStreamId: RemoteRxAudioStream](), Api.objectQ)  public var remoteRxAudioStreams
   @Barrier([RemoteTxStreamId: RemoteTxAudioStream](), Api.objectQ)  public var remoteTxAudioStreams
-  @Barrier([SequenceId: ReplyTuple](), Api.objectQ)                 public var replyHandlers
-  @Barrier([SliceId: xLib6000.Slice](), Api.objectQ)                         public var slices
+  @Barrier([SequenceNumber: ReplyTuple](), Api.objectQ)             public var replyHandlers
+  @Barrier([SliceId: xLib6000.Slice](), Api.objectQ)                public var slices
   @Barrier([TnfId: Tnf](), Api.objectQ)                             public var tnfs
-  @Barrier([DaxStreamId: TxAudioStream](), Api.objectQ)             public var txAudioStreams
+  @Barrier([TxStreamId: TxAudioStream](), Api.objectQ)              public var txAudioStreams
   @Barrier([UsbCableId: UsbCable](), Api.objectQ)                   public var usbCables
-  @Barrier([WaterfallId: Waterfall](), Api.objectQ)                 public var waterfalls
+  @Barrier([WaterfallStreamId: Waterfall](), Api.objectQ)           public var waterfalls
   @Barrier([XvtrId: Xvtr](), Api.objectQ)                           public var xvtrs
 
   // ----------------------------------------------------------------------------
@@ -210,32 +209,31 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     equalizers[.rxsc] = Equalizer(id: Equalizer.EqType.rxsc.rawValue)
     equalizers[.txsc] = Equalizer(id: Equalizer.EqType.txsc.rawValue)
   }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Public methods
-  
-  /// Create a Tnf
-  ///
-  /// - Parameters:
-  ///   - frequency:          frequency (Hz)
-  ///   - callback:           ReplyHandler (optional)
-  ///
-  public func createTnf(frequency: String, callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to create a Tnf
-    sendCommand("tnf create " + "freq" + "=\(frequency)", replyTo: callback)
-  }
 
+  // Send commands  -------------------------------------------------------------
+
+  /// Send a TCP Command
+  /// - Parameters:
+  ///   - command:        a command String
+  ///   - flag:           normal / diagnostic
+  ///   - callback:       reply handler (if any)
+  ///
   public func sendCommand(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) {
 
+    // forward to the Api function
     _api.send(command, diagnostic: flag, replyTo: callback)
   }
-  
+  /// Send Vita UDP data
+  /// - Parameter data:   the contents as Data
+  ///
   public func sendVita(_ data: Data?) {
-    
+
+    // forward to the Api function
     _api.send(data)
   }
   
+  // Remove All  ----------------------------------------------------------------
+
   /// Remove all Radio objects
   ///
   public func removeAll() {
@@ -394,7 +392,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       return
     }
     // is there an Object expecting to be notified?
-    if let replyTuple = replyHandlers[ components[0] ] {
+    if let replyTuple = replyHandlers[ components[0].uValue ] {
       
       // YES, an Object is waiting for this reply, send the Command to the Handler on that Object
       
@@ -403,15 +401,15 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       if let handler = replyTuple.replyTo {
         
         // YES, call the Handler
-        handler(command, components[0], components[1], (components.count == 3) ? components[2] : "")
+        handler(command, components[0].sequenceNumber, components[1], (components.count == 3) ? components[2] : "")
         
       } else {
         
         // send it to the default reply handler
-        defaultReplyHandler(replyTuple.command, seqNum: components[0], responseValue: components[1], reply: replySuffix)
+        defaultReplyHandler(replyTuple.command, sequenceNumber: components[0].sequenceNumber, responseValue: components[1], reply: replySuffix)
       }
       // Remove the object from the notification list
-      replyHandlers[components[0]] = nil
+      replyHandlers[components[0].sequenceNumber] = nil
       
     } else {
       
@@ -1169,7 +1167,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - sequenceId:     sequence number of the Command
   ///   - replyTuple:     a Reply Tuple
   ///
-  public func addReplyHandler(_ seqNumber: SequenceId, replyTuple: ReplyTuple) {
+  public func addReplyHandler(_ seqNumber: UInt, replyTuple: ReplyTuple) {
     
     // add the handler
     replyHandlers[seqNumber] = replyTuple
@@ -1184,7 +1182,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - responseValue:  the response value
   ///   - reply:          the reply
   ///
-  public func defaultReplyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
+  public func defaultReplyHandler(_ command: String, sequenceNumber: SequenceNumber, responseValue: String, reply: String) {
     
     guard responseValue == Api.kNoError else {
       
@@ -1193,7 +1191,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
         // Anything other than 0 is an error, log it and ignore the Reply
         let errorLevel = flexErrorLevel(errorCode: responseValue)
-        _log.msg("c\(seqNum), \(command), non-zero reply \(responseValue), \(flexErrorString(errorCode: responseValue))", level: errorLevel, function: #function, file: #file, line: #line)
+        _log.msg("c\(sequenceNumber), \(command), non-zero reply \(responseValue), \(flexErrorString(errorCode: responseValue))", level: errorLevel, function: #function, file: #file, line: #line)
 
         // FIXME: ***** Temporarily commented out until bugs in v2.4.9 are fixed *****
         
@@ -1249,7 +1247,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case xLib6000.Slice.kListCmd:
       // save the list
-      sliceList = reply.valuesArray()
+      sliceList = reply.valuesArray().compactMap {$0.objectId}
       
     case Radio.kUptimeCmd:
       // save the returned Uptime (seconds)
@@ -1281,13 +1279,16 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         // parse the reply
         let components = command.components(separatedBy: " ")
         
-        // if it's valid and the Tnf has not been removed
-        if components.count == 3 && tnfs[components[2].uValue] != nil{
-          // notify all observers
-          NC.post(.tnfWillBeRemoved, object: tnfs[components[2].uValue] as Any?)
-
-          // remove the Tnf
-          tnfs[components[2].uValue] = nil
+        if let tnfId = components[2].objectId {
+          
+          // if it's valid and the Tnf has not been removed
+          if components.count == 3 {
+            // notify all observers
+            NC.post(.tnfWillBeRemoved, object: tnfs[tnfId] as Any?)
+            
+            // remove the Tnf
+            tnfs[tnfId] = nil
+          }
         }
         
       } else if command.hasPrefix("stream create " + "dax=") {
@@ -1663,4 +1664,244 @@ extension Radio {
   public typealias FilterMode               = String
   public typealias MicrophonePort           = String
   public typealias RfGainValue              = String
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - DaxIqStream public methods
+
+extension Radio {
+    
+  /// Find the IQ Stream for a DaxIqChannel
+  ///
+  /// - Parameters:
+  ///   - daxIqChannel:   a Dax IQ channel number
+  /// - Returns:          an IQ Stream reference (or nil)
+  ///
+  public func findDaxIqStream(using channel: DaxIqChannel) -> DaxIqStream? {
+
+    // find the IQ Streams with the specified Channel (if any)
+    let selectedStreams = daxIqStreams.values.filter { $0.channel == channel }
+    guard selectedStreams.count >= 1 else { return nil }
+    
+    // return the first one
+    return selectedStreams[0]
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - IQ Stream public methods
+
+extension Radio {
+  
+  /// Find the IQ Stream for a DaxIqChannel
+  ///
+  /// - Parameters:
+  ///   - daxIqChannel:   a Dax IQ channel number
+  /// - Returns:          an IQ Stream reference (or nil)
+  ///
+  public func findIqStream(using channel: DaxIqChannel) -> IqStream? {
+
+    // find the IQ Streams with the specified Channel (if any)
+    let selectedStreams = iqStreams.values.filter { $0.daxIqChannel == channel }
+    guard selectedStreams.count >= 1 else { return nil }
+    
+    // return the first one
+    return selectedStreams[0]
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - Meter public methods
+
+extension Radio {
+    
+    /// Find Meters by a Slice Id
+    ///
+    /// - Parameters:
+    ///   - sliceId:    a Slice id
+    /// - Returns:      an array of Meters
+    ///
+    public func findMeters(on sliceId: SliceId) -> [Meter] {
+      
+      // find the Meters on the specified Slice (if any)
+      return meters.values.filter { $0.source == "slc" && $0.group.objectId == sliceId }
+    }
+    /// Find a Meter by its ShortName
+    ///
+    /// - Parameters:
+    ///   - name:       Short Name of a Meter
+    /// - Returns:      a Meter reference
+    ///
+    public func findMeter(shortName name: MeterName) -> Meter? {
+
+      // find the Meters with the specified Name (if any)
+      let selectedMeters = meters.values.filter { $0.name == name }
+      guard selectedMeters.count >= 1 else { return nil }
+      
+      // return the first one
+      return selectedMeters[0]
+    }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - Panadapter public methods
+
+extension Radio {
+    
+  /// Find the active Panadapter
+  ///
+  /// - Returns:      a reference to a Panadapter (or nil)
+  ///
+  public func findActivePanadapter() -> Panadapter? {
+
+    // find the Panadapters with an active Slice (if any)
+    let selectedPanadapters = panadapters.values.filter { findActiveSlice(on: $0.streamId) != nil }
+    guard selectedPanadapters.count >= 1 else { return nil }
+
+    // return the first one
+    return selectedPanadapters[0]
+  }
+  /// Find the Panadapter for a DaxIqChannel
+  ///
+  /// - Parameters:
+  ///   - daxIqChannel:   a Dax channel number
+  /// - Returns:          a Panadapter reference (or nil)
+  ///
+  public func findPanadapter(using channel: DaxIqChannel) -> Panadapter? {
+
+    // find the Panadapters with the specified Channel (if any)
+    let selectedPanadapters = panadapters.values.filter { $0.daxIqChannel == channel }
+    guard selectedPanadapters.count >= 1 else { return nil }
+    
+    // return the first one
+    return selectedPanadapters[0]
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - Slice public methods
+
+extension Radio {
+  
+  /// Disable all TxEnabled
+  ///
+  public func disableSliceTx() {
+    
+    // for all Slices, turn off txEnabled
+    for (_, slice) in slices where slice.txEnabled {
+      
+      slice.txEnabled = false
+    }
+  }
+  /// Return references to all Slices on the specified Panadapter
+  ///
+  /// - Parameters:
+  ///   - pan:        a Panadapter Id
+  /// - Returns:      an array of Slices (may be empty)
+  ///
+  public func findAllSlices(on id: PanadapterStreamId) -> [xLib6000.Slice]? {
+    
+    // find the Slices on the Panadapter (if any)
+    let filteredSlices = slices.values.filter { $0.panadapterId == id }
+    guard filteredSlices.count >= 1 else { return nil }
+
+    return filteredSlices
+  }
+  /// Given a Frequency, return the Slice on the specified Panadapter containing it (if any)
+  ///
+  /// - Parameters:
+  ///   - id:         a Panadapter Stream Id
+  ///   - freq:       a Frequency (in hz)
+  ///   - width:      frequenct width
+  /// - Returns:      a reference to a Slice (or nil)
+  ///
+  public func findSlice(on id: PanadapterStreamId, at freq: Int, width: Int) -> xLib6000.Slice? {
+    
+    // find the Slices on the Panadapter (if any)
+    let filteredSlices = findAllSlices(on: id)
+    guard filteredSlices != nil else {return nil}
+    
+    // find the ones in the frequency range
+    let selectedSlices = filteredSlices!.filter { freq >= $0.frequency + min(-width/2, $0.filterLow) && freq <= $0.frequency + max(width/2, $0.filterHigh)}
+    guard selectedSlices.count >= 1 else { return nil }
+
+    // return the first one
+    return selectedSlices[0]
+  }
+  /// Return the Active Slice (if any)
+  ///
+  /// - Returns:      a Slice reference (or nil)
+  ///
+  public func findActiveSlice() -> xLib6000.Slice? {
+
+    // find the active Slices (if any)
+    let filteredSlices = slices.values.filter { $0.active }
+    guard filteredSlices.count >= 1 else { return nil }
+    
+    // return the first one
+    return filteredSlices[0]
+  }
+  /// Return the Active Slice on the specified Panadapter (if any)
+  ///
+  /// - Parameters:
+  ///   - id:         a Panadapter Stream Id
+  /// - Returns:      a Slice reference (or nil)
+  ///
+  public func findActiveSlice(on id: PanadapterStreamId) -> xLib6000.Slice? {
+    
+    // find the active Slices on the specified Panadapter (if any)
+    let filteredSlices = slices.values.filter { $0.active && $0.panadapterId == id }
+    guard filteredSlices.count >= 1 else { return nil }
+    
+    // return the first one
+    return filteredSlices[0]
+  }
+  /// Find a Slice by DAX Channel
+  ///
+  /// - Parameter channel:    Dax channel number
+  /// - Returns:              a Slice (if any)
+  ///
+  public func findSlice(using channel: DaxChannel) -> xLib6000.Slice? {
+
+    // find the Slices with the specified Channel (if any)
+    let filteredSlices = slices.values.filter { $0.daxChannel == channel }
+    guard filteredSlices.count >= 1 else { return nil }
+    
+    // return the first one
+    return filteredSlices[0]
+  }
+}
+    
+// ----------------------------------------------------------------------------
+// MARK: - Tnf public methods
+
+extension Radio {
+
+  /// Create a Tnf
+  ///
+  /// - Parameters:
+  ///   - frequency:          frequency (Hz)
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func createTnf(frequency: String, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Tnf
+    sendCommand("tnf create " + "freq" + "=\(frequency)", replyTo: callback)
+  }
+  /// Given a Frequency, return a reference to the Tnf containing it (if any)
+  ///
+  /// - Parameters:
+  ///   - frequency:      a Frequency (in hz)
+  ///   - minWidth:       panadapter bandwidth (hz)
+  /// - Returns:          a Tnf reference (or nil)
+  ///
+  public func findTnf(at freq: UInt, width: UInt) -> Tnf? {
+
+    // return the Tnfs within the specified Frequency / minimum width (if any)
+    let filteredTnfs = tnfs.values.filter { freq >= ($0.frequency - max(width, $0.width/2)) && freq <= ($0.frequency + max(width, $0.width/2)) }
+    guard filteredTnfs.count >= 1 else { return nil }
+    
+    // return the first one
+    return filteredTnfs[0]
+  }
 }

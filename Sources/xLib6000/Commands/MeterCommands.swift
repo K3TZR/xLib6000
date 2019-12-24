@@ -16,16 +16,16 @@ extension Meter {
   // ----------------------------------------------------------------------------
   // MARK: - Class methods that send Commands
 
-  public class func subscribe(number: MeterNumber) {
+  public class func subscribe(id: MeterId) {
     
     // subscribe to the specified Meter
-    Api.sharedInstance.send("sub meter \(number)")
+    Api.sharedInstance.send("sub meter \(id)")
     
   }
-  public class func unSubscribe(number: MeterNumber) {
+  public class func unSubscribe(id: MeterId) {
     
     // un subscribe from the specified Meter
-    Api.sharedInstance.send("unsub meter \(number)")
+    Api.sharedInstance.send("unsub meter \(id)")
     
   }
   /// Request a list of Meters
