@@ -29,7 +29,7 @@ public final class Tnf                      : NSObject, DynamicModel {
   // MARK: - Public properties
   
   public let radio                          : Radio
-  public let tnfId                          : TnfId
+  public let id                             : TnfId
 
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -181,7 +181,7 @@ public final class Tnf                      : NSObject, DynamicModel {
   public init(radio: Radio, id: TnfId) {
     
     self.radio = radio
-    self.tnfId = id
+    self.id = id
     
     super.init()
   }
