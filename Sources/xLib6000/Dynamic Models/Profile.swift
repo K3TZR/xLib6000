@@ -30,7 +30,7 @@ public final class Profile                  : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var id                : ProfileId!
+  public let id                             : ProfileId!
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -152,13 +152,64 @@ public final class Profile                  : NSObject, StaticModel {
 extension Profile {
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var selection: ProfileName {
+    get {  return _selection }
+    set { if _selection != newValue { _selection = newValue ; profileCmd(newValue) } } }
+
+  // ----------------------------------------------------------------------------
+  // Public properties (KVO compliant)
   
   @objc dynamic public var list: [ProfileName] {
     return _list }
-  
+      
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Instance methods that send Commands
+
+  // FIXME: How should this work?
+
+  /// Delete a Profile entry
+  ///
+  /// - Parameters:
+  ///   - token:              profile type
+  ///   - name:               profile name
+  ///   - callback:           ReplyHandler (optional)
+  ///
+//  public func deleteProfile(_ type: String, name: String, callback: ReplyHandler? = nil) {
+//    
+//    // tell the Radio to delete the Profile name in the specified Profile type
+//    Api.sharedInstance.send("profile "  + type + " delete \"" + name + "\"", replyTo: callback)
+//  }
+  /// Save a Profile entry
+  ///
+  /// - Parameters:
+  ///   - token:              profile type
+  ///   - name:               profile name
+  ///   - callback:           ReplyHandler (optional)
+  ///
+//  public func saveProfile(_ type: String, name: String, callback: ReplyHandler? = nil) {
+//    
+//    // tell the Radio to save the Profile name in the specified Profile type
+//    Api.sharedInstance.send("profile "  + type + " save \"" + name + "\"", replyTo: callback)
+//  }
+
+  // ----------------------------------------------------------------------------
+  // Private command helper methods
+
+  /// Set a Profile property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      a String
+  ///   - value:      the new value
+  ///
+  private func profileCmd(_ value: Any) {
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
+    Api.sharedInstance.send("profile "  + id + " load \"\(value)\"")
+  }
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Types
   ///

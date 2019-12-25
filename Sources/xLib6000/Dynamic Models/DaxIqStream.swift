@@ -24,8 +24,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                          : Radio
-  public let streamId                       : DaxIqStreamId
+  public let id                 : DaxIqStreamId
   
   public private(set) var rxLostPacketCount = 0
   
@@ -41,12 +40,12 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private weak var _delegate : StreamHandler?
-  private      var _initialized = false       // True if initialized by Radio hardware
-  private      var _rxSeq : Int?              // Rx sequence number
-  private      var _kOneOverZeroDBfs : Float = 1.0 / pow(2.0, 15.0)
-
-  private      let _log = Log.sharedInstance
+  public       let _radio             : Radio
+  private weak var _delegate          : StreamHandler?
+  private      var _initialized       = false       // True if initialized by Radio hardware
+  private      var _rxSeq             : Int?              // Rx sequence number
+  private      var _kOneOverZeroDBfs  : Float = 1.0 / pow(2.0, 15.0)
+  private      let _log               = Log.sharedInstance
   
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
@@ -74,31 +73,12 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
         if isForThisClient( properties ) == false { return }
 
         // create a new Stream & add it to the collection
-        radio.daxIqStreams[daxIqStreamId] = DaxIqStream(radio: radio, streamId: daxIqStreamId)
+        radio.daxIqStreams[daxIqStreamId] = DaxIqStream(radio: radio, id: daxIqStreamId)
       }
       // pass the remaining key values for parsing (dropping the Id)
       radio.daxIqStreams[daxIqStreamId]!.parseProperties( Array(properties.dropFirst(1)) )
     }
   }
-
-  // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-//  /// Find the IQ Stream for a DaxIqChannel
-//  ///
-//  /// - Parameters:
-//  ///   - daxIqChannel:   a Dax IQ channel number
-//  /// - Returns:          an IQ Stream reference (or nil)
-//  ///
-//  public class func findBy(channel: DaxIqChannel) -> DaxIqStream? {
-//
-//    // find the IQ Streams with the specified Channel (if any)
-//    let streams = Api.sharedInstance.radio!.daxIqStreams.values.filter { $0.channel == channel }
-//    guard streams.count >= 1 else { return nil }
-//    
-//    // return the first one
-//    return streams[0]
-//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -109,10 +89,10 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   ///   - id:                 the Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: DaxIqStreamId) {
+  init(radio: Radio, id: DaxIqStreamId) {
     
-    self.radio = radio
-    self.streamId = streamId
+    self._radio = radio
+    self.id = id
     super.init()
   }
 
@@ -233,9 +213,23 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
 }
 
 extension DaxIqStream {
-  
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var rate: Int {
+    get { return _rate }
+    set {
+      if _rate != newValue {
+        if newValue == 24000 || newValue == 48000 || newValue == 96000 || newValue == 192000 {
+          _rate = newValue
+          _radio.sendCommand("stream set \(id.hex) daxiq_rate=\(_rate)")
+        }
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Public properties (KVO compliant)
   
   @objc dynamic public var channel: DaxIqChannel {
     return _channel }
@@ -250,14 +244,45 @@ extension DaxIqStream {
     return _isActive  }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties
+  // Public properties
   
   public var delegate: StreamHandler? {
     get { return Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-  
+    
   // ----------------------------------------------------------------------------
-  // Mark: - Tokens
+  // MARK: - Instance methods that send Commands
+
+  /// Remove this DaxIqStream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              success / failure
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // notify all observers
+    NC.post(.daxIqStreamWillBeRemoved, object: self as Any?)
+
+    // remove the stream
+    _radio.daxIqStreams[id] = nil
+
+    // tell the Radio to remove this Stream
+    _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
+  }
+  /// Get error ???
+  ///
+  /// - Parameters:
+  ///   - id:                 IQ Stream Id
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func getError(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to ???
+    _radio.sendCommand("stream get_error \(id.hex)", replyTo: callback)
+  }
+
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

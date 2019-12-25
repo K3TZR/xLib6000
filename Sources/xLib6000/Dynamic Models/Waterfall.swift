@@ -23,8 +23,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
     
-  public              let radio             : Radio
-  public              let streamId          : WaterfallStreamId
+  public              let id                : WaterfallStreamId
 
   public private(set) var packetFrame       = -1            // Frame index of next Vita payload
   public private(set) var droppedPackets    = 0             // Number of dropped (out of sequence) packets
@@ -47,6 +46,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private let _radio                        : Radio
   private let _log                          = Log.sharedInstance
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -89,7 +89,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
         if radio.waterfalls[waterfallStreamId] == nil {
           
           // NO, Create a Waterfall & add it to the Waterfalls collection
-          radio.waterfalls[waterfallStreamId] = Waterfall(radio: radio, streamId: waterfallStreamId)
+          radio.waterfalls[waterfallStreamId] = Waterfall(radio: radio, id: waterfallStreamId)
         }
         // pass the key values to the Waterfall for parsing (dropping the Type and Id)
         radio.waterfalls[waterfallStreamId]!.parseProperties(Array(keyValues.dropFirst(2)))
@@ -117,10 +117,10 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   ///   - radio:      the Radio instance
   ///   - streamId:           a Waterfall Id
   ///
-  public init(radio: Radio, streamId: WaterfallStreamId) {
+  public init(radio: Radio, id: WaterfallStreamId) {
     
-    self.streamId = streamId
-    self.radio = radio
+    self.id = id
+    self._radio = radio
     
     // allocate two dataframes
     for _ in 0..<_numberOfDataFrames {
@@ -225,7 +225,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
 extension Waterfall {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant)
   
   @objc dynamic public var autoBlackLevel: UInt32 {
     return _autoBlackLevel }
@@ -235,18 +235,55 @@ extension Waterfall {
   
   @objc dynamic public var panadapterId: PanadapterStreamId {
     return _panadapterId }
-  
+
   // ----------------------------------------------------------------------------
-  // MARK: - NON Public properties (KVO compliant)
+  // Properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var autoBlackEnabled: Bool {
+    get { return _autoBlackEnabled }
+    set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; waterfallCmd( .autoBlackEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var blackLevel: Int {
+    get { return _blackLevel }
+    set { if _blackLevel != newValue { _blackLevel = newValue ; waterfallCmd( .blackLevel, newValue) } } }
+  
+  @objc dynamic public var colorGain: Int {
+    get { return _colorGain }
+    set { if _colorGain != newValue { _colorGain = newValue ; waterfallCmd( .colorGain, newValue) } } }
+  
+  @objc dynamic public var gradientIndex: Int {
+    get { return _gradientIndex }
+    set { if _gradientIndex != newValue { _gradientIndex = newValue ; waterfallCmd( .gradientIndex, newValue) } } }
+  
+  @objc dynamic public var lineDuration: Int {
+    get { return _lineDuration }
+    set { if _lineDuration != newValue { _lineDuration = newValue ; waterfallCmd( .lineDuration, newValue) } } }
+    
+  // ----------------------------------------------------------------------------
+  // Public properties
   
   public var delegate: StreamHandler? {
     get { return Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-    
+
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Private command helper methods
+
+  /// Set a Waterfall property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func waterfallCmd(_ token: Token, _ value: Any) {
+    
+    _radio.sendCommand("display panafall set " + "\(id.hex) " + token.rawValue + "=\(value)")
+  }
   
-  /// Properties
+  // ----------------------------------------------------------------------------
+  // Tokens
+  
+  /// Waterfall Properties
   ///
   internal enum Token : String {
     // on Waterfall
@@ -275,4 +312,3 @@ extension Waterfall {
     case xvtr
   }
 }
-

@@ -21,15 +21,14 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kCmd             = "dax iq "         // Command prefixes
-  static let kStreamCreateCmd = "stream create "
-  static let kStreamRemoveCmd = "stream remove "
+//  static let kCmd             = "dax iq "         // Command prefixes
+//  static let kStreamCreateCmd = "stream create "
+//  static let kStreamRemoveCmd = "stream remove "
 
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                          : Radio
-  public let streamId                       : DaxIqStreamId
+  public let id                             : DaxIqStreamId
   public private(set) var rxLostPacketCount = 0       // Rx lost packet count
   
   // ------------------------------------------------------------------------------
@@ -49,12 +48,13 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private weak var _delegate : StreamHandler? // Delegate for IQ stream
-  private      var _initialized      = false  // True if initialized by Radio hardware
-  private      var _rxSeq            : Int?   // Rx sequence number
-  private      var _kOneOverZeroDBfs : Float = 1.0 / pow(2.0, 15.0)
+  private      let _radio             : Radio
+  private weak var _delegate          : StreamHandler? // Delegate for IQ stream
+  private      var _initialized       = false  // True if initialized by Radio hardware
+  private      var _rxSeq             : Int?   // Rx sequence number
+  private      var _kOneOverZeroDBfs  : Float = 1.0 / pow(2.0, 15.0)
 
-  private      let _log              = Log.sharedInstance
+  private      let _log               = Log.sharedInstance
   
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
@@ -135,8 +135,8 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   ///
   init(radio: Radio, id: DaxIqStreamId) {
     
-    self.radio = radio
-    self.streamId = id
+    _radio = radio
+    self.id = id
     super.init()
   }
 
@@ -284,7 +284,22 @@ public final class IqStream : NSObject, DynamicModelWithStream {
 extension IqStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var rate: Int {
+    get { return _rate }
+    set {
+      if _rate != newValue {
+        if newValue == 24000 || newValue == 48000 || newValue == 96000 || newValue == 192000 {
+          _rate = newValue
+          iqCmd( .rate, newValue)
+        }
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Public properties (KVO compliant)
   
   @objc dynamic public var available: Int {
     return _available }
@@ -311,14 +326,42 @@ extension IqStream {
     return _streaming  }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties
+  // Public properties
   
   public var delegate: StreamHandler? {
     get { return Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // Mark: - Tokens
+  // Instance methods that send Commands
+
+  /// Remove this IQ Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+
+    // tell the Radio to remove the Stream
+    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
+  }
+  
+  // ----------------------------------------------------------------------------
+  // Private command helper methods
+
+  /// Set an IQ Stream property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func iqCmd(_ token: Token, _ value: Any) {
+    
+    _radio.sendCommand("dax iq " + "\(_daxIqChannel) " + token.rawValue + "=\(value)")
+  }
+
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

@@ -23,14 +23,9 @@ public typealias EqualizerId = String
 public final class Equalizer : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kCmd = "eq " // Command prefixes
-
-  // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var id : EqualizerId  // Rx/Tx Equalizer
+  public let id             : EqualizerId
 
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -48,6 +43,7 @@ public final class Equalizer : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private let _radio        : Radio
   private let _log          = Log.sharedInstance
   private var _initialized  = false               // True if initialized by Radio hardware
   
@@ -109,8 +105,9 @@ public final class Equalizer : NSObject, DynamicModel {
   ///   - eqType:             the Equalizer type (rxsc or txsc)
   ///   - queue:              Concurrent queue
   ///
-  init(id: EqualizerId) {
+  init(radio: Radio, id: EqualizerId) {
     
+    self._radio = radio
     self.id = id
     super.init()
   }
@@ -186,8 +183,73 @@ public final class Equalizer : NSObject, DynamicModel {
 
 extension Equalizer {
   
+  
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Public properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var eqEnabled: Bool {
+    get { return  _eqEnabled }
+    set { if _eqEnabled != newValue { _eqEnabled = newValue ; eqCmd( .enabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var level63Hz: Int {
+    get { return _level63Hz }
+    set { if _level63Hz != newValue { _level63Hz = newValue ; eqCmd( "63Hz", newValue) } } }
+  
+  @objc dynamic public var level125Hz: Int {
+    get { return _level125Hz }
+    set { if _level125Hz != newValue { _level125Hz = newValue ; eqCmd( "125Hz", newValue) } } }
+  
+  @objc dynamic public var level250Hz: Int {
+    get { return _level250Hz }
+    set { if _level250Hz != newValue { _level250Hz = newValue ; eqCmd( "250Hz", newValue) } } }
+  
+  @objc dynamic public var level500Hz: Int {
+    get { return _level500Hz }
+    set { if _level500Hz != newValue { _level500Hz = newValue ; eqCmd( "500Hz", newValue) } } }
+  
+  @objc dynamic public var level1000Hz: Int {
+    get { return _level1000Hz }
+    set { if _level1000Hz != newValue { _level1000Hz = newValue ; eqCmd( "1000Hz", newValue) } } }
+  
+  @objc dynamic public var level2000Hz: Int {
+    get { return _level2000Hz }
+    set { if _level2000Hz != newValue { _level2000Hz = newValue ; eqCmd( "2000Hz", newValue) } } }
+  
+  @objc dynamic public var level4000Hz: Int {
+    get { return _level4000Hz }
+    set { if _level4000Hz != newValue { _level4000Hz = newValue ; eqCmd( "4000Hz", newValue) } } }
+  
+  @objc dynamic public var level8000Hz: Int {
+    get { return _level8000Hz }
+    set { if _level8000Hz != newValue { _level8000Hz = newValue ; eqCmd( "8000Hz", newValue) } } }
+  
+  
+  // ----------------------------------------------------------------------------
+  // Private command helper methods
+
+  /// Set an Equalizer property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func eqCmd(_ token: Token, _ value: Any) {
+    
+    _radio.sendCommand("eq " + id + " " + token.rawValue + "=\(value)")
+  }
+  /// Set an Equalizer property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      a String
+  ///   - value:      the new value
+  ///
+  private func eqCmd( _ token: String, _ value: Any) {
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
+    _radio.sendCommand("eq " + id + " " + token + "=\(value)")
+  }
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

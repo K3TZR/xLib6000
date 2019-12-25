@@ -25,8 +25,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                  : Radio
-  public let streamId               : DaxRxStreamId
+  public let id                   : DaxRxStreamId
   
   public private(set) var rxLostPacketCount = 0
   
@@ -43,11 +42,11 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private weak var _delegate : StreamHandler? // Delegate for Audio stream
-  private      var _initialized = false       // True if initialized by Radio hardware
-  private      var _rxSeq : Int?              // Rx sequence number
-
-  private      let _log = Log.sharedInstance
+  private      let _radio           : Radio
+  private weak var _delegate        : StreamHandler? // Delegate for Audio stream
+  private      var _initialized     = false       // True if initialized by Radio hardware
+  private      var _rxSeq           : Int?              // Rx sequence number
+  private      let _log             = Log.sharedInstance
 
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
@@ -75,7 +74,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
         if isForThisClient( properties ) == false { return }
 
         // create a new Stream & add it to the collection
-        radio.daxRxAudioStreams[daxRxStreamId] = DaxRxAudioStream(radio: radio, streamId: daxRxStreamId)
+        radio.daxRxAudioStreams[daxRxStreamId] = DaxRxAudioStream(radio: radio, id: daxRxStreamId)
       }
       // pass the remaining key values for parsing (dropping the Id & Type)
       radio.daxRxAudioStreams[daxRxStreamId]!.parseProperties( Array(properties.dropFirst(2)) )
@@ -131,10 +130,10 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   ///   - id:                 the Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: DaxRxStreamId) {
+  init(radio: Radio, id: DaxRxStreamId) {
     
-    self.radio = radio
-    self.streamId = streamId
+    self._radio = radio
+    self.id = id
     super.init()
   }
 
@@ -179,7 +178,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
 
       case .slice:
         if let sliceId = property.value.objectId {
-          update(&_slice, to: radio.slices[sliceId], signal: \.slice)
+          update(&_slice, to: _radio.slices[sliceId], signal: \.slice)
         }
 
         let gain = _rxGain
@@ -268,7 +267,18 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
 extension DaxRxAudioStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var rxGain: Int {
+    get { return _rxGain  }
+    set { if _rxGain != newValue {
+      _rxGain = newValue
+      if _slice != nil && !Api.sharedInstance.testerModeEnabled { audioStreamCmd( "gain", _rxGain) }
+      }
+    }
+  }
+  // ----------------------------------------------------------------------------
+  // Public properties (KVO compliant)
   
   @objc dynamic public var clientHandle: Handle {
     get { return _clientHandle  }
@@ -279,9 +289,9 @@ extension DaxRxAudioStream {
     set {
       if _daxChannel != newValue {
         _daxChannel = newValue
-//        if _radio != nil {
-        slice = radio.findSlice(using: _daxChannel)
-//        }
+        //        if _radio != nil {
+        slice = _radio.findSlice(using: _daxChannel)
+        //        }
       }
     }
   }
@@ -295,14 +305,47 @@ extension DaxRxAudioStream {
     set { if _slice != newValue { _slice = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - NON Public properties (KVO compliant)
+  // Public properties
   
   public var delegate: StreamHandler? {
     get { return Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Instance methods that send Commands
+
+  /// Remove this DaxRxAudioStream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              success / failure
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // notify all observers
+    NC.post(.daxRxAudioStreamWillBeRemoved, object: self as Any?)
+    
+    // remove the stream
+    _radio.daxRxAudioStreams[id] = nil
+    
+    // tell the Radio to remove this Stream
+    _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
+  }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Private command helper methods
+
+  /// Set an Audio Stream property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func audioStreamCmd(_ token: String, _ value: Any) {
+    
+    _radio.sendCommand("audio stream \(id.hex) slice \(_slice!.id) " + token + " \(value)")
+  }
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

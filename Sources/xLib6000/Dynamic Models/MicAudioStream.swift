@@ -20,8 +20,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                          : Radio
-  public let streamId                       : DaxMicStreamId
+  public let id                             : DaxMicStreamId
   public var rxLostPacketCount              = 0                             // Rx lost packet count
   
   // ------------------------------------------------------------------------------
@@ -39,9 +38,9 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private let _radio                        : Radio
   private var _log                          = Log.sharedInstance
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  
   private var _rxSeq                        : Int?                          // Rx sequence number
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -109,8 +108,8 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   ///
   init(radio: Radio, id: DaxMicStreamId) {
     
-    self.radio = radio
-    streamId = id
+    _radio = radio
+    self.id = id
     super.init()
   }
   
@@ -241,7 +240,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
 extension MicAudioStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant)
   
   @objc dynamic public var inUse: Bool {
     return _inUse }
@@ -272,14 +271,28 @@ extension MicAudioStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - NON Public properties (KVO compliant)
+  // Public properties
   
   public var delegate: StreamHandler? {
     get { return Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Instance methods that send Commands
+
+  /// Remove this Mic Audio Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove the Stream
+    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
+  }
+
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

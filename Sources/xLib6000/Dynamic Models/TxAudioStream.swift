@@ -22,8 +22,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                        : Radio
-  public let streamId                     : TxStreamId
+  public let id                             : TxStreamId
   
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -39,6 +38,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private let _radio                        : Radio
   private var _log                          = Log.sharedInstance
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -73,7 +73,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
           if !AudioStream.isStatusForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
-          radio.txAudioStreams[txAudioStreamId] = TxAudioStream(radio: radio, streamId: txAudioStreamId)
+          radio.txAudioStreams[txAudioStreamId] = TxAudioStream(radio: radio, id: txAudioStreamId)
         }
         // pass the remaining key values for parsing (dropping the Id)
         radio.txAudioStreams[txAudioStreamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
@@ -102,10 +102,10 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   ///   - id:                 Dax stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: TxStreamId) {
+  init(radio: Radio, id: TxStreamId) {
     
-    self.radio = radio
-    self.streamId = streamId
+    self._radio = radio
+    self.id = id
     super.init()
   }
   
@@ -127,7 +127,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
     if !_transmit { return false }
     
     // get a TxAudio Vita
-    if _vita == nil { _vita = Vita(type: .txAudio, streamId: streamId) }
+    if _vita == nil { _vita = Vita(type: .txAudio, streamId: id) }
     
     let kMaxSamplesToSend = 128     // maximum packet samples (per channel)
     let kNumberOfChannels = 2       // 2 channels
@@ -179,7 +179,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
         
         // send packet to radio
 //        _api.sendVitaData(data)
-        radio.sendVita(data)
+        _radio.sendVita(data)
       }
       // increment the sequence number (mod 16)
       _txSeq = (_txSeq + 1) % 16
@@ -248,8 +248,15 @@ public final class TxAudioStream            : NSObject, DynamicModel {
 extension TxAudioStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant) that send Commands
   
+  @objc dynamic public var transmit: Bool {
+    get { return _transmit  }
+    set { if _transmit != newValue { _transmit = newValue ; txAudioCmd( newValue.as1or0) } } }
+
+  // ----------------------------------------------------------------------------
+  // Public properties (KVO compliant)
+
   @objc dynamic public var inUse: Bool {
     return _inUse }
   
@@ -277,9 +284,37 @@ extension TxAudioStream {
       }
     }
   }
+
+  // ----------------------------------------------------------------------------
+  // Instance methods that send Commands
+
+  /// Remove this Tx Audio Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove a Stream
+    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
+  }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Private command helper methods
+
+  /// Set a TxAudioStream property on the Radio
+  ///
+  /// - Parameters:
+  ///   - id:         the TxAudio Stream Id
+  ///   - value:      the new value
+  ///
+  private func txAudioCmd(_ value: Any) {
+    
+    _radio.sendCommand("dax " + "tx" + " \(value)")
+  }
+
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

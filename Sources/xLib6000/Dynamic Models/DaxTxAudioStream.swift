@@ -23,8 +23,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                  : Radio
-  public let streamId               : DaxTxStreamId
+  public let id               : DaxTxStreamId
 
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -38,10 +37,10 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _initialized = false  // True if initialized by Radio hardware
-  private var _txSeq = 0            // Tx sequence number (modulo 16)
-
-  private let _log = Log.sharedInstance
+  private let _radio          : Radio
+  private var _initialized    = false  // True if initialized by Radio hardware
+  private var _txSeq          = 0            // Tx sequence number (modulo 16)
+  private let _log            = Log.sharedInstance
 
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
@@ -69,7 +68,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
         if isForThisClient( properties ) == false { return }
         
         // create a new Stream & add it to the collection
-        radio.daxTxAudioStreams[daxTxStreamId] = DaxTxAudioStream(radio: radio, streamId: daxTxStreamId)
+        radio.daxTxAudioStreams[daxTxStreamId] = DaxTxAudioStream(radio: radio, id: daxTxStreamId)
       }
       // pass the remaining key values parsing (dropping the Id)
       radio.daxTxAudioStreams[daxTxStreamId]!.parseProperties( Array(properties.dropFirst(1)) )
@@ -85,10 +84,10 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   ///   - id:                 Dax stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: DaxTxStreamId) {
+  init(radio: Radio, id: DaxTxStreamId) {
     
-    self.radio = radio
-    self.streamId = streamId
+    self._radio = radio
+    self.id = id
     super.init()
   }
   
@@ -110,7 +109,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
     if !_isTransmitChannel { return false }
     
     // get a TxAudio Vita
-    if _vita == nil { _vita = Vita(type: .txAudio, streamId: streamId) }
+    if _vita == nil { _vita = Vita(type: .txAudio, streamId: id) }
     
     let kMaxSamplesToSend = 128     // maximum packet samples (per channel)
     let kNumberOfChannels = 2       // 2 channels
@@ -161,7 +160,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       if let data = Vita.encodeAsData(_vita!) {
         
         // send packet to radio
-        radio.sendVita(data)
+        _radio.sendVita(data)
       }
       // increment the sequence number (mod 16)
       _txSeq = (_txSeq + 1) % 16
@@ -225,7 +224,14 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
 extension DaxTxAudioStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var isTransmitChannel: Bool {
+    get { return _isTransmitChannel  }
+    set { if _isTransmitChannel != newValue { _isTransmitChannel = newValue ; txAudioCmd( newValue.as1or0) } } }
+
+  // ----------------------------------------------------------------------------
+  // Public properties (KVO compliant)
   
   @objc dynamic public var txGain: Int {
     get { return _txGain  }
@@ -248,7 +254,39 @@ extension DaxTxAudioStream {
     set { if _clientHandle != newValue { _clientHandle = newValue} } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Instance methods that send Commands
+
+  /// Remove this DaxTxAudioStream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              success / failure
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // notify all observers
+    NC.post(.daxTxAudioStreamWillBeRemoved, object: self as Any?)
+    
+    // remove the stream
+    _radio.daxTxAudioStreams[id] = nil
+    
+    // tell the Radio to remove this Stream
+    _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
+  }
+
+  // ----------------------------------------------------------------------------
+  // Private command helper methods
+
+  /// Set a TxAudioStream property on the Radio
+  ///
+  /// - Parameters:
+  ///   - value:      the new value
+  ///
+  private func txAudioCmd(_ value: Any) {
+    
+    _radio.sendCommand("dax tx" + " \(value)")
+  }
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

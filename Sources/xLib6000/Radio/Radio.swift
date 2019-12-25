@@ -206,8 +206,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     waveform = Waveform(radio: self)
     
     // initialize Equalizers (use the newer "sc" type)
-    equalizers[.rxsc] = Equalizer(id: Equalizer.EqType.rxsc.rawValue)
-    equalizers[.txsc] = Equalizer(id: Equalizer.EqType.txsc.rawValue)
+    equalizers[.rxsc] = Equalizer(radio: self, id: Equalizer.EqType.rxsc.rawValue)
+    equalizers[.txsc] = Equalizer(radio: self, id: Equalizer.EqType.txsc.rawValue)
   }
 
   // Send commands  -------------------------------------------------------------
@@ -1271,7 +1271,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     default:
       
-      if command.hasPrefix(Panadapter.kCmd + "create") {
+      if command.hasPrefix("display pan " + "create") {
         // ignore, Panadapter & Waterfall will be created when Status reply is seen
         break
         
@@ -1390,7 +1390,148 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 }
 
 extension Radio {
- 
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Properties (KVO compliant) that send Commands
+  
+  // listed in alphabetical order
+  @objc dynamic public var apfEnabled: Bool {
+    get {  return _apfEnabled }
+    set { if _apfEnabled != newValue { _apfEnabled = newValue ; apfCmd( .mode, newValue.as1or0) } } }
+  
+  @objc dynamic public var apfQFactor: Int {
+    get {  return _apfQFactor }
+    set { if _apfQFactor != newValue { _apfQFactor = newValue ; apfCmd( .qFactor, newValue) } } }
+  
+  @objc dynamic public var apfGain: Int {
+    get {  return _apfGain }
+    set { if _apfGain != newValue { _apfGain = newValue ; apfCmd( .gain, newValue) } } }
+  
+  // FIXME: command for backlight
+  @objc dynamic public var backlight: Int {
+    get {  return _backlight }
+    set { if _backlight != newValue { _backlight = newValue  } } }
+  
+  @objc dynamic public var bandPersistenceEnabled: Bool {
+    get {  return _bandPersistenceEnabled }
+    set { if _bandPersistenceEnabled != newValue { _bandPersistenceEnabled = newValue ; radioSetCmd( .bandPersistenceEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var binauralRxEnabled: Bool {
+    get {  return _binauralRxEnabled }
+    set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var calFreq: Int {
+    get {  return _calFreq }
+    set { if _calFreq != newValue { _calFreq = newValue ; radioSetCmd( .calFreq, newValue.hzToMhz) } } }
+  
+  @objc dynamic public var callsign: String {
+    get {  return _callsign }
+    set { if _callsign != newValue { _callsign = newValue ; radioCmd( .callsign, newValue) } } }
+  
+  @objc dynamic public var enforcePrivateIpEnabled: Bool {
+    get {  return _enforcePrivateIpEnabled }
+    set { if _enforcePrivateIpEnabled != newValue { _enforcePrivateIpEnabled = newValue ; radioSetCmd( .enforcePrivateIpEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var filterCwAutoEnabled: Bool {
+    get {  return _filterCwAutoEnabled }
+    set { if _filterCwAutoEnabled != newValue { _filterCwAutoEnabled = newValue ; radioFilterCmd( .cw, .autoLevel, newValue.as1or0) } } }
+  
+  @objc dynamic public var filterDigitalAutoEnabled: Bool {
+    get {  return _filterDigitalAutoEnabled }
+    set { if _filterDigitalAutoEnabled != newValue { _filterDigitalAutoEnabled = newValue ; radioFilterCmd( .digital, .autoLevel, newValue.as1or0) } } }
+  
+  @objc dynamic public var filterVoiceAutoEnabled: Bool {
+    get {  return _filterVoiceAutoEnabled }
+    set { if _filterVoiceAutoEnabled != newValue { _filterVoiceAutoEnabled = newValue ; radioFilterCmd( .voice, .autoLevel, newValue.as1or0) } } }
+  
+  @objc dynamic public var filterCwLevel: Int {
+    get {  return _filterCwLevel }
+    set { if _filterCwLevel != newValue { _filterCwLevel = newValue ; radioFilterCmd( .cw, .level, newValue) } } }
+  
+  @objc dynamic public var filterDigitalLevel: Int {
+    get {  return _filterDigitalLevel }
+    set { if _filterDigitalLevel != newValue { _filterDigitalLevel = newValue ; radioFilterCmd( .digital, .level, newValue) } } }
+  
+  @objc dynamic public var filterVoiceLevel: Int {
+    get {  return _filterVoiceLevel }
+    set { if _filterVoiceLevel != newValue { _filterVoiceLevel = newValue ; radioFilterCmd( .voice, .level, newValue) } } }
+  
+  @objc dynamic public var freqErrorPpb: Int {
+    get {  return _freqErrorPpb }
+    set { if _freqErrorPpb != newValue { _freqErrorPpb = newValue ; radioSetCmd( .freqErrorPpb, newValue) } } }
+  
+  @objc dynamic public var frontSpeakerMute: Bool {
+    get {  return _frontSpeakerMute }
+    set { if _frontSpeakerMute != newValue { _frontSpeakerMute = newValue ; radioSetCmd( .frontSpeakerMute, newValue.as1or0) } } }
+  
+  @objc dynamic public var fullDuplexEnabled: Bool {
+    get {  return _fullDuplexEnabled }
+    set { if _fullDuplexEnabled != newValue { _fullDuplexEnabled = newValue ; radioSetCmd( .fullDuplexEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var headphoneGain: Int {
+    get {  return _headphoneGain }
+    set { if _headphoneGain != newValue { _headphoneGain = newValue ; mixerCmd( "headphone gain", newValue) } } }
+  
+  @objc dynamic public var headphoneMute: Bool {
+    get {  return _headphoneMute }
+    set { if _headphoneMute != newValue { _headphoneMute = newValue; mixerCmd( "headphone mute", newValue.as1or0) } } }
+  
+  @objc dynamic public var lineoutGain: Int {
+    get {  return _lineoutGain }
+    set { if _lineoutGain != newValue { _lineoutGain = newValue ; mixerCmd( "lineout gain", newValue) } } }
+  
+  @objc dynamic public var lineoutMute: Bool {
+    get {  return _lineoutMute }
+    set { if _lineoutMute != newValue { _lineoutMute = newValue ; mixerCmd( "lineout mute", newValue.as1or0) } } }
+  
+  @objc dynamic public var mox: Bool {
+    get { return _mox }
+    set { if _mox != newValue { _mox = newValue ; xmitCmd( newValue.as1or0) } } }
+  
+  @objc dynamic public var muteLocalAudio: Bool {
+    get { return _muteLocalAudio }
+    set { if _muteLocalAudio != newValue { _muteLocalAudio = newValue ; radioSetCmd( "mute_local_audio", newValue.as1or0) } } }
+  
+  @objc dynamic public var nickname: String {
+    get {  return _nickname }
+    set { if _nickname != newValue { _nickname = newValue ; radioCmd("name", newValue) } } }
+  
+  @objc dynamic public var radioScreenSaver: String {
+    get {  return _radioScreenSaver }
+    set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ; radioCmd("screensaver", newValue) } } }
+  
+  @objc dynamic public var remoteOnEnabled: Bool {
+    get {  return _remoteOnEnabled }
+    set { if _remoteOnEnabled != newValue { _remoteOnEnabled = newValue ; radioSetCmd( .remoteOnEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var rttyMark: Int {
+    get {  return _rttyMark }
+    set { if _rttyMark != newValue { _rttyMark = newValue ; radioSetCmd( .rttyMark, newValue) } } }
+  
+  @objc dynamic public var snapTuneEnabled: Bool {
+    get {  return _snapTuneEnabled }
+    set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; radioSetCmd( .snapTuneEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var startCalibration: Bool {
+    get { return _startCalibration }
+    set { if _startCalibration != newValue { _startCalibration = newValue ; if newValue { radioCmd("pll_start", "") } } } }
+  
+  @objc dynamic public var staticGateway: String {
+    get {  return _staticGateway }
+    set { if _staticGateway != newValue { _staticGateway = newValue } } }
+  
+  @objc dynamic public var staticIp: String {
+    get {  return _staticIp }
+    set { if _staticIp != newValue { _staticIp = newValue } } }
+  
+  @objc dynamic public var staticNetmask: String {
+    get {  return _staticNetmask }
+    set { if _staticNetmask != newValue { _staticNetmask = newValue } } }
+  
+  @objc dynamic public var tnfsEnabled: Bool {
+    get {  return _tnfsEnabled }
+    set { if _tnfsEnabled != newValue { _tnfsEnabled = newValue ; radioSetCmd( .tnfsEnabled, newValue.asTrueFalse) } } }
+
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
   
@@ -1486,9 +1627,86 @@ extension Radio {
 
   @objc dynamic public var tcxoPresent: Bool {
     return _tcxoPresent }
+    
+  // ----------------------------------------------------------------------------
+  // Private command helper methods
+
+  /// Set an Apf property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func apfCmd( _ token: EqApfToken, _ value: Any) {
+    
+   Api.sharedInstance.send(Radio.kApfCmd + token.rawValue + "=\(value)")
+  }
+  /// Set a Mixer property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func mixerCmd( _ token: String, _ value: Any) {
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
+
+   Api.sharedInstance.send(Radio.kMixerCmd + token + " \(value)")
+  }
+  /// Set a Radio property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func radioSetCmd( _ token: RadioToken, _ value: Any) {
+    
+   Api.sharedInstance.send(Radio.kSetCmd + token.rawValue + "=\(value)")
+  }
+  private func radioSetCmd( _ token: String, _ value: Any) {
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
+
+    Api.sharedInstance.send(Radio.kSetCmd + token + "=\(value)")
+  }
+  /// Set a Radio property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func radioCmd( _ token: RadioToken, _ value: Any) {
+    
+   Api.sharedInstance.send(Radio.kCmd + token.rawValue + " \(value)")
+  }
+  private func radioCmd( _ token: String, _ value: Any) {
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
+    Api.sharedInstance.send(Radio.kCmd + token + " \(value)")
+  }
+  /// Set a Radio Filter property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func radioFilterCmd( _ token1: RadioFilterSharpness,  _ token2: RadioFilterSharpness, _ value: Any) {
+    
+   Api.sharedInstance.send(Radio.kCmd + "filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
+  }
+  /// Set Xmit on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func xmitCmd(_ value: Any) {
+    
+    Api.sharedInstance.send(Radio.kXmitCmd + "\(value)")
+  }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Tokens
   
   /// Clients (V3 only)
   ///
@@ -1658,7 +1876,7 @@ extension Radio {
   }
   
   // --------------------------------------------------------------------------------
-  // MARK: - Aliases
+  // Aliases
   
   public typealias AntennaPort              = String
   public typealias FilterMode               = String
@@ -1667,10 +1885,58 @@ extension Radio {
 }
 
 // ----------------------------------------------------------------------------
-// MARK: - DaxIqStream public methods
+// MARK: - Amplifier methods
 
 extension Radio {
+  /// Create an Amplifier record
+  ///
+  /// - Parameters:
+  ///   - ip:             Ip Address (dotted-decimal STring)
+  ///   - port:           Port number
+  ///   - model:          Model
+  ///   - serialNumber:   Serial number
+  ///   - antennaPairs:   antenna pairs
+  ///   - callback:       ReplyHandler (optional)
+  ///
+  public func create(ip: String, port: Int, model: String, serialNumber: String, antennaPairs: String, callback: ReplyHandler? = nil) {
     
+    // TODO: add code
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - AudioStream methods
+
+extension Radio {
+  /// Create an Audio Stream
+  ///
+  /// - Parameters:
+  ///   - channel:            DAX channel number
+  ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public func createAudioStream(_ channel: String, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Stream
+    return sendCommand("stream create " + "dax" + "=\(channel)", replyTo: callback)
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - DaxIqStream methods
+
+extension Radio {
+  /// Create a DaxIQStream
+  ///
+  /// - Parameters:
+  ///   - channel:            DAX channel number
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func create(_ channel: String, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create the Stream
+    sendCommand("stream create type=dax_iq daxiq_channel=\(channel)", replyTo: callback)
+  }
   /// Find the IQ Stream for a DaxIqChannel
   ///
   /// - Parameters:
@@ -1689,10 +1955,106 @@ extension Radio {
 }
 
 // ----------------------------------------------------------------------------
-// MARK: - IQ Stream public methods
+// MARK: - DaxMicAudioStream methods
 
 extension Radio {
-  
+  /// Create a DaxMicAudioStream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func create(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Stream
+    sendCommand("stream create type=dax_mic", replyTo: callback)
+  }
+  /// Request a List of Mic sources
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func listRequest(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for a list of Mic Sources
+    sendCommand("mic list", replyTo: callback == nil ? defaultReplyHandler : callback)
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - DaxRxAudioStream methods
+
+extension Radio {
+  /// Create a DaxRxAudioStream
+  ///
+  /// - Parameters:
+  ///   - channel:            DAX channel number
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func createDaxRxAudioStream(_ channel: String, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Stream
+    sendCommand("stream create type=dax_rx dax_channel=\(channel)", replyTo: callback)
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - DaxTxAudioStream methods
+
+extension Radio {
+  /// Create a DaxTxAudioStream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func createDaxTxAudioStream(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Stream
+    sendCommand("stream create type=dax_tx", replyTo: callback)
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - Equalizer methods
+
+extension Radio {
+  /// Return a list of Equalizer values
+  ///
+  /// - Parameters:
+  ///   - eqType:             Equalizer type raw value of the enum)
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func equalizerInfo(_ eqType: String, callback:  ReplyHandler? = nil) {
+    
+    // ask the Radio for the selected Equalizer settings
+    sendCommand("eq " + eqType + " info", replyTo: callback)
+  }
+}
+
+
+// ----------------------------------------------------------------------------
+// MARK: - IQ Stream methods
+
+extension Radio {
+  /// Create an IQ Stream
+  ///
+  /// - Parameters:
+  ///   - channel:            DAX channel number
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func createIqStream(_ channel: String, callback: ReplyHandler? = nil) {
+    
+    sendCommand("stream create " + "daxiq" + "=\(channel)", replyTo: callback)
+  }
+  /// Create an IQ Stream
+  ///
+  /// - Parameters:
+  ///   - channel:            DAX channel number
+  ///   - ip:                 ip address
+  ///   - port:               port number
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func createIqStream(_ channel: String, ip: String, port: Int, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create the Stream
+    sendCommand("stream create " + "daxiq" + "=\(channel) " + "ip" + "=\(ip) " + "port" + "=\(port)", replyTo: callback)
+  }
   /// Find the IQ Stream for a DaxIqChannel
   ///
   /// - Parameters:
@@ -1711,43 +2073,241 @@ extension Radio {
 }
 
 // ----------------------------------------------------------------------------
-// MARK: - Meter public methods
+// MARK: - Meter methods
 
 extension Radio {
+  /// Find Meters by a Slice Id
+  ///
+  /// - Parameters:
+  ///   - sliceId:    a Slice id
+  /// - Returns:      an array of Meters
+  ///
+  public func findMeters(on sliceId: SliceId) -> [Meter] {
     
-    /// Find Meters by a Slice Id
-    ///
-    /// - Parameters:
-    ///   - sliceId:    a Slice id
-    /// - Returns:      an array of Meters
-    ///
-    public func findMeters(on sliceId: SliceId) -> [Meter] {
-      
-      // find the Meters on the specified Slice (if any)
-      return meters.values.filter { $0.source == "slc" && $0.group.objectId == sliceId }
-    }
-    /// Find a Meter by its ShortName
-    ///
-    /// - Parameters:
-    ///   - name:       Short Name of a Meter
-    /// - Returns:      a Meter reference
-    ///
-    public func findMeter(shortName name: MeterName) -> Meter? {
-
-      // find the Meters with the specified Name (if any)
-      let selectedMeters = meters.values.filter { $0.name == name }
-      guard selectedMeters.count >= 1 else { return nil }
-      
-      // return the first one
-      return selectedMeters[0]
-    }
+    // find the Meters on the specified Slice (if any)
+    return meters.values.filter { $0.source == "slc" && $0.group.objectId == sliceId }
+  }
+  /// Find a Meter by its ShortName
+  ///
+  /// - Parameters:
+  ///   - name:       Short Name of a Meter
+  /// - Returns:      a Meter reference
+  ///
+  public func findMeter(shortName name: MeterName) -> Meter? {
+    
+    // find the Meters with the specified Name (if any)
+    let selectedMeters = meters.values.filter { $0.name == name }
+    guard selectedMeters.count >= 1 else { return nil }
+    
+    // return the first one
+    return selectedMeters[0]
+  }
+  /// Subscribe to a meter
+  /// - Parameter id:       the meter id
+  ///
+  public func subscribeMeter(id: MeterId) {
+    
+    // subscribe to the specified Meter
+    sendCommand("sub meter \(id)")
+  }
+  /// Unsubscribe to a meter
+  /// - Parameter id:       the meter id
+  ///
+  public func unSubscribeMeter(id: MeterId) {
+    
+    // unsubscribe from the specified Meter
+    sendCommand("unsub meter \(id)")
+  }
+  /// Request a list of Meters
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func listMeters(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for a list of Meters
+    sendCommand(Api.Command.meterList.rawValue, replyTo: callback)
+  }
 }
 
 // ----------------------------------------------------------------------------
-// MARK: - Panadapter public methods
+// MARK: - Memory methods
 
 extension Radio {
+  /// Create a Memory
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func createMemory(callback: ReplyHandler? = nil) {
     
+    // tell the Radio to create a Memory
+    sendCommand("memory create", replyTo: callback)
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - MicAudioStream methods
+
+extension Radio {
+  /// Create a Mic Audio Stream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public func createMicAudioStream(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Stream
+    sendCommand("stream create daxmic", replyTo: callback)
+  }
+  /// Request a List of Mic sources
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func listMicSources(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for a list of Mic Sources
+    sendCommand(Api.Command.micList.rawValue, replyTo: callback == nil ? defaultReplyHandler : callback)
+  }
+
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - Opus methods
+
+extension Radio {
+  
+  // FIXME: - How should this work?
+  
+  /// Turn Opus Rx On/Off
+  ///
+  /// - Parameters:
+  ///   - value:              On/Off
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  //  public func create(callback: ReplyHandler? = nil) {
+  //
+  //    // tell the Radio to enable Opus Rx
+  //    Api.sharedInstance.send(Opus.kCmd + Opus.Token.remoteRxOn.rawValue + " \(value.asNumber)", replyTo: callback)
+  //  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - Panadapter methods
+
+extension Radio {
+  /// Request a list of antenns
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func antennaListRequest(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio to send a list of antennas
+    sendCommand(Api.Command.antList.rawValue, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+  }
+  /// Identify a low Bandwidth connection
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func clientLowBandwidthConnect(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to limit the connection bandwidth
+   sendCommand(Api.Command.clientProgram.rawValue + "low_bw_connect", replyTo: callback)
+  }
+  /// Turn off persistence
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func clientPersistenceOff(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to turn off persistence
+   sendCommand(Api.Command.clientProgram.rawValue + "start_persistence off", replyTo: callback)
+  }
+  /// Key CW
+  ///
+  /// - Parameters:
+  ///   - state:              Key Up = 0, Key Down = 1
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func cwKeyImmediate(state: Bool, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to change the keydown state
+   sendCommand(Transmit.kCwCmd + "key immediate" + " \(state.as1or0)", replyTo: callback)
+  }
+  
+  /// Refresh the Radio License
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func refreshLicense(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for its license info
+    return sendCommand(Radio.kLicenseCmd + "refresh", replyTo: callback)
+  }
+  /// Set Static Network properties on the Radio
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func staticNetParamsSet(callback: ReplyHandler? = nil) {
+    
+    sendCommand(Radio.kCmd + "static_net_params" + " " + RadioStaticNet.ip.rawValue + "=\(staticIp) " + RadioStaticNet.gateway.rawValue + "=\(staticGateway) " + RadioStaticNet.netmask.rawValue + "=\(staticNetmask)")
+  }
+  /// Reset the Static Net Params
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func staticNetParamsReset(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to reset the Static Net Params
+   sendCommand(Radio.kCmd + "static_net_params" + " reset", replyTo: callback)
+  }
+  /// Reboot the Radio
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func rebootRequest(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to reboot
+   sendCommand(Radio.kCmd + "reboot", replyTo: callback)
+  }
+  /// Request the elapsed uptime
+  ///
+  public func uptimeRequest(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for the elapsed uptime
+   sendCommand(Radio.kUptimeCmd, replyTo: callback == nil ? defaultReplyHandler : callback)
+  }
+  /// Create a Panafall
+  ///
+  /// - Parameters:
+  ///   - dimensions:         Panafall dimensions
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func createPanadapter(_ dimensions: CGSize, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Panafall (if any available)
+    if availablePanadapters > 0 {
+      sendCommand("display pan create x=\(dimensions.width) y=\(dimensions.height)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+    }
+  }
+  /// Create a Panafall
+  ///
+  /// - Parameters:
+  ///   - frequency:          selected frequency (Hz)
+  ///   - antenna:            selected antenna
+  ///   - dimensions:         Panafall dimensions
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func createPanadapter(frequency: Int, antenna: String? = nil, dimensions: CGSize? = nil, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Panafall (if any available)
+    if availablePanadapters > 0 {
+      
+      var cmd = "display pan create freq" + "=\(frequency.hzToMhz)"
+      if antenna != nil { cmd += " ant=" + "\(antenna!)" }
+      if dimensions != nil { cmd += " x" + "=\(dimensions!.width)" + " y" + "=\(dimensions!.height)" }
+      sendCommand(cmd, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+    }
+  }
   /// Find the active Panadapter
   ///
   /// - Returns:      a reference to a Panadapter (or nil)
@@ -1755,7 +2315,7 @@ extension Radio {
   public func findActivePanadapter() -> Panadapter? {
 
     // find the Panadapters with an active Slice (if any)
-    let selectedPanadapters = panadapters.values.filter { findActiveSlice(on: $0.streamId) != nil }
+    let selectedPanadapters = panadapters.values.filter { findActiveSlice(on: $0.id) != nil }
     guard selectedPanadapters.count >= 1 else { return nil }
 
     // return the first one
@@ -1779,10 +2339,36 @@ extension Radio {
 }
 
 // ----------------------------------------------------------------------------
-// MARK: - Slice public methods
+// MARK: - Slice methods
 
 extension Radio {
-  
+  /// Create a new Slice
+  ///
+  /// - Parameters:
+  ///   - frequency:          frequenct (Hz)
+  ///   - antenna:            selected antenna
+  ///   - mode:               selected mode
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func create(frequency: Int, antenna: String, mode: String, callback: ReplyHandler? = nil) {
+    if availableSlices > 0 {
+      // tell the Radio to create a Slice
+      sendCommand("slice create " + "\(frequency.hzToMhz) \(antenna) \(mode)", replyTo: callback)
+    }
+  }
+  /// Create a new Slice
+  ///
+  /// - Parameters:
+  ///   - panadapter:         selected panadapter
+  ///   - frequency:          frequency (Hz)
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func create(panadapter: Panadapter, frequency: Int = 0, callback: ReplyHandler? = nil) {
+    if availableSlices > 0 {
+      // tell the Radio to create a Slice
+      sendCommand("slice create " + "pan" + "=\(panadapter.id.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz)")", replyTo: callback)
+    }
+  }
   /// Disable all TxEnabled
   ///
   public func disableSliceTx() {
@@ -1871,12 +2457,47 @@ extension Radio {
     return filteredSlices[0]
   }
 }
-    
+
 // ----------------------------------------------------------------------------
-// MARK: - Tnf public methods
+// MARK: -  RemoteRxAudioStream methods
 
 extension Radio {
+  /// Create a RemoteRxAudioStream
+  ///
+  /// - Parameters:
+  ///   - compression:        "opus"|"none""
+  ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              success / failure
+  ///
+  public func createRxAudioStream(compression: String, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to enable Opus Rx
+    sendCommand("stream create type=remote_audio_rx compression=\(compression)", replyTo: callback)
+  }
+}
 
+// ----------------------------------------------------------------------------
+// MARK: -  RemoteTxAudioStream methods
+
+extension Radio {
+  /// Create a RemoteTxAudioStream
+  ///
+  /// - Parameters:
+  ///   - compression:        "opus"|"none""
+  ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              success / failure
+  ///
+  public func createTxAudioStream(compression: String, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to enable RemoteTxAudioStream
+    sendCommand("stream create type=remote_audio_tx compression=\(compression)", replyTo: callback)
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - Tnf methods
+
+extension Radio {
   /// Create a Tnf
   ///
   /// - Parameters:
@@ -1903,5 +2524,54 @@ extension Radio {
     
     // return the first one
     return filteredTnfs[0]
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - TxAudioStream methods
+
+extension Radio {
+  /// Create a Tx Audio Stream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public func createTxAudioStream(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Stream
+    sendCommand("stream create " + "daxtx", replyTo: callback)
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - WanServer methods
+
+extension Radio {
+  /// Setup SmartLink ports
+  ///
+  /// - Parameters:
+  ///   - tcpPort:                  public Tls port
+  ///   - udpPort:                  public Udp port
+  ///   - callback:                 ReplyHandler (optional)
+  ///
+  public func smartlinkConfigure(tcpPort: Int, udpPort: Int, callback: ReplyHandler? = nil) {
+    
+    // set the Radio's SmartLink port usage
+    sendCommand("wan set " + "public_tls_port" + "=\(tcpPort)" + " public_udp_port" + "=\(udpPort)", replyTo: callback)
+  }
+}
+
+// ----------------------------------------------------------------------------
+// MARK: - Xvtr methods
+
+extension Radio {
+  /// Create an Xvtr
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func createXvtr(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a USB Cable
+    sendCommand("xvtr create" , replyTo: callback)
   }
 }

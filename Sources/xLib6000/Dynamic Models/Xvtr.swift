@@ -22,7 +22,7 @@ public final class Xvtr                     : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var id                : XvtrId = ""                   // Id that uniquely identifies this Xvtr
+  public let id                             : XvtrId
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -43,6 +43,7 @@ public final class Xvtr                     : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
+  private let _radio                        : Radio
   private let _log                          = Log.sharedInstance
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -76,7 +77,7 @@ public final class Xvtr                     : NSObject, DynamicModel {
       if radio.xvtrs[name] == nil {
         
         // NO, create a new Xvtr & add it to the Xvtrs collection
-        radio.xvtrs[name] = Xvtr(id: name)
+        radio.xvtrs[name] = Xvtr(radio: radio, id: name)
       }
       // pass the remaining key values to the Xvtr for parsing (dropping the Id)
       radio.xvtrs[name]!.parseProperties( Array(keyValues.dropFirst(1)) )
@@ -101,8 +102,9 @@ public final class Xvtr                     : NSObject, DynamicModel {
   ///   - queue:              Concurrent queue
   ///   - log:                logging instance
   ///
-  public init(id: XvtrId) {
+  public init(radio: Radio, id: XvtrId) {
     
+    self._radio = radio
     self.id = id
     super.init()
   }
@@ -189,7 +191,7 @@ public final class Xvtr                     : NSObject, DynamicModel {
 extension Xvtr {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant)
   
   @objc dynamic public var inUse: Bool {
     return _inUse }
@@ -204,9 +206,72 @@ extension Xvtr {
     return _twoMeterInt }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Public properties (KVO compliant) that send Commands
   
-  /// Properties
+  @objc dynamic public var ifFrequency: Int {
+    get { return _ifFrequency }
+    set { if _ifFrequency != newValue { _ifFrequency = newValue ; xvtrCmd( .ifFrequency, newValue) } } }
+  
+  @objc dynamic public var loError: Int {
+    get { return _loError }
+    set { if _loError != newValue { _loError = newValue ; xvtrCmd( .loError, newValue) } } }
+  
+  @objc dynamic public var name: String {
+    get { return _name }
+    set { if _name != newValue { _name = newValue ; xvtrCmd( .name, newValue) } } }
+  
+  @objc dynamic public var maxPower: Int {
+    get { return _maxPower }
+    set { if _maxPower != newValue { _maxPower = newValue ; xvtrCmd( .maxPower, newValue) } } }
+  
+  @objc dynamic public var order: Int {
+    get { return _order }
+    set { if _order != newValue { _order = newValue ; xvtrCmd( .order, newValue) } } }
+  
+  @objc dynamic public var rfFrequency: Int {
+    get { return _rfFrequency }
+    set { if _rfFrequency != newValue { _rfFrequency = newValue ; xvtrCmd( .rfFrequency, newValue) } } }
+  
+  @objc dynamic public var rxGain: Int {
+    get { return _rxGain }
+    set { if _rxGain != newValue { _rxGain = newValue ; xvtrCmd( .rxGain, newValue) } } }
+  
+  @objc dynamic public var rxOnly: Bool {
+    get { return _rxOnly }
+    set { if _rxOnly != newValue { _rxOnly = newValue ; xvtrCmd( .rxOnly, newValue) } } }
+  
+  // ----------------------------------------------------------------------------
+  // Instance methods that send Commands
+  
+  /// Remove this Xvtr
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove a XVTR
+    _radio.sendCommand("xvtr remove " + "\(id)", replyTo: callback)
+  }
+  
+  // ----------------------------------------------------------------------------
+  // Private command helper methods
+
+  /// Set an Xvtr property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func xvtrCmd(_ token: Token, _ value: Any) {
+    
+    _radio.sendCommand("xvtr set " + "\(id) " + token.rawValue + "=\(value)")
+  }
+  
+  // ----------------------------------------------------------------------------
+  // Tokens
+  
+  /// Xvtr Properties
   ///
   internal enum Token : String {
     case name

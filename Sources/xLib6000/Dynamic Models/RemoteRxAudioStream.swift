@@ -36,8 +36,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                          : Radio
-  public let streamId                       : RemoteRxStreamId
+  public let id                             : RemoteRxStreamId
   public var isStreaming                    = false
   
   // ------------------------------------------------------------------------------
@@ -52,6 +51,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private let _radio                        : Radio
   private let _log                          = Log.sharedInstance
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -88,7 +88,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
         if isForThisClient( properties ) == false { return }
 
         // create a new object & add it to the collection
-        radio.remoteRxAudioStreams[remoteRxStreamId] = RemoteRxAudioStream(radio: radio, streamId: remoteRxStreamId)
+        radio.remoteRxAudioStreams[remoteRxStreamId] = RemoteRxAudioStream(radio: radio, id: remoteRxStreamId)
       }
       // pass the remaining key values for parsing (dropping the Id & Type)
       radio.remoteRxAudioStreams[remoteRxStreamId]!.parseProperties( Array(properties.dropFirst(2)) )
@@ -104,10 +104,10 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   ///   - id:                 an Opus Stream id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: RemoteRxStreamId) {
+  init(radio: Radio, id: RemoteRxStreamId) {
     
-    self.radio = radio
-    self.streamId = streamId
+    self._radio = radio
+    self.id = id
     super.init()
     
     isStreaming = false
@@ -217,12 +217,8 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
 extension RemoteRxAudioStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - NON Public properties (KVO compliant)
+  // Public properties (KVO compliant)
   
-  public var delegate: StreamHandler? {
-    get { return Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-
   @objc dynamic public var clientHandle: Handle {
     get { return _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue} } }
@@ -236,7 +232,34 @@ extension RemoteRxAudioStream {
     set { if _ip != newValue { _ip = newValue} } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Public properties
+  
+  public var delegate: StreamHandler? {
+    get { return Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
+
+  // ----------------------------------------------------------------------------
+  // Instance methods that send Commands
+
+  /// Remove this RemoteRxAudioStream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              success / failure
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+
+    // notify all observers
+    NC.post(.remoteRxAudioStreamWillBeRemoved, object: self as Any?)
+    
+    // remove the stream
+    _radio.remoteRxAudioStreams[id] = nil
+
+    // tell the Radio to remove the Stream
+    _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
+  }
+
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

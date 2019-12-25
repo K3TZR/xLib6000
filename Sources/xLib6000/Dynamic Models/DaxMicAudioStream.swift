@@ -23,10 +23,8 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                    : Radio
-  public let streamId                 : DaxMicStreamId
-  
-  public              var rxLostPacketCount  = 0  // Rx lost packet count
+  public let id                       : DaxMicStreamId
+  public var rxLostPacketCount        = 0  // Rx lost packet count
   
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -39,11 +37,12 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
 
-  private weak var _delegate : StreamHandler? // Delegate for Audio stream
-  private      var _initialized = false       // True if initialized by Radio hardware
-  private      var _rxSeq : Int?              // Rx sequence number
+  private      let _radio         : Radio
+  private weak var _delegate      : StreamHandler? // Delegate for Audio stream
+  private      var _initialized   = false       // True if initialized by Radio hardware
+  private      var _rxSeq         : Int?              // Rx sequence number
 
-  private      let _log = Log.sharedInstance
+  private      let _log           = Log.sharedInstance
 
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
@@ -71,7 +70,7 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
         if isForThisClient( properties ) == false { return }
 
         // create a new object & add it to the collection
-        radio.daxMicAudioStreams[daxMicStreamId] = DaxMicAudioStream(radio: radio, streamId: daxMicStreamId)
+        radio.daxMicAudioStreams[daxMicStreamId] = DaxMicAudioStream(radio: radio, id: daxMicStreamId)
       }
       // pass the remaining key values for parsing (dropping the Id)
       radio.daxMicAudioStreams[daxMicStreamId]!.parseProperties( Array(properties.dropFirst(1)) )
@@ -87,10 +86,10 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
   ///   - id:                 a Dax Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: DaxMicStreamId) {
+  init(radio: Radio, id: DaxMicStreamId) {
     
-    self.radio = radio
-    self.streamId = streamId
+    _radio = radio
+    self.id = id
     super.init()
   }
   
@@ -215,7 +214,7 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
 extension DaxMicAudioStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant)
   
   @objc dynamic public var clientHandle: Handle {
     get { return _clientHandle  }
@@ -239,14 +238,33 @@ extension DaxMicAudioStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - NON Public properties (KVO compliant)
+  // Public properties
   
   public var delegate: StreamHandler? {
     get { return Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Instance methods that send Commands
+
+  /// Remove this DaxMicAudioStream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              success / failure
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // notify all observers
+    NC.post(.daxMicAudioStreamWillBeRemoved, object: self as Any?)
+    
+    // remove the stream
+    _radio.daxMicAudioStreams[id] = nil
+    
+    // tell the Radio to remove this Stream
+    _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
+  }
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

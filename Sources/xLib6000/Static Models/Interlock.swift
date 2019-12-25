@@ -17,38 +17,37 @@ import Foundation
 public final class Interlock                : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Static properties
+  // MARK: - Public properties
   
-  static let kCmd                           = "interlock "
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(false, Api.objectQ)  var _accTxEnabled                            //
-  @Barrier(0, Api.objectQ)      var _accTxDelay                                   //
-  @Barrier(false, Api.objectQ)  var _accTxReqEnabled                          //
-  @Barrier(false, Api.objectQ)  var _accTxReqPolarity                         //
-  @Barrier("", Api.objectQ)     var _amplifier                                   //
-  @Barrier(false, Api.objectQ)  var _rcaTxReqEnabled                          //
-  @Barrier(false, Api.objectQ)  var _rcaTxReqPolarity                         //
-  @Barrier("", Api.objectQ)     var _reason                                      //
-  @Barrier("", Api.objectQ)     var _source                                      //
-  @Barrier("", Api.objectQ)     var _state                                       //
-  @Barrier(0, Api.objectQ)      var _timeout                                     //
-  @Barrier(false, Api.objectQ)  var _txAllowed                               //
-  @Barrier(0, Api.objectQ)      var _txDelay                                      //
-  @Barrier(0, Api.objectQ)      var _tx1Delay                                     //
-  @Barrier(false, Api.objectQ)  var _tx1Enabled                               //
-  @Barrier(0, Api.objectQ)      var _tx2Delay                                    //
-  @Barrier(false, Api.objectQ)  var _tx2Enabled                               //
-  @Barrier(0, Api.objectQ)      var _tx3Delay                                    //
-  @Barrier(false, Api.objectQ)  var _tx3Enabled                              //
+  @Barrier(false, Api.objectQ)  var _accTxEnabled
+  @Barrier(0, Api.objectQ)      var _accTxDelay
+  @Barrier(false, Api.objectQ)  var _accTxReqEnabled
+  @Barrier(false, Api.objectQ)  var _accTxReqPolarity
+  @Barrier("", Api.objectQ)     var _amplifier
+  @Barrier(false, Api.objectQ)  var _rcaTxReqEnabled
+  @Barrier(false, Api.objectQ)  var _rcaTxReqPolarity
+  @Barrier("", Api.objectQ)     var _reason
+  @Barrier("", Api.objectQ)     var _source
+  @Barrier("", Api.objectQ)     var _state
+  @Barrier(0, Api.objectQ)      var _timeout
+  @Barrier(false, Api.objectQ)  var _txAllowed
+  @Barrier(0, Api.objectQ)      var _txDelay
+  @Barrier(0, Api.objectQ)      var _tx1Delay
+  @Barrier(false, Api.objectQ)  var _tx1Enabled
+  @Barrier(0, Api.objectQ)      var _tx2Delay
+  @Barrier(false, Api.objectQ)  var _tx2Enabled
+  @Barrier(0, Api.objectQ)      var _tx3Delay
+  @Barrier(false, Api.objectQ)  var _tx3Enabled
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private let _radio                        : Radio
   private let _log                          = Log.sharedInstance
-  private var _radio                        : Radio
 
  // ------------------------------------------------------------------------------
   // MARK: - Initialization
@@ -165,8 +164,68 @@ public final class Interlock                : NSObject, StaticModel {
 
 extension Interlock {
 
+  
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var accTxEnabled: Bool {
+    get { return _accTxEnabled }
+    set { if _accTxEnabled != newValue { _accTxEnabled = newValue ; interlockCmd( .accTxEnabled, newValue.asTF) } } }
+  
+  @objc dynamic public var accTxDelay: Int {
+    get { return _accTxDelay }
+    set { if _accTxDelay != newValue { _accTxDelay = newValue ; interlockCmd( .accTxDelay, newValue) } } }
+  
+  @objc dynamic public var accTxReqEnabled: Bool {
+    get {  return _accTxReqEnabled }
+    set { if _accTxReqEnabled != newValue { _accTxReqEnabled = newValue ; interlockCmd( .accTxReqEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var accTxReqPolarity: Bool {
+    get {  return _accTxReqPolarity }
+    set { if _accTxReqPolarity != newValue { _accTxReqPolarity = newValue ; interlockCmd( .accTxReqPolarity, newValue.as1or0) } } }
+  
+  @objc dynamic public var rcaTxReqEnabled: Bool {
+    get {  return _rcaTxReqEnabled}
+    set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue ; interlockCmd( .rcaTxReqEnabled, newValue.asTF) } } }
+  
+  @objc dynamic public var rcaTxReqPolarity: Bool {
+    get {  return _rcaTxReqPolarity }
+    set { if _rcaTxReqPolarity != newValue { _rcaTxReqPolarity = newValue ; interlockCmd( .rcaTxReqPolarity, newValue.asTF) } } }
+  
+  @objc dynamic public var timeout: Int {
+    get {  return _timeout }
+    set { if _timeout != newValue { _timeout = newValue ; interlockCmd( .timeout, newValue) } } }
+  
+  @objc dynamic public var txDelay: Int {
+    get { return _txDelay }
+    set { if _txDelay != newValue { _txDelay = newValue  ; interlockCmd( .txDelay, newValue) } } }
+
+  @objc dynamic public var tx1Enabled: Bool {
+    get { return _tx1Enabled }
+    set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; interlockCmd( .tx1Enabled, newValue.asTF) } } }
+  
+  @objc dynamic public var tx1Delay: Int {
+    get { return _tx1Delay }
+    set { if _tx1Delay != newValue { _tx1Delay = newValue  ; interlockCmd( .tx1Delay, newValue) } } }
+  
+  @objc dynamic public var tx2Enabled: Bool {
+    get { return _tx2Enabled }
+    set { if _tx2Enabled != newValue { _tx2Enabled = newValue ; interlockCmd( .tx2Enabled, newValue.asTF) } } }
+  
+  @objc dynamic public var tx2Delay: Int {
+    get { return _tx2Delay }
+    set { if _tx2Delay != newValue { _tx2Delay = newValue ; interlockCmd( .tx2Delay, newValue) } } }
+  
+  @objc dynamic public var tx3Enabled: Bool {
+    get { return _tx3Enabled }
+    set { if _tx3Enabled != newValue { _tx3Enabled = newValue ; interlockCmd( .tx3Enabled, newValue.asTF) } } }
+  
+  @objc dynamic public var tx3Delay: Int {
+    get { return _tx3Delay }
+    set { if _tx3Delay != newValue { _tx3Delay = newValue ; interlockCmd( .tx3Delay, newValue) } } }
+
+  // ----------------------------------------------------------------------------
+  // Public properties (KVO compliant)
   
   @objc dynamic public var reason: String {
     return _reason }
@@ -184,7 +243,21 @@ extension Interlock {
     return _txAllowed }
     
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Private command helper methods
+
+  /// Set a Interlock property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func interlockCmd(_ token: Token, _ value: Any) {
+    
+    _radio.sendCommand("interlock " + token.rawValue + "=\(value)")
+  }
+  
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

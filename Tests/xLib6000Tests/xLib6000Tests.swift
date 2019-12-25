@@ -31,10 +31,10 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertNotNil(radio.wan, "Failed to instantiate Wan")
     XCTAssertNotNil(radio.waveform, "Failed to instantiate Waveform")
     
-    let pan = Panadapter(radio: radio, streamId: "0x40000000".streamId!)
+    let pan = Panadapter(radio: radio, id: "0x40000000".streamId!)
     XCTAssertNotNil(pan, "Failed to instantiate Panadapter")
 
-    let waterfall = Waterfall(radio: radio, streamId: "0x40000001".streamId!)
+    let waterfall = Waterfall(radio: radio, id: "0x40000001".streamId!)
     XCTAssertNotNil(waterfall, "Failed to instantiate Waterfall")
 
     let slice = Slice(radio: radio, id: 1)
@@ -43,7 +43,7 @@ final class xLib6000Tests: XCTestCase {
     let tnf = Tnf(radio: radio, id: 1)
     XCTAssertNotNil(tnf, "Failed to instantiate Tnf")
 
-    let audioStream = AudioStream(radio: radio, streamId: "0x41000000".streamId!)
+    let audioStream = AudioStream(radio: radio, id: "0x41000000".streamId!)
     XCTAssertNotNil(audioStream, "Failed to instantiate AudioStream")
     
     let meter = Meter(radio: radio, id: 1)

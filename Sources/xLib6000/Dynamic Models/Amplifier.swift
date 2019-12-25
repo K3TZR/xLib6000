@@ -17,37 +17,29 @@ public typealias AmplifierId = String
 ///      updated by the incoming TCP messages. They are collected in the amplifiers
 ///      collection on the Radio object.
 ///
-public final class Amplifier : NSObject, DynamicModel {
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kSetCmd  = "amplifier set "  // Command prefixes
-  static let kOperate = "OPERATE"
-  static let kStandby = "STANDBY"
+public final class Amplifier  : NSObject, DynamicModel {
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var id : AmplifierId = "" // Id that uniquely identifies this Amplifier
+  public let id               : AmplifierId
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
 
-  @Barrier("", Api.objectQ) var _ant            // Antenna list
-  @Barrier("", Api.objectQ) var _ip             // Ip Address (dotted decimal)
-  @Barrier("", Api.objectQ) var _model          // Amplifier model
-  @Barrier("", Api.objectQ) var _mode           // Amplifier mode
-  @Barrier(0, Api.objectQ)  var _port           //
-  @Barrier("", Api.objectQ) var _serialNumber   // Serial number
+  @Barrier("", Api.objectQ) var _ant
+  @Barrier("", Api.objectQ) var _ip
+  @Barrier("", Api.objectQ) var _model
+  @Barrier("", Api.objectQ) var _mode
+  @Barrier(0, Api.objectQ)  var _port
+  @Barrier("", Api.objectQ) var _serialNumber
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _initialized  = false             // True if initialized by Radio hardware
-
-  private let _log = Log.sharedInstance
-  private let _radio : Radio
+  private let _radio        : Radio
+  private var _initialized  = false
+  private let _log          = Log.sharedInstance
 
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
@@ -174,7 +166,69 @@ public final class Amplifier : NSObject, DynamicModel {
 extension Amplifier {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Public properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var ant: String {
+    get { return _ant }
+    set { if _ant != newValue { _ant = newValue ; amplifierCmd(.ant, newValue) } } }
+  
+  @objc dynamic public var ip: String {
+    get { return _ip }
+    set { if _ip != newValue { _ip = newValue ; amplifierCmd(.ip, newValue) } } }
+  
+  @objc dynamic public var model: String {
+    get { return _model }
+    set { if _model != newValue { _model = newValue ; amplifierCmd(.model, newValue) } } }
+  
+  @objc dynamic public var mode: String {
+    get { return _mode }
+    set { if _mode != newValue { _mode = newValue ; amplifierCmd(.mode, newValue) } } }
+  
+  @objc dynamic public var port: Int {
+    get { return _port }
+    set { if _port != newValue { _port = newValue ; amplifierCmd( .port, newValue) } } }
+  
+  @objc dynamic public var serialNumber: String {
+    get { return _serialNumber }
+    set { if _serialNumber != newValue { _serialNumber = newValue ; amplifierCmd( .serialNumber, newValue) } } }
+
+  // ----------------------------------------------------------------------------
+  // Instance methods that send Commands
+
+  /// Remove this Amplifier record
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // TODO: add code
+  }
+  /// Change the Amplifier Mode
+  ///
+  /// - Parameters:
+  ///   - mode:           mode (String)
+  ///   - callback:       ReplyHandler (optional)
+  ///
+  public func setMode(_ mode: Bool, callback: ReplyHandler? = nil) {
+    
+    // TODO: add code
+  }
+
+  // ----------------------------------------------------------------------------
+  // Private command helper methods
+
+  /// Set an Amplifier property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func amplifierCmd(_ token: Token, _ value: Any) {
+    
+    _radio.sendCommand("amplifier set " + "\(id) " + token.rawValue + "=\(value)")
+  }
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

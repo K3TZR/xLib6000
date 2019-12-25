@@ -102,8 +102,16 @@ public final class Atu                      : NSObject, StaticModel {
 
 extension Atu {
   
+  
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var memoriesEnabled: Bool {
+    get {  return _memoriesEnabled }
+    set { if _memoriesEnabled != newValue { _memoriesEnabled = newValue ; atuCmd( .memoriesEnabled, newValue.as1or0) } } }
+
+  // ----------------------------------------------------------------------------
+  // Public properties (KVO compliant)
   
   @objc dynamic public var status: String {
     var value = ""
@@ -137,7 +145,52 @@ extension Atu {
     return _enabled }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Instance methods that send Commands
+
+  /// Clear the ATU
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func atuClear(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to clear the ATU
+    _radio.sendCommand(Atu.kClearCmd, replyTo: callback)
+  }
+  /// Start the ATU
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func atuStart(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to start the ATU
+    _radio.sendCommand(Atu.kStartCmd, replyTo: callback)
+  }
+  /// Bypass the ATU
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func atuBypass(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to bypass the ATU
+    _radio.sendCommand(Atu.kBypassCmd, replyTo: callback)
+  }
+
+  // ----------------------------------------------------------------------------
+  // Private command helper methods
+
+  /// Set an ATU property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func atuCmd(_ token: Token, _ value: Any) {
+    
+    _radio.sendCommand("atu " + token.rawValue + "=\(value)")
+  }
+
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

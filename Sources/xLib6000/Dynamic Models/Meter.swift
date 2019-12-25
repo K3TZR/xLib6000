@@ -24,7 +24,6 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                          : Radio
   public let id                             : MeterId
 
   @Barrier("", Api.objectQ) @objc dynamic public  var desc
@@ -41,6 +40,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private let _radio                        : Radio
   private let _log                          = Log.sharedInstance
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
 
@@ -211,7 +211,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   ///
   public init(radio: Radio, id: MeterId) {
     
-    self.radio = radio
+    _radio = radio
     self.id = id
     
     // FIXME:
@@ -330,52 +330,9 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
 }
 
 extension Meter {
-  
+
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
-  
-//  @objc dynamic public var desc: String {
-//    get { return Api.objectQ.sync { _desc } }
-//    set { Api.objectQ.sync(flags: .barrier) { _desc = newValue } } }
-//  
-//  @objc dynamic public var fps: Int {
-//    get { return Api.objectQ.sync { _fps } }
-//    set { Api.objectQ.sync(flags: .barrier) { _fps = newValue } } }
-//  
-//  @objc dynamic public var high: Float {
-//    get { return Api.objectQ.sync { _high } }
-//    set { Api.objectQ.sync(flags: .barrier) { _high = newValue } } }
-//  
-//  @objc dynamic public var low: Float {
-//    get { return Api.objectQ.sync { _low } }
-//    set { Api.objectQ.sync(flags: .barrier) { _low = newValue } } }
-//  
-//  @objc dynamic public var name: String {
-//    get { return Api.objectQ.sync { _name } }
-//    set { Api.objectQ.sync(flags: .barrier) { _name = newValue } } }
-//  
-//  @objc dynamic public var group: String {
-//    get { return Api.objectQ.sync { _group } }
-//    set { Api.objectQ.sync(flags: .barrier) { _group = newValue } } }
-//  
-//  @objc dynamic public var peak: Float {
-//    get { return Api.objectQ.sync { _peak } }
-//    set { Api.objectQ.sync(flags: .barrier) { _peak = newValue } } }
-//  
-//  @objc dynamic public var source: String {
-//    get { return Api.objectQ.sync { _source } }
-//    set { Api.objectQ.sync(flags: .barrier) { _source = newValue } } }
-//  
-//  @objc dynamic public var units: String {
-//    get { return Api.objectQ.sync { _units } }
-//    set { Api.objectQ.sync(flags: .barrier) { _units = newValue } } }
-//  
-//  @objc dynamic public var value: Float {
-//    get { return Api.objectQ.sync { _value } }
-//    set { Api.objectQ.sync(flags: .barrier) { _value = newValue } } }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Tokens
   
   /// Properties
   ///

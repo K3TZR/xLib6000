@@ -39,8 +39,8 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
+  public let id                             : OpusId
   public var isStreaming                    = false
-  public private(set) var streamId          : OpusId                        // The Opus streamId
   
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -57,8 +57,8 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _log                          = Log.sharedInstance
   private var _radio                        : Radio
+  private let _log                          = Log.sharedInstance
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
   private var _clientHandle                 : UInt32 = 0                    //
@@ -92,7 +92,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       if  radio.opusStreams[streamId] == nil {
         
         // NO, create a new Opus & add it to the OpusStreams collection
-        radio.opusStreams[streamId] = Opus(streamId: streamId, radio: radio)
+        radio.opusStreams[streamId] = Opus(radio: radio, id: streamId)
       }
       // pass the key values to Opus for parsing  (dropping the Id)
       radio.opusStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
@@ -108,10 +108,10 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   ///   - id:                 an Opus Stream id
   ///   - queue:              Concurrent queue
   ///
-  init(streamId: OpusId, radio: Radio) {
+  init(radio: Radio, id: OpusId) {
     
-    self.streamId = streamId
     _radio = radio
+    self.id = id
     super.init()
     
     isStreaming = false
@@ -272,7 +272,18 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
 extension Opus {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var rxEnabled: Bool {
+    get { return _rxEnabled }
+    set { if _rxEnabled != newValue { _rxEnabled = newValue ; opusCmd( .rxEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var txEnabled: Bool {
+    get { return _txEnabled }
+    set { if _txEnabled != newValue { _txEnabled = newValue ; opusCmd( .txEnabled, newValue.as1or0) } } }
+
+  // ----------------------------------------------------------------------------
+  // Public properties (KVO compliant)
   
   @objc dynamic public var clientHandle: UInt32 {
     get { return _clientHandle }
@@ -291,14 +302,40 @@ extension Opus {
     set { if _rxStopped != newValue { _rxStopped = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - NON Public properties (KVO compliant)
+  // Public properties
   
   public var delegate: StreamHandler? {
     get { return Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
   
+    // ----------------------------------------------------------------------------
+    // Instance methods that send Commands
+
+    /// Remove this Opus Stream
+    ///
+    /// - Parameters:
+    ///   - callback:           ReplyHandler (optional)
+    ///
+  //  public func remove(callback: ReplyHandler? = nil) {
+  //
+  //    // tell the Radio to remove the Stream
+  //    Api.sharedInstance.send(Opus.kStreamRemoveCmd + "0x\(id)", replyTo: callback)
+  //  }
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Private command helper methods
+
+  /// Set an Opus property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func opusCmd(_ token: Token, _ value: Any) {
+    
+    Api.sharedInstance.send(Opus.kCmd + token.rawValue + " \(value)")
+  }
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

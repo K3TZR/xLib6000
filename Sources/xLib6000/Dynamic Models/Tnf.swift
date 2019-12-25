@@ -28,7 +28,6 @@ public final class Tnf                      : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                          : Radio
   public let id                             : TnfId
 
   // ------------------------------------------------------------------------------
@@ -43,6 +42,7 @@ public final class Tnf                      : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private let _radio                        : Radio
   private let _log                          = Log.sharedInstance
   private var _initialized                  = false                         // True if initialized by Radio hardware
   
@@ -87,8 +87,8 @@ public final class Tnf                      : NSObject, DynamicModel {
     }
   }
   
-  // ------------------------------------------------------------------------------
-  // MARK: - Class methods
+//   ------------------------------------------------------------------------------
+//   MARK: - Class methods
   
 //  /// Given a Frequency, return a reference to the Tnf containing it (if any)
 //  ///
@@ -106,8 +106,6 @@ public final class Tnf                      : NSObject, DynamicModel {
 //    // return the first one
 //    return tnfs[0]
 //  }
-
-  // FIXME: should this be a class func ???
 
   /// Determine a frequency for a Tnf
   ///
@@ -180,7 +178,7 @@ public final class Tnf                      : NSObject, DynamicModel {
   ///
   public init(radio: Radio, id: TnfId) {
     
-    self.radio = radio
+    self._radio = radio
     self.id = id
     
     super.init()
@@ -242,9 +240,61 @@ public final class Tnf                      : NSObject, DynamicModel {
 }
 
 extension Tnf {
+    
+  // ----------------------------------------------------------------------------
+  // Properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var depth: UInt {
+    get { return _depth }
+    set { if _depth != newValue { _depth = newValue ; tnfCmd( .depth, newValue) } } }
+  
+  @objc dynamic public var frequency: UInt {
+    get { return _frequency }
+    set { if _frequency != newValue { _frequency = newValue ; tnfCmd( .frequency, newValue.hzToMhz) } } }
+  
+  @objc dynamic public var permanent: Bool {
+    get { return _permanent }
+    set { if _permanent != newValue { _permanent = newValue ; tnfCmd( .permanent, newValue.as1or0) } } }
+  
+  @objc dynamic public var width: UInt {
+    get { return _width  }
+    set { if _width != newValue { _width = newValue ; tnfCmd( .width, newValue.hzToMhz) } } }
+
+  // ----------------------------------------------------------------------------
+  // Instance methods that send Commands
+
+  /// Remove a Tnf
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove the Tnf
+    _radio.sendCommand("tnf remove " + " \(id)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.tnfWillBeRemoved, object: self as Any?)
+    
+    // remove the Tnf
+    _radio.tnfs[id] = nil
+  }
+
+  // ----------------------------------------------------------------------------
+  // Private command helper methods
+  
+  /// Set a Tnf property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func tnfCmd(_ token: Token, _ value: Any) {
+    _radio.sendCommand("tnf set " + "\(id) " + token.rawValue + "=\(value)")
+  }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Tokens
   
   /// Properties
   ///

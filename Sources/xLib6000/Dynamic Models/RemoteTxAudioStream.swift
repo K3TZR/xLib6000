@@ -33,8 +33,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                          : Radio
-  public let streamId                       : RemoteTxStreamId
+  public let id                             : RemoteTxStreamId
   public var isStreaming                    = false
   
   // ------------------------------------------------------------------------------
@@ -49,6 +48,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private let _radio                        : Radio
   private let _log                          = Log.sharedInstance
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -85,7 +85,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
         if isForThisClient( properties ) == false { return }
 
         // create a new object & add it to the collection
-        radio.remoteTxAudioStreams[remoteRxStreamId] = RemoteTxAudioStream(radio: radio, streamId: remoteRxStreamId)
+        radio.remoteTxAudioStreams[remoteRxStreamId] = RemoteTxAudioStream(radio: radio, id: remoteRxStreamId)
       }
       // pass the remaining key values for parsing (dropping the Id & Type)
       radio.remoteTxAudioStreams[remoteRxStreamId]!.parseProperties( Array(properties.dropFirst(2)) )
@@ -101,10 +101,10 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   ///   - id:                 an Opus Stream id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: RemoteTxStreamId) {
+  init(radio: Radio, id: RemoteTxStreamId) {
     
-    self.streamId = streamId
-    self.radio = radio
+    self.id = id
+    self._radio = radio
     super.init()
     
     isStreaming = false
@@ -121,10 +121,10 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   ///
   public func sendRemoteTxAudioStream(buffer: [UInt8], samples: Int) {
     
-    if radio.interlock.state == "TRANSMITTING" {
+    if _radio.interlock.state == "TRANSMITTING" {
     
       // get an OpusTx Vita
-      if _vita == nil { _vita = Vita(type: .opusTx, streamId: streamId) }
+      if _vita == nil { _vita = Vita(type: .opusTx, streamId: id) }
     
       // create new array for payload (interleaved L/R samples)
       _vita!.payloadData = buffer
@@ -140,7 +140,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       if let data = Vita.encodeAsData(_vita!) {
         
         // send packet to radio
-        radio.sendVita(data)
+        _radio.sendVita(data)
       }
       // increment the sequence number (mod 16)
       _txSeq = (_txSeq + 1) % 16
@@ -201,11 +201,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
 extension RemoteTxAudioStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - NON Public properties (KVO compliant)
-  
-  public var delegate: StreamHandler? {
-    get { return Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
+  // Public properties (KVO compliant)
   
   @objc dynamic public var clientHandle: Handle {
     get { return _clientHandle  }
@@ -218,9 +214,36 @@ extension RemoteTxAudioStream {
   @objc dynamic public var ip: String {
     get { return _ip  }
     set { if _ip != newValue { _ip = newValue} } }
+    
+  // ----------------------------------------------------------------------------
+  // Public properties
+
+  public var delegate: StreamHandler? {
+    get { return Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Instance methods that send Commands
+  
+  /// Remove this RemoteTxAudioStream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              success / failure
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+
+    // notify all observers
+    NC.post(.remoteTxAudioStreamWillBeRemoved, object: self as Any?)
+    
+    // remove the stream
+    _radio.remoteTxAudioStreams[id] = nil
+    
+    // tell the Radio to remove the Stream
+    _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
+  }
+
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///

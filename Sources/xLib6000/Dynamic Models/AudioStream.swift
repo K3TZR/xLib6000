@@ -31,8 +31,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let radio                          : Radio
-  public let streamId                       : AudioStreamId
+  public let id                             : AudioStreamId
   
   public private(set) var rxLostPacketCount = 0
   
@@ -51,11 +50,11 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private weak var _delegate : StreamHandler? = nil // Delegate for Audio stream
-  private      var _initialized = false             // True if initialized by Radio hardware
-  private      var _rxSeq : Int?                    // Rx sequence number
-
-  private      let _log = Log.sharedInstance
+  private      let _radio                   : Radio
+  private weak var _delegate                : StreamHandler? = nil
+  private      var _initialized             = false
+  private      var _rxSeq                   : Int?
+  private      let _log                     = Log.sharedInstance
 
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
@@ -86,7 +85,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
           if !AudioStream.isStatusForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
-          radio.audioStreams[audioStreamId] = AudioStream(radio: radio, streamId: audioStreamId)
+          radio.audioStreams[audioStreamId] = AudioStream(radio: radio, id: audioStreamId)
         }
         // pass the remaining key values for parsing (dropping the Id)
         radio.audioStreams[audioStreamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
@@ -188,10 +187,10 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   ///   - id:                 the Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(radio: Radio, streamId: AudioStreamId) {
+  init(radio: Radio, id: AudioStreamId) {
     
-    self.radio = radio
-    self.streamId = streamId
+    self._radio = radio
+    self.id = id
     super.init()
   }
 
@@ -242,7 +241,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
 
       case .slice:
         if let sliceId = property.value.objectId {
-          update(&_slice, to: radio.slices[sliceId], signal: \.slice)
+          update(&_slice, to: _radio.slices[sliceId], signal: \.slice)
         }
 
         let gain = _rxGain
@@ -331,7 +330,16 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
 extension AudioStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant) that send Commands
+  
+  @objc dynamic public var rxGain: Int {
+    get { return _rxGain  }
+    set { if _rxGain != newValue { _rxGain = newValue ; if _slice != nil && !Api.sharedInstance.testerModeEnabled { audioStreamCmd( "gain", newValue) }}
+    }
+  }
+
+  // ----------------------------------------------------------------------------
+  // Public properties (KVO compliant)
   
   @objc dynamic public var daxChannel: Int {
     get { return _daxChannel }
@@ -339,7 +347,7 @@ extension AudioStream {
       if _daxChannel != newValue {
         _daxChannel = newValue
 //        if _radio != nil {
-        _slice = radio.findSlice(using: _daxChannel)
+        _slice = _radio.findSlice(using: _daxChannel)
 //        }
       }
     }
@@ -365,14 +373,40 @@ extension AudioStream {
     set { if _slice != newValue { _slice = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - NON Public properties (KVO compliant)
+  // Public properties
   
   public var delegate: StreamHandler? {
     get { return Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-  
+    
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Instance methods that send Commands
+
+  /// Remove this Audio Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove a Stream
+    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
+  }
+  // ----------------------------------------------------------------------------
+  // Private command helper methods
+
+  /// Set an Audio Stream property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func audioStreamCmd(_ token: String, _ value: Any) {
+    
+    _radio.sendCommand("audio stream " + "\(id.hex) slice \(_slice!.id) " + token + " \(value)")
+  }
+  // ----------------------------------------------------------------------------
+  // Tokens
   
   /// Properties
   ///
