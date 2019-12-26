@@ -40,16 +40,16 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
-  public private(set) var radioVersion      = Version()
-
   @objc dynamic public var radio            : Radio?                        // current Radio class
+
+  public private(set) var radioVersion      = Version()
   public var apiState                       : Api.State! {
     didSet { _log.msg( "Api state = \(apiState.rawValue)", level: .debug, function: #function, file: #file, line: #line)}}
 
   public var delegate                       : ApiDelegate?                  // API delegate
   public var testerModeEnabled              = false                         // Library being used by xAPITester
   public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
-  public var activeRadio                    : DiscoveredRadio?              // Radio params
+//  public var activeRadio                    : DiscoveredRadio?              // Radio params
   public var pingerEnabled                  = true                          // Pinger enable
   public var isWan                          = false                         // Remote connection
   public var wanConnectionHandle            = ""                            // Wan connection handle
@@ -131,7 +131,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     - subscriptionCmdTypes: array of "subscription" commandtypes (defaults to .all)
   /// - Returns:                  Success / Failure
   ///
-  public func connect(_ selectedRadio: DiscoveredRadio,
+  public func connect(_ discoveryPacket: DiscoveredRadio,
                       clientStation: String = "",
                       clientProgram: String,
                       clientId: UUID? = nil,
@@ -140,41 +140,34 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       wanHandle: String = "",
                       primaryCmdTypes: [Api.Command] = [.allPrimary],
                       secondaryCmdTypes: [Api.Command] = [.allSecondary],
-                      subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) -> Bool {
+                      subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) -> Radio? {
 
     // must be in the Disconnected state to connect
-    guard apiState == .disconnected else { return false }
-    
-    _clientProgram = clientProgram
-    _clientId = clientId
-    _clientStation = clientStation
-    _isGui = isGui
-    self.isWan = isWan
-    wanConnectionHandle = wanHandle
-    
-    // Create a Radio class
-    radio = Radio(api: self)
-    
-    activeRadio = selectedRadio
-    
+    guard apiState == .disconnected else { return nil }
+        
     // save the Command types
     _primaryCmdTypes = primaryCmdTypes
     _secondaryCmdTypes = secondaryCmdTypes
     _subscriptionCmdTypes = subscriptionCmdTypes
     
     // start a connection to the Radio
-    if _tcp.connect(radioParameters: selectedRadio, isWan: isWan) {
-      
-      // pause listening for Discovery broadcasts
-      //          _radioFactory.pause()
+    if _tcp.connect(discoveryPacket, isWan: isWan) {
       
       // check the versions
-      checkFirmware()
+      checkFirmware(discoveryPacket)
       
-      return true
+      _clientProgram = clientProgram
+      _clientId = clientId
+      _clientStation = clientStation
+      _isGui = isGui
+      self.isWan = isWan
+      wanConnectionHandle = wanHandle
+      
+      // Create a Radio class
+      radio = Radio(discoveryPacket, api: self)
+      return radio
     }
-    // returns sucess if active
-    return false
+    return nil
   }
   /// Shutdown the active Radio
   ///
@@ -189,7 +182,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _log.msg("Pinger stopped", level: .info, function: #function, file: #file, line: #line)
     }
     // the radio (if any) will be removed, inform observers
-    if activeRadio != nil { NC.post(.radioWillBeRemoved, object: radio as Any?) }
+    if radio != nil { NC.post(.radioWillBeRemoved, object: radio as Any?) }
     
     if apiState != .disconnected {
       // disconnect TCP
@@ -200,13 +193,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     }
     
     // the radio (if any)) has been removed, inform observers
-    if activeRadio != nil { NC.post(.radioHasBeenRemoved, object: nil) }
+    if radio != nil { NC.post(.radioHasBeenRemoved, object: nil) }
 
     // remove the Radio
-    activeRadio = nil
-    
-    // FIXME: possible race on setting / reading radio
-    
     radio = nil
   }
   /// Send a command to the Radio (hardware)
@@ -283,7 +272,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
   /// A Client has been connected
   ///
-  func clientConnected() {
+  func clientConnected(_ discoveryPacket: DiscoveredRadio) {
     
     // code to be executed after an IP Address has been obtained
     func connectionCompletion() {
@@ -294,7 +283,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // set the streaming UDP port
       if isWan {
         // Wan, establish a UDP port for the Data Streams
-        let _ = _udp.bind(radioParameters: activeRadio!, isWan: true, clientHandle: connectionHandle)
+        let _ = _udp.bind(radioParameters: discoveryPacket, isWan: true, clientHandle: connectionHandle)
         
       } else {
         // Local
@@ -304,12 +293,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       if pingerEnabled {
         
         let wanStatus = isWan ? "REMOTE" : "LOCAL"
-        let p = (isWan ? activeRadio!.publicTlsPort : activeRadio!.port)
-        _log.msg("Pinger started: \(activeRadio!.nickname) @ \(activeRadio!.publicIp), port \(p) \(wanStatus)", level: .info, function: #function, file: #file, line: #line)
+        let p = (isWan ? discoveryPacket.publicTlsPort : discoveryPacket.port)
+        _log.msg("Pinger started: \(discoveryPacket.nickname) @ \(discoveryPacket.publicIp), port \(p) \(wanStatus)", level: .info, function: #function, file: #file, line: #line)
         _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ)
       }
       // TCP & UDP connections established, inform observers
-      NC.post(.clientDidConnect, object: activeRadio as Any?)
+      NC.post(.clientDidConnect, object: radio as Any?)
     }
     
     _log.msg("Client connection established", level: .info, function: #function, file: #file, line: #line)
@@ -352,10 +341,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameters:
   ///   - selectedRadio:      a RadioParameters struct
   ///
-  private func checkFirmware() {
+  private func checkFirmware(_ selectedRadio: DiscoveredRadio) {
     
     // create the Version structs
-    radioVersion = Version(activeRadio!.firmwareVersion)
+    radioVersion = Version(selectedRadio.firmwareVersion)
     // make sure they are valid
     // compare them
     switch (radioVersion, Api.kVersion) {
@@ -534,7 +523,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // log it
       let wanStatus = isWan ? "REMOTE" : "LOCAL"
       let guiStatus = _isGui ? "(GUI) " : ""
-      _log.msg("TCP connected to \(activeRadio!.nickname) @ \(host), port \(port) \(guiStatus)(\(wanStatus)), radio version = \(activeRadio!.firmwareVersion)", level: .info, function: #function, file: #file, line: #line)
+      _log.msg("TCP connected to \(host), port \(port) \(guiStatus)(\(wanStatus))", level: .info, function: #function, file: #file, line: #line)
 
       // YES, set state
       apiState = .tcpConnected
@@ -552,7 +541,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
       } else {
         // insure that a UDP port was bound (for the Data Streams)
-        guard _udp.bind(radioParameters: activeRadio!, isWan: isWan) else {
+        guard _udp.bind(radioParameters: radio!.discoveryPacket, isWan: isWan) else {
           
           // Bind failed, disconnect
           _tcp.disconnect()
@@ -564,7 +553,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         }
       }
       // if another Gui client connected, disconnect it
-      if activeRadio!.status == "In_Use" && _isGui {
+      if radio?.discoveryPacket.status == "In_Use" && _isGui {
         
         send("client disconnect")
         _log.msg("client disconnect sent", level: .info, function: #function, file: #file, line: #line)

@@ -31,9 +31,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
+  public                let discoveryPacket         : DiscoveredRadio
   public private(set)   var uptime                  = 0
-  @objc dynamic public  var version                 : String { return _api.activeRadio?.firmwareVersion ?? "" }
-  @objc dynamic public  var serialNumber            : String { return _api.activeRadio?.serialNumber ?? "" }
+  @objc dynamic public  var version                 : String { return discoveryPacket.firmwareVersion }
+  @objc dynamic public  var serialNumber            : String { return discoveryPacket.serialNumber }
 
   // Static models
   @objc dynamic public private(set) var atu         : Atu!
@@ -189,8 +190,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   /// - Parameters:
   ///   - api:        an Api instance
   ///
-  public init(api: Api) {
+  public init(_ discoveryPacket: DiscoveredRadio, api: Api) {
     
+    self.discoveryPacket = discoveryPacket
     _api = api
     super.init()
 
@@ -616,7 +618,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         _clientInitialized = true
         
         // Finish the UDP initialization & set the API state
-        _api.clientConnected()
+        _api.clientConnected(discoveryPacket)
       }
     }
   }
@@ -642,7 +644,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // what is the message?
     if keyValues[1].key == "connected" {
       // Connected
-      _api.clientConnected()
+      _api.clientConnected(discoveryPacket)
       
     } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
       // FIXME: Handle the disconnect?
