@@ -167,8 +167,6 @@ extension Profile {
   // ----------------------------------------------------------------------------
   // Instance methods that send Commands
 
-  // FIXME: How should this work?
-
   /// Delete a Profile entry
   ///
   /// - Parameters:
@@ -176,11 +174,11 @@ extension Profile {
   ///   - name:               profile name
   ///   - callback:           ReplyHandler (optional)
   ///
-//  public func deleteProfile(_ type: String, name: String, callback: ReplyHandler? = nil) {
-//    
-//    // tell the Radio to delete the Profile name in the specified Profile type
-//    Api.sharedInstance.send("profile "  + type + " delete \"" + name + "\"", replyTo: callback)
-//  }
+  public func remove(_ name: String, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to delete the Profile name in the specified Profile type
+    Api.sharedInstance.send("profile "  + "\(id)" + " delete \"" + name + "\"", replyTo: callback)
+  }
   /// Save a Profile entry
   ///
   /// - Parameters:
@@ -188,11 +186,11 @@ extension Profile {
   ///   - name:               profile name
   ///   - callback:           ReplyHandler (optional)
   ///
-//  public func saveProfile(_ type: String, name: String, callback: ReplyHandler? = nil) {
-//    
-//    // tell the Radio to save the Profile name in the specified Profile type
-//    Api.sharedInstance.send("profile "  + type + " save \"" + name + "\"", replyTo: callback)
-//  }
+  public func saveProfile(_ name: String, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to save the Profile name in the specified Profile type
+    Api.sharedInstance.send("profile "  + "\(id)" + " save \"" + name + "\"", replyTo: callback)
+  }
 
   // ----------------------------------------------------------------------------
   // Private command helper methods
