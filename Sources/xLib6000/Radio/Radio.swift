@@ -1900,7 +1900,7 @@ extension Radio {
   ///   - antennaPairs:   antenna pairs
   ///   - callback:       ReplyHandler (optional)
   ///
-  public func create(ip: String, port: Int, model: String, serialNumber: String, antennaPairs: String, callback: ReplyHandler? = nil) {
+  public func createAmplifier(ip: String, port: Int, model: String, serialNumber: String, antennaPairs: String, callback: ReplyHandler? = nil) {
     
     // TODO: add code
   }
@@ -1934,7 +1934,7 @@ extension Radio {
   ///   - channel:            DAX channel number
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func create(_ channel: String, callback: ReplyHandler? = nil) {
+  public func createDaxIqStream(_ channel: String, callback: ReplyHandler? = nil) {
     
     // tell the Radio to create the Stream
     sendCommand("stream create type=dax_iq daxiq_channel=\(channel)", replyTo: callback)
@@ -1964,7 +1964,7 @@ extension Radio {
   ///
   /// - Parameter callback:   ReplyHandler (optional)
   ///
-  public func create(callback: ReplyHandler? = nil) {
+  public func createDaxMicAudioStream(callback: ReplyHandler? = nil) {
     
     // tell the Radio to create a Stream
     sendCommand("stream create type=dax_mic", replyTo: callback)
@@ -2185,7 +2185,7 @@ extension Radio {
   ///   - value:              On/Off
   ///   - callback:           ReplyHandler (optional)
   ///
-  //  public func create(callback: ReplyHandler? = nil) {
+  //  public func createOpus(callback: ReplyHandler? = nil) {
   //
   //    // tell the Radio to enable Opus Rx
   //    Api.sharedInstance.send(Opus.kCmd + Opus.Token.remoteRxOn.rawValue + " \(value.asNumber)", replyTo: callback)
@@ -2352,7 +2352,7 @@ extension Radio {
   ///   - mode:               selected mode
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func create(frequency: Int, antenna: String, mode: String, callback: ReplyHandler? = nil) {
+  public func createSlice(frequency: Int, antenna: String, mode: String, callback: ReplyHandler? = nil) {
     if availableSlices > 0 {
       // tell the Radio to create a Slice
       sendCommand("slice create " + "\(frequency.hzToMhz) \(antenna) \(mode)", replyTo: callback)
@@ -2365,7 +2365,7 @@ extension Radio {
   ///   - frequency:          frequency (Hz)
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func create(panadapter: Panadapter, frequency: Int = 0, callback: ReplyHandler? = nil) {
+  public func createSlice(panadapter: Panadapter, frequency: Int = 0, callback: ReplyHandler? = nil) {
     if availableSlices > 0 {
       // tell the Radio to create a Slice
       sendCommand("slice create " + "pan" + "=\(panadapter.id.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz)")", replyTo: callback)
