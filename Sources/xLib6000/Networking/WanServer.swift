@@ -662,20 +662,9 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
 }
 
 extension WanServer {
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Private properties
-  
-//  private var _isConnected: Bool {
-//    get { return _objectQ.sync { __isConnected } }
-//    set { _objectQ.sync(flags: .barrier) { __isConnected = newValue } } }
-//
-//  private var _sslClientPublicIp: String {
-//    get { return _objectQ.sync { __sslClientPublicIp } }
-//    set { _objectQ.sync(flags: .barrier) { __sslClientPublicIp = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
+  // Public properties (KVO compliant)
   
   @objc dynamic public var isConnected: Bool {
     return _isConnected }
@@ -684,7 +673,7 @@ extension WanServer {
     return _sslClientPublicIp }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Tokens
+  // Tokens
   
   /// Types
   ///
