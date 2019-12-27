@@ -99,8 +99,8 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   /// Initialize an TX Audio Stream
   ///
   /// - Parameters:
-  ///   - id:                 Dax stream Id
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
+  ///   - id:           a TxAudioStream Id
   ///
   init(radio: Radio, id: TxStreamId) {
     

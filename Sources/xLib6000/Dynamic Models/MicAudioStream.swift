@@ -103,8 +103,8 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   /// Initialize an Mic Audio Stream
   ///
   /// - Parameters:
-  ///   - id:                 a Dax Stream Id
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
+  ///   - id:           a MicAudioStream Id
   ///
   init(radio: Radio, id: DaxMicStreamId) {
     

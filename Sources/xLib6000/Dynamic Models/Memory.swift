@@ -111,8 +111,8 @@ public final class Memory                   : NSObject, DynamicModel {
   /// Initialize a Memory
   ///
   /// - Parameters:
-  ///   - id:                 a Memory Id
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
+  ///   - id:           a Memory Id
   ///
   init(radio: Radio, id: MemoryId) {
     

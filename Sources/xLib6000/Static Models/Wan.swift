@@ -34,7 +34,7 @@ public final class Wan                      : NSObject, StaticModel {
   /// Initialize Wan
   ///
   /// - Parameters:
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
 

@@ -181,11 +181,11 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
   
-  /// Initialize an Audio Stream
+  /// Initialize an AudioStream
   ///
   /// - Parameters:
-  ///   - id:                 the Stream Id
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
+  ///   - id:           an AudioStream Id
   ///
   init(radio: Radio, id: AudioStreamId) {
     

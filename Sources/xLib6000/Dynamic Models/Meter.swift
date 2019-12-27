@@ -205,9 +205,8 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   /// Initialize a Meter
   ///
   /// - Parameters:
-  ///   - id:                 a Meter Id
-  ///   - queue:              Concurrent queue
-  ///   - log:                logging instance
+  ///   - radio:        the Radio instance
+  ///   - id:           a Meter Id
   ///
   public init(radio: Radio, id: MeterId) {
     

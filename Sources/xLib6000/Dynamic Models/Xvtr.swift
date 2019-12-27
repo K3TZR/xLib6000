@@ -17,14 +17,56 @@ import Foundation
 ///      the incoming TCP messages. They are collected in the xvtrs
 ///      collection on the Radio object.
 ///
-public final class Xvtr                     : NSObject, DynamicModel {
+public final class Xvtr : NSObject, DynamicModel {
   
-  // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                             : XvtrId
+  public let id : XvtrId
   
-  // ----------------------------------------------------------------------------
+  @objc dynamic public var ifFrequency: Int {
+    get { return _ifFrequency }
+    set { if _ifFrequency != newValue { _ifFrequency = newValue ; xvtrCmd( .ifFrequency, newValue) } } }
+  
+  @objc dynamic public var inUse: Bool {
+    return _inUse }
+  
+  @objc dynamic public var isValid: Bool {
+    return _isValid }
+  
+  @objc dynamic public var loError: Int {
+    get { return _loError }
+    set { if _loError != newValue { _loError = newValue ; xvtrCmd( .loError, newValue) } } }
+  
+  @objc dynamic public var name: String {
+    get { return _name }
+    set { if _name != newValue { _name = newValue ; xvtrCmd( .name, newValue) } } }
+  
+  @objc dynamic public var maxPower: Int {
+    get { return _maxPower }
+    set { if _maxPower != newValue { _maxPower = newValue ; xvtrCmd( .maxPower, newValue) } } }
+  
+  @objc dynamic public var order: Int {
+    get { return _order }
+    set { if _order != newValue { _order = newValue ; xvtrCmd( .order, newValue) } } }
+  
+  @objc dynamic public var preferred: Bool {
+    return _preferred }
+  
+  @objc dynamic public var rfFrequency: Int {
+    get { return _rfFrequency }
+    set { if _rfFrequency != newValue { _rfFrequency = newValue ; xvtrCmd( .rfFrequency, newValue) } } }
+  
+  @objc dynamic public var rxGain: Int {
+    get { return _rxGain }
+    set { if _rxGain != newValue { _rxGain = newValue ; xvtrCmd( .rxGain, newValue) } } }
+  
+  @objc dynamic public var rxOnly: Bool {
+    get { return _rxOnly }
+    set { if _rxOnly != newValue { _rxOnly = newValue ; xvtrCmd( .rxOnly, newValue) } } }
+
+  @objc dynamic public var twoMeterInt: Int {
+    return _twoMeterInt }
+  
   // MARK: - Internal properties
   
   @Barrier("", Api.objectQ)     var _name
@@ -40,16 +82,26 @@ public final class Xvtr                     : NSObject, DynamicModel {
   @Barrier(false, Api.objectQ)  var _rxOnly
   @Barrier(0, Api.objectQ)      var _twoMeterInt
 
-  // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
-  private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance
-  private var _initialized                  = false                         // True if initialized by Radio hardware
+  private var _initialized = false
+  private let _log         = Log.sharedInstance
+  private let _radio       : Radio
 
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Methods
   
+  /// Initialize an Xvtr
+  ///
+  /// - Parameters:
+  ///   - radio:              the Radio instance
+  ///   - id:                 an Xvtr Id
+  ///
+  public init(radio: Radio, id: XvtrId) {
+    _radio = radio
+    self.id = id
+    super.init()
+  }
+
   /// Parse an Xvtr status message
   ///
   ///   StatusParser protocol method, executes on the parseQ
@@ -91,26 +143,6 @@ public final class Xvtr                     : NSObject, DynamicModel {
       radio.xvtrs[name] = nil
     }
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize an Xvtr
-  ///
-  /// - Parameters:
-  ///   - id:                 an Xvtr Id
-  ///   - queue:              Concurrent queue
-  ///   - log:                logging instance
-  ///
-  public init(radio: Radio, id: XvtrId) {
-    
-    self._radio = radio
-    self.id = id
-    super.init()
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
 
   /// Parse Xvtr key/value pairs
   ///
@@ -186,77 +218,21 @@ public final class Xvtr                     : NSObject, DynamicModel {
       NC.post(.xvtrHasBeenAdded, object: self as Any?)
     }
   }
-}
 
-extension Xvtr {
-  
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
-  
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
-  @objc dynamic public var isValid: Bool {
-    return _isValid }
-  
-  @objc dynamic public var preferred: Bool {
-    return _preferred }
-  
-  @objc dynamic public var twoMeterInt: Int {
-    return _twoMeterInt }
-  
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant) that send Commands
-  
-  @objc dynamic public var ifFrequency: Int {
-    get { return _ifFrequency }
-    set { if _ifFrequency != newValue { _ifFrequency = newValue ; xvtrCmd( .ifFrequency, newValue) } } }
-  
-  @objc dynamic public var loError: Int {
-    get { return _loError }
-    set { if _loError != newValue { _loError = newValue ; xvtrCmd( .loError, newValue) } } }
-  
-  @objc dynamic public var name: String {
-    get { return _name }
-    set { if _name != newValue { _name = newValue ; xvtrCmd( .name, newValue) } } }
-  
-  @objc dynamic public var maxPower: Int {
-    get { return _maxPower }
-    set { if _maxPower != newValue { _maxPower = newValue ; xvtrCmd( .maxPower, newValue) } } }
-  
-  @objc dynamic public var order: Int {
-    get { return _order }
-    set { if _order != newValue { _order = newValue ; xvtrCmd( .order, newValue) } } }
-  
-  @objc dynamic public var rfFrequency: Int {
-    get { return _rfFrequency }
-    set { if _rfFrequency != newValue { _rfFrequency = newValue ; xvtrCmd( .rfFrequency, newValue) } } }
-  
-  @objc dynamic public var rxGain: Int {
-    get { return _rxGain }
-    set { if _rxGain != newValue { _rxGain = newValue ; xvtrCmd( .rxGain, newValue) } } }
-  
-  @objc dynamic public var rxOnly: Bool {
-    get { return _rxOnly }
-    set { if _rxOnly != newValue { _rxOnly = newValue ; xvtrCmd( .rxOnly, newValue) } } }
-  
-  // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
-  
   /// Remove this Xvtr
   ///
   /// - Parameters:
   ///   - callback:           ReplyHandler (optional)
   ///
   public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove a XVTR
     _radio.sendCommand("xvtr remove " + "\(id)", replyTo: callback)
   }
-  
-  // ----------------------------------------------------------------------------
-  // Private command helper methods
+}
 
+// MARK: - Extensions
+
+extension Xvtr {
+  
   /// Set an Xvtr property on the Radio
   ///
   /// - Parameters:
@@ -264,12 +240,8 @@ extension Xvtr {
   ///   - value:      the new value
   ///
   private func xvtrCmd(_ token: Token, _ value: Any) {
-    
     _radio.sendCommand("xvtr set " + "\(id) " + token.rawValue + "=\(value)")
   }
-  
-  // ----------------------------------------------------------------------------
-  // Tokens
   
   /// Xvtr Properties
   ///

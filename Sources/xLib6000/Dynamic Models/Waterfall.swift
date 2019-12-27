@@ -18,44 +18,93 @@ public typealias WaterfallStreamId = StreamId
 ///      data in a UDP stream. They are collected in the waterfalls collection
 ///      on the Radio object.
 ///
-public final class Waterfall                : NSObject, DynamicModelWithStream {
+public final class Waterfall : NSObject, DynamicModelWithStream {
   
-  // ----------------------------------------------------------------------------
   // MARK: - Public properties
     
-  public              let id                : WaterfallStreamId
+  public let id : WaterfallStreamId
+  
+  @objc dynamic public var autoBlackEnabled: Bool {
+    get { return _autoBlackEnabled }
+    set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; waterfallCmd( .autoBlackEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var autoBlackLevel: UInt32 {
+    return _autoBlackLevel }
+  
+  @objc dynamic public var blackLevel: Int {
+    get { return _blackLevel }
+    set { if _blackLevel != newValue { _blackLevel = newValue ; waterfallCmd( .blackLevel, newValue) } } }
+  
+  @objc dynamic public var clientHandle: Handle {
+    return _clientHandle }
+  
+  @objc dynamic public var colorGain: Int {
+    get { return _colorGain }
+    set { if _colorGain != newValue { _colorGain = newValue ; waterfallCmd( .colorGain, newValue) } } }
+  
+  @objc dynamic public var gradientIndex: Int {
+    get { return _gradientIndex }
+    set { if _gradientIndex != newValue { _gradientIndex = newValue ; waterfallCmd( .gradientIndex, newValue) } } }
+  
+  @objc dynamic public var lineDuration: Int {
+    get { return _lineDuration }
+    set { if _lineDuration != newValue { _lineDuration = newValue ; waterfallCmd( .lineDuration, newValue) } } }
+  
+  @objc dynamic public var panadapterId: PanadapterStreamId {
+    return _panadapterId }
+  
+//  public var delegate: StreamHandler? {
+//    get { return Api.objectQ.sync { _delegate } }
+//    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
 
-  public private(set) var packetFrame       = -1            // Frame index of next Vita payload
-  public private(set) var droppedPackets    = 0             // Number of dropped (out of sequence) packets
-  public var isStreaming                    = false
+  public weak         var delegate        : StreamHandler?
+  public private(set) var droppedPackets  = 0
+  public              var isStreaming     = false
+  public private(set) var packetFrame     = -1
 
-  // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
   @Barrier(false, Api.objectQ)  var _autoBlackEnabled
   @Barrier(0, Api.objectQ)      var _autoBlackLevel : UInt32
   @Barrier(0, Api.objectQ)      var _blackLevel
-  @Barrier(0, Api.objectQ)      var _clientHandle : Handle
+  @Barrier(0, Api.objectQ)      var _clientHandle   : Handle
   @Barrier(0, Api.objectQ)      var _colorGain
   @Barrier(0, Api.objectQ)      var _gradientIndex
   @Barrier(0, Api.objectQ)      var _lineDuration
-  @Barrier(0, Api.objectQ)      var _panadapterId : PanadapterStreamId
+  @Barrier(0, Api.objectQ)      var _panadapterId   : PanadapterStreamId
 
-  private weak var _delegate : StreamHandler?
-
-  // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance
-  private var _initialized                  = false                         // True if initialized by Radio hardware
-
-  private var _waterfallframes              = [WaterfallFrame]()
-  private var _index                        = 0  
-  private let _numberOfDataFrames           = 10
+//  private weak  var _delegate           : StreamHandler?
+  private       var _index              = 0
+  private       var _initialized        = false
+  private       let _log                = Log.sharedInstance
+  private       let _numberOfDataFrames = 10
+  private       let _radio              : Radio
+  private       var _waterfallframes    = [WaterfallFrame]()
   
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Methods
+  
+  /// Initialize a Waterfall
+  ///
+  /// - Parameters:
+  ///   - radio:        the Radio instance
+  ///   - id:           a Waterfall Id
+  ///
+  public init(radio: Radio, id: WaterfallStreamId) {
+    
+    self.id = id
+    self._radio = radio
+    
+    // allocate two dataframes
+    for _ in 0..<_numberOfDataFrames {
+      _waterfallframes.append(WaterfallFrame(frameSize: 4096))
+    }
+
+    super.init()
+    
+    isStreaming = false
+  }
   
   /// Parse a Waterfall status message
   ///
@@ -107,33 +156,6 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       }
     }
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize a Waterfall
-  ///
-  /// - Parameters:
-  ///   - radio:      the Radio instance
-  ///   - streamId:           a Waterfall Id
-  ///
-  public init(radio: Radio, id: WaterfallStreamId) {
-    
-    self.id = id
-    self._radio = radio
-    
-    // allocate two dataframes
-    for _ in 0..<_numberOfDataFrames {
-      _waterfallframes.append(WaterfallFrame(frameSize: 4096))
-    }
-
-    super.init()
-    
-    isStreaming = false
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
   
   /// Parse Waterfall key/value pairs
   ///
@@ -196,6 +218,28 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       NC.post(.waterfallHasBeenAdded, object: self as Any?)
     }
   }
+
+  /// Close a Waterfall
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func close(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove the Waterfall
+    _radio.sendCommand("display panafall remove " + " \(id.hex)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.waterfallWillBeRemoved, object: self as Any?)
+    
+    // remove the Tnf
+    _radio.waterfalls[id] = nil
+  }
+}
+// MARK: - Extensions
+
+extension Waterfall {
+
   /// Process the Waterfall Vita struct
   ///
   ///   VitaProcessor protocol method, executes on the streamQ
@@ -220,54 +264,6 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       _index = (_index + 1) % _numberOfDataFrames
     }
   }
-}
-
-extension Waterfall {
-  
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
-  
-  @objc dynamic public var autoBlackLevel: UInt32 {
-    return _autoBlackLevel }
-  
-  @objc dynamic public var clientHandle: Handle {         // (V3 only)
-    return _clientHandle }
-  
-  @objc dynamic public var panadapterId: PanadapterStreamId {
-    return _panadapterId }
-
-  // ----------------------------------------------------------------------------
-  // Properties (KVO compliant) that send Commands
-  
-  @objc dynamic public var autoBlackEnabled: Bool {
-    get { return _autoBlackEnabled }
-    set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; waterfallCmd( .autoBlackEnabled, newValue.as1or0) } } }
-  
-  @objc dynamic public var blackLevel: Int {
-    get { return _blackLevel }
-    set { if _blackLevel != newValue { _blackLevel = newValue ; waterfallCmd( .blackLevel, newValue) } } }
-  
-  @objc dynamic public var colorGain: Int {
-    get { return _colorGain }
-    set { if _colorGain != newValue { _colorGain = newValue ; waterfallCmd( .colorGain, newValue) } } }
-  
-  @objc dynamic public var gradientIndex: Int {
-    get { return _gradientIndex }
-    set { if _gradientIndex != newValue { _gradientIndex = newValue ; waterfallCmd( .gradientIndex, newValue) } } }
-  
-  @objc dynamic public var lineDuration: Int {
-    get { return _lineDuration }
-    set { if _lineDuration != newValue { _lineDuration = newValue ; waterfallCmd( .lineDuration, newValue) } } }
-    
-  // ----------------------------------------------------------------------------
-  // Public properties
-  
-  public var delegate: StreamHandler? {
-    get { return Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-
-  // ----------------------------------------------------------------------------
-  // Private command helper methods
 
   /// Set a Waterfall property on the Radio
   ///
@@ -279,9 +275,6 @@ extension Waterfall {
     
     _radio.sendCommand("display panafall set " + "\(id.hex) " + token.rawValue + "=\(value)")
   }
-  
-  // ----------------------------------------------------------------------------
-  // Tokens
   
   /// Waterfall Properties
   ///

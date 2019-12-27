@@ -46,7 +46,7 @@ public final class Cwx                      : NSObject, StaticModel {
   /// Initialize Cwx
   ///
   /// - Parameters:
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
   ///
   init(radio: Radio) {
     

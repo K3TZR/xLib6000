@@ -17,38 +17,65 @@ public typealias TnfId = ObjectId
 ///      updated by the incoming TCP messages. They are collected in the
 ///      tnfs collection on the Radio object.
 ///
-public final class Tnf                      : NSObject, DynamicModel {
+public final class Tnf : NSObject, DynamicModel {
   
-  // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kWidthMin               : UInt = 5
-  public static let kWidthMax               : UInt = 6_000
-
-  // ----------------------------------------------------------------------------
+  static let kWidthMin  : UInt = 5
+  static let kWidthMax  : UInt = 6_000
+  
+  static let kNormal    = Depth.normal.rawValue
+  static let kVeryDeep  = Depth.veryDeep.rawValue
+  
   // MARK: - Public properties
-  
-  public let id                             : TnfId
 
-  // ------------------------------------------------------------------------------
+  public let id : TnfId
+
+  @objc dynamic public var depth: UInt {
+    get { return _depth }
+    set { if _depth != newValue { _depth = newValue ; tnfCmd( .depth, newValue) } } }
+  
+  @objc dynamic public var frequency: UInt {
+    get { return _frequency }
+    set { if _frequency != newValue { _frequency = newValue ; tnfCmd( .frequency, newValue.hzToMhz) } } }
+  
+  @objc dynamic public var permanent: Bool {
+    get { return _permanent }
+    set { if _permanent != newValue { _permanent = newValue ; tnfCmd( .permanent, newValue.as1or0) } } }
+  
+  @objc dynamic public var width: UInt {
+    get { return _width  }
+    set { if _width != newValue { _width = newValue ; tnfCmd( .width, newValue.hzToMhz) } } }
+  
   // MARK: - Internal properties
-  
-  @BarrierClamped(0, Api.objectQ, range: kWidthMin...kWidthMax) var _width : UInt
-  @BarrierClamped(Tnf.Depth.normal.rawValue, Api.objectQ, range: Depth.normal.rawValue...Depth.veryDeep.rawValue)  var _depth : UInt
 
-  @Barrier(0, Api.objectQ)                          var _frequency : UInt
-  @Barrier(false, Api.objectQ)                      var _permanent
+  @BarrierClamped(kNormal, Api.objectQ, range: kNormal...kVeryDeep) var _depth      : UInt
+  @Barrier(0, Api.objectQ)                                          var _frequency  : UInt
+  @Barrier(false, Api.objectQ)                                      var _permanent
+  @BarrierClamped(0, Api.objectQ, range: kWidthMin...kWidthMax)     var _width      : UInt
 
-  // ------------------------------------------------------------------------------
   // MARK: - Private properties
-  
-  private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance
-  private var _initialized                  = false                         // True if initialized by Radio hardware
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
-  
+
+  private var _initialized  = false
+  private let _log          = Log.sharedInstance
+  private let _radio        : Radio
+    
+  // MARK: - Methods
+
+  /// Initialize a Tnf
+  ///
+  /// - Parameters:
+  ///   - radio:        the Radio instance
+  ///   - id:           a Tnf Id
+  ///
+  public init(radio: Radio, id: TnfId) {
+    
+    self._radio = radio
+    self.id = id
+    
+    super.init()
+  }
+    
   /// Parse a Tnf status message
   ///
   ///   StatusParser Protocol method, executes on the parseQ
@@ -87,9 +114,74 @@ public final class Tnf                      : NSObject, DynamicModel {
     }
   }
   
-//   ------------------------------------------------------------------------------
-//   MARK: - Class methods
-  
+  /// Parse Tnf key/value pairs
+  ///
+  ///   PropertiesParser Protocol method, executes on the parseQ
+  ///
+  /// - Parameter properties:       a KeyValuesArray
+  ///
+  func parseProperties(_ properties: KeyValuesArray) {
+    
+    // function to change value and signal KVO
+    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Tnf, T>) {
+      willChangeValue(for: keyPath)
+      property.pointee = value
+      didChangeValue(for: keyPath)
+    }
+
+    // process each key/value pair, <key=value>
+    for property in properties {
+      
+      // check for unknown Keys
+      guard let token = Token(rawValue: property.key) else {
+        // log it and ignore the Key
+        _log.msg("Unknown Tnf token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        continue
+      }
+      // known keys, in alphabetical order
+      switch token {
+        
+      case .depth:
+        update(&_depth, to: property.value.uValue, signal: \.depth)
+        
+      case .frequency:
+        update(&_frequency, to: property.value.mhzToHzUInt, signal: \.frequency)
+        
+      case .permanent:
+        update(&_permanent, to: property.value.bValue, signal: \.permanent)
+        
+      case .width:
+        update(&_width, to: property.value.mhzToHzUInt, signal: \.width)
+      }
+      // is the Tnf initialized?
+      if !_initialized && _frequency != 0 {
+        
+        // YES, the Radio (hardware) has acknowledged this Tnf
+        _initialized = true
+        
+        // notify all observers
+        NC.post(.tnfHasBeenAdded, object: self as Any?)
+      }
+    }
+  }
+
+  /// Remove a Tnf
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove the Tnf
+    _radio.sendCommand("tnf remove " + " \(id)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.tnfWillBeRemoved, object: self as Any?)
+    
+    // remove the Tnf
+    _radio.tnfs[id] = nil
+  }
+
 //  /// Given a Frequency, return a reference to the Tnf containing it (if any)
 //  ///
 //  /// - Parameters:
@@ -167,122 +259,12 @@ public final class Tnf                      : NSObject, DynamicModel {
 //    }
 //    return tnfFreq
 //  }
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize a Tnf
-  ///
-  /// - Parameters:
-  ///   - radio:              radio containing Tnf
-  ///   - id:                 a Tnf Id
-  ///
-  public init(radio: Radio, id: TnfId) {
-    
-    self._radio = radio
-    self.id = id
-    
-    super.init()
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
-
-  /// Parse Tnf key/value pairs
-  ///
-  ///   PropertiesParser Protocol method, executes on the parseQ
-  ///
-  /// - Parameter properties:       a KeyValuesArray
-  ///
-  func parseProperties(_ properties: KeyValuesArray) {
-    
-    // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Tnf, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
-
-    // process each key/value pair, <key=value>
-    for property in properties {
-      
-      // check for unknown Keys
-      guard let token = Token(rawValue: property.key) else {
-        // log it and ignore the Key
-        _log.msg("Unknown Tnf token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
-        continue
-      }
-      // known keys, in alphabetical order
-      switch token {
-        
-      case .depth:
-        update(&_depth, to: property.value.uValue, signal: \.depth)
-        
-      case .frequency:
-        update(&_frequency, to: property.value.mhzToHzUInt, signal: \.frequency)
-        
-      case .permanent:
-        update(&_permanent, to: property.value.bValue, signal: \.permanent)
-        
-      case .width:
-        update(&_width, to: property.value.mhzToHzUInt, signal: \.width)
-      }
-      // is the Tnf initialized?
-      if !_initialized && _frequency != 0 {
-        
-        // YES, the Radio (hardware) has acknowledged this Tnf
-        _initialized = true
-        
-        // notify all observers
-        NC.post(.tnfHasBeenAdded, object: self as Any?)
-      }
-    }
-  }
 }
 
+// MARK: - Extensions
+
 extension Tnf {
-    
-  // ----------------------------------------------------------------------------
-  // Properties (KVO compliant) that send Commands
-  
-  @objc dynamic public var depth: UInt {
-    get { return _depth }
-    set { if _depth != newValue { _depth = newValue ; tnfCmd( .depth, newValue) } } }
-  
-  @objc dynamic public var frequency: UInt {
-    get { return _frequency }
-    set { if _frequency != newValue { _frequency = newValue ; tnfCmd( .frequency, newValue.hzToMhz) } } }
-  
-  @objc dynamic public var permanent: Bool {
-    get { return _permanent }
-    set { if _permanent != newValue { _permanent = newValue ; tnfCmd( .permanent, newValue.as1or0) } } }
-  
-  @objc dynamic public var width: UInt {
-    get { return _width  }
-    set { if _width != newValue { _width = newValue ; tnfCmd( .width, newValue.hzToMhz) } } }
 
-  // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
-
-  /// Remove a Tnf
-  ///
-  /// - Parameters:
-  ///   - callback:           ReplyHandler (optional)
-  ///
-  public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove the Tnf
-    _radio.sendCommand("tnf remove " + " \(id)", replyTo: callback)
-    
-    // notify all observers
-    NC.post(.tnfWillBeRemoved, object: self as Any?)
-    
-    // remove the Tnf
-    _radio.tnfs[id] = nil
-  }
-
-  // ----------------------------------------------------------------------------
-  // Private command helper methods
-  
   /// Set a Tnf property on the Radio
   ///
   /// - Parameters:
@@ -292,10 +274,7 @@ extension Tnf {
   private func tnfCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("tnf set " + "\(id) " + token.rawValue + "=\(value)")
   }
-  
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
+
   /// Properties
   ///
   internal enum Token : String {

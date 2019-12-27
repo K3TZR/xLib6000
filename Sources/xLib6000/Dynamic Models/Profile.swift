@@ -30,7 +30,7 @@ public final class Profile                  : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                             : ProfileId!
+  public let id                             : ProfileId
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -91,11 +91,12 @@ public final class Profile                  : NSObject, StaticModel {
   /// Initialize Profile
   ///
   /// - Parameters:
-  ///   - id:                 Concurrent queue
-  ///   - queue:              Concurrent queue
+  ///   - radio:              the Radio instance
+  ///   - id:                 a Profile Id
   ///
   public init(radio: Radio, id: ProfileId) {
-   self.id = id
+    
+    self.id = id
     _radio = radio
     super.init()
   }
@@ -177,7 +178,7 @@ extension Profile {
   public func remove(_ name: String, callback: ReplyHandler? = nil) {
     
     // tell the Radio to delete the Profile name in the specified Profile type
-    Api.sharedInstance.send("profile "  + "\(id)" + " delete \"" + name + "\"", replyTo: callback)
+    _radio.sendCommand("profile "  + "\(id)" + " delete \"" + name + "\"", replyTo: callback)
   }
   /// Save a Profile entry
   ///
@@ -189,7 +190,7 @@ extension Profile {
   public func saveProfile(_ name: String, callback: ReplyHandler? = nil) {
     
     // tell the Radio to save the Profile name in the specified Profile type
-    Api.sharedInstance.send("profile "  + "\(id)" + " save \"" + name + "\"", replyTo: callback)
+    _radio.sendCommand("profile "  + "\(id)" + " save \"" + name + "\"", replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------

@@ -105,8 +105,8 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   /// Initialize Opus
   ///
   /// - Parameters:
-  ///   - id:                 an Opus Stream id
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
+  ///   - id:           an Opus Id
   ///
   init(radio: Radio, id: OpusId) {
     

@@ -105,8 +105,8 @@ public final class UsbCable                 : NSObject, DynamicModel {
   /// Initialize a UsbCable
   ///
   /// - Parameters:
-  ///   - id:                 a UsbCable serial number
-  ///   - queue:              Concurrent queue
+  ///   - radio:              the Radio instance
+  ///   - id:                 a Cable Id
   ///   - cableType:          the type of UsbCable
   ///
   public init(radio: Radio, id: UsbCableId, cableType: UsbCableType) {

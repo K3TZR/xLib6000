@@ -44,7 +44,7 @@ public final class Atu                      : NSObject, StaticModel {
   /// Initialize Atu
   ///
   /// - Parameters:
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
     

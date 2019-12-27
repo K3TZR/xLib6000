@@ -119,7 +119,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// Connect to a Radio
   ///
   /// - Parameters:
-  ///     - selectedRadio:        a RadioParameters struct for the desired Radio
+  ///     - discoveryPacket:      a DiscoveredRadio struct for the desired Radio
   ///     - clientStation:        the name of the Station using this library (V3 only)
   ///     - clientName:           the name of the Client using this library
   ///     - clientId:             a UUID String (if any) (V3 only)
@@ -150,6 +150,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     _secondaryCmdTypes = secondaryCmdTypes
     _subscriptionCmdTypes = subscriptionCmdTypes
     
+    // Create a Radio class
+    radio = Radio(discoveryPacket, api: self)
+
     // start a connection to the Radio
     if _tcp.connect(discoveryPacket, isWan: isWan) {
       
@@ -162,12 +165,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _isGui = isGui
       self.isWan = isWan
       wanConnectionHandle = wanHandle
-      
-      // Create a Radio class
-      radio = Radio(discoveryPacket, api: self)
-      return radio
+    
+    } else {
+      radio = nil
     }
-    return nil
+    return radio
   }
   /// Shutdown the active Radio
   ///

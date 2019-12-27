@@ -80,11 +80,11 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
-  /// Initialize an Mic Audio Stream
+  /// Initialize a DaxMicAudioStream
   ///
   /// - Parameters:
-  ///   - id:                 a Dax Stream Id
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
+  ///   - id:           a DaxMicAudioStream Id
   ///
   init(radio: Radio, id: DaxMicStreamId) {
     

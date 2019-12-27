@@ -72,7 +72,7 @@ public final class Gps                      : NSObject, StaticModel {
   /// Initialize Gps
   ///
   /// - Parameters:
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
 

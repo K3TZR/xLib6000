@@ -278,8 +278,8 @@ public final class Slice                    : NSObject, DynamicModel {
   /// Initialize a Slice
   ///
   /// - Parameters:
-  ///   - sliceId:            a Slice Id
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
+  ///   - id:           a Slice Id
   ///
   public init(radio: Radio, id: SliceId) {
 

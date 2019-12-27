@@ -102,8 +102,8 @@ public final class Equalizer : NSObject, DynamicModel {
   /// Initialize an Equalizer
   ///
   /// - Parameters:
-  ///   - eqType:             the Equalizer type (rxsc or txsc)
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
+  ///   - id:           an Equalizer Id
   ///
   init(radio: Radio, id: EqualizerId) {
     

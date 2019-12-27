@@ -55,7 +55,7 @@ public final class Interlock                : NSObject, StaticModel {
   /// Initialize Interlock
   ///
   /// - Parameters:
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
 

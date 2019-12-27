@@ -130,8 +130,8 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   /// Initialize an IQ Stream
   ///
   /// - Parameters:
-  ///   - id:                 the Stream Id
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
+  ///   - id:           an IqStream Id
   ///
   init(radio: Radio, id: DaxIqStreamId) {
     

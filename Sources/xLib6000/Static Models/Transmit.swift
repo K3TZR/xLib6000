@@ -86,7 +86,7 @@ public final class Transmit                 : NSObject, StaticModel {
   /// Initialize Transmit
   ///
   /// - Parameters:
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
 

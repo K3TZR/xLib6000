@@ -187,8 +187,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   /// Initialize a Panadapter
   ///
   /// - Parameters:
-  ///   - streamId:           a Panadapter Stream Id
-  ///   - queue:              Concurrent queue
+  ///   - radio:              the Radio instance
+  ///   - id:                 a Panadapter Id
   ///
   init(radio: Radio, id: PanadapterStreamId) {
     

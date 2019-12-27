@@ -33,7 +33,7 @@ public final class Waveform                 : NSObject, StaticModel {
   /// Initialize Waveform
   ///
   /// - Parameters:
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
 

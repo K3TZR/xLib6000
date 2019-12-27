@@ -92,8 +92,8 @@ public final class Amplifier  : NSObject, DynamicModel {
   /// Initialize an Amplifier
   ///
   /// - Parameters:
-  ///   - id:                 an Xvtr Id
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
+  ///   - id:           an Amplifier Id
   ///
   public init(radio: Radio, id: AmplifierId) {
     

@@ -98,8 +98,8 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   /// Initialize RemoteTxAudioStream
   ///
   /// - Parameters:
-  ///   - id:                 an Opus Stream id
-  ///   - queue:              Concurrent queue
+  ///   - radio:        the Radio instance
+  ///   - id:           a RemoteTxAudioStream Id
   ///
   init(radio: Radio, id: RemoteTxStreamId) {
     
