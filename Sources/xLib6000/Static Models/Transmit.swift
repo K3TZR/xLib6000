@@ -106,11 +106,11 @@ public final class Transmit                 : NSObject, StaticModel {
   func parseProperties(_ properties: KeyValuesArray) {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Transmit, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Transmit, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -125,136 +125,136 @@ public final class Transmit                 : NSObject, StaticModel {
       switch token {
         
       case .amCarrierLevel:
-        update(&_carrierLevel, to: property.value.iValue, signal: \.carrierLevel)
+        update(self, &_carrierLevel, to: property.value.iValue, signal: \.carrierLevel)
 
       case .companderEnabled:
-        update(&_companderEnabled, to: property.value.bValue, signal: \.companderEnabled)
+        update(self, &_companderEnabled, to: property.value.bValue, signal: \.companderEnabled)
 
       case .companderLevel:
-        update(&_companderLevel, to: property.value.iValue, signal: \.companderLevel)
+        update(self, &_companderLevel, to: property.value.iValue, signal: \.companderLevel)
 
       case .cwBreakInEnabled:
-        update(&_cwBreakInEnabled, to: property.value.bValue, signal: \.cwBreakInEnabled)
+        update(self, &_cwBreakInEnabled, to: property.value.bValue, signal: \.cwBreakInEnabled)
 
       case .cwBreakInDelay:
-        update(&_cwBreakInDelay, to: property.value.iValue, signal: \.cwBreakInDelay)
+        update(self, &_cwBreakInDelay, to: property.value.iValue, signal: \.cwBreakInDelay)
 
       case .cwIambicEnabled:
-        update(&_cwIambicEnabled, to: property.value.bValue, signal: \.cwIambicEnabled)
+        update(self, &_cwIambicEnabled, to: property.value.bValue, signal: \.cwIambicEnabled)
 
       case .cwIambicMode:
-        update(&_cwIambicMode, to: property.value.iValue, signal: \.cwIambicMode)
+        update(self, &_cwIambicMode, to: property.value.iValue, signal: \.cwIambicMode)
 
       case .cwlEnabled:
-        update(&_cwlEnabled, to: property.value.bValue, signal: \.cwlEnabled)
+        update(self, &_cwlEnabled, to: property.value.bValue, signal: \.cwlEnabled)
 
       case .cwPitch:
-        update(&_cwPitch, to: property.value.iValue, signal: \.cwPitch)
+        update(self, &_cwPitch, to: property.value.iValue, signal: \.cwPitch)
 
       case .cwSidetoneEnabled:
-        update(&_cwSidetoneEnabled, to: property.value.bValue, signal: \.cwSidetoneEnabled)
+        update(self, &_cwSidetoneEnabled, to: property.value.bValue, signal: \.cwSidetoneEnabled)
 
       case .cwSpeed:
-        update(&_cwSpeed, to: property.value.iValue, signal: \.cwSpeed)
+        update(self, &_cwSpeed, to: property.value.iValue, signal: \.cwSpeed)
 
       case .cwSwapPaddles:
-        update(&_cwSwapPaddles, to: property.value.bValue, signal: \.cwSwapPaddles)
+        update(self, &_cwSwapPaddles, to: property.value.bValue, signal: \.cwSwapPaddles)
 
       case .cwSyncCwxEnabled:
-        update(&_cwSyncCwxEnabled, to: property.value.bValue, signal: \.cwSyncCwxEnabled)
+        update(self, &_cwSyncCwxEnabled, to: property.value.bValue, signal: \.cwSyncCwxEnabled)
 
       case .daxEnabled:
-        update(&_daxEnabled, to: property.value.bValue, signal: \.daxEnabled)
+        update(self, &_daxEnabled, to: property.value.bValue, signal: \.daxEnabled)
 
       case .frequency:
-        update(&_frequency, to: property.value.mhzToHz, signal: \.frequency)
+        update(self, &_frequency, to: property.value.mhzToHz, signal: \.frequency)
 
       case .hwAlcEnabled:
-        update(&_hwAlcEnabled, to: property.value.bValue, signal: \.hwAlcEnabled)
+        update(self, &_hwAlcEnabled, to: property.value.bValue, signal: \.hwAlcEnabled)
 
       case .inhibit:
-        update(&_inhibit, to: property.value.bValue, signal: \.inhibit)
+        update(self, &_inhibit, to: property.value.bValue, signal: \.inhibit)
 
       case .maxPowerLevel:
-        update(&_maxPowerLevel, to: property.value.iValue, signal: \.maxPowerLevel)
+        update(self, &_maxPowerLevel, to: property.value.iValue, signal: \.maxPowerLevel)
 
       case .metInRxEnabled:
-        update(&_metInRxEnabled, to: property.value.bValue, signal: \.metInRxEnabled)
+        update(self, &_metInRxEnabled, to: property.value.bValue, signal: \.metInRxEnabled)
 
       case .micAccEnabled:
-        update(&_micAccEnabled, to: property.value.bValue, signal: \.micAccEnabled)
+        update(self, &_micAccEnabled, to: property.value.bValue, signal: \.micAccEnabled)
 
       case .micBoostEnabled:
-        update(&_micBoostEnabled, to: property.value.bValue, signal: \.micBoostEnabled)
+        update(self, &_micBoostEnabled, to: property.value.bValue, signal: \.micBoostEnabled)
 
       case .micBiasEnabled:
-        update(&micBiasEnabled, to: property.value.bValue, signal: \.micBiasEnabled)
+        update(self, &micBiasEnabled, to: property.value.bValue, signal: \.micBiasEnabled)
 
       case .micLevel:
-        update(&_micLevel, to: property.value.iValue, signal: \.micLevel)
+        update(self, &_micLevel, to: property.value.iValue, signal: \.micLevel)
 
       case .micSelection:
-        update(&_micSelection, to: property.value, signal: \.micSelection)
+        update(self, &_micSelection, to: property.value, signal: \.micSelection)
 
       case .rawIqEnabled:
-        update(&_rawIqEnabled, to: property.value.bValue, signal: \.rawIqEnabled)
+        update(self, &_rawIqEnabled, to: property.value.bValue, signal: \.rawIqEnabled)
 
       case .rfPower:
-        update(&_rfPower, to: property.value.iValue, signal: \.rfPower)
+        update(self, &_rfPower, to: property.value.iValue, signal: \.rfPower)
 
       case .speechProcessorEnabled:
-        update(&_speechProcessorEnabled, to: property.value.bValue, signal: \.speechProcessorEnabled)
+        update(self, &_speechProcessorEnabled, to: property.value.bValue, signal: \.speechProcessorEnabled)
 
       case .speechProcessorLevel:
-        update(&_speechProcessorLevel, to: property.value.iValue, signal: \.speechProcessorLevel)
+        update(self, &_speechProcessorLevel, to: property.value.iValue, signal: \.speechProcessorLevel)
 
       case .txFilterChanges:
-        update(&_txFilterChanges, to: property.value.bValue, signal: \.txFilterChanges)
+        update(self, &_txFilterChanges, to: property.value.bValue, signal: \.txFilterChanges)
 
       case .txFilterHigh:
-        update(&_txFilterHigh, to: property.value.iValue, signal: \.txFilterHigh)
+        update(self, &_txFilterHigh, to: property.value.iValue, signal: \.txFilterHigh)
 
       case .txFilterLow:
-        update(&_txFilterLow, to: property.value.iValue, signal: \.txFilterLow)
+        update(self, &_txFilterLow, to: property.value.iValue, signal: \.txFilterLow)
 
       case .txInWaterfallEnabled:
-        update(&_txInWaterfallEnabled, to: property.value.bValue, signal: \.txInWaterfallEnabled)
+        update(self, &_txInWaterfallEnabled, to: property.value.bValue, signal: \.txInWaterfallEnabled)
 
       case .txMonitorAvailable:
-        update(&_txMonitorAvailable, to: property.value.bValue, signal: \.txMonitorAvailable)
+        update(self, &_txMonitorAvailable, to: property.value.bValue, signal: \.txMonitorAvailable)
 
       case .txMonitorEnabled:
-        update(&_txMonitorEnabled, to: property.value.bValue, signal: \.txMonitorEnabled)
+        update(self, &_txMonitorEnabled, to: property.value.bValue, signal: \.txMonitorEnabled)
 
       case .txMonitorGainCw:
-        update(&_txMonitorGainCw, to: property.value.iValue, signal: \.txMonitorGainCw)
+        update(self, &_txMonitorGainCw, to: property.value.iValue, signal: \.txMonitorGainCw)
 
       case .txMonitorGainSb:
-        update(&_txMonitorGainSb, to: property.value.iValue, signal: \.txMonitorGainSb)
+        update(self, &_txMonitorGainSb, to: property.value.iValue, signal: \.txMonitorGainSb)
 
       case .txMonitorPanCw:
-        update(&_txMonitorPanCw, to: property.value.iValue, signal: \.txMonitorPanCw)
+        update(self, &_txMonitorPanCw, to: property.value.iValue, signal: \.txMonitorPanCw)
 
       case .txMonitorPanSb:
-        update(&_txMonitorPanSb, to: property.value.iValue, signal: \.txMonitorPanSb)
+        update(self, &_txMonitorPanSb, to: property.value.iValue, signal: \.txMonitorPanSb)
 
       case .txRfPowerChanges:
-        update(&_txRfPowerChanges, to: property.value.bValue, signal: \.txRfPowerChanges)
+        update(self, &_txRfPowerChanges, to: property.value.bValue, signal: \.txRfPowerChanges)
 
       case .tune:
-        update(&_tune, to: property.value.bValue, signal: \.tune)
+        update(self, &_tune, to: property.value.bValue, signal: \.tune)
 
       case .tunePower:
-        update(&_tunePower, to: property.value.iValue, signal: \.tunePower)
+        update(self, &_tunePower, to: property.value.iValue, signal: \.tunePower)
 
       case .voxEnabled:
-        update(&_voxEnabled, to: property.value.bValue, signal: \.voxEnabled)
+        update(self, &_voxEnabled, to: property.value.bValue, signal: \.voxEnabled)
 
       case .voxDelay:
-        update(&_voxDelay, to: property.value.iValue, signal: \.voxDelay)
+        update(self, &_voxDelay, to: property.value.iValue, signal: \.voxDelay)
 
       case .voxLevel:
-        update(&_voxLevel, to: property.value.iValue, signal: \.voxLevel)
+        update(self, &_voxLevel, to: property.value.iValue, signal: \.voxLevel)
       }
     }
     // is Transmit initialized?

@@ -111,11 +111,11 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
     for property in properties {
       
       // function to change value and signal KVO
-      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<DaxIqStream, T>) {
-        willChangeValue(for: keyPath)
-        property.pointee = value
-        didChangeValue(for: keyPath)
-      }
+//      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<DaxIqStream, T>) {
+//        willChangeValue(for: keyPath)
+//        property.pointee = value
+//        didChangeValue(for: keyPath)
+//      }
 
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
@@ -126,19 +126,19 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       switch token {
         
       case .clientHandle:
-        update(&_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
+        update(self, &_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
 
       case .channel:
-        update(&_channel, to: property.value.iValue, signal: \.channel)
+        update(self, &_channel, to: property.value.iValue, signal: \.channel)
 
       case .isActive:
-        update(&_isActive, to: property.value.bValue, signal: \.isActive)
+        update(self, &_isActive, to: property.value.bValue, signal: \.isActive)
 
       case .pan:
-        update(&_pan, to: property.value.streamId ?? 0, signal: \.pan)
+        update(self, &_pan, to: property.value.streamId ?? 0, signal: \.pan)
 
       case .rate:
-        update(&_rate, to: property.value.iValue, signal: \.rate)
+        update(self, &_rate, to: property.value.iValue, signal: \.rate)
       }
     }
     // is the Stream initialized?

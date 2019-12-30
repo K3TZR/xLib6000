@@ -166,11 +166,11 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   func parseProperties(_ properties: KeyValuesArray) {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Waterfall, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Waterfall, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -185,22 +185,22 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       switch token {
         
       case .autoBlackEnabled:
-        update(&_autoBlackEnabled, to: property.value.bValue, signal: \.autoBlackEnabled)
+        update(self, &_autoBlackEnabled, to: property.value.bValue, signal: \.autoBlackEnabled)
 
       case .blackLevel:
-        update(&_blackLevel, to: property.value.iValue, signal: \.blackLevel)
+        update(self, &_blackLevel, to: property.value.iValue, signal: \.blackLevel)
 
       case .colorGain:
-        update(&_colorGain, to: property.value.iValue, signal: \.colorGain)
+        update(self, &_colorGain, to: property.value.iValue, signal: \.colorGain)
 
       case .gradientIndex:
-        update(&_gradientIndex, to: property.value.iValue, signal: \.gradientIndex)
+        update(self, &_gradientIndex, to: property.value.iValue, signal: \.gradientIndex)
 
       case .lineDuration:
-        update(&_lineDuration, to: property.value.iValue, signal: \.lineDuration)
+        update(self, &_lineDuration, to: property.value.iValue, signal: \.lineDuration)
 
       case .panadapterId:
-        update(&_panadapterId, to: property.value.streamId ?? 0, signal: \.panadapterId)
+        update(self, &_panadapterId, to: property.value.streamId ?? 0, signal: \.panadapterId)
 
       case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqRate,
            .loopA, .loopB, .rfGain, .rxAnt, .segmentZoomEnabled, .wide, .xPixels, .xvtr:

@@ -186,11 +186,11 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
     for property in properties {
       
       // function to change value and signal KVO
-      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<DaxTxAudioStream, T>) {
-        willChangeValue(for: keyPath)
-        property.pointee = value
-        didChangeValue(for: keyPath)
-      }
+//      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<DaxTxAudioStream, T>) {
+//        willChangeValue(for: keyPath)
+//        property.pointee = value
+//        didChangeValue(for: keyPath)
+//      }
 
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
@@ -202,10 +202,10 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       switch token {
         
       case .clientHandle:
-        update(&_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
+        update(self, &_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
 
       case .isTransmitChannel:
-        update(&_isTransmitChannel, to: property.value.bValue, signal: \.isTransmitChannel)
+        update(self, &_isTransmitChannel, to: property.value.bValue, signal: \.isTransmitChannel)
 
       }
     }

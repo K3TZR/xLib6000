@@ -147,11 +147,11 @@ public final class Cwx                      : NSObject, StaticModel {
   func parseProperties(_ properties: KeyValuesArray)  {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Cwx, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Cwx, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -182,7 +182,7 @@ public final class Cwx                      : NSObject, StaticModel {
         switch token {
           
         case .breakInDelay:
-          update(&_breakInDelay, to: property.value.iValue, signal: \.breakInDelay)
+          update(self, &_breakInDelay, to: property.value.iValue, signal: \.breakInDelay)
 
         case .erase:
           let values = property.value.components(separatedBy: ",")
@@ -195,14 +195,14 @@ public final class Cwx                      : NSObject, StaticModel {
           }
           
         case .qskEnabled:
-          update(&_qskEnabled, to: property.value.bValue, signal: \.qskEnabled)
+          update(self, &_qskEnabled, to: property.value.bValue, signal: \.qskEnabled)
 
         case .sent:
           // inform the Event Handler (if any)
           charSentEventHandler?(property.value.iValue)
           
         case .wpm:
-          update(&_wpm, to: property.value.iValue, signal: \.wpm)
+          update(self, &_wpm, to: property.value.iValue, signal: \.wpm)
         }
       }
     }

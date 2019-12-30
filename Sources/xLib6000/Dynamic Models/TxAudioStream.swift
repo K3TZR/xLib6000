@@ -202,11 +202,11 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   func parseProperties(_ properties: KeyValuesArray) {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<TxAudioStream, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<TxAudioStream, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -221,16 +221,16 @@ public final class TxAudioStream            : NSObject, DynamicModel {
       switch token {
         
       case .daxTx:
-        update(&_transmit, to: property.value.bValue, signal: \.transmit)
+        update(self, &_transmit, to: property.value.bValue, signal: \.transmit)
 
       case .inUse:
-        update(&_inUse, to: property.value.bValue, signal: \.inUse)
+        update(self, &_inUse, to: property.value.bValue, signal: \.inUse)
 
       case .ip:
-        update(&_ip, to: property.value, signal: \.ip)
+        update(self, &_ip, to: property.value, signal: \.ip)
 
       case .port:
-        update(&_port, to: property.value.iValue, signal: \.port)
+        update(self, &_port, to: property.value.iValue, signal: \.port)
       }
     }
     // is the AudioStream acknowledged by the radio?

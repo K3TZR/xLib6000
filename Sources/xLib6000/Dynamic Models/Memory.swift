@@ -214,11 +214,11 @@ public final class Memory                   : NSObject, DynamicModel {
     for property in properties {
       
       // function to change value and signal KVO
-      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Memory, T>) {
-        willChangeValue(for: keyPath)
-        property.pointee = value
-        didChangeValue(for: keyPath)
-      }
+//      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Memory, T>) {
+//        willChangeValue(for: keyPath)
+//        property.pointee = value
+//        didChangeValue(for: keyPath)
+//      }
 
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key) else {
@@ -230,16 +230,16 @@ public final class Memory                   : NSObject, DynamicModel {
       switch (token) {
         
       case .digitalLowerOffset:
-        update(&_digitalLowerOffset, to: property.value.iValue, signal: \.digitalLowerOffset)
+        update(self, &_digitalLowerOffset, to: property.value.iValue, signal: \.digitalLowerOffset)
 
       case .digitalUpperOffset:
-        update(&_digitalUpperOffset, to: property.value.iValue, signal: \.digitalUpperOffset)
+        update(self, &_digitalUpperOffset, to: property.value.iValue, signal: \.digitalUpperOffset)
 
       case .frequency:
-        update(&_frequency, to: property.value.mhzToHz, signal: \.frequency)
+        update(self, &_frequency, to: property.value.mhzToHz, signal: \.frequency)
 
       case .group:
-        update(&_group, to: property.value.replacingSpaces(), signal: \.group)
+        update(self, &_group, to: property.value.replacingSpaces(), signal: \.group)
 
       case .highlight:            // not implemented
         break
@@ -248,49 +248,49 @@ public final class Memory                   : NSObject, DynamicModel {
         break
         
       case .mode:
-        update(&_mode, to: property.value.replacingSpaces(), signal: \.mode)
+        update(self, &_mode, to: property.value.replacingSpaces(), signal: \.mode)
 
       case .name:
-        update(&_name, to: property.value.replacingSpaces(), signal: \.name)
+        update(self, &_name, to: property.value.replacingSpaces(), signal: \.name)
 
       case .owner:
-        update(&_owner, to: property.value.replacingSpaces(), signal: \.owner)
+        update(self, &_owner, to: property.value.replacingSpaces(), signal: \.owner)
 
       case .repeaterOffsetDirection:
-        update(&_offsetDirection, to: property.value.replacingSpaces(), signal: \.offsetDirection)
+        update(self, &_offsetDirection, to: property.value.replacingSpaces(), signal: \.offsetDirection)
 
       case .repeaterOffset:
-        update(&_offset, to: property.value.iValue, signal: \.offset)
+        update(self, &_offset, to: property.value.iValue, signal: \.offset)
 
       case .rfPower:
-        update(&_rfPower, to: property.value.iValue, signal: \.rfPower)
+        update(self, &_rfPower, to: property.value.iValue, signal: \.rfPower)
 
       case .rttyMark:
-        update(&_rttyMark, to: property.value.iValue, signal: \.rttyMark)
+        update(self, &_rttyMark, to: property.value.iValue, signal: \.rttyMark)
 
       case .rttyShift:
-        update(&_rttyShift, to: property.value.iValue, signal: \.rttyShift)
+        update(self, &_rttyShift, to: property.value.iValue, signal: \.rttyShift)
 
       case .rxFilterHigh:
-        update(&_filterHigh, to: filterHighLimits(property.value.iValue), signal: \.filterHigh)
+        update(self, &_filterHigh, to: filterHighLimits(property.value.iValue), signal: \.filterHigh)
 
       case .rxFilterLow:
-        update(&_filterLow, to: filterLowLimits(property.value.iValue), signal: \.filterLow)
+        update(self, &_filterLow, to: filterLowLimits(property.value.iValue), signal: \.filterLow)
 
       case .squelchEnabled:
-        update(&_squelchEnabled, to: property.value.bValue, signal: \.squelchEnabled)
+        update(self, &_squelchEnabled, to: property.value.bValue, signal: \.squelchEnabled)
 
       case .squelchLevel:
-        update(&_squelchLevel, to: property.value.iValue, signal: \.squelchLevel)
+        update(self, &_squelchLevel, to: property.value.iValue, signal: \.squelchLevel)
 
       case .step:
-        update(&_step, to: property.value.iValue, signal: \.step)
+        update(self, &_step, to: property.value.iValue, signal: \.step)
 
       case .toneMode:
-        update(&_toneMode, to: property.value.replacingSpaces(), signal: \.toneMode)
+        update(self, &_toneMode, to: property.value.replacingSpaces(), signal: \.toneMode)
 
       case .toneValue:
-        update(&_toneValue, to: property.value.iValue, signal: \.toneValue)
+        update(self, &_toneValue, to: property.value.iValue, signal: \.toneValue)
       }
     }
     // is the Memory initialized?

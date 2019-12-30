@@ -95,11 +95,11 @@ public final class Gps                      : NSObject, StaticModel {
     //          <"freq_error", value> <"status", "Not Present" | "Present"> <"time", value> <"track", value>
     
        // function to change value and signal KVO
-       func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Gps, T>) {
-         willChangeValue(for: keyPath)
-         property.pointee = value
-         didChangeValue(for: keyPath)
-       }
+//       func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Gps, T>) {
+//         willChangeValue(for: keyPath)
+//         property.pointee = value
+//         didChangeValue(for: keyPath)
+//       }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -114,37 +114,37 @@ public final class Gps                      : NSObject, StaticModel {
       switch token {
         
       case .altitude:
-        update(&_altitude, to: property.value, signal: \.altitude)
+        update(self, &_altitude, to: property.value, signal: \.altitude)
 
       case .frequencyError:
-        update(&_frequencyError, to: property.value.dValue, signal: \.frequencyError)
+        update(self, &_frequencyError, to: property.value.dValue, signal: \.frequencyError)
 
       case .grid:
-        update(&_grid, to: property.value, signal: \.grid)
+        update(self, &_grid, to: property.value, signal: \.grid)
 
       case .latitude:
-        update(&_latitude, to: property.value, signal: \.latitude)
+        update(self, &_latitude, to: property.value, signal: \.latitude)
 
       case .longitude:
-        update(&_longitude, to: property.value, signal: \.longitude)
+        update(self, &_longitude, to: property.value, signal: \.longitude)
 
       case .speed:
-        update(&_speed, to: property.value, signal: \.speed)
+        update(self, &_speed, to: property.value, signal: \.speed)
 
       case .status:
-        update(&_status, to: property.value == "present" ? true : false, signal: \.status)
+        update(self, &_status, to: property.value == "present" ? true : false, signal: \.status)
 
       case .time:
-        update(&_time, to: property.value, signal: \.time)
+        update(self, &_time, to: property.value, signal: \.time)
 
       case .track:
-        update(&_track, to: property.value.dValue, signal: \.track)
+        update(self, &_track, to: property.value.dValue, signal: \.track)
 
       case .tracked:
-        update(&_tracked, to: property.value.bValue, signal: \.tracked)
+        update(self, &_tracked, to: property.value.bValue, signal: \.tracked)
 
       case .visible:
-        update(&_visible, to: property.value.bValue, signal: \.visible)
+        update(self, &_visible, to: property.value.bValue, signal: \.visible)
       }
     }
   }

@@ -65,11 +65,11 @@ public final class Atu                      : NSObject, StaticModel {
     // Format: <"status", value> <"memories_enabled", 1|0> <"using_mem", 1|0>
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Atu, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Atu, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -84,17 +84,17 @@ public final class Atu                      : NSObject, StaticModel {
       switch token {
         
       case .enabled:
-        update(&_enabled, to: property.value.bValue, signal: \.enabled)
+        update(self, &_enabled, to: property.value.bValue, signal: \.enabled)
 
       case .memoriesEnabled:
-        update(&_memoriesEnabled, to: property.value.bValue, signal: \.memoriesEnabled)
+        update(self, &_memoriesEnabled, to: property.value.bValue, signal: \.memoriesEnabled)
 
       case .status:
-//        update(&_status, to: property.value, signal: \.status)
+//        update(self, &_status, to: property.value, signal: \.status)
         break
 
       case .usingMemories:
-        update(&_usingMemories, to: property.value.bValue, signal: \.usingMemories)
+        update(self, &_usingMemories, to: property.value.bValue, signal: \.usingMemories)
       }
     }
   }

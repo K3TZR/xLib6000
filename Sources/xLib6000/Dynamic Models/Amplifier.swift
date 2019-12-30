@@ -114,11 +114,11 @@ public final class Amplifier  : NSObject, DynamicModel {
   func parseProperties(_ properties: KeyValuesArray) {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Amplifier, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Amplifier, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -133,19 +133,19 @@ public final class Amplifier  : NSObject, DynamicModel {
       switch token {
         
       case .ant:
-        update(&_ant, to: property.value, signal: \.ant)
+        update(self, &_ant, to: property.value, signal: \.ant)
 
       case .ip:
-        update(&_ip, to: property.value, signal: \.ip)
+        update(self, &_ip, to: property.value, signal: \.ip)
 
       case .model:
-        update(&_model, to: property.value, signal: \.model)
+        update(self, &_model, to: property.value, signal: \.model)
 
       case .port:
-        update(&_port, to: property.value.iValue, signal: \.port)
+        update(self, &_port, to: property.value.iValue, signal: \.port)
 
       case .serialNumber:
-        update(&_serialNumber, to: property.value, signal: \.serialNumber)
+        update(self, &_serialNumber, to: property.value, signal: \.serialNumber)
 
       case .mode:      // never received from Radio
         break

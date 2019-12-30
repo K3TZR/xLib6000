@@ -124,11 +124,11 @@ public final class Equalizer : NSObject, DynamicModel {
   func parseProperties(_ properties: KeyValuesArray) {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Equalizer, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Equalizer, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -143,31 +143,31 @@ public final class Equalizer : NSObject, DynamicModel {
       switch token {
         
       case .level63Hz:
-        update(&_level63Hz, to: property.value.iValue, signal: \.level63Hz)
+        update(self, &_level63Hz, to: property.value.iValue, signal: \.level63Hz)
 
       case .level125Hz:
-        update(&_level125Hz, to: property.value.iValue, signal: \.level125Hz)
+        update(self, &_level125Hz, to: property.value.iValue, signal: \.level125Hz)
 
       case .level250Hz:
-        update(&_level250Hz, to: property.value.iValue, signal: \.level250Hz)
+        update(self, &_level250Hz, to: property.value.iValue, signal: \.level250Hz)
 
       case .level500Hz:
-        update(&_level500Hz, to: property.value.iValue, signal: \.level500Hz)
+        update(self, &_level500Hz, to: property.value.iValue, signal: \.level500Hz)
 
       case .level1000Hz:
-        update(&_level1000Hz, to: property.value.iValue, signal: \.level1000Hz)
+        update(self, &_level1000Hz, to: property.value.iValue, signal: \.level1000Hz)
 
       case .level2000Hz:
-        update(&_level2000Hz, to: property.value.iValue, signal: \.level2000Hz)
+        update(self, &_level2000Hz, to: property.value.iValue, signal: \.level2000Hz)
 
       case .level4000Hz:
-        update(&_level4000Hz, to: property.value.iValue, signal: \.level4000Hz)
+        update(self, &_level4000Hz, to: property.value.iValue, signal: \.level4000Hz)
 
       case .level8000Hz:
-        update(&_level8000Hz, to: property.value.iValue, signal: \.level8000Hz)
+        update(self, &_level8000Hz, to: property.value.iValue, signal: \.level8000Hz)
 
       case .enabled:
-        update(&_eqEnabled, to: property.value.bValue, signal: \.eqEnabled)
+        update(self, &_eqEnabled, to: property.value.bValue, signal: \.eqEnabled)
       }
     }
     // is the Equalizer initialized?

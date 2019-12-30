@@ -57,11 +57,11 @@ public final class Wan                      : NSObject, StaticModel {
     for property in properties {
       
       // function to change value and signal KVO
-      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Wan, T>) {
-        willChangeValue(for: keyPath)
-        property.pointee = value
-        didChangeValue(for: keyPath)
-      }
+//      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Wan, T>) {
+//        willChangeValue(for: keyPath)
+//        property.pointee = value
+//        didChangeValue(for: keyPath)
+//      }
 
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
@@ -73,10 +73,10 @@ public final class Wan                      : NSObject, StaticModel {
       switch token {
         
       case .serverConnected:
-        update(&_serverConnected, to: property.value.bValue, signal: \.serverConnected)
+        update(self, &_serverConnected, to: property.value.bValue, signal: \.serverConnected)
 
       case .radioAuthenticated:
-        update(&_radioAuthenticated, to: property.value.bValue, signal: \.radioAuthenticated)
+        update(self, &_radioAuthenticated, to: property.value.bValue, signal: \.radioAuthenticated)
       }
     }
   }

@@ -125,11 +125,11 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   func parseProperties(_ properties: KeyValuesArray) {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<RemoteRxAudioStream, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<RemoteRxAudioStream, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair
     for property in properties {
@@ -144,13 +144,13 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       switch token {
         
       case .clientHandle:        
-        update(&_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
+        update(self, &_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
 
       case .compression:
-        update(&_compression, to: property.value.lowercased(), signal: \.compression)
+        update(self, &_compression, to: property.value.lowercased(), signal: \.compression)
 
       case .ip:
-       update(&_ip, to: property.value, signal: \.ip)
+       update(self, &_ip, to: property.value, signal: \.ip)
      }
     }
     // the Radio (hardware) has acknowledged this RxRemoteAudioStream

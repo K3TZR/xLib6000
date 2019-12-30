@@ -137,11 +137,11 @@ public final class UsbCable                 : NSObject, DynamicModel {
     // FIXME: Need other formats
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<UsbCable, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<UsbCable, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // is the Status for a cable of this type?
     if cableType.rawValue == properties[0].value {
@@ -160,59 +160,59 @@ public final class UsbCable                 : NSObject, DynamicModel {
         switch token {
           
         case .autoReport:
-          update(&_autoReport, to: property.value.bValue, signal: \.autoReport)
+          update(self, &_autoReport, to: property.value.bValue, signal: \.autoReport)
 
         case .band:
-          update(&_band, to: property.value, signal: \.band)
+          update(self, &_band, to: property.value, signal: \.band)
 
         case .cableType:
           // ignore this token's value (set by init)
           break
           
         case .dataBits:
-          update(&_dataBits, to: property.value.iValue, signal: \.dataBits)
+          update(self, &_dataBits, to: property.value.iValue, signal: \.dataBits)
 
         case .enable:
-          update(&_enable, to: property.value.bValue, signal: \.enable)
+          update(self, &_enable, to: property.value.bValue, signal: \.enable)
 
         case .flowControl:
-          update(&_flowControl, to: property.value, signal: \.flowControl)
+          update(self, &_flowControl, to: property.value, signal: \.flowControl)
 
         case .name:
-          update(&_name, to: property.value, signal: \.name)
+          update(self, &_name, to: property.value, signal: \.name)
 
         case .parity:
-          update(&_parity, to: property.value, signal: \.parity)
+          update(self, &_parity, to: property.value, signal: \.parity)
 
         case .pluggedIn:
-          update(&_pluggedIn, to: property.value.bValue, signal: \.pluggedIn)
+          update(self, &_pluggedIn, to: property.value.bValue, signal: \.pluggedIn)
 
         case .polarity:
-          update(&_polarity, to: property.value, signal: \.polarity)
+          update(self, &_polarity, to: property.value, signal: \.polarity)
 
         case .preamp:
-          update(&_preamp, to: property.value, signal: \.preamp)
+          update(self, &_preamp, to: property.value, signal: \.preamp)
 
         case .source:
-          update(&_source, to: property.value, signal: \.source)
+          update(self, &_source, to: property.value, signal: \.source)
 
         case .sourceRxAnt:
-          update(&_sourceRxAnt, to: property.value, signal: \.sourceRxAnt)
+          update(self, &_sourceRxAnt, to: property.value, signal: \.sourceRxAnt)
 
         case .sourceSlice:
-          update(&_sourceSlice, to: property.value.iValue, signal: \.sourceSlice)
+          update(self, &_sourceSlice, to: property.value.iValue, signal: \.sourceSlice)
 
         case .sourceTxAnt:
-          update(&_sourceTxAnt, to: property.value, signal: \.sourceTxAnt)
+          update(self, &_sourceTxAnt, to: property.value, signal: \.sourceTxAnt)
 
         case .speed:
-          update(&_speed, to: property.value.iValue, signal: \.speed)
+          update(self, &_speed, to: property.value.iValue, signal: \.speed)
 
         case .stopBits:
-          update(&_stopBits, to: property.value.iValue, signal: \.stopBits)
+          update(self, &_stopBits, to: property.value.iValue, signal: \.stopBits)
 
         case .usbLog:
-          update(&_usbLog, to: property.value.bValue, signal: \.usbLog)
+          update(self, &_usbLog, to: property.value.bValue, signal: \.usbLog)
 
           //                case .usbLogLine:
           //                    willChangeValue(forKey: "usbLogLine")

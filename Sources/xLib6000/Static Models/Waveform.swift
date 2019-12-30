@@ -53,11 +53,11 @@ public final class Waveform                 : NSObject, StaticModel {
   func parseProperties(_ properties: KeyValuesArray) {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Waveform, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Waveform, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -72,7 +72,7 @@ public final class Waveform                 : NSObject, StaticModel {
       switch token {
         
       case .waveformList:
-        update(&_waveformList, to: property.value, signal: \.waveformList)      }
+        update(self, &_waveformList, to: property.value, signal: \.waveformList)      }
     }
   }
 }

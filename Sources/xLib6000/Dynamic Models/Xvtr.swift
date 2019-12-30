@@ -153,11 +153,11 @@ public final class Xvtr : NSObject, DynamicModel {
   func parseProperties(_ properties: KeyValuesArray) {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Xvtr, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Xvtr, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -172,40 +172,40 @@ public final class Xvtr : NSObject, DynamicModel {
       switch token {
         
       case .name:
-        update(&_name, to: property.value, signal: \.name)
+        update(self, &_name, to: property.value, signal: \.name)
 
       case .ifFrequency:
-        update(&_ifFrequency, to: property.value.iValue, signal: \.ifFrequency)
+        update(self, &_ifFrequency, to: property.value.iValue, signal: \.ifFrequency)
 
       case .inUse:
-        update(&_inUse, to: property.value.bValue, signal: \.inUse)
+        update(self, &_inUse, to: property.value.bValue, signal: \.inUse)
 
       case .isValid:
-        update(&_isValid, to: property.value.bValue, signal: \.isValid)
+        update(self, &_isValid, to: property.value.bValue, signal: \.isValid)
 
       case .loError:
-        update(&_loError, to: property.value.iValue, signal: \.loError)
+        update(self, &_loError, to: property.value.iValue, signal: \.loError)
 
       case .maxPower:
-        update(&_maxPower, to: property.value.iValue, signal: \.maxPower)
+        update(self, &_maxPower, to: property.value.iValue, signal: \.maxPower)
 
       case .order:
-        update(&_order, to: property.value.iValue, signal: \.order)
+        update(self, &_order, to: property.value.iValue, signal: \.order)
 
       case .preferred:
-        update(&_preferred, to: property.value.bValue, signal: \.preferred)
+        update(self, &_preferred, to: property.value.bValue, signal: \.preferred)
 
       case .rfFrequency:
-        update(&_rfFrequency, to: property.value.iValue, signal: \.rfFrequency)
+        update(self, &_rfFrequency, to: property.value.iValue, signal: \.rfFrequency)
 
       case .rxGain:
-        update(&_rxGain, to: property.value.iValue, signal: \.rxGain)
+        update(self, &_rxGain, to: property.value.iValue, signal: \.rxGain)
 
       case .rxOnly:
-        update(&_rxOnly, to: property.value.bValue, signal: \.rxOnly)
+        update(self, &_rxOnly, to: property.value.bValue, signal: \.rxOnly)
 
       case .twoMeterInt:
-        update(&_twoMeterInt, to: property.value.iValue, signal: \.twoMeterInt)
+        update(self, &_twoMeterInt, to: property.value.iValue, signal: \.twoMeterInt)
       }
     }
     // is the waterfall initialized?

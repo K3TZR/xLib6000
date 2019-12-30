@@ -123,11 +123,11 @@ public final class Tnf : NSObject, DynamicModel {
   func parseProperties(_ properties: KeyValuesArray) {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Tnf, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Tnf, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -141,17 +141,10 @@ public final class Tnf : NSObject, DynamicModel {
       // known keys, in alphabetical order
       switch token {
         
-      case .depth:
-        updateX(self, &_depth, to: property.value.uValue, signal: \.depth)
-        
-      case .frequency:
-       updateX(self, &_frequency, to: property.value.mhzToHzUInt, signal: \.frequency)
-        
-      case .permanent:
-        updateX(self, &_permanent, to: property.value.bValue, signal: \.permanent)
-        
-      case .width:
-        updateX(self, &_width, to: property.value.mhzToHzUInt, signal: \.width)
+      case .depth:      update(self, &_depth,     to: property.value.uValue,      signal: \.depth)
+      case .frequency:  update(self, &_frequency, to: property.value.mhzToHzUInt, signal: \.frequency)
+      case .permanent:  update(self, &_permanent, to: property.value.bValue,      signal: \.permanent)
+      case .width:      update(self, &_width,     to: property.value.mhzToHzUInt, signal: \.width)
       }
       // is the Tnf initialized?
       if !_initialized && _frequency != 0 {

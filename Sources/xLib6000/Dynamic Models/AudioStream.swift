@@ -206,11 +206,11 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   func parseProperties(_ properties: KeyValuesArray) {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<AudioStream, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<AudioStream, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -225,23 +225,23 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       switch token {
         
       case .daxChannel:
-        update(&_daxChannel, to: property.value.iValue, signal: \.daxChannel)
+        update(self, &_daxChannel, to: property.value.iValue, signal: \.daxChannel)
 
       case .daxClients:
-        update(&_daxClients, to: property.value.iValue, signal: \.daxClients)
+        update(self, &_daxClients, to: property.value.iValue, signal: \.daxClients)
 
       case .inUse:
-        update(&_inUse, to: property.value.bValue, signal: \.inUse)
+        update(self, &_inUse, to: property.value.bValue, signal: \.inUse)
 
       case .ip:
-        update(&_ip, to: property.value, signal: \.ip)
+        update(self, &_ip, to: property.value, signal: \.ip)
 
       case .port:
-        update(&_port, to: property.value.iValue, signal: \.port)
+        update(self, &_port, to: property.value.iValue, signal: \.port)
 
       case .slice:
         if let sliceId = property.value.objectId {
-          update(&_slice, to: _radio.slices[sliceId], signal: \.slice)
+          update(self, &_slice, to: _radio.slices[sliceId], signal: \.slice)
         }
 
         let gain = _rxGain

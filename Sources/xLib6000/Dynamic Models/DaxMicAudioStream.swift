@@ -105,11 +105,11 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
   func parseProperties(_ properties: KeyValuesArray) {
     
     // function to change value and signal KVO
-    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<DaxMicAudioStream, T>) {
-      willChangeValue(for: keyPath)
-      property.pointee = value
-      didChangeValue(for: keyPath)
-    }
+//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<DaxMicAudioStream, T>) {
+//      willChangeValue(for: keyPath)
+//      property.pointee = value
+//      didChangeValue(for: keyPath)
+//    }
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -124,7 +124,7 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
       switch token {
         
       case .clientHandle:
-        update(&_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
+        update(self, &_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
       }
     }
     // is the AudioStream acknowledged by the radio?

@@ -443,11 +443,11 @@ public final class Slice                    : NSObject, DynamicModel {
     for property in properties {
       
       // function to change value and signal KVO
-      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<xLib6000.Slice, T>) {
-        willChangeValue(for: keyPath)
-        property.pointee = value
-        didChangeValue(for: keyPath)
-      }
+//      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<xLib6000.Slice, T>) {
+//        willChangeValue(for: keyPath)
+//        property.pointee = value
+//        didChangeValue(for: keyPath)
+//      }
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -458,37 +458,37 @@ public final class Slice                    : NSObject, DynamicModel {
       switch token {
         
       case .active:
-        update(&_active, to: property.value.bValue, signal: \.active)
+        update(self, &_active, to: property.value.bValue, signal: \.active)
 
       case .agcMode:
-        update(&_agcMode, to: property.value, signal: \.agcMode)
+        update(self, &_agcMode, to: property.value, signal: \.agcMode)
 
       case .agcOffLevel:
-        update(&_agcOffLevel, to: property.value.iValue, signal: \.agcOffLevel)
+        update(self, &_agcOffLevel, to: property.value.iValue, signal: \.agcOffLevel)
 
       case .agcThreshold:
-        update(&_agcThreshold, to: property.value.iValue, signal: \.agcThreshold)
+        update(self, &_agcThreshold, to: property.value.iValue, signal: \.agcThreshold)
 
       case .anfEnabled:
-        update(&_anfEnabled, to: property.value.bValue, signal: \.anfEnabled)
+        update(self, &_anfEnabled, to: property.value.bValue, signal: \.anfEnabled)
 
       case .anfLevel:
-        update(&_anfLevel, to: property.value.iValue, signal: \.anfLevel)
+        update(self, &_anfLevel, to: property.value.iValue, signal: \.anfLevel)
 
       case .apfEnabled:
-        update(&_apfEnabled, to: property.value.bValue, signal: \.apfEnabled)
+        update(self, &_apfEnabled, to: property.value.bValue, signal: \.apfEnabled)
 
       case .apfLevel:
-        update(&_apfLevel, to: property.value.iValue, signal: \.apfLevel)
+        update(self, &_apfLevel, to: property.value.iValue, signal: \.apfLevel)
 
       case .audioGain:
-        update(&_audioGain, to: property.value.iValue, signal: \.audioGain)
+        update(self, &_audioGain, to: property.value.iValue, signal: \.audioGain)
 
       case .audioMute:
-        update(&_audioMute, to: property.value.bValue, signal: \.audioMute)
+        update(self, &_audioMute, to: property.value.bValue, signal: \.audioMute)
 
       case .audioPan:
-        update(&_audioPan, to: property.value.iValue, signal: \.audioPan)
+        update(self, &_audioPan, to: property.value.iValue, signal: \.audioPan)
 
       case .daxChannel:
         if _daxChannel != 0 && property.value.iValue == 0 {
@@ -497,185 +497,185 @@ public final class Slice                    : NSObject, DynamicModel {
             audioStream.slice = nil
           }
         }
-        update(&_daxChannel, to: property.value.iValue, signal: \.daxChannel)
+        update(self, &_daxChannel, to: property.value.iValue, signal: \.daxChannel)
 
       case .daxTxEnabled:
-        update(&_daxTxEnabled, to: property.value.bValue, signal: \.daxTxEnabled)
+        update(self, &_daxTxEnabled, to: property.value.bValue, signal: \.daxTxEnabled)
 
       case .detached:
-        update(&_detached, to: property.value.bValue, signal: \.detached)
+        update(self, &_detached, to: property.value.bValue, signal: \.detached)
 
      case .dfmPreDeEmphasisEnabled:
-        update(&_dfmPreDeEmphasisEnabled, to: property.value.bValue, signal: \.dfmPreDeEmphasisEnabled)
+        update(self, &_dfmPreDeEmphasisEnabled, to: property.value.bValue, signal: \.dfmPreDeEmphasisEnabled)
 
       case .digitalLowerOffset:
-        update(&_digitalLowerOffset, to: property.value.iValue, signal: \.digitalLowerOffset)
+        update(self, &_digitalLowerOffset, to: property.value.iValue, signal: \.digitalLowerOffset)
 
       case .digitalUpperOffset:
-        update(&_digitalUpperOffset, to: property.value.iValue, signal: \.digitalUpperOffset)
+        update(self, &_digitalUpperOffset, to: property.value.iValue, signal: \.digitalUpperOffset)
 
       case .diversityEnabled:
         if _diversityIsAllowed {
-          update(&_diversityEnabled, to: property.value.bValue, signal: \.diversityEnabled)
+          update(self, &_diversityEnabled, to: property.value.bValue, signal: \.diversityEnabled)
         }
         
       case .diversityChild:
         if _diversityIsAllowed {
-          update(&_diversityChild, to: property.value.bValue, signal: \.diversityChild)
+          update(self, &_diversityChild, to: property.value.bValue, signal: \.diversityChild)
         }
         
       case .diversityIndex:
         if _diversityIsAllowed {
-          update(&_diversityIndex, to: property.value.iValue, signal: \.diversityIndex)
+          update(self, &_diversityIndex, to: property.value.iValue, signal: \.diversityIndex)
         }
         
       case .filterHigh:
-        update(&_filterHigh, to: property.value.iValue, signal: \.filterHigh)
+        update(self, &_filterHigh, to: property.value.iValue, signal: \.filterHigh)
 
       case .filterLow:
-        update(&_filterLow, to: property.value.iValue, signal: \.filterLow)
+        update(self, &_filterLow, to: property.value.iValue, signal: \.filterLow)
 
       case .fmDeviation:
-        update(&_fmDeviation, to: property.value.iValue, signal: \.fmDeviation)
+        update(self, &_fmDeviation, to: property.value.iValue, signal: \.fmDeviation)
 
       case .fmRepeaterOffset:
-        update(&_fmRepeaterOffset, to: property.value.fValue, signal: \.fmRepeaterOffset)
+        update(self, &_fmRepeaterOffset, to: property.value.fValue, signal: \.fmRepeaterOffset)
 
       case .fmToneBurstEnabled:
-        update(&_fmToneBurstEnabled, to: property.value.bValue, signal: \.fmToneBurstEnabled)
+        update(self, &_fmToneBurstEnabled, to: property.value.bValue, signal: \.fmToneBurstEnabled)
 
       case .fmToneMode:
-        update(&_fmToneMode, to: property.value, signal: \.fmToneMode)
+        update(self, &_fmToneMode, to: property.value, signal: \.fmToneMode)
 
       case .fmToneFreq:
-        update(&_fmToneFreq, to: property.value.fValue, signal: \.fmToneFreq)
+        update(self, &_fmToneFreq, to: property.value.fValue, signal: \.fmToneFreq)
 
       case .frequency:
-        update(&_frequency, to: property.value.mhzToHz, signal: \.frequency)
+        update(self, &_frequency, to: property.value.mhzToHz, signal: \.frequency)
 
       case .ghost:
         // FIXME: Is this needed?
         _log.msg("Unprocessed Slice property: \( property.key).\(property.value)", level: .warning, function: #function, file: #file, line: #line)
 
       case .inUse:
-        update(&_inUse, to: property.value.bValue, signal: \.inUse)
+        update(self, &_inUse, to: property.value.bValue, signal: \.inUse)
 
       case .locked:
-        update(&_locked, to: property.value.bValue, signal: \.locked)
+        update(self, &_locked, to: property.value.bValue, signal: \.locked)
 
       case .loopAEnabled:
-        update(&_loopAEnabled, to: property.value.bValue, signal: \.loopAEnabled)
+        update(self, &_loopAEnabled, to: property.value.bValue, signal: \.loopAEnabled)
 
       case .loopBEnabled:
-        update(&_loopBEnabled, to: property.value.bValue, signal: \.loopBEnabled)
+        update(self, &_loopBEnabled, to: property.value.bValue, signal: \.loopBEnabled)
 
       case .mode:
-        update(&_mode, to: property.value.uppercased(), signal: \.mode)
+        update(self, &_mode, to: property.value.uppercased(), signal: \.mode)
 
       case .modeList:
-        update(&_modeList, to: property.value.components(separatedBy: ","), signal: \.modeList)
+        update(self, &_modeList, to: property.value.components(separatedBy: ","), signal: \.modeList)
 
       case .nbEnabled:
-        update(&_nbEnabled, to: property.value.bValue, signal: \.nbEnabled)
+        update(self, &_nbEnabled, to: property.value.bValue, signal: \.nbEnabled)
 
       case .nbLevel:
-        update(&_nbLevel, to: property.value.iValue, signal: \.nbLevel)
+        update(self, &_nbLevel, to: property.value.iValue, signal: \.nbLevel)
 
       case .nrEnabled:
-        update(&_nrEnabled, to: property.value.bValue, signal: \.nrEnabled)
+        update(self, &_nrEnabled, to: property.value.bValue, signal: \.nrEnabled)
 
       case .nrLevel:
-        update(&_nrLevel, to: property.value.iValue, signal: \.nrLevel)
+        update(self, &_nrLevel, to: property.value.iValue, signal: \.nrLevel)
 
       case .nr2:
-        update(&_nr2, to: property.value.iValue, signal: \.nr2)
+        update(self, &_nr2, to: property.value.iValue, signal: \.nr2)
 
       case .owner:
-        update(&_owner, to: property.value.iValue, signal: \.owner)
+        update(self, &_owner, to: property.value.iValue, signal: \.owner)
 
       case .panadapterId:
-        update(&_panadapterId, to: property.value.streamId ?? 0, signal: \.panadapterId)
+        update(self, &_panadapterId, to: property.value.streamId ?? 0, signal: \.panadapterId)
 
       case .playbackEnabled:
-        update(&_playbackEnabled, to: (property.value == "enabled") || (property.value == "1"), signal: \.playbackEnabled)
+        update(self, &_playbackEnabled, to: (property.value == "enabled") || (property.value == "1"), signal: \.playbackEnabled)
 
       case .postDemodBypassEnabled:
-        update(&_postDemodBypassEnabled, to: property.value.bValue, signal: \.postDemodBypassEnabled)
+        update(self, &_postDemodBypassEnabled, to: property.value.bValue, signal: \.postDemodBypassEnabled)
 
       case .postDemodLow:
-        update(&_postDemodLow, to: property.value.iValue, signal: \.postDemodLow)
+        update(self, &_postDemodLow, to: property.value.iValue, signal: \.postDemodLow)
 
       case .postDemodHigh:
-        update(&_postDemodHigh, to: property.value.iValue, signal: \.postDemodHigh)
+        update(self, &_postDemodHigh, to: property.value.iValue, signal: \.postDemodHigh)
 
       case .qskEnabled:
-        update(&_qskEnabled, to: property.value.bValue, signal: \.qskEnabled)
+        update(self, &_qskEnabled, to: property.value.bValue, signal: \.qskEnabled)
 
       case .recordEnabled:
-        update(&_recordEnabled, to: property.value.bValue, signal: \.recordEnabled)
+        update(self, &_recordEnabled, to: property.value.bValue, signal: \.recordEnabled)
 
       case .repeaterOffsetDirection:
-        update(&_repeaterOffsetDirection, to: property.value, signal: \.repeaterOffsetDirection)
+        update(self, &_repeaterOffsetDirection, to: property.value, signal: \.repeaterOffsetDirection)
 
       case .rfGain:
-        update(&_rfGain, to: property.value.iValue, signal: \.rfGain)
+        update(self, &_rfGain, to: property.value.iValue, signal: \.rfGain)
 
       case .ritOffset:
-        update(&_ritOffset, to: property.value.iValue, signal: \.ritOffset)
+        update(self, &_ritOffset, to: property.value.iValue, signal: \.ritOffset)
 
       case .ritEnabled:
-        update(&_ritEnabled, to: property.value.bValue, signal: \.ritEnabled)
+        update(self, &_ritEnabled, to: property.value.bValue, signal: \.ritEnabled)
 
       case .rttyMark:
-        update(&_rttyMark, to: property.value.iValue, signal: \.rttyMark)
+        update(self, &_rttyMark, to: property.value.iValue, signal: \.rttyMark)
 
       case .rttyShift:
-        update(&_rttyShift, to: property.value.iValue, signal: \.rttyShift)
+        update(self, &_rttyShift, to: property.value.iValue, signal: \.rttyShift)
 
       case .rxAnt:
-        update(&_rxAnt, to: property.value, signal: \.rxAnt)
+        update(self, &_rxAnt, to: property.value, signal: \.rxAnt)
 
       case .rxAntList:
-        update(&_rxAntList, to: property.value.components(separatedBy: ","), signal: \.rxAntList)
+        update(self, &_rxAntList, to: property.value.components(separatedBy: ","), signal: \.rxAntList)
 
       case .squelchEnabled:
-        update(&_squelchEnabled, to: property.value.bValue, signal: \.squelchEnabled)
+        update(self, &_squelchEnabled, to: property.value.bValue, signal: \.squelchEnabled)
 
       case .squelchLevel:
-        update(&_squelchLevel, to: property.value.iValue, signal: \.squelchLevel)
+        update(self, &_squelchLevel, to: property.value.iValue, signal: \.squelchLevel)
 
       case .step:
-        update(&_step, to: property.value.iValue, signal: \.step)
+        update(self, &_step, to: property.value.iValue, signal: \.step)
 
       case .stepList:
-        update(&_stepList, to: property.value, signal: \.stepList)
+        update(self, &_stepList, to: property.value, signal: \.stepList)
 
       case .txEnabled:
-        update(&_txEnabled, to: property.value.bValue, signal: \.txEnabled)
+        update(self, &_txEnabled, to: property.value.bValue, signal: \.txEnabled)
 
       case .txAnt:
-        update(&_txAnt, to: property.value, signal: \.txAnt)
+        update(self, &_txAnt, to: property.value, signal: \.txAnt)
 
       case .txAntList:
-       update(&_txAntList, to: property.value.components(separatedBy: ","), signal: \.txAntList)
+       update(self, &_txAntList, to: property.value.components(separatedBy: ","), signal: \.txAntList)
 
       case .txOffsetFreq:
-        update(&_txOffsetFreq, to: property.value.fValue, signal: \.txOffsetFreq)
+        update(self, &_txOffsetFreq, to: property.value.fValue, signal: \.txOffsetFreq)
 
       case .wide:
-        update(&_wide, to: property.value.bValue, signal: \.wide)
+        update(self, &_wide, to: property.value.bValue, signal: \.wide)
 
       case .wnbEnabled:
-        update(&_wnbEnabled, to: property.value.bValue, signal: \.wnbEnabled)
+        update(self, &_wnbEnabled, to: property.value.bValue, signal: \.wnbEnabled)
 
       case .wnbLevel:
-        update(&_wnbLevel, to: property.value.iValue, signal: \.wnbLevel)
+        update(self, &_wnbLevel, to: property.value.iValue, signal: \.wnbLevel)
 
       case .xitOffset:
-        update(&_xitOffset, to: property.value.iValue, signal: \.xitOffset)
+        update(self, &_xitOffset, to: property.value.iValue, signal: \.xitOffset)
 
       case .xitEnabled:
-        update(&_xitEnabled, to: property.value.bValue, signal: \.xitEnabled)
+        update(self, &_xitEnabled, to: property.value.bValue, signal: \.xitEnabled)
 
       case .daxClients, .diversityParent, .recordTime:
         // ignore these
