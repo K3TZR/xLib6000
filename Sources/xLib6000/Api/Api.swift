@@ -22,8 +22,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public static let kVersion                = Version("1.0.0")
   public static let kName                   = "xLib6000"
 
-  public static let kDomainName             = "net.k3tzr"
-  public static let kBundleIdentifier       = Api.kDomainName + "." + Api.kName
+//  public static let kDomainName             = "net.k3tzr"
+  public static let kBundleIdentifier       = "net.k3tzr." + Api.kName
   public static let kDaxChannels            = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
   public static let kDaxIqChannels          = ["None", "1", "2", "3", "4"]
   public static let kNoError                = "0"

@@ -1,6 +1,5 @@
 //
 //  Discovery.swift
-//  CommonCode
 //
 //  Created by Douglas Adams on 5/13/15
 //  Copyright © 2018 Douglas Adams & Mario Illgen. All rights reserved.
@@ -29,7 +28,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  @Barrier([], radiosQ) public var discoveredRadios: [DiscoveredRadio]
+  @Barrier([DiscoveredRadio](), radiosQ) public var discoveredRadios
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -294,8 +293,8 @@ public class DiscoveredRadio : Equatable {
   /// Returns a Boolean value indicating whether two DiscoveredRadio instances are equal.
   ///
   /// - Parameters:
-  ///   - lhs:            A value to compare.
-  ///   - rhs:            Another value to compare.
+  ///   - lhs:            the left value
+  ///   - rhs:            the right value
   ///
   public static func ==(lhs: DiscoveredRadio, rhs: DiscoveredRadio) -> Bool {
     return lhs.serialNumber == rhs.serialNumber && lhs.model == rhs.model

@@ -686,4 +686,9 @@ struct ClampingBarrier {
   }
 }
 */
-
+// function to change value and signal KVO
+func updateX<S:NSObject, T>(_ object: S, _ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<S,T>) {
+  object.willChangeValue(for: keyPath)
+  property.pointee = value
+  object.didChangeValue(for: keyPath)
+}

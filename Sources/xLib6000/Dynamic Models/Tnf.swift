@@ -142,16 +142,16 @@ public final class Tnf : NSObject, DynamicModel {
       switch token {
         
       case .depth:
-        update(&_depth, to: property.value.uValue, signal: \.depth)
+        updateX(self, &_depth, to: property.value.uValue, signal: \.depth)
         
       case .frequency:
-        update(&_frequency, to: property.value.mhzToHzUInt, signal: \.frequency)
+       updateX(self, &_frequency, to: property.value.mhzToHzUInt, signal: \.frequency)
         
       case .permanent:
-        update(&_permanent, to: property.value.bValue, signal: \.permanent)
+        updateX(self, &_permanent, to: property.value.bValue, signal: \.permanent)
         
       case .width:
-        update(&_width, to: property.value.mhzToHzUInt, signal: \.width)
+        updateX(self, &_width, to: property.value.mhzToHzUInt, signal: \.width)
       }
       // is the Tnf initialized?
       if !_initialized && _frequency != 0 {
