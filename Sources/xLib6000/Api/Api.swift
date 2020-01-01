@@ -116,15 +116,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Public methods
 
-  public func setupCommands(_ primaryCmdTypes: [Api.Command] = [.allPrimary],
-                            secondaryCmdTypes: [Api.Command] = [.allSecondary],
-                            subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) {
-    
-    // save the Command types
-    _primaryCmdTypes = primaryCmdTypes
-    _secondaryCmdTypes = secondaryCmdTypes
-    _subscriptionCmdTypes = subscriptionCmdTypes
-  }
   /// Connect to a Radio
   ///
   /// - Parameters:
@@ -135,6 +126,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     - isGui:                whether this is a GUI connection
   ///     - isWan:                whether this is a Wan connection
   ///     - wanHandle:            Wan Handle (if any)
+  ///     - primaryCmdTypes:      array of "primary" command types (defaults to .all)
+  ///     - secondaryCmdTYpes:    array of "secondary" command types (defaults to .all)
+  ///     - subscriptionCmdTypes: array of "subscription" commandtypes (defaults to .all)
   /// - Returns:                  Success / Failure
   ///
   public func connect(_ discoveryPacket: DiscoveredRadio,
@@ -143,11 +137,19 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       clientId: UUID? = nil,
                       isGui: Bool = true,
                       isWan: Bool = false,
-                      wanHandle: String = "") -> Radio? {
+                      wanHandle: String = "",
+                      primaryCmdTypes: [Api.Command] = [.allPrimary],
+                      secondaryCmdTypes: [Api.Command] = [.allSecondary],
+                      subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) -> Radio? {
 
     // must be in the Disconnected state to connect
     guard apiState == .disconnected else { return nil }
         
+    // save the Command types
+    _primaryCmdTypes = primaryCmdTypes
+    _secondaryCmdTypes = secondaryCmdTypes
+    _subscriptionCmdTypes = subscriptionCmdTypes
+    
     // Create a Radio class
     radio = Radio(discoveryPacket, api: self)
 
