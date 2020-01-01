@@ -116,6 +116,15 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Public methods
 
+  public func setupCommands(_ primaryCmdTypes: [Api.Command] = [.allPrimary],
+                            secondaryCmdTypes: [Api.Command] = [.allSecondary],
+                            subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) {
+    
+    // save the Command types
+    _primaryCmdTypes = primaryCmdTypes
+    _secondaryCmdTypes = secondaryCmdTypes
+    _subscriptionCmdTypes = subscriptionCmdTypes
+  }
   /// Connect to a Radio
   ///
   /// - Parameters:
@@ -126,9 +135,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     - isGui:                whether this is a GUI connection
   ///     - isWan:                whether this is a Wan connection
   ///     - wanHandle:            Wan Handle (if any)
-  ///     - primaryCmdTypes:      array of "primary" command types (defaults to .all)
-  ///     - secondaryCmdTYpes:    array of "secondary" command types (defaults to .all)
-  ///     - subscriptionCmdTypes: array of "subscription" commandtypes (defaults to .all)
   /// - Returns:                  Success / Failure
   ///
   public func connect(_ discoveryPacket: DiscoveredRadio,
@@ -137,19 +143,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       clientId: UUID? = nil,
                       isGui: Bool = true,
                       isWan: Bool = false,
-                      wanHandle: String = "",
-                      primaryCmdTypes: [Api.Command] = [.allPrimary],
-                      secondaryCmdTypes: [Api.Command] = [.allSecondary],
-                      subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) -> Radio? {
+                      wanHandle: String = "") -> Radio? {
 
     // must be in the Disconnected state to connect
     guard apiState == .disconnected else { return nil }
         
-    // save the Command types
-    _primaryCmdTypes = primaryCmdTypes
-    _secondaryCmdTypes = secondaryCmdTypes
-    _subscriptionCmdTypes = subscriptionCmdTypes
-    
     // Create a Radio class
     radio = Radio(discoveryPacket, api: self)
 
@@ -507,6 +505,76 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // pass it to xAPITester (if present)
     testerDelegate?.sentMessage( String(msg.dropLast()) )
   }
+  
+  func didConnect(host: String, port: UInt16, error: String) {
+
+    // YES, set state
+    apiState = .tcpConnected
+    
+    // log it
+    let wanStatus = isWan ? "REMOTE" : "LOCAL"
+    let guiStatus = _isGui ? "(GUI) " : ""
+    _log.msg("TCP connected to \(host), port \(port) \(guiStatus)(\(wanStatus))", level: .info, function: #function, file: #file, line: #line)
+
+    // a tcp connection has been established, inform observers
+    NC.post(.tcpDidConnect, object: nil)
+    
+    _tcp.readNext()
+    
+    if isWan {
+      let cmd = "wan validate handle=" + wanConnectionHandle // TODO: + "\n"
+      send(cmd, replyTo: nil)
+      
+      _log.msg("Wan validate handle: \(wanConnectionHandle)", level: .info, function: #function, file: #file, line: #line)
+
+    } else {
+      // insure that a UDP port was bound (for the Data Streams)
+      guard _udp.bind(radioParameters: radio!.discoveryPacket, isWan: isWan) else {
+        
+        // Bind failed, disconnect
+        _tcp.disconnect()
+
+        // the tcp connection was disconnected, inform observers
+        NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: "Udp bind failure"))
+
+        return
+      }
+    }
+    // if another Gui client connected, disconnect it
+    if radio?.discoveryPacket.status == "In_Use" && _isGui {
+      
+      send("client disconnect")
+      _log.msg("client disconnect sent", level: .info, function: #function, file: #file, line: #line)
+      sleep(1)
+    }
+  }
+
+  func didDisconnect(host: String, port: UInt16, error: String) {
+
+    // NO, error?
+    if error == "" {
+      
+      // the tcp connection was disconnected, inform observers
+      NC.post(.tcpDidDisconnect, object: DisconnectReason.normal)
+      
+      _log.msg("Tcp Disconnected", level: .info, function: #function, file: #file, line: #line)
+      
+    } else {
+      
+      // YES, disconnect with error (don't keep the UDP port open as it won't be reused with a new connection)
+      
+      _udp.unbind()
+      
+      // the tcp connection was disconnected, inform observers
+      NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: error))
+      
+      _log.msg("Tcp Disconnected with message = \(error)", level: .info, function: #function, file: #file, line: #line)
+    }
+    
+    apiState = .disconnected
+  }
+  
+  
   /// Respond to a TCP Connection/Disconnection event
   ///
   ///   TcpManagerDelegate method, arrives on the tcpReceiveQ
@@ -517,76 +585,76 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///   - port:       port number
   ///   - error:      error message
   ///
-  func tcpState(connected: Bool, host: String, port: UInt16, error: String) {
-    
-    // connected?
-    if connected {
-      
-      // log it
-      let wanStatus = isWan ? "REMOTE" : "LOCAL"
-      let guiStatus = _isGui ? "(GUI) " : ""
-      _log.msg("TCP connected to \(host), port \(port) \(guiStatus)(\(wanStatus))", level: .info, function: #function, file: #file, line: #line)
-
-      // YES, set state
-      apiState = .tcpConnected
-      
-      // a tcp connection has been established, inform observers
-      NC.post(.tcpDidConnect, object: nil)
-      
-      _tcp.readNext()
-      
-      if isWan {
-        let cmd = "wan validate handle=" + wanConnectionHandle // TODO: + "\n"
-        send(cmd, replyTo: nil)
-        
-        _log.msg("Wan validate handle: \(wanConnectionHandle)", level: .info, function: #function, file: #file, line: #line)
-
-      } else {
-        // insure that a UDP port was bound (for the Data Streams)
-        guard _udp.bind(radioParameters: radio!.discoveryPacket, isWan: isWan) else {
-          
-          // Bind failed, disconnect
-          _tcp.disconnect()
-
-          // the tcp connection was disconnected, inform observers
-          NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: "Udp bind failure"))
-
-          return
-        }
-      }
-      // if another Gui client connected, disconnect it
-      if radio?.discoveryPacket.status == "In_Use" && _isGui {
-        
-        send("client disconnect")
-        _log.msg("client disconnect sent", level: .info, function: #function, file: #file, line: #line)
-        sleep(1)
-      }
-
-    } else {
-      
-      // NO, error?
-      if error == "" {
-        
-        // the tcp connection was disconnected, inform observers
-        NC.post(.tcpDidDisconnect, object: DisconnectReason.normal)
-
-        _log.msg("Tcp Disconnected", level: .info, function: #function, file: #file, line: #line)
-
-      } else {
-        
-        // YES, disconnect with error (don't keep the UDP port open as it won't be reused with a new connection)
-        
-        _udp.unbind()
-        
-        // the tcp connection was disconnected, inform observers
-        NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: error))
-
-        _log.msg("Tcp Disconnected with message = \(error)", level: .info, function: #function, file: #file, line: #line)
-      }
-
-      apiState = .disconnected
-    }
-  }
+//  func tcpState(connected: Bool, host: String, port: UInt16, error: String) {
+//    
+//    // connected?
+//    if connected {
+//      
+//      // log it
+//      let wanStatus = isWan ? "REMOTE" : "LOCAL"
+//      let guiStatus = _isGui ? "(GUI) " : ""
+//      _log.msg("TCP connected to \(host), port \(port) \(guiStatus)(\(wanStatus))", level: .info, function: #function, file: #file, line: #line)
+//
+//      // YES, set state
+//      apiState = .tcpConnected
+//      
+//      // a tcp connection has been established, inform observers
+//      NC.post(.tcpDidConnect, object: nil)
+//      
+//      _tcp.readNext()
+//      
+//      if isWan {
+//        let cmd = "wan validate handle=" + wanConnectionHandle // TODO: + "\n"
+//        send(cmd, replyTo: nil)
+//        
+//        _log.msg("Wan validate handle: \(wanConnectionHandle)", level: .info, function: #function, file: #file, line: #line)
+//
+//      } else {
+//        // insure that a UDP port was bound (for the Data Streams)
+//        guard _udp.bind(radioParameters: radio!.discoveryPacket, isWan: isWan) else {
+//          
+//          // Bind failed, disconnect
+//          _tcp.disconnect()
+//
+//          // the tcp connection was disconnected, inform observers
+//          NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: "Udp bind failure"))
+//
+//          return
+//        }
+//      }
+//      // if another Gui client connected, disconnect it
+//      if radio?.discoveryPacket.status == "In_Use" && _isGui {
+//        
+//        send("client disconnect")
+//        _log.msg("client disconnect sent", level: .info, function: #function, file: #file, line: #line)
+//        sleep(1)
+//      }
+//
+//    } else {
+//      
+//      // NO, error?
+//      if error == "" {
+//        
+//        // the tcp connection was disconnected, inform observers
+//        NC.post(.tcpDidDisconnect, object: DisconnectReason.normal)
+//
+//        _log.msg("Tcp Disconnected", level: .info, function: #function, file: #file, line: #line)
+//
+//      } else {
+//        
+//        // YES, disconnect with error (don't keep the UDP port open as it won't be reused with a new connection)
+//        
+//        _udp.unbind()
+//        
+//        // the tcp connection was disconnected, inform observers
+//        NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: error))
+//
+//        _log.msg("Tcp Disconnected with message = \(error)", level: .info, function: #function, file: #file, line: #line)
+//      }
+//
+//      apiState = .disconnected
+//    }
+//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - UdpManager delegate methods

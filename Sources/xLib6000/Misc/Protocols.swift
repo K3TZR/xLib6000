@@ -148,7 +148,10 @@ protocol TcpManagerDelegate: class {
   ///   - port:                     host Port number
   ///   - error:                    error message (may be blank)
   ///
-  func tcpState(connected: Bool, host: String, port: UInt16, error: String)
+//  func tcpState(connected: Bool, host: String, port: UInt16, error: String)
+  
+  func didConnect(host: String, port: UInt16, error: String)
+  func didDisconnect(host: String, port: UInt16, error: String)
 }
 
 /// Delegate protocol for the UdpManager class

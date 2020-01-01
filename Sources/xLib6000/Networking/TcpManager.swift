@@ -189,6 +189,8 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
     
     // set the state
     _delegate?.tcpState(connected: false, host: sock.connectedHost ?? "", port: sock.connectedPort, error: (err == nil) ? "" : err!.localizedDescription)
+    
+    _delegate?.didDisconnect(host: sock.connectedHost, port: sock.connectedPort, error: error: (err == nil) ? "" : err!.localizedDescription)
   }
   /// Called after the TCP/IP connection has been established
   ///
