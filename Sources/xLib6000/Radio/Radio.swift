@@ -2007,7 +2007,7 @@ extension Radio {
   ///
   /// - Parameter callback:   ReplyHandler (optional)
   ///
-  public func requestRreboot(callback: ReplyHandler? = nil) {
+  public func requestReboot(callback: ReplyHandler? = nil) {
     
     // tell the Radio to reboot
     sendCommand(Radio.kCmd + "reboot", replyTo: callback)
