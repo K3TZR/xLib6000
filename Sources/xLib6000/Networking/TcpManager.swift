@@ -188,9 +188,9 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   @objc func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
     
     // set the state
-    _delegate?.tcpState(connected: false, host: sock.connectedHost ?? "", port: sock.connectedPort, error: (err == nil) ? "" : err!.localizedDescription)
+//    _delegate?.tcpState(connected: false, host: sock.connectedHost ?? "", port: sock.connectedPort, error: (err == nil) ? "" : err!.localizedDescription)
     
-    _delegate?.didDisconnect(host: sock.connectedHost, port: sock.connectedPort, error: error: (err == nil) ? "" : err!.localizedDescription)
+    _delegate?.didDisconnect(host: sock.connectedHost ?? "", port: sock.connectedPort, error: (err == nil) ? "" : err!.localizedDescription)
   }
   /// Called after the TCP/IP connection has been established
   ///
@@ -216,7 +216,8 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
     } else {
       
       // NO, set the state
-      _delegate?.tcpState(connected: true, host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
+//      _delegate?.tcpState(connected: true, host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
+      _delegate?.didConnect(host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
     }
   }
   /// Called when data has been read from the TCP/IP connection
@@ -254,7 +255,8 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
     guard _isWan else { return }
 
     // set the state
-    _delegate?.tcpState(connected: true, host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
+//    _delegate?.tcpState(connected: true, host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
+    _delegate?.didSecure(host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
   }
   /**
    * Allows a socket delegate to hook into the TLS handshake and manually validate the peer it's connecting to.

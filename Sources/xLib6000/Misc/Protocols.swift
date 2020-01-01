@@ -152,6 +152,7 @@ protocol TcpManagerDelegate: class {
   
   func didConnect(host: String, port: UInt16, error: String)
   func didDisconnect(host: String, port: UInt16, error: String)
+  func didSecure(host: String, port: UInt16, error: String)
 }
 
 /// Delegate protocol for the UdpManager class

@@ -573,6 +573,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     apiState = .disconnected
   }
+  func didSecure(host: String, port: UInt16, error: String) {
+    
+    // FIXME: ????
+    Swift.print("didSecure")
+  }
+
   
   
   /// Respond to a TCP Connection/Disconnection event
