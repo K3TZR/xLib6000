@@ -22,17 +22,36 @@ public final class Cwx                      : NSObject, StaticModel {
   public var messageQueuedEventHandler      : ((_ sequence: Int, _ bufferIndex: Int) -> Void)?
   public var charSentEventHandler           : ((_ index: Int) -> Void)?
   public var eraseSentEventHandler          : ((_ start: Int, _ stop: Int) -> Void)?
+
+  @objc dynamic public var breakInDelay: Int {
+    get { return _breakInDelay }
+    set { if _breakInDelay != newValue { let value = newValue ;  _breakInDelay = value ; cwxCmd( "delay", value) } } }
   
+  @objc dynamic public var qskEnabled: Bool {
+    get { return _qskEnabled }
+    set { if _qskEnabled != newValue { _qskEnabled = newValue ; cwxCmd( .qskEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var wpm: Int {
+    get { return _wpm }
+    set { if _wpm != newValue { let value = newValue ; if _wpm != value  { _wpm = value ; cwxCmd( .wpm, value) } } } }
+
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  internal var macros                       : [String]
-  internal let kMaxNumberOfMacros           = 12                            
-    
   @BarrierClamped(0, Api.objectQ, range: 0...2_000) var _breakInDelay
+  @Barrier(false, Api.objectQ) var _qskEnabled
   @BarrierClamped(0, Api.objectQ, range: 5...100)   var _wpm
 
-  @Barrier(false, Api.objectQ) var _qskEnabled
+  internal var macros                       : [String]
+  internal let kMaxNumberOfMacros           = 12
+
+  internal enum Token : String {
+    case breakInDelay   = "break_in_delay"
+    case qskEnabled     = "qsk_enabled"
+    case erase
+    case sent
+    case wpm            = "wpm"
+  }
 
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
@@ -134,10 +153,6 @@ public final class Cwx                      : NSObject, StaticModel {
       messageQueuedEventHandler?(charPos!, block!)
     }
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
-
   /// Parse Cwx key/value pairs, called by Radio
   ///
   ///   PropertiesParser protocol method, executes on the parseQ
@@ -146,13 +161,6 @@ public final class Cwx                      : NSObject, StaticModel {
   ///
   func parseProperties(_ properties: KeyValuesArray)  {
     
-    // function to change value and signal KVO
-//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Cwx, T>) {
-//      willChangeValue(for: keyPath)
-//      property.pointee = value
-//      didChangeValue(for: keyPath)
-//    }
-
     // process each key/value pair, <key=value>
     for property in properties {
       
@@ -181,8 +189,7 @@ public final class Cwx                      : NSObject, StaticModel {
         // Known tokens, in alphabetical order
         switch token {
           
-        case .breakInDelay:
-          update(self, &_breakInDelay, to: property.value.iValue, signal: \.breakInDelay)
+        case .breakInDelay: update(self, &_breakInDelay, to: property.value.iValue, signal: \.breakInDelay)
 
         case .erase:
           let values = property.value.components(separatedBy: ",")
@@ -194,41 +201,13 @@ public final class Cwx                      : NSObject, StaticModel {
             eraseSentEventHandler?(start, stop)
           }
           
-        case .qskEnabled:
-          update(self, &_qskEnabled, to: property.value.bValue, signal: \.qskEnabled)
-
-        case .sent:
-          // inform the Event Handler (if any)
-          charSentEventHandler?(property.value.iValue)
-          
-        case .wpm:
-          update(self, &_wpm, to: property.value.iValue, signal: \.wpm)
+        case .qskEnabled:   update(self, &_qskEnabled,  to: property.value.bValue, signal: \.qskEnabled)
+        case .sent:         charSentEventHandler?(property.value.iValue)
+        case .wpm:          update(self, &_wpm,         to: property.value.iValue, signal: \.wpm)
         }
       }
     }
   }
-}
-
-extension Cwx {
-    
-    // ----------------------------------------------------------------------------
-    // Public properties (KVO compliant) that send Commands
-    
-    @objc dynamic public var breakInDelay: Int {
-      get { return _breakInDelay }
-      set { if _breakInDelay != newValue { let value = newValue ;  _breakInDelay = value ; cwxCmd( "delay", value) } } }
-    
-    @objc dynamic public var qskEnabled: Bool {
-      get { return _qskEnabled }
-      set { if _qskEnabled != newValue { _qskEnabled = newValue ; cwxCmd( .qskEnabled, newValue.as1or0) } } }
-    
-    @objc dynamic public var wpm: Int {
-      get { return _wpm }
-      set { if _wpm != newValue { let value = newValue ; if _wpm != value  { _wpm = value ; cwxCmd( .wpm, value) } } } }
-  
-  // ------------------------------------------------------------------------------
-  // Instance methods that send Commands
-
   /// Clear the character buffer
   ///
   public func clearBuffer() {
@@ -333,7 +312,7 @@ extension Cwx {
   }
 
   // ----------------------------------------------------------------------------
-  // Private command helper methods
+  // MARK: - Private methods
 
   /// Set a Cwx property on the Radio
   ///
@@ -345,28 +324,13 @@ extension Cwx {
     
     _radio.sendCommand("cwx " + token.rawValue + " \(value)")
   }
-  /// Set a Cwx property on the Radio
+  /// Send a command to Set a Cwx property
   ///
   /// - Parameters:
   ///   - token:      a String
   ///   - value:      the new value
   ///
   private func cwxCmd(_ token: String, _ value: Any) {
-    // NOTE: commands use this format when the Token received does not match the Token sent
-    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
     _radio.sendCommand("cwx " + token + " \(value)")
   }
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Properties
-  ///
-  internal enum Token : String {
-    case breakInDelay   = "break_in_delay"            // "delay"
-    case qskEnabled     = "qsk_enabled"
-    case erase
-    case sent
-    case wpm            = "wpm"
-  }
-  
 }

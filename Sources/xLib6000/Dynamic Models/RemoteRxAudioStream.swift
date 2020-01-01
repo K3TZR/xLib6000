@@ -37,16 +37,34 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public let id                             : RemoteRxStreamId
-  public var isStreaming                    = false
+
+  @objc dynamic public var clientHandle: Handle {
+    get { return _clientHandle  }
+    set { if _clientHandle != newValue { _clientHandle = newValue} } }
+  
+  @objc dynamic public var compression: String {
+    get { return _compression  }
+    set { if _compression != newValue { _compression = newValue} } }
+  
+  @objc dynamic public var ip: String {
+    get { return _ip  }
+    set { if _ip != newValue { _ip = newValue} } }
+  
+  public weak var delegate                 : StreamHandler?
+  public      var isStreaming              = false
   
   // ------------------------------------------------------------------------------
-  // MARK: - Interna; properties
+  // MARK: - Internal properties
   
-  @Barrier(0, Api.objectQ)                                  var _clientHandle                : Handle
+  @Barrier(0, Api.objectQ)                                  var _clientHandle : Handle
   @Barrier(RemoteRxAudioStream.kUncompressed, Api.objectQ)  var _compression
   @Barrier("", Api.objectQ)                                 var _ip                         
 
-  private weak var _delegate                : StreamHandler?                // Delegate for Opus Data Stream
+  enum Token : String {
+    case clientHandle         = "client_handle"
+    case compression
+    case ip
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -63,7 +81,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   private var _txSampleCount                = 0                             // Tx sample count
   
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Class methods
   
   /// Parse an RemoteRxAudioStream status message
   ///
@@ -114,7 +132,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   }
  
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
+  // MARK: - Instance methods
   
   ///  Parse RemoteRxAudioStream key/value pairs
   ///
@@ -124,13 +142,6 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   ///
   func parseProperties(_ properties: KeyValuesArray) {
     
-    // function to change value and signal KVO
-//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<RemoteRxAudioStream, T>) {
-//      willChangeValue(for: keyPath)
-//      property.pointee = value
-//      didChangeValue(for: keyPath)
-//    }
-
     // process each key/value pair
     for property in properties {
       
@@ -163,6 +174,26 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       NC.post(.remoteRxAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
+  /// Remove this RemoteRxAudioStream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              success / failure
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+
+    // notify all observers
+    NC.post(.remoteRxAudioStreamWillBeRemoved, object: self as Any?)
+    
+    // remove the stream
+    _radio.remoteRxAudioStreams[id] = nil
+
+    // tell the Radio to remove the Stream
+    _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
+  }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Stream methods
+  
   /// Receive RxRemoteAudioStream audio
   ///
   ///   VitaProcessor protocol method, called by Radio ,executes on the streamQ
@@ -211,62 +242,6 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       // Pass the data frame to the Opus delegate
       delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: vita.payloadSize) )
     }
-  }
-}
-
-extension RemoteRxAudioStream {
-  
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
-  
-  @objc dynamic public var clientHandle: Handle {
-    get { return _clientHandle  }
-    set { if _clientHandle != newValue { _clientHandle = newValue} } }
-  
-  @objc dynamic public var compression: String {
-    get { return _compression  }
-    set { if _compression != newValue { _compression = newValue} } }
-  
-  @objc dynamic public var ip: String {
-    get { return _ip  }
-    set { if _ip != newValue { _ip = newValue} } }
-  
-  // ----------------------------------------------------------------------------
-  // Public properties
-  
-  public var delegate: StreamHandler? {
-    get { return Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-
-  // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
-
-  /// Remove this RemoteRxAudioStream
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  /// - Returns:              success / failure
-  ///
-  public func remove(callback: ReplyHandler? = nil) {
-
-    // notify all observers
-    NC.post(.remoteRxAudioStreamWillBeRemoved, object: self as Any?)
-    
-    // remove the stream
-    _radio.remoteRxAudioStreams[id] = nil
-
-    // tell the Radio to remove the Stream
-    _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
-  }
-
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Properties
-  ///
-  internal enum Token : String {
-    case clientHandle         = "client_handle"
-    case compression
-    case ip
   }
 }
 

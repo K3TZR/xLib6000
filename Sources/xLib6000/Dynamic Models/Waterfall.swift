@@ -20,6 +20,7 @@ public typealias WaterfallStreamId = StreamId
 ///
 public final class Waterfall : NSObject, DynamicModelWithStream {
   
+  // ----------------------------------------------------------------------------
   // MARK: - Public properties
     
   public let id : WaterfallStreamId
@@ -53,15 +54,12 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   @objc dynamic public var panadapterId: PanadapterStreamId {
     return _panadapterId }
   
-//  public var delegate: StreamHandler? {
-//    get { return Api.objectQ.sync { _delegate } }
-//    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-
   public weak         var delegate        : StreamHandler?
   public private(set) var droppedPackets  = 0
   public              var isStreaming     = false
   public private(set) var packetFrame     = -1
 
+  // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
   @Barrier(false, Api.objectQ)  var _autoBlackEnabled
@@ -72,18 +70,46 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   @Barrier(0, Api.objectQ)      var _gradientIndex
   @Barrier(0, Api.objectQ)      var _lineDuration
   @Barrier(0, Api.objectQ)      var _panadapterId   : PanadapterStreamId
+  
+  enum Token : String {
+    // on Waterfall
+    case autoBlackEnabled     = "auto_black"
+    case blackLevel           = "black_level"
+    case colorGain            = "color_gain"
+    case gradientIndex        = "gradient_index"
+    case lineDuration         = "line_duration"
+    // unused here
+    case available
+    case band
+    case bandZoomEnabled      = "band_zoom"
+    case bandwidth
+    case capacity
+    case center
+    case daxIq                = "daxiq"
+    case daxIqRate            = "daxiq_rate"
+    case loopA                = "loopa"
+    case loopB                = "loopb"
+    case panadapterId         = "panadapter"
+    case rfGain               = "rfgain"
+    case rxAnt                = "rxant"
+    case segmentZoomEnabled   = "segment_zoom"
+    case wide
+    case xPixels              = "x_pixels"
+    case xvtr
+  }
 
+  // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-//  private weak  var _delegate           : StreamHandler?
-  private       var _index              = 0
-  private       var _initialized        = false
-  private       let _log                = Log.sharedInstance
-  private       let _numberOfDataFrames = 10
-  private       let _radio              : Radio
-  private       var _waterfallframes    = [WaterfallFrame]()
+  private var _index              = 0
+  private var _initialized        = false
+  private let _log                = Log.sharedInstance
+  private let _numberOfDataFrames = 10
+  private let _radio              : Radio
+  private var _waterfallframes    = [WaterfallFrame]()
   
-  // MARK: - Methods
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
   
   /// Initialize a Waterfall
   ///
@@ -105,6 +131,9 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     
     isStreaming = false
   }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Class methods
   
   /// Parse a Waterfall status message
   ///
@@ -157,6 +186,9 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     }
   }
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Instance methods
+  
   /// Parse Waterfall key/value pairs
   ///
   ///   PropertiesParser protocol method, executes on the parseQ
@@ -165,13 +197,6 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   ///
   func parseProperties(_ properties: KeyValuesArray) {
     
-    // function to change value and signal KVO
-//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Waterfall, T>) {
-//      willChangeValue(for: keyPath)
-//      property.pointee = value
-//      didChangeValue(for: keyPath)
-//    }
-
     // process each key/value pair, <key=value>
     for property in properties {
       
@@ -184,24 +209,13 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       // Known keys, in alphabetical order
       switch token {
         
-      case .autoBlackEnabled:
-        update(self, &_autoBlackEnabled, to: property.value.bValue, signal: \.autoBlackEnabled)
-
-      case .blackLevel:
-        update(self, &_blackLevel, to: property.value.iValue, signal: \.blackLevel)
-
-      case .colorGain:
-        update(self, &_colorGain, to: property.value.iValue, signal: \.colorGain)
-
-      case .gradientIndex:
-        update(self, &_gradientIndex, to: property.value.iValue, signal: \.gradientIndex)
-
-      case .lineDuration:
-        update(self, &_lineDuration, to: property.value.iValue, signal: \.lineDuration)
-
-      case .panadapterId:
-        update(self, &_panadapterId, to: property.value.streamId ?? 0, signal: \.panadapterId)
-
+      case .autoBlackEnabled: update(self, &_autoBlackEnabled,  to: property.value.bValue,        signal: \.autoBlackEnabled)
+      case .blackLevel:       update(self, &_blackLevel,        to: property.value.iValue,        signal: \.blackLevel)
+      case .colorGain:        update(self, &_colorGain,         to: property.value.iValue,        signal: \.colorGain)
+      case .gradientIndex:    update(self, &_gradientIndex,     to: property.value.iValue,        signal: \.gradientIndex)
+      case .lineDuration:     update(self, &_lineDuration,      to: property.value.iValue,        signal: \.lineDuration)
+      case .panadapterId:     update(self, &_panadapterId,      to: property.value.streamId ?? 0, signal: \.panadapterId)
+      
       case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqRate,
            .loopA, .loopB, .rfGain, .rxAnt, .segmentZoomEnabled, .wide, .xPixels, .xvtr:
         // ignored here
@@ -219,12 +233,12 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     }
   }
 
-  /// Close a Waterfall
+  /// Remove a Waterfall
   ///
   /// - Parameters:
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func close(callback: ReplyHandler? = nil) {
+  public func remove(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove the Waterfall
     _radio.sendCommand("display panafall remove " + " \(id.hex)", replyTo: callback)
@@ -235,11 +249,10 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     // remove the Tnf
     _radio.waterfalls[id] = nil
   }
-}
-// MARK: - Extensions
-
-extension Waterfall {
-
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Stream methods
+  
   /// Process the Waterfall Vita struct
   ///
   ///   VitaProcessor protocol method, executes on the streamQ
@@ -265,43 +278,16 @@ extension Waterfall {
     }
   }
 
-  /// Set a Waterfall property on the Radio
+  // ----------------------------------------------------------------------------
+  // MARK: - Private methods
+  
+  /// Send a command to Set a Waterfall property
   ///
   /// - Parameters:
   ///   - token:      the parse token
   ///   - value:      the new value
   ///
   private func waterfallCmd(_ token: Token, _ value: Any) {
-    
     _radio.sendCommand("display panafall set " + "\(id.hex) " + token.rawValue + "=\(value)")
-  }
-  
-  /// Waterfall Properties
-  ///
-  internal enum Token : String {
-    // on Waterfall
-    case autoBlackEnabled     = "auto_black"
-    case blackLevel           = "black_level"
-    case colorGain            = "color_gain"
-    case gradientIndex        = "gradient_index"
-    case lineDuration         = "line_duration"
-    // unused here
-    case available
-    case band
-    case bandZoomEnabled      = "band_zoom"
-    case bandwidth
-    case capacity
-    case center
-    case daxIq                = "daxiq"
-    case daxIqRate            = "daxiq_rate"
-    case loopA                = "loopa"
-    case loopB                = "loopb"
-    case panadapterId         = "panadapter"
-    case rfGain               = "rfgain"
-    case rxAnt                = "rxant"
-    case segmentZoomEnabled   = "segment_zoom"
-    case wide
-    case xPixels              = "x_pixels"
-    case xvtr
   }
 }

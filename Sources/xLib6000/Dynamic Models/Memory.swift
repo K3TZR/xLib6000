@@ -20,295 +20,9 @@ public typealias MemoryId = String
 public final class Memory                   : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-//  static let kCreateCmd                     = "memory create"           // Command prefixes
-//  static let kRemoveCmd                     = "memory remove "
-//  static let kSetCmd                        = "memory set "
-//  static let kApplyCmd                      = "memory apply "
-  
-  // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public let id                             : MemoryId                  // Id that uniquely identifies this Memory
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Internal properties
-  
-  @Barrier(0, Api.objectQ)      var _digitalLowerOffset                       // Digital Lower Offset
-  @Barrier(0, Api.objectQ)      var _digitalUpperOffset                       // Digital Upper Offset
-  @Barrier(0, Api.objectQ)      var _filterHigh                               // Filter high
-  @Barrier(0, Api.objectQ)      var _filterLow                                // Filter low
-  @Barrier(0, Api.objectQ)      var _frequency                                // Frequency (Hz)
-  @Barrier("", Api.objectQ)     var _group                                    // Group
-  @Barrier("", Api.objectQ)     var _mode                                     // Mode
-  @Barrier("", Api.objectQ)     var _name                                     // Name
-  @Barrier(0, Api.objectQ)      var _offset                                   // Offset (Hz)
-  @Barrier("", Api.objectQ)     var _offsetDirection                          // Offset direction
-  @Barrier("", Api.objectQ)     var _owner                                    // Owner
-  @Barrier(0, Api.objectQ)      var _rfPower                                  // Rf Power
-  @Barrier(0, Api.objectQ)      var _rttyMark                                 // RTTY Mark
-  @Barrier(0, Api.objectQ)      var _rttyShift                                // RTTY Shift
-  @Barrier(false, Api.objectQ)  var _squelchEnabled                           // Squelch enabled
-  @Barrier(0, Api.objectQ)      var _squelchLevel                             // Squelch level
-  @Barrier(0, Api.objectQ)      var _step                                     // Step (Hz)
-  @Barrier("", Api.objectQ)     var _toneMode                                 // Tone Mode
-  @Barrier(0, Api.objectQ)      var _toneValue                                // Tone values (Hz)
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Private properties
-  
-  private let _log                          = Log.sharedInstance
-  private var _radio                        : Radio
-  private var _initialized                  = false                         // True if initialized by Radio hardware
-
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
-  
-  /// Parse a Memory status message
-  ///
-  ///   StatusParser protocol method, executes on the parseQ
-  ///
-  /// - Parameters:
-  ///   - keyValues:      a KeyValuesArray
-  ///   - radio:          the current Radio class
-  ///   - queue:          a parse Queue for the object
-  ///   - inUse:          false = "to be deleted"
-  ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
-    var memory: Memory?
-    
-    // get the Memory Id
-    let memoryId = keyValues[0].key
-    
-    // is the Memory in use?
-    if inUse {
-      
-      // YES, does it exist?
-      memory = radio.memories[memoryId]
-      if memory == nil {
-        
-        // NO, create a new Memory & add it to the Memories collection
-        memory = Memory(radio: radio, id: memoryId)
-        radio.memories[memoryId] = memory
-      }
-      // pass the key values to the Memory for parsing (dropping the Id)
-      memory!.parseProperties( Array(keyValues.dropFirst(1)) )
-      
-    } else {
-      
-      // NO, notify all observers
-      NC.post(.memoryWillBeRemoved, object: radio.memories[memoryId] as Any?)
-      
-      // remove it
-      radio.memories[memoryId] = nil
-    }
-  }
-
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize a Memory
-  ///
-  /// - Parameters:
-  ///   - radio:        the Radio instance
-  ///   - id:           a Memory Id
-  ///
-  init(radio: Radio, id: MemoryId) {
-    
-    _radio = radio
-    self.id = id
-    super.init()
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Internal instance methods
-  
-  /// Restrict the Filter High value
-  ///
-  /// - Parameters:
-  ///   - value:          the value
-  /// - Returns:          adjusted value
-  ///
-  func filterHighLimits(_ value: Int) -> Int {
-    
-    var newValue = (value < filterHigh + 10 ? filterHigh + 10 : value)
-    
-    if let modeType = xLib6000.Slice.Mode(rawValue: mode.lowercased()) {
-      switch modeType {
-        
-      case .CW:
-        newValue = (newValue > 12_000 - _radio.transmit.cwPitch ? 12_000 - _radio.transmit.cwPitch : newValue)
-        
-      case .RTTY:
-        newValue = (newValue > 4_000 ? 4_000 : newValue)
-        
-      case .AM, .SAM, .FM, .NFM, .DFM:
-        newValue = (newValue > 12_000 ? 12_000 : newValue)
-        newValue = (newValue < 10 ? 10 : newValue)
-        
-      case .LSB, .DIGL:
-        newValue = (newValue > 0 ? 0 : newValue)
-        
-      case .USB, .DIGU:
-        newValue = (newValue > 12_000 ? 12_000 : newValue)
-      }
-    }
-    return newValue
-  }
-  /// Restrict the Filter Low value
-  ///
-  /// - Parameters:
-  ///   - value:          the value
-  /// - Returns:          adjusted value
-  ///
-  func filterLowLimits(_ value: Int) -> Int {
-    
-    var newValue = (value > filterHigh - 10 ? filterHigh - 10 : value)
-    
-    if let modeType = xLib6000.Slice.Mode(rawValue: mode.lowercased()) {
-      switch modeType {
-        
-      case .CW:
-        newValue = (newValue < -12_000 - _radio.transmit.cwPitch ? -12_000 - _radio.transmit.cwPitch : newValue)
-        
-      case .RTTY:
-        newValue = (newValue < -12_000 ? -12_000 : newValue)
-        
-      case .AM, .SAM, .FM, .NFM, .DFM:
-        newValue = (newValue < -12_000 ? -12_000 : newValue)
-        newValue = (newValue > -10 ? -10 : newValue)
-        
-      case .LSB, .DIGL:
-        newValue = (newValue < -12_000 ? -12_000 : newValue)
-        
-      case .USB, .DIGU:
-        newValue = (newValue < 0 ? 0 : newValue)
-      }
-    }
-    return newValue
-  }
-  /// Validate the Tone Value
-  ///
-  /// - Parameters:
-  ///   - value:          a Tone Value
-  /// - Returns:          true = Valid
-  ///
-  func toneValueValid( _ value: Int) -> Bool {
-    
-    return toneMode == ToneMode.ctcssTx.rawValue && toneValue.within(0, 301)
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
-
-  /// Parse Memory key/value pairs
-  ///
-  ///   PropertiesParser Protocol method, executes on the parseQ
-  ///
-  /// - Parameter properties:       a KeyValuesArray
-  ///
-  func parseProperties(_ properties: KeyValuesArray)  {
-    
-    // process each key/value pair, <key=value>
-    for property in properties {
-      
-      // function to change value and signal KVO
-//      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Memory, T>) {
-//        willChangeValue(for: keyPath)
-//        property.pointee = value
-//        didChangeValue(for: keyPath)
-//      }
-
-      // Check for Unknown Keys
-      guard let token = Token(rawValue: property.key) else {
-        // log it and ignore the Key
-        _log.msg("Unknown Memory token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
-        continue
-      }
-      // Known tokens, in alphabetical order
-      switch (token) {
-        
-      case .digitalLowerOffset:
-        update(self, &_digitalLowerOffset, to: property.value.iValue, signal: \.digitalLowerOffset)
-
-      case .digitalUpperOffset:
-        update(self, &_digitalUpperOffset, to: property.value.iValue, signal: \.digitalUpperOffset)
-
-      case .frequency:
-        update(self, &_frequency, to: property.value.mhzToHz, signal: \.frequency)
-
-      case .group:
-        update(self, &_group, to: property.value.replacingSpaces(), signal: \.group)
-
-      case .highlight:            // not implemented
-        break
-        
-      case .highlightColor:       // not implemented
-        break
-        
-      case .mode:
-        update(self, &_mode, to: property.value.replacingSpaces(), signal: \.mode)
-
-      case .name:
-        update(self, &_name, to: property.value.replacingSpaces(), signal: \.name)
-
-      case .owner:
-        update(self, &_owner, to: property.value.replacingSpaces(), signal: \.owner)
-
-      case .repeaterOffsetDirection:
-        update(self, &_offsetDirection, to: property.value.replacingSpaces(), signal: \.offsetDirection)
-
-      case .repeaterOffset:
-        update(self, &_offset, to: property.value.iValue, signal: \.offset)
-
-      case .rfPower:
-        update(self, &_rfPower, to: property.value.iValue, signal: \.rfPower)
-
-      case .rttyMark:
-        update(self, &_rttyMark, to: property.value.iValue, signal: \.rttyMark)
-
-      case .rttyShift:
-        update(self, &_rttyShift, to: property.value.iValue, signal: \.rttyShift)
-
-      case .rxFilterHigh:
-        update(self, &_filterHigh, to: filterHighLimits(property.value.iValue), signal: \.filterHigh)
-
-      case .rxFilterLow:
-        update(self, &_filterLow, to: filterLowLimits(property.value.iValue), signal: \.filterLow)
-
-      case .squelchEnabled:
-        update(self, &_squelchEnabled, to: property.value.bValue, signal: \.squelchEnabled)
-
-      case .squelchLevel:
-        update(self, &_squelchLevel, to: property.value.iValue, signal: \.squelchLevel)
-
-      case .step:
-        update(self, &_step, to: property.value.iValue, signal: \.step)
-
-      case .toneMode:
-        update(self, &_toneMode, to: property.value.replacingSpaces(), signal: \.toneMode)
-
-      case .toneValue:
-        update(self, &_toneValue, to: property.value.iValue, signal: \.toneValue)
-      }
-    }
-    // is the Memory initialized?
-    if !_initialized  {
-      
-      // YES, the Radio (hardware) has acknowledged this Memory
-      _initialized = true
-      
-      // notify all observers
-      NC.post(.memoryHasBeenAdded, object: self as Any?)
-    }
-  }
-}
-
-extension Memory {
-  
-  // ----------------------------------------------------------------------------
-  // Properties (KVO compliant) that send Commands
   
   @objc dynamic public var digitalLowerOffset: Int {
     get { return _digitalLowerOffset }
@@ -385,55 +99,41 @@ extension Memory {
   @objc dynamic public var toneValue: Int {
     get { return _toneValue }
     set { if _toneValue != newValue && toneValueValid(newValue) { _toneValue = newValue ; memCmd( .toneValue, newValue) } } }
+
+  public enum TXOffsetDirection : String {
+    case down
+    case simplex
+    case up
+  }
+  public enum ToneMode : String {
+    case ctcssTx = "ctcss_tx"
+    case off
+  }
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Internal properties
   
-  // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
+  @Barrier(0, Api.objectQ)      var _digitalLowerOffset
+  @Barrier(0, Api.objectQ)      var _digitalUpperOffset
+  @Barrier(0, Api.objectQ)      var _filterHigh
+  @Barrier(0, Api.objectQ)      var _filterLow
+  @Barrier(0, Api.objectQ)      var _frequency
+  @Barrier("", Api.objectQ)     var _group
+  @Barrier("", Api.objectQ)     var _mode
+  @Barrier("", Api.objectQ)     var _name
+  @Barrier(0, Api.objectQ)      var _offset
+  @Barrier("", Api.objectQ)     var _offsetDirection
+  @Barrier("", Api.objectQ)     var _owner
+  @Barrier(0, Api.objectQ)      var _rfPower
+  @Barrier(0, Api.objectQ)      var _rttyMark
+  @Barrier(0, Api.objectQ)      var _rttyShift
+  @Barrier(false, Api.objectQ)  var _squelchEnabled
+  @Barrier(0, Api.objectQ)      var _squelchLevel
+  @Barrier(0, Api.objectQ)      var _step
+  @Barrier("", Api.objectQ)     var _toneMode
+  @Barrier(0, Api.objectQ)      var _toneValue
 
-  /// Apply a Memory
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  ///
-  public func apply(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to apply the Memory
-    Api.sharedInstance.send("memory apply " + "\(id)", replyTo: callback)
-  }
-  /// Remove a Memory
-  ///
-  /// - Parameters:
-  ///   - callback:           ReplyHandler (optional)
-  ///
-  public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove the Memory
-    Api.sharedInstance.send("memory remove " + "\(id)", replyTo: callback)
-  }
-  /// Select a Memory
-  ///
-  public func select() {
-    
-    Api.sharedInstance.send("memory apply " + "\(id)")
-  }
-  // ----------------------------------------------------------------------------
-  // Private command helper methods
-
-  /// Set a Memory property on the Radio
-  ///
-  /// - Parameters:
-  ///   - token:      the parse token
-  ///   - value:      the new value
-  ///
-  private func memCmd(_ token: Token, _ value: Any) {
-    
-    Api.sharedInstance.send("memory set " + "\(id) " + token.rawValue + "=\(value)")
-  }
-
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Properties
-  ///
-  internal enum Token : String {
+  enum Token : String {
     case digitalLowerOffset                 = "digl_offset"
     case digitalUpperOffset                 = "digu_offset"
     case frequency                          = "freq"
@@ -456,18 +156,239 @@ extension Memory {
     case toneMode                           = "tone_mode"
     case toneValue                          = "tone_value"
   }
-  /// Offsets
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Private properties
+  
+  private var _initialized                  = false
+  private let _log                          = Log.sharedInstance
+  private var _radio                        : Radio
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
+  /// Parse a Memory status message
   ///
-  public enum TXOffsetDirection : String {  // Tx offset types
-    case down
-    case simplex
-    case up
+  ///   StatusParser protocol method, executes on the parseQ
+  ///
+  /// - Parameters:
+  ///   - keyValues:      a KeyValuesArray
+  ///   - radio:          the current Radio class
+  ///   - queue:          a parse Queue for the object
+  ///   - inUse:          false = "to be deleted"
+  ///
+  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
+    var memory: Memory?
+    
+    // get the Memory Id
+    let memoryId = keyValues[0].key
+    
+    // is the Memory in use?
+    if inUse {
+      
+      // YES, does it exist?
+      memory = radio.memories[memoryId]
+      if memory == nil {
+        
+        // NO, create a new Memory & add it to the Memories collection
+        memory = Memory(radio: radio, id: memoryId)
+        radio.memories[memoryId] = memory
+      }
+      // pass the key values to the Memory for parsing (dropping the Id)
+      memory!.parseProperties( Array(keyValues.dropFirst(1)) )
+      
+    } else {
+      
+      // NO, notify all observers
+      NC.post(.memoryWillBeRemoved, object: radio.memories[memoryId] as Any?)
+      
+      // remove it
+      radio.memories[memoryId] = nil
+    }
   }
-  /// Tone choices
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize a Memory
   ///
-  public enum ToneMode : String {           // Tone modes
-    case ctcssTx = "ctcss_tx"
-    case off
+  /// - Parameters:
+  ///   - radio:        the Radio instance
+  ///   - id:           a Memory Id
+  ///
+  init(radio: Radio, id: MemoryId) {
+    
+    _radio = radio
+    self.id = id
+    super.init()
   }
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Instance methods
+  
+  /// Restrict the Filter High value
+  ///
+  /// - Parameters:
+  ///   - value:          the value
+  /// - Returns:          adjusted value
+  ///
+  func filterHighLimits(_ value: Int) -> Int {
+    
+    var newValue = (value < filterHigh + 10 ? filterHigh + 10 : value)
+    
+    if let modeType = xLib6000.Slice.Mode(rawValue: mode.lowercased()) {
+      switch modeType {
+        
+      case .CW:
+        newValue = (newValue > 12_000 - _radio.transmit.cwPitch ? 12_000 - _radio.transmit.cwPitch : newValue)
+        
+      case .RTTY:
+        newValue = (newValue > 4_000 ? 4_000 : newValue)
+        
+      case .AM, .SAM, .FM, .NFM, .DFM:
+        newValue = (newValue > 12_000 ? 12_000 : newValue)
+        newValue = (newValue < 10 ? 10 : newValue)
+        
+      case .LSB, .DIGL:
+        newValue = (newValue > 0 ? 0 : newValue)
+        
+      case .USB, .DIGU:
+        newValue = (newValue > 12_000 ? 12_000 : newValue)
+      }
+    }
+    return newValue
+  }
+  /// Restrict the Filter Low value
+  ///
+  /// - Parameters:
+  ///   - value:          the value
+  /// - Returns:          adjusted value
+  ///
+  func filterLowLimits(_ value: Int) -> Int {
+    
+    var newValue = (value > filterHigh - 10 ? filterHigh - 10 : value)
+    
+    if let modeType = xLib6000.Slice.Mode(rawValue: mode.lowercased()) {
+      switch modeType {
+        
+      case .CW:
+        newValue = (newValue < -12_000 - _radio.transmit.cwPitch ? -12_000 - _radio.transmit.cwPitch : newValue)
+        
+      case .RTTY:
+        newValue = (newValue < -12_000 ? -12_000 : newValue)
+        
+      case .AM, .SAM, .FM, .NFM, .DFM:
+        newValue = (newValue < -12_000 ? -12_000 : newValue)
+        newValue = (newValue > -10 ? -10 : newValue)
+        
+      case .LSB, .DIGL:
+        newValue = (newValue < -12_000 ? -12_000 : newValue)
+        
+      case .USB, .DIGU:
+        newValue = (newValue < 0 ? 0 : newValue)
+      }
+    }
+    return newValue
+  }
+  /// Validate the Tone Value
+  ///
+  /// - Parameters:
+  ///   - value:          a Tone Value
+  /// - Returns:          true = Valid
+  ///
+  func toneValueValid( _ value: Int) -> Bool {
+    
+    return toneMode == ToneMode.ctcssTx.rawValue && toneValue.within(0, 301)
+  }
+  /// Parse Memory key/value pairs
+  ///
+  ///   PropertiesParser Protocol method, executes on the parseQ
+  ///
+  /// - Parameter properties:       a KeyValuesArray
+  ///
+  func parseProperties(_ properties: KeyValuesArray)  {
+    
+    // process each key/value pair, <key=value>
+    for property in properties {
+      
+      // Check for Unknown Keys
+      guard let token = Token(rawValue: property.key) else {
+        // log it and ignore the Key
+        _log.msg("Unknown Memory token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        continue
+      }
+      // Known tokens, in alphabetical order
+      switch (token) {
+        
+      case .digitalLowerOffset:       update(self, &_digitalLowerOffset,  to: property.value.iValue,                    signal: \.digitalLowerOffset)
+      case .digitalUpperOffset:       update(self, &_digitalUpperOffset,  to: property.value.iValue,                    signal: \.digitalUpperOffset)
+      case .frequency:                update(self, &_frequency,           to: property.value.mhzToHz,                   signal: \.frequency)
+      case .group:                    update(self, &_group,               to: property.value.replacingSpaces(),         signal: \.group)
+      case .highlight:                break // not implemented
+      case .highlightColor:           break // not implemented
+      case .mode:                     update(self, &_mode,                to: property.value.replacingSpaces(),         signal: \.mode)
+      case .name:                     update(self, &_name,                to: property.value.replacingSpaces(),         signal: \.name)
+      case .owner:                    update(self, &_owner,               to: property.value.replacingSpaces(),         signal: \.owner)
+      case .repeaterOffsetDirection:  update(self, &_offsetDirection,     to: property.value.replacingSpaces(),         signal: \.offsetDirection)
+      case .repeaterOffset:           update(self, &_offset,              to: property.value.iValue,                    signal: \.offset)
+      case .rfPower:                  update(self, &_rfPower,             to: property.value.iValue,                    signal: \.rfPower)
+      case .rttyMark:                 update(self, &_rttyMark,            to: property.value.iValue,                    signal: \.rttyMark)
+      case .rttyShift:                update(self, &_rttyShift,           to: property.value.iValue,                    signal: \.rttyShift)
+      case .rxFilterHigh:             update(self, &_filterHigh,          to: filterHighLimits(property.value.iValue),  signal: \.filterHigh)
+      case .rxFilterLow:              update(self, &_filterLow,           to: filterLowLimits(property.value.iValue),   signal: \.filterLow)
+      case .squelchEnabled:           update(self, &_squelchEnabled,      to: property.value.bValue,                    signal: \.squelchEnabled)
+      case .squelchLevel:             update(self, &_squelchLevel,        to: property.value.iValue,                    signal: \.squelchLevel)
+      case .step:                     update(self, &_step,                to: property.value.iValue,                    signal: \.step)
+      case .toneMode:                 update(self, &_toneMode,            to: property.value.replacingSpaces(),         signal: \.toneMode)
+      case .toneValue:                update(self, &_toneValue,           to: property.value.iValue,                    signal: \.toneValue)
+      }
+    }
+    // is the Memory initialized?
+    if !_initialized  {
+      
+      // YES, the Radio (hardware) has acknowledged this Memory
+      _initialized = true
+      
+      // notify all observers
+      NC.post(.memoryHasBeenAdded, object: self as Any?)
+    }
+  }
+  /// Apply a Memory
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func apply(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to apply the Memory
+    _radio.sendCommand("memory apply " + "\(id)", replyTo: callback)
+  }
+  /// Remove a Memory
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove the Memory
+    _radio.sendCommand("memory remove " + "\(id)", replyTo: callback)
+  }
+  /// Select a Memory
+  ///
+  public func select() {
+    
+    _radio.sendCommand("memory apply " + "\(id)")
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Private methods
+
+  /// Set a Memory property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func memCmd(_ token: Token, _ value: Any) {
+    _radio.sendCommand("memory set " + "\(id) " + token.rawValue + "=\(value)")
+  }
 }

@@ -17,11 +17,22 @@ import Foundation
 public final class Wan                      : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
+  @objc dynamic public var radioAuthenticated : Bool { _radioAuthenticated }
+  @objc dynamic public var serverConnected    : Bool { _serverConnected }
+
+  // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(false, Api.objectQ) var _radioAuthenticated                                 // SmartLink status
-  @Barrier(false, Api.objectQ) var _serverConnected                                      // SmartLink status
+  @Barrier(false, Api.objectQ) var _radioAuthenticated
+  @Barrier(false, Api.objectQ) var _serverConnected
 
+  enum Token: String {
+    case serverConnected    = "server_connected"
+    case radioAuthenticated = "radio_authenticated"
+  }
+  
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -43,7 +54,7 @@ public final class Wan                      : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
+  // MARK: - Instance methods
 
   /// Parse a Wan status message
   ///
@@ -56,13 +67,6 @@ public final class Wan                      : NSObject, StaticModel {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // function to change value and signal KVO
-//      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Wan, T>) {
-//        willChangeValue(for: keyPath)
-//        property.pointee = value
-//        didChangeValue(for: keyPath)
-//      }
-
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key
@@ -72,34 +76,9 @@ public final class Wan                      : NSObject, StaticModel {
       // Known tokens, in alphabetical order
       switch token {
         
-      case .serverConnected:
-        update(self, &_serverConnected, to: property.value.bValue, signal: \.serverConnected)
-
-      case .radioAuthenticated:
-        update(self, &_radioAuthenticated, to: property.value.bValue, signal: \.radioAuthenticated)
+      case .serverConnected:    update(self, &_serverConnected,     to: property.value.bValue, signal: \.serverConnected)
+      case .radioAuthenticated: update(self, &_radioAuthenticated,  to: property.value.bValue, signal: \.radioAuthenticated)
       }
     }
-  }
-}
-
-extension Wan {
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
-  
-  @objc dynamic public var radioAuthenticated: Bool {
-    return _radioAuthenticated }
-  
-  @objc dynamic public var serverConnected: Bool {
-    return _serverConnected }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Tokens
-  
-  /// Properties
-  ///
-  internal enum Token: String {
-    case serverConnected = "server_connected"
-    case radioAuthenticated = "radio_authenticated"
   }
 }

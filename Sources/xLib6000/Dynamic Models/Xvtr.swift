@@ -19,6 +19,7 @@ import Foundation
 ///
 public final class Xvtr : NSObject, DynamicModel {
   
+  // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public let id : XvtrId
@@ -67,6 +68,7 @@ public final class Xvtr : NSObject, DynamicModel {
   @objc dynamic public var twoMeterInt: Int {
     return _twoMeterInt }
   
+  // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
   @Barrier("", Api.objectQ)     var _name
@@ -82,13 +84,30 @@ public final class Xvtr : NSObject, DynamicModel {
   @Barrier(false, Api.objectQ)  var _rxOnly
   @Barrier(0, Api.objectQ)      var _twoMeterInt
 
+  enum Token : String {
+    case name
+    case ifFrequency        = "if_freq"
+    case inUse              = "in_use"
+    case isValid            = "is_valid"
+    case loError            = "lo_error"
+    case maxPower           = "max_power"
+    case order
+    case preferred
+    case rfFrequency        = "rf_freq"
+    case rxGain             = "rx_gain"
+    case rxOnly             = "rx_only"
+    case twoMeterInt        = "two_meter_int"
+  }
+
+  // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
   private var _initialized = false
   private let _log         = Log.sharedInstance
   private let _radio       : Radio
 
-  // MARK: - Methods
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
   
   /// Initialize an Xvtr
   ///
@@ -101,6 +120,9 @@ public final class Xvtr : NSObject, DynamicModel {
     self.id = id
     super.init()
   }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Class methods
 
   /// Parse an Xvtr status message
   ///
@@ -143,7 +165,10 @@ public final class Xvtr : NSObject, DynamicModel {
       radio.xvtrs[name] = nil
     }
   }
-
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Instance methods
+  
   /// Parse Xvtr key/value pairs
   ///
   ///   PropertiesParser protocol method, executes on the parseQ
@@ -152,13 +177,6 @@ public final class Xvtr : NSObject, DynamicModel {
   ///
   func parseProperties(_ properties: KeyValuesArray) {
     
-    // function to change value and signal KVO
-//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Xvtr, T>) {
-//      willChangeValue(for: keyPath)
-//      property.pointee = value
-//      didChangeValue(for: keyPath)
-//    }
-
     // process each key/value pair, <key=value>
     for property in properties {
       
@@ -171,41 +189,18 @@ public final class Xvtr : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
-      case .name:
-        update(self, &_name, to: property.value, signal: \.name)
-
-      case .ifFrequency:
-        update(self, &_ifFrequency, to: property.value.iValue, signal: \.ifFrequency)
-
-      case .inUse:
-        update(self, &_inUse, to: property.value.bValue, signal: \.inUse)
-
-      case .isValid:
-        update(self, &_isValid, to: property.value.bValue, signal: \.isValid)
-
-      case .loError:
-        update(self, &_loError, to: property.value.iValue, signal: \.loError)
-
-      case .maxPower:
-        update(self, &_maxPower, to: property.value.iValue, signal: \.maxPower)
-
-      case .order:
-        update(self, &_order, to: property.value.iValue, signal: \.order)
-
-      case .preferred:
-        update(self, &_preferred, to: property.value.bValue, signal: \.preferred)
-
-      case .rfFrequency:
-        update(self, &_rfFrequency, to: property.value.iValue, signal: \.rfFrequency)
-
-      case .rxGain:
-        update(self, &_rxGain, to: property.value.iValue, signal: \.rxGain)
-
-      case .rxOnly:
-        update(self, &_rxOnly, to: property.value.bValue, signal: \.rxOnly)
-
-      case .twoMeterInt:
-        update(self, &_twoMeterInt, to: property.value.iValue, signal: \.twoMeterInt)
+      case .name:         update(self, &_name,        to: property.value,         signal: \.name)
+      case .ifFrequency:  update(self, &_ifFrequency, to: property.value.iValue,  signal: \.ifFrequency)
+      case .inUse:        update(self, &_inUse,       to: property.value.bValue,  signal: \.inUse)
+      case .isValid:      update(self, &_isValid,     to: property.value.bValue,  signal: \.isValid)
+      case .loError:      update(self, &_loError,     to: property.value.iValue,  signal: \.loError)
+      case .maxPower:     update(self, &_maxPower,    to: property.value.iValue,  signal: \.maxPower)
+      case .order:        update(self, &_order,       to: property.value.iValue,  signal: \.order)
+      case .preferred:    update(self, &_preferred,   to: property.value.bValue,  signal: \.preferred)
+      case .rfFrequency:  update(self, &_rfFrequency, to: property.value.iValue,  signal: \.rfFrequency)
+      case .rxGain:       update(self, &_rxGain,      to: property.value.iValue,  signal: \.rxGain)
+      case .rxOnly:       update(self, &_rxOnly,      to: property.value.bValue,  signal: \.rxOnly)
+      case .twoMeterInt:  update(self, &_twoMeterInt, to: property.value.iValue,  signal: \.twoMeterInt)
       }
     }
     // is the waterfall initialized?
@@ -218,7 +213,6 @@ public final class Xvtr : NSObject, DynamicModel {
       NC.post(.xvtrHasBeenAdded, object: self as Any?)
     }
   }
-
   /// Remove this Xvtr
   ///
   /// - Parameters:
@@ -227,13 +221,11 @@ public final class Xvtr : NSObject, DynamicModel {
   public func remove(callback: ReplyHandler? = nil) {
     _radio.sendCommand("xvtr remove " + "\(id)", replyTo: callback)
   }
-}
-
-// MARK: - Extensions
-
-extension Xvtr {
   
-  /// Set an Xvtr property on the Radio
+  // ----------------------------------------------------------------------------
+  // MARK: - Private methods
+  
+    /// Set an Xvtr property on the Radio
   ///
   /// - Parameters:
   ///   - token:      the parse token
@@ -241,22 +233,5 @@ extension Xvtr {
   ///
   private func xvtrCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("xvtr set " + "\(id) " + token.rawValue + "=\(value)")
-  }
-  
-  /// Xvtr Properties
-  ///
-  internal enum Token : String {
-    case name
-    case ifFrequency        = "if_freq"
-    case inUse              = "in_use"
-    case isValid            = "is_valid"
-    case loError            = "lo_error"
-    case maxPower           = "max_power"
-    case order
-    case preferred
-    case rfFrequency        = "rf_freq"
-    case rxGain             = "rx_gain"
-    case rxOnly             = "rx_only"
-    case twoMeterInt        = "two_meter_int"
   }
 }

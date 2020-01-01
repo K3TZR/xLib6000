@@ -24,6 +24,38 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   
   public let id                             : TxStreamId
   
+  @objc dynamic public var transmit: Bool {
+    get { return _transmit  }
+    set { if _transmit != newValue { _transmit = newValue ; txAudioCmd( newValue.as1or0) } } }
+
+  @objc dynamic public var inUse: Bool {
+    return _inUse }
+  
+  @objc dynamic public var ip: String {
+    get { return _ip }
+    set { if _ip != newValue { _ip = newValue } } }
+  
+  @objc dynamic public var port: Int {
+    get { return _port  }
+    set { if _port != newValue { _port = newValue } } }
+  
+  @objc dynamic public var txGain: Int {
+    get { return _txGain  }
+    set {
+      if _txGain != newValue {
+        _txGain = newValue
+        if _txGain == 0 {
+          _txGainScalar = 0.0
+          return
+        }
+        let db_min:Float = -10.0;
+        let db_max:Float = +10.0;
+        let db:Float = db_min + (Float(_txGain) / 100.0) * (db_max - db_min);
+        _txGainScalar = pow(10.0, db / 20.0);
+      }
+    }
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -34,6 +66,13 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   @Barrier(0, Api.objectQ)      var _port
   @Barrier(false, Api.objectQ)  var _transmit
   @Barrier(1.0, Api.objectQ)    var _txGainScalar : Float
+  
+  enum Token: String {
+    case daxTx      = "dax_tx"
+    case inUse      = "in_use"
+    case ip
+    case port
+  }
 
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
@@ -45,7 +84,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   private var _txSeq                        = 0                             // Tx sequence number (modulo 16)
   
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Class methods
   
   /// Parse a TxAudioStream status message
   ///
@@ -110,7 +149,57 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Public instance methods
+  // MARK: - Instance methods
+  
+  /// Parse TX Audio Stream key/value pairs
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
+  ///
+  /// - Parameter properties:       a KeyValuesArray
+  ///
+  func parseProperties(_ properties: KeyValuesArray) {
+    
+    // process each key/value pair, <key=value>
+    for property in properties {
+      
+      // check for unknown Keys
+      guard let token = Token(rawValue: property.key) else {
+        // log it and ignore the Key
+        _log.msg("Unknown TxAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        continue
+      }
+      // known keys, in alphabetical order
+      switch token {
+        
+      case .daxTx:  update(self, &_transmit,  to: property.value.bValue,  signal: \.transmit)
+      case .inUse:  update(self, &_inUse,     to: property.value.bValue,  signal: \.inUse)
+      case .ip:     update(self, &_ip,        to: property.value,         signal: \.ip)
+      case .port:   update(self, &_port,      to: property.value.iValue,  signal: \.port)
+      }
+    }
+    // is the AudioStream acknowledged by the radio?
+    if !_initialized && _inUse && _ip != "" {
+      
+      // YES, the Radio (hardware) has acknowledged this Audio Stream
+      _initialized = true
+      
+      // notify all observers
+      NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)
+    }
+  }
+  /// Remove this Tx Audio Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove a Stream
+    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Stream methods
   
   private var _vita: Vita?
   /// Send Tx Audio to the Radio
@@ -155,9 +244,9 @@ public final class TxAudioStream            : NSObject, DynamicModel {
       for i in 0..<numSamplesToSend {                                         // TODO: use Accelerate
         floatPtr.advanced(by: 2 * i).pointee = left[i + samplesSent] * _txGainScalar
         floatPtr.advanced(by: (2 * i) + 1).pointee = left[i + samplesSent] * _txGainScalar
-
-//        payload[(2 * i)] = left[i + samplesSent] * _txGainScalar
-//        payload[(2 * i) + 1] = right[i + samplesSent] * _txGainScalar
+        
+        //        payload[(2 * i)] = left[i + samplesSent] * _txGainScalar
+        //        payload[(2 * i) + 1] = right[i + samplesSent] * _txGainScalar
       }
       
       // swap endianess of the samples
@@ -166,7 +255,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
       }
       
       _vita!.payloadData = payloadData
-
+      
       // set the length of the packet
       _vita!.payloadSize = numFloatsToSend * MemoryLayout<UInt32>.size            // 32-Bit L/R samples
       _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size
@@ -178,7 +267,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
       if let data = Vita.encodeAsData(_vita!) {
         
         // send packet to radio
-//        _api.sendVitaData(data)
+        //        _api.sendVitaData(data)
         _radio.sendVita(data)
       }
       // increment the sequence number (mod 16)
@@ -189,140 +278,18 @@ public final class TxAudioStream            : NSObject, DynamicModel {
     }
     return true
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
-
-  /// Parse TX Audio Stream key/value pairs
-  ///
-  ///   PropertiesParser protocol method, executes on the parseQ
-  ///
-  /// - Parameter properties:       a KeyValuesArray
-  ///
-  func parseProperties(_ properties: KeyValuesArray) {
-    
-    // function to change value and signal KVO
-//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<TxAudioStream, T>) {
-//      willChangeValue(for: keyPath)
-//      property.pointee = value
-//      didChangeValue(for: keyPath)
-//    }
-
-    // process each key/value pair, <key=value>
-    for property in properties {
-      
-      // check for unknown Keys
-      guard let token = Token(rawValue: property.key) else {
-        // log it and ignore the Key
-        _log.msg("Unknown TxAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
-        continue
-      }
-      // known keys, in alphabetical order
-      switch token {
-        
-      case .daxTx:
-        update(self, &_transmit, to: property.value.bValue, signal: \.transmit)
-
-      case .inUse:
-        update(self, &_inUse, to: property.value.bValue, signal: \.inUse)
-
-      case .ip:
-        update(self, &_ip, to: property.value, signal: \.ip)
-
-      case .port:
-        update(self, &_port, to: property.value.iValue, signal: \.port)
-      }
-    }
-    // is the AudioStream acknowledged by the radio?
-    if !_initialized && _inUse && _ip != "" {
-      
-      // YES, the Radio (hardware) has acknowledged this Audio Stream
-      _initialized = true
-      
-      // notify all observers
-      NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)
-    }
-  }
-}
-
-extension TxAudioStream {
-  
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant) that send Commands
-  
-  @objc dynamic public var transmit: Bool {
-    get { return _transmit  }
-    set { if _transmit != newValue { _transmit = newValue ; txAudioCmd( newValue.as1or0) } } }
 
   // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
+  // MARK: - Private methods
 
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
-  @objc dynamic public var ip: String {
-    get { return _ip }
-    set { if _ip != newValue { _ip = newValue } } }
-  
-  @objc dynamic public var port: Int {
-    get { return _port  }
-    set { if _port != newValue { _port = newValue } } }
-  
-  @objc dynamic public var txGain: Int {
-    get { return _txGain  }
-    set {
-      if _txGain != newValue {
-        _txGain = newValue
-        if _txGain == 0 {
-          _txGainScalar = 0.0
-          return
-        }
-        let db_min:Float = -10.0;
-        let db_max:Float = +10.0;
-        let db:Float = db_min + (Float(_txGain) / 100.0) * (db_max - db_min);
-        _txGainScalar = pow(10.0, db / 20.0);
-      }
-    }
-  }
-
-  // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
-
-  /// Remove this Tx Audio Stream
-  ///
-  /// - Parameters:
-  ///   - callback:           ReplyHandler (optional)
-  ///
-  public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove a Stream
-    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
-  }
-  
-  // ----------------------------------------------------------------------------
-  // Private command helper methods
-
-  /// Set a TxAudioStream property on the Radio
+  /// Send a command to Set a TxAudioStream property
   ///
   /// - Parameters:
   ///   - id:         the TxAudio Stream Id
   ///   - value:      the new value
   ///
   private func txAudioCmd(_ value: Any) {
-    
     _radio.sendCommand("dax " + "tx" + " \(value)")
-  }
-
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Properties
-  ///
-  internal enum Token: String {
-    case daxTx      = "dax_tx"
-    case inUse      = "in_use"
-    case ip
-    case port
   }
 }
 

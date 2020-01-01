@@ -19,6 +19,7 @@ public typealias TnfId = ObjectId
 ///
 public final class Tnf : NSObject, DynamicModel {
   
+  // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
   static let kWidthMin  : UInt = 5
@@ -27,6 +28,7 @@ public final class Tnf : NSObject, DynamicModel {
   static let kNormal    = Depth.normal.rawValue
   static let kVeryDeep  = Depth.veryDeep.rawValue
   
+  // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
   public let id : TnfId
@@ -34,7 +36,7 @@ public final class Tnf : NSObject, DynamicModel {
   @objc dynamic public var depth: UInt {
     get { return _depth }
     set { if _depth != newValue { _depth = newValue ; tnfCmd( .depth, newValue) } } }
-  
+
   @objc dynamic public var frequency: UInt {
     get { return _frequency }
     set { if _frequency != newValue { _frequency = newValue ; tnfCmd( .frequency, newValue.hzToMhz) } } }
@@ -47,20 +49,36 @@ public final class Tnf : NSObject, DynamicModel {
     get { return _width  }
     set { if _width != newValue { _width = newValue ; tnfCmd( .width, newValue.hzToMhz) } } }
   
+  public enum Depth : UInt {
+    case normal         = 1
+    case deep           = 2
+    case veryDeep       = 3
+  }
+  
+  // ----------------------------------------------------------------------------
   // MARK: - Internal properties
 
   @BarrierClamped(kNormal, Api.objectQ, range: kNormal...kVeryDeep) var _depth      : UInt
   @Barrier(0, Api.objectQ)                                          var _frequency  : UInt
   @Barrier(false, Api.objectQ)                                      var _permanent
   @BarrierClamped(0, Api.objectQ, range: kWidthMin...kWidthMax)     var _width      : UInt
+  
+  enum Token : String {
+    case depth
+    case frequency      = "freq"
+    case permanent
+    case width
+  }
 
+  // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
   private var _initialized  = false
   private let _log          = Log.sharedInstance
   private let _radio        : Radio
     
-  // MARK: - Methods
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
 
   /// Initialize a Tnf
   ///
@@ -76,6 +94,9 @@ public final class Tnf : NSObject, DynamicModel {
     super.init()
   }
     
+  // ----------------------------------------------------------------------------
+  // MARK: - Class methods
+
   /// Parse a Tnf status message
   ///
   ///   StatusParser Protocol method, executes on the parseQ
@@ -114,6 +135,9 @@ public final class Tnf : NSObject, DynamicModel {
     }
   }
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Instance methods
+
   /// Parse Tnf key/value pairs
   ///
   ///   PropertiesParser Protocol method, executes on the parseQ
@@ -122,13 +146,6 @@ public final class Tnf : NSObject, DynamicModel {
   ///
   func parseProperties(_ properties: KeyValuesArray) {
     
-    // function to change value and signal KVO
-//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Tnf, T>) {
-//      willChangeValue(for: keyPath)
-//      property.pointee = value
-//      didChangeValue(for: keyPath)
-//    }
-
     // process each key/value pair, <key=value>
     for property in properties {
       
@@ -252,13 +269,11 @@ public final class Tnf : NSObject, DynamicModel {
 //    }
 //    return tnfFreq
 //  }
-}
 
-// MARK: - Extensions
+  // ----------------------------------------------------------------------------
+  // MARK: - Private methods
 
-extension Tnf {
-
-  /// Set a Tnf property on the Radio
+  /// Send a command to Set a Tnf property
   ///
   /// - Parameters:
   ///   - token:      the parse token
@@ -266,21 +281,5 @@ extension Tnf {
   ///
   private func tnfCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("tnf set " + "\(id) " + token.rawValue + "=\(value)")
-  }
-
-  /// Properties
-  ///
-  internal enum Token : String {
-    case depth
-    case frequency      = "freq"
-    case permanent
-    case width
-  }
-  /// Depths
-  ///
-  public enum Depth : UInt {
-    case normal         = 1
-    case deep           = 2
-    case veryDeep       = 3
   }
 }

@@ -17,9 +17,18 @@ import Foundation
 public final class Waveform                 : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
+  @objc dynamic public var waveformList: String { _waveformList }
+
+  // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier("", Api.objectQ) var _waveformList                                         //
+  @Barrier("", Api.objectQ) var _waveformList                                         
+
+  enum Token: String {
+    case waveformList = "installed_list"
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -42,7 +51,7 @@ public final class Waveform                 : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
+  // MARK: - Instance methods
 
   /// Parse a Waveform status message
   ///
@@ -52,13 +61,6 @@ public final class Waveform                 : NSObject, StaticModel {
   ///
   func parseProperties(_ properties: KeyValuesArray) {
     
-    // function to change value and signal KVO
-//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Waveform, T>) {
-//      willChangeValue(for: keyPath)
-//      property.pointee = value
-//      didChangeValue(for: keyPath)
-//    }
-
     // process each key/value pair, <key=value>
     for property in properties {
       
@@ -71,26 +73,7 @@ public final class Waveform                 : NSObject, StaticModel {
       // Known tokens, in alphabetical order
       switch token {
         
-      case .waveformList:
-        update(self, &_waveformList, to: property.value, signal: \.waveformList)      }
+      case .waveformList: update(self, &_waveformList, to: property.value, signal: \.waveformList)      }
     }
-  }
-}
-
-extension Waveform {
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
-  
-  @objc dynamic public var waveformList: String {
-    return _waveformList }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Tokens
-  
-  /// Properties
-  ///
-  internal enum Token: String {
-    case waveformList = "installed_list"
   }
 }

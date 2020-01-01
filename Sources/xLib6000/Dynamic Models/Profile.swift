@@ -32,21 +32,38 @@ public final class Profile                  : NSObject, StaticModel {
   
   public let id                             : ProfileId
 
+  @objc dynamic public var selection: ProfileName {
+    get {  return _selection }
+    set { if _selection != newValue { _selection = newValue ; profileCmd(newValue) } } }
+  
+  @objc dynamic public var list: [ProfileName] {
+    return _list }
+
+  public enum Group : String {
+    case global
+    case mic
+    case tx
+  }
+  public enum Token: String {
+    case list       = "list"
+    case selection  = "current"
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier([ProfileName](), Api.objectQ)  var _list           : [ProfileName]            // list of Profile names
-  @Barrier("", Api.objectQ)               var _selection      : ProfileId                // selected Profile name
+  @Barrier([ProfileName](), Api.objectQ)  var _list           : [ProfileName]
+  @Barrier("", Api.objectQ)               var _selection      : ProfileId
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _radio                        : Radio
+  private var _initialized                  = false
   private let _log                          = Log.sharedInstance
-  private var _initialized                  = false                         // True if initialized by Radio (hardware)
+  private var _radio                        : Radio
 
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Class methods
   
   /// Parse a Profile status message
   ///
@@ -102,7 +119,7 @@ public final class Profile                  : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
+  // MARK: - Instance methods
 
   /// Parse a Profile status message
   ///
@@ -148,27 +165,7 @@ public final class Profile                  : NSObject, StaticModel {
       NC.post(.profileHasBeenAdded, object: self as Any?)
     }
   }
-}
-
-extension Profile {
-
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant) that send Commands
-  
-  @objc dynamic public var selection: ProfileName {
-    get {  return _selection }
-    set { if _selection != newValue { _selection = newValue ; profileCmd(newValue) } } }
-
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
-  
-  @objc dynamic public var list: [ProfileName] {
-    return _list }
-      
-  // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
-
-  /// Delete a Profile entry
+  /// Remove a Profile entry
   ///
   /// - Parameters:
   ///   - token:              profile type
@@ -194,7 +191,7 @@ extension Profile {
   }
 
   // ----------------------------------------------------------------------------
-  // Private command helper methods
+  // MARK: - Private methods
 
   /// Set a Profile property on the Radio
   ///
@@ -203,24 +200,6 @@ extension Profile {
   ///   - value:      the new value
   ///
   private func profileCmd(_ value: Any) {
-    // NOTE: commands use this format when the Token received does not match the Token sent
-    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    Api.sharedInstance.send("profile "  + id + " load \"\(value)\"")
-  }
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Types
-  ///
-  public enum Group : String {
-    case global
-    case mic
-    case tx
-  }
-  /// Properties
-  ///
-  public enum Token: String {
-    case list       = "list"
-    case selection  = "current"
+    _radio.sendCommand("profile "  + id + " load \"\(value)\"")
   }
 }

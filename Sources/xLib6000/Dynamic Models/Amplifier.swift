@@ -23,7 +23,31 @@ public final class Amplifier  : NSObject, DynamicModel {
   // MARK: - Public properties
   
   public let id               : AmplifierId
+
+  @objc dynamic public var ant: String {
+    get { return _ant }
+    set { if _ant != newValue { _ant = newValue ; amplifierCmd(.ant, newValue) } } }
   
+  @objc dynamic public var ip: String {
+    get { return _ip }
+    set { if _ip != newValue { _ip = newValue ; amplifierCmd(.ip, newValue) } } }
+  
+  @objc dynamic public var model: String {
+    get { return _model }
+    set { if _model != newValue { _model = newValue ; amplifierCmd(.model, newValue) } } }
+  
+  @objc dynamic public var mode: String {
+    get { return _mode }
+    set { if _mode != newValue { _mode = newValue ; amplifierCmd(.mode, newValue) } } }
+  
+  @objc dynamic public var port: Int {
+    get { return _port }
+    set { if _port != newValue { _port = newValue ; amplifierCmd( .port, newValue) } } }
+  
+  @objc dynamic public var serialNumber: String {
+    get { return _serialNumber }
+    set { if _serialNumber != newValue { _serialNumber = newValue ; amplifierCmd( .serialNumber, newValue) } } }
+
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
 
@@ -34,6 +58,15 @@ public final class Amplifier  : NSObject, DynamicModel {
   @Barrier(0, Api.objectQ)  var _port
   @Barrier("", Api.objectQ) var _serialNumber
   
+  enum Token : String {
+    case ant
+    case ip
+    case model
+    case mode        // never received from Radio (values = KOperate or kStandby)
+    case port
+    case serialNumber                       = "serial_num"
+  }
+  
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -42,7 +75,7 @@ public final class Amplifier  : NSObject, DynamicModel {
   private let _log          = Log.sharedInstance
 
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Class methods
   
   /// Parse an Amplifier status message
   ///
@@ -103,7 +136,7 @@ public final class Amplifier  : NSObject, DynamicModel {
   }
 
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
+  // MARK: - Instance methods
   
   /// Parse Amplifier key/value pairs
   ///
@@ -113,13 +146,6 @@ public final class Amplifier  : NSObject, DynamicModel {
   ///
   func parseProperties(_ properties: KeyValuesArray) {
     
-    // function to change value and signal KVO
-//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Amplifier, T>) {
-//      willChangeValue(for: keyPath)
-//      property.pointee = value
-//      didChangeValue(for: keyPath)
-//    }
-
     // process each key/value pair, <key=value>
     for property in properties {
       
@@ -132,23 +158,12 @@ public final class Amplifier  : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
-      case .ant:
-        update(self, &_ant, to: property.value, signal: \.ant)
-
-      case .ip:
-        update(self, &_ip, to: property.value, signal: \.ip)
-
-      case .model:
-        update(self, &_model, to: property.value, signal: \.model)
-
-      case .port:
-        update(self, &_port, to: property.value.iValue, signal: \.port)
-
-      case .serialNumber:
-        update(self, &_serialNumber, to: property.value, signal: \.serialNumber)
-
-      case .mode:      // never received from Radio
-        break
+      case .ant:          update(self, &_ant,           to: property.value,         signal: \.ant)
+      case .ip:           update(self, &_ip,            to: property.value,         signal: \.ip)
+      case .model:        update(self, &_model,         to: property.value,         signal: \.model)
+      case .port:         update(self, &_port,          to: property.value.iValue,  signal: \.port)
+      case .serialNumber: update(self, &_serialNumber,  to: property.value,         signal: \.serialNumber)
+      case .mode:         break     // never received from Radio
       }
     }
     // is the Amplifier initialized?
@@ -161,40 +176,6 @@ public final class Amplifier  : NSObject, DynamicModel {
       NC.post(.amplifierHasBeenAdded, object: self as Any?)
     }
   }
-}
-
-extension Amplifier {
-  
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant) that send Commands
-  
-  @objc dynamic public var ant: String {
-    get { return _ant }
-    set { if _ant != newValue { _ant = newValue ; amplifierCmd(.ant, newValue) } } }
-  
-  @objc dynamic public var ip: String {
-    get { return _ip }
-    set { if _ip != newValue { _ip = newValue ; amplifierCmd(.ip, newValue) } } }
-  
-  @objc dynamic public var model: String {
-    get { return _model }
-    set { if _model != newValue { _model = newValue ; amplifierCmd(.model, newValue) } } }
-  
-  @objc dynamic public var mode: String {
-    get { return _mode }
-    set { if _mode != newValue { _mode = newValue ; amplifierCmd(.mode, newValue) } } }
-  
-  @objc dynamic public var port: Int {
-    get { return _port }
-    set { if _port != newValue { _port = newValue ; amplifierCmd( .port, newValue) } } }
-  
-  @objc dynamic public var serialNumber: String {
-    get { return _serialNumber }
-    set { if _serialNumber != newValue { _serialNumber = newValue ; amplifierCmd( .serialNumber, newValue) } } }
-
-  // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
-
   /// Remove this Amplifier record
   ///
   /// - Parameter callback:   ReplyHandler (optional)
@@ -215,7 +196,7 @@ extension Amplifier {
   }
 
   // ----------------------------------------------------------------------------
-  // Private command helper methods
+  // MARK: - Private methods
 
   /// Set an Amplifier property on the Radio
   ///
@@ -224,21 +205,7 @@ extension Amplifier {
   ///   - value:      the new value
   ///
   private func amplifierCmd(_ token: Token, _ value: Any) {
-    
     _radio.sendCommand("amplifier set " + "\(id) " + token.rawValue + "=\(value)")
-  }
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Properties
-  ///
-  internal enum Token : String {
-    case ant
-    case ip
-    case model
-    case mode        // never received from Radio (values = KOperate or kStandby)
-    case port
-    case serialNumber                       = "serial_num"
   }
 }
 

@@ -111,7 +111,13 @@ public extension Sequence {
 }
 
 public extension String {
-  
+  /// Convert a comma delimited String to aa array
+  ///
+  /// - Returns:      an array of Stringl
+  ///
+  var list: [String] {
+    return self.components(separatedBy: ",")
+  }
   /// Convert a String to a UInt16
   ///
   /// - Returns:      the UInt6 equivalent or nil
@@ -181,6 +187,13 @@ public extension String {
   ///
   var fValue : Float {
     return Float(self) ?? 0
+  }
+  /// Return the CGFloat value (or 0 if invalid)
+  ///
+  /// - Returns:      a CGFloat equivalent
+  ///
+  var cgValue : CGFloat {
+    return CGFloat(self)
   }
   /// Return the Double value (or 0 if invalid)
   ///
@@ -648,45 +661,25 @@ struct BarrierClamped<Element: Comparable> {
   }
 }
 
-/*
 @propertyWrapper
-/// Protect a property by "clamping" it within prescribed bounds
 ///
-struct Clamping<Value: Comparable> {
-  private var _value    : Value
-  private let _range    : ClosedRange<Value>
+///
+public struct Shadow<Element> {
+  private var _ptr  : UnsafeMutablePointer<Element>
   
-  init(_ value: Value, _ range: ClosedRange<Value>) {
-    precondition(range.contains(value))
-    _value = value
-    _range = range
+  public var wrappedValue: Element {
+    get { return _ptr.pointee }
+    set { _ptr.pointee = newValue }
   }
-  var wrappedValue: Value {
-    get { _value }
-    set { _value = min( max(_range.lowerBound, newValue), _range.upperBound) }
+  
+  init(_ ptr: UnsafeMutablePointer<Element>) {
+    _ptr = ptr
   }
 }
 
-@propertyWrapper
-/// Protect a property using a concurrent queue and a barrier for writes
+
+/// Function to change value and signal KVO
 ///
-struct ClampingBarrier {
-  private var _value    : Int
-  private var _q        : DispatchQueue
-  
-  var wrappedValue: Int {
-    get { return _q.sync { _value }}
-    set { _q.sync(flags: .barrier) { _value = min( max(Api.kControlMin, newValue ), Api.kControlMax) }
-    }
-  }
-  
-  init(_ value: Int, _ queue: DispatchQueue) {
-    _value = value
-    _q = queue
-  }
-}
-*/
-// function to change value and signal KVO
 func update<S:NSObject, T>(_ object: S, _ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<S,T>) {
   object.willChangeValue(for: keyPath)
   property.pointee = value

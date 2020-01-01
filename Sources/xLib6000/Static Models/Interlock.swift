@@ -19,155 +19,6 @@ public final class Interlock                : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Internal properties
-  
-  @Barrier(false, Api.objectQ)  var _accTxEnabled
-  @Barrier(0, Api.objectQ)      var _accTxDelay
-  @Barrier(false, Api.objectQ)  var _accTxReqEnabled
-  @Barrier(false, Api.objectQ)  var _accTxReqPolarity
-  @Barrier("", Api.objectQ)     var _amplifier
-  @Barrier(false, Api.objectQ)  var _rcaTxReqEnabled
-  @Barrier(false, Api.objectQ)  var _rcaTxReqPolarity
-  @Barrier("", Api.objectQ)     var _reason
-  @Barrier("", Api.objectQ)     var _source
-  @Barrier("", Api.objectQ)     var _state
-  @Barrier(0, Api.objectQ)      var _timeout
-  @Barrier(false, Api.objectQ)  var _txAllowed
-  @Barrier(0, Api.objectQ)      var _txDelay
-  @Barrier(0, Api.objectQ)      var _tx1Delay
-  @Barrier(false, Api.objectQ)  var _tx1Enabled
-  @Barrier(0, Api.objectQ)      var _tx2Delay
-  @Barrier(false, Api.objectQ)  var _tx2Enabled
-  @Barrier(0, Api.objectQ)      var _tx3Delay
-  @Barrier(false, Api.objectQ)  var _tx3Enabled
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Private properties
-  
-  private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance
-
- // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize Interlock
-  ///
-  /// - Parameters:
-  ///   - radio:        the Radio instance
-  ///
-  public init(radio: Radio) {
-
-    _radio = radio
-    super.init()
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
-
-  /// Parse an Interlock status message
-  ///
-  ///   PropertiesParser protocol method, executes on the parseQ
-  ///
-  /// - Parameter properties:       a KeyValuesArray
-  ///
-  func parseProperties(_ properties: KeyValuesArray) {
-    // Format: <"timeout", value> <"acc_txreq_enable", 1|0> <"rca_txreq_enable", 1|0> <"acc_txreq_polarity", 1|0> <"rca_txreq_polarity", 1|0>
-    //              <"tx1_enabled", 1|0> <"tx1_delay", value> <"tx2_enabled", 1|0> <"tx2_delay", value> <"tx3_enabled", 1|0> <"tx3_delay", value>
-    //              <"acc_tx_enabled", 1|0> <"acc_tx_delay", value> <"tx_delay", value>
-    //      OR
-    // Format: <"state", value> <"tx_allowed", 1|0>
-    
-    // process each key/value pair, <key=value>
-    for property in properties {
-      
-      // function to change value and signal KVO
-//      func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Interlock, T>) {
-//        willChangeValue(for: keyPath)
-//        property.pointee = value
-//        didChangeValue(for: keyPath)
-//      }
-
-      // Check for Unknown Keys
-      guard let token = Token(rawValue: property.key)  else {
-        // log it and ignore the Key
-        _log.msg("Unknown Interlock token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
-        continue
-      }
-      // Known tokens, in alphabetical order
-      switch token {
-        
-      case .accTxEnabled:
-        update(self, &_accTxEnabled, to: property.value.bValue, signal: \.accTxEnabled)
-
-      case .accTxDelay:
-        update(self, &_accTxDelay, to: property.value.iValue, signal: \.accTxDelay)
-
-      case .accTxReqEnabled:
-        update(self, &_accTxReqEnabled, to: property.value.bValue, signal: \.accTxReqEnabled)
-
-      case .accTxReqPolarity:
-        update(self, &_accTxReqPolarity, to: property.value.bValue, signal: \.accTxReqPolarity)
-
-      case .amplifier:
-        update(self, &_amplifier, to: property.value, signal: \.amplifier)
-
-      case .rcaTxReqEnabled:
-        update(self, &_rcaTxReqEnabled, to: property.value.bValue, signal: \.rcaTxReqEnabled)
-
-      case .rcaTxReqPolarity:
-        update(self, &_rcaTxReqPolarity, to: property.value.bValue, signal: \.rcaTxReqPolarity)
-
-      case .reason:
-        update(self, &_reason, to: property.value, signal: \.reason)
-
-      case .source:
-        update(self, &_source, to: property.value, signal: \.source)
-
-      case .state:
-        update(self, &_state, to: property.value, signal: \.state)
-
-        // determine if a Mox change is needed
-        _radio.stateChange(_state)
-
-      case .timeout:
-        update(self, &_timeout, to: property.value.iValue, signal: \.timeout)
-
-      case .txAllowed:
-        update(self, &_txAllowed, to: property.value.bValue, signal: \.txAllowed)
-
-      case .txDelay:
-        update(self, &_txDelay, to: property.value.iValue, signal: \.txDelay)
-
-      case .tx1Delay:
-        update(self, &_tx1Delay, to: property.value.iValue, signal: \.tx1Delay)
-
-      case .tx1Enabled:
-        update(self, &_tx1Enabled, to: property.value.bValue, signal: \.tx1Enabled)
-
-      case .tx2Delay:
-        update(self, &_tx2Delay, to: property.value.iValue, signal: \.tx2Delay)
-
-      case .tx2Enabled:
-        update(self, &_tx2Enabled, to: property.value.bValue, signal: \.tx2Enabled)
-
-      case .tx3Delay:
-        update(self, &_tx3Delay, to: property.value.iValue, signal: \.tx3Delay)
-
-      case .tx3Enabled:
-         update(self, &_tx3Enabled, to: property.value.bValue, signal: \.tx3Enabled)
-      }
-    }
-  }
-}
-
-extension Interlock {
-
-  
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant) that send Commands
-  
   @objc dynamic public var accTxEnabled: Bool {
     get { return _accTxEnabled }
     set { if _accTxEnabled != newValue { _accTxEnabled = newValue ; interlockCmd( .accTxEnabled, newValue.asTF) } } }
@@ -223,45 +74,37 @@ extension Interlock {
   @objc dynamic public var tx3Delay: Int {
     get { return _tx3Delay }
     set { if _tx3Delay != newValue { _tx3Delay = newValue ; interlockCmd( .tx3Delay, newValue) } } }
+  
+  @objc dynamic public var reason     : String { _reason }
+  @objc dynamic public var source     : String { _source }
+  @objc dynamic public var amplifier  : String { _amplifier }
+  @objc dynamic public var state      : String { _state }
+  @objc dynamic public var txAllowed  : Bool { _txAllowed }
 
   // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
+  // MARK: - Internal properties
   
-  @objc dynamic public var reason: String {
-    return _reason }
-  
-  @objc dynamic public var source: String {
-    return _source }
+  @Barrier(false, Api.objectQ)  var _accTxEnabled
+  @Barrier(0, Api.objectQ)      var _accTxDelay
+  @Barrier(false, Api.objectQ)  var _accTxReqEnabled
+  @Barrier(false, Api.objectQ)  var _accTxReqPolarity
+  @Barrier("", Api.objectQ)     var _amplifier
+  @Barrier(false, Api.objectQ)  var _rcaTxReqEnabled
+  @Barrier(false, Api.objectQ)  var _rcaTxReqPolarity
+  @Barrier("", Api.objectQ)     var _reason
+  @Barrier("", Api.objectQ)     var _source
+  @Barrier("", Api.objectQ)     var _state
+  @Barrier(0, Api.objectQ)      var _timeout
+  @Barrier(false, Api.objectQ)  var _txAllowed
+  @Barrier(0, Api.objectQ)      var _txDelay
+  @Barrier(0, Api.objectQ)      var _tx1Delay
+  @Barrier(false, Api.objectQ)  var _tx1Enabled
+  @Barrier(0, Api.objectQ)      var _tx2Delay
+  @Barrier(false, Api.objectQ)  var _tx2Enabled
+  @Barrier(0, Api.objectQ)      var _tx3Delay
+  @Barrier(false, Api.objectQ)  var _tx3Enabled
 
-  @objc dynamic public var amplifier: String {
-    return _amplifier }
-
-  @objc dynamic public var state: String {
-    return _state }
-  
-  @objc dynamic public var txAllowed: Bool {
-    return _txAllowed }
-    
-  // ----------------------------------------------------------------------------
-  // Private command helper methods
-
-  /// Set a Interlock property on the Radio
-  ///
-  /// - Parameters:
-  ///   - token:      the parse token
-  ///   - value:      the new value
-  ///
-  private func interlockCmd(_ token: Token, _ value: Any) {
-    
-    _radio.sendCommand("interlock " + token.rawValue + "=\(value)")
-  }
-  
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Properties
-  ///
-  internal enum Token: String {
+  enum Token: String {
     case accTxEnabled       = "acc_tx_enabled"
     case accTxDelay         = "acc_tx_delay"
     case accTxReqEnabled    = "acc_txreq_enable"
@@ -282,9 +125,7 @@ extension Interlock {
     case tx3Enabled         = "tx3_enabled"
     case tx3Delay           = "tx3_delay"
   }
-  /// States
-  ///
-  internal enum State: String {
+  enum State: String {
     case receive            = "RECEIVE"
     case ready              = "READY"
     case notReady           = "NOT_READY"
@@ -295,17 +136,13 @@ extension Interlock {
     case stuckInput         = "STUCK_INPUT"
     case unKeyRequested     = "UNKEY_REQUESTED"
   }
-  /// Sources
-  ///
-  internal enum PttSource: String {
+  enum PttSource: String {
     case software           = "SW"
     case mic                = "MIC"
     case acc                = "ACC"
     case rca                = "RCA"
   }
-  /// Reasons
-  ///
-  internal enum Reasons: String {
+  enum Reasons: String {
     case rcaTxRequest       = "RCA_TXREQ"
     case accTxRequest       = "ACC_TXREQ"
     case badMode            = "BAD_MODE"
@@ -314,5 +151,92 @@ extension Interlock {
     case paRange            = "PA_RANGE"
     case clientTxInhibit    = "CLIENT_TX_INHIBIT"
     case xvtrRxOnly         = "XVTR_RX_OLY"
+  }
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Private properties
+  
+  private let _radio                        : Radio
+  private let _log                          = Log.sharedInstance
+
+ // ------------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize Interlock
+  ///
+  /// - Parameters:
+  ///   - radio:        the Radio instance
+  ///
+  public init(radio: Radio) {
+
+    _radio = radio
+    super.init()
+  }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Instance methods
+
+  /// Parse an Interlock status message
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
+  ///
+  /// - Parameter properties:       a KeyValuesArray
+  ///
+  func parseProperties(_ properties: KeyValuesArray) {
+    // Format: <"timeout", value> <"acc_txreq_enable", 1|0> <"rca_txreq_enable", 1|0> <"acc_txreq_polarity", 1|0> <"rca_txreq_polarity", 1|0>
+    //              <"tx1_enabled", 1|0> <"tx1_delay", value> <"tx2_enabled", 1|0> <"tx2_delay", value> <"tx3_enabled", 1|0> <"tx3_delay", value>
+    //              <"acc_tx_enabled", 1|0> <"acc_tx_delay", value> <"tx_delay", value>
+    //      OR
+    // Format: <"state", value> <"tx_allowed", 1|0>
+    
+    // process each key/value pair, <key=value>
+    for property in properties {
+      
+      // Check for Unknown Keys
+      guard let token = Token(rawValue: property.key)  else {
+        // log it and ignore the Key
+        _log.msg("Unknown Interlock token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        continue
+      }
+      // Known tokens, in alphabetical order
+      switch token {
+        
+      case .accTxEnabled:     update(self, &_accTxEnabled,      to: property.value.bValue,  signal: \.accTxEnabled)
+      case .accTxDelay:       update(self, &_accTxDelay,        to: property.value.iValue,  signal: \.accTxDelay)
+      case .accTxReqEnabled:  update(self, &_accTxReqEnabled,   to: property.value.bValue,  signal: \.accTxReqEnabled)
+      case .accTxReqPolarity: update(self, &_accTxReqPolarity,  to: property.value.bValue,  signal: \.accTxReqPolarity)
+      case .amplifier:        update(self, &_amplifier,         to: property.value,         signal: \.amplifier)
+      case .rcaTxReqEnabled:  update(self, &_rcaTxReqEnabled,   to: property.value.bValue,  signal: \.rcaTxReqEnabled)
+      case .rcaTxReqPolarity: update(self, &_rcaTxReqPolarity,  to: property.value.bValue,  signal: \.rcaTxReqPolarity)
+      case .reason:           update(self, &_reason,            to: property.value,         signal: \.reason)
+      case .source:           update(self, &_source,            to: property.value,         signal: \.source)
+      case .state:            update(self, &_state,             to: property.value,         signal: \.state)
+        // determine if a Mox change is needed
+        _radio.stateChange(_state)
+
+      case .timeout:          update(self, &_timeout,           to: property.value.iValue,  signal: \.timeout)
+      case .txAllowed:        update(self, &_txAllowed,         to: property.value.bValue,  signal: \.txAllowed)
+      case .txDelay:          update(self, &_txDelay,           to: property.value.iValue,  signal: \.txDelay)
+      case .tx1Delay:         update(self, &_tx1Delay,          to: property.value.iValue,  signal: \.tx1Delay)
+      case .tx1Enabled:       update(self, &_tx1Enabled,        to: property.value.bValue,  signal: \.tx1Enabled)
+      case .tx2Delay:         update(self, &_tx2Delay,          to: property.value.iValue,  signal: \.tx2Delay)
+      case .tx2Enabled:       update(self, &_tx2Enabled,        to: property.value.bValue,  signal: \.tx2Enabled)
+      case .tx3Delay:         update(self, &_tx3Delay,          to: property.value.iValue,  signal: \.tx3Delay)
+      case .tx3Enabled:       update(self, &_tx3Enabled,        to: property.value.bValue,  signal: \.tx3Enabled)
+      }
+    }
+  }
+    
+  // ----------------------------------------------------------------------------
+  // MARK: - Private methods
+
+  /// Send a command to Set a Interlock property
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func interlockCmd(_ token: Token, _ value: Any) {
+    _radio.sendCommand("interlock " + token.rawValue + "=\(value)")
   }
 }

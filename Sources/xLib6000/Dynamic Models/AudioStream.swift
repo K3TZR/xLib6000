@@ -24,16 +24,53 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kCmd             = "audio stream "   // Command prefixes
+  static let kCmd             = "audio stream "
   static let kStreamCreateCmd = "stream create "
   static let kStreamRemoveCmd = "stream remove "
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                             : AudioStreamId
+  public              let id                        : AudioStreamId
+  public              var delegate                  : StreamHandler?
+  public private(set) var rxLostPacketCount         = 0
+
+  @objc dynamic public var rxGain: Int {
+    get { return _rxGain  }
+    set { if _rxGain != newValue { _rxGain = newValue ; if _slice != nil && !Api.sharedInstance.testerModeEnabled { audioStreamCmd( "gain", newValue) }}
+    }
+  }
   
-  public private(set) var rxLostPacketCount = 0
+  @objc dynamic public var daxChannel: Int {
+    get { return _daxChannel }
+    set {
+      if _daxChannel != newValue {
+        _daxChannel = newValue
+        //        if _radio != nil {
+        _slice = _radio.findSlice(using: _daxChannel)
+        //        }
+      }
+    }
+  }
+  
+  @objc dynamic public var daxClients: Int {
+    get { return _daxClients  }
+    set { if _daxClients != newValue { _daxClients = newValue } } }
+  
+  @objc dynamic public var inUse: Bool {
+    return _inUse }
+  
+  @objc dynamic public var ip: String {
+    get { return _ip }
+    set { if _ip != newValue { _ip = newValue } } }
+  
+  @objc dynamic public var port: Int {
+    get { return _port  }
+    set { if _port != newValue { _port = newValue } } }
+  
+  @objc dynamic public var slice: xLib6000.Slice? {
+    get { return _slice }
+    set { if _slice != newValue { _slice = newValue } } }
   
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -47,6 +84,15 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   @Barrier(0, Api.objectQ)      var _port
   @Barrier(nil, Api.objectQ)    var _slice : xLib6000.Slice?
 
+  internal enum Token: String {
+    case daxChannel                         = "dax"
+    case daxClients                         = "dax_clients"
+    case inUse                              = "in_use"
+    case ip
+    case port
+    case slice
+  }
+  
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -57,7 +103,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   private      let _log                     = Log.sharedInstance
 
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Class methods
 
   /// Parse an AudioStream status message
   ///
@@ -104,10 +150,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       }
     }
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
   /// Check if an Audio Stream belongs to us
   ///
   /// - Parameters:
@@ -195,7 +237,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   }
 
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
+  // MARK: - Instance methods
   
   /// Parse Audio Stream key/value pairs
   ///
@@ -205,13 +247,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   ///
   func parseProperties(_ properties: KeyValuesArray) {
     
-    // function to change value and signal KVO
-//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<AudioStream, T>) {
-//      willChangeValue(for: keyPath)
-//      property.pointee = value
-//      didChangeValue(for: keyPath)
-//    }
-
     // process each key/value pair, <key=value>
     for property in properties {
       
@@ -224,21 +259,11 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .daxChannel:
-        update(self, &_daxChannel, to: property.value.iValue, signal: \.daxChannel)
-
-      case .daxClients:
-        update(self, &_daxClients, to: property.value.iValue, signal: \.daxClients)
-
-      case .inUse:
-        update(self, &_inUse, to: property.value.bValue, signal: \.inUse)
-
-      case .ip:
-        update(self, &_ip, to: property.value, signal: \.ip)
-
-      case .port:
-        update(self, &_port, to: property.value.iValue, signal: \.port)
-
+      case .daxChannel: update(self, &_daxChannel,  to: property.value.iValue,  signal: \.daxChannel)
+      case .daxClients: update(self, &_daxClients,  to: property.value.iValue,  signal: \.daxClients)
+      case .inUse:      update(self, &_inUse,       to: property.value.bValue,  signal: \.inUse)
+      case .ip:         update(self, &_ip,          to: property.value,         signal: \.ip)
+      case .port:       update(self, &_port,        to: property.value.iValue,  signal: \.port)
       case .slice:
         if let sliceId = property.value.objectId {
           update(self, &_slice, to: _radio.slices[sliceId], signal: \.slice)
@@ -259,6 +284,20 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       NC.post(.audioStreamHasBeenAdded, object: self as Any?)
     }
   }
+  /// Remove this Audio Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove a Stream
+    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
+  }
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Stream methods
+  
   /// Process the AudioStream Vita struct
   ///
   ///   VitaProcessor Protocol method, executes on the streamQ
@@ -325,75 +364,8 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       _rxSeq = expectedSequenceNumber
     }
   }
-}
-
-extension AudioStream {
-  
   // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant) that send Commands
-  
-  @objc dynamic public var rxGain: Int {
-    get { return _rxGain  }
-    set { if _rxGain != newValue { _rxGain = newValue ; if _slice != nil && !Api.sharedInstance.testerModeEnabled { audioStreamCmd( "gain", newValue) }}
-    }
-  }
-
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
-  
-  @objc dynamic public var daxChannel: Int {
-    get { return _daxChannel }
-    set {
-      if _daxChannel != newValue {
-        _daxChannel = newValue
-//        if _radio != nil {
-        _slice = _radio.findSlice(using: _daxChannel)
-//        }
-      }
-    }
-  }
-  
-  @objc dynamic public var daxClients: Int {
-    get { return _daxClients  }
-    set { if _daxClients != newValue { _daxClients = newValue } } }
-  
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
-  @objc dynamic public var ip: String {
-    get { return _ip }
-    set { if _ip != newValue { _ip = newValue } } }
-  
-  @objc dynamic public var port: Int {
-    get { return _port  }
-    set { if _port != newValue { _port = newValue } } }
-  
-  @objc dynamic public var slice: xLib6000.Slice? {
-    get { return _slice }
-    set { if _slice != newValue { _slice = newValue } } }
-  
-  // ----------------------------------------------------------------------------
-  // Public properties
-  
-  public var delegate: StreamHandler? {
-    get { return Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-    
-  // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
-
-  /// Remove this Audio Stream
-  ///
-  /// - Parameters:
-  ///   - callback:           ReplyHandler (optional)
-  ///
-  public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove a Stream
-    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
-  }
-  // ----------------------------------------------------------------------------
-  // Private command helper methods
+  // MARK: - Private methods
 
   /// Set an Audio Stream property on the Radio
   ///
@@ -402,21 +374,7 @@ extension AudioStream {
   ///   - value:      the new value
   ///
   private func audioStreamCmd(_ token: String, _ value: Any) {
-    
     _radio.sendCommand("audio stream " + "\(id.hex) slice \(_slice!.id) " + token + " \(value)")
-  }
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Properties
-  ///
-  internal enum Token: String {
-    case daxChannel                         = "dax"
-    case daxClients                         = "dax_clients"
-    case inUse                              = "in_use"
-    case ip
-    case port
-    case slice
   }
 }
 

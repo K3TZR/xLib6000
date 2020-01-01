@@ -23,29 +23,52 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                       : DaxMicStreamId
-  public var rxLostPacketCount        = 0  // Rx lost packet count
+  public      let id                  : DaxMicStreamId
+  public weak var delegate            : StreamHandler?
+  public var rxLostPacketCount        = 0
+
+  @objc dynamic public var clientHandle: Handle {
+    get { return _clientHandle  }
+    set { if _clientHandle != newValue { _clientHandle = newValue } } }
   
+  @objc dynamic public var micGain: Int {
+    get { return _micGain  }
+    set {
+      if _micGain != newValue {
+        _micGain = newValue
+        if _micGain == 0 {
+          _micGainScalar = 0.0
+          return
+        }
+        let db_min:Float = -10.0;
+        let db_max:Float = +10.0;
+        let db:Float = db_min + (Float(_micGain) / 100.0) * (db_max - db_min);
+        _micGainScalar = pow(10.0, db / 20.0);
+      }
+    }
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @BarrierClamped(50, Api.objectQ, range: 0...100)  var _micGain
-
   @Barrier(0, Api.objectQ)    var _clientHandle : Handle
+  @BarrierClamped(50, Api.objectQ, range: 0...100)  var _micGain
   @Barrier(1.0, Api.objectQ)  var _micGainScalar : Float
+  
+  enum Token: String {
+    case clientHandle      = "client_handle"
+  }
   
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
 
-  private      let _radio         : Radio
-  private weak var _delegate      : StreamHandler? // Delegate for Audio stream
-  private      var _initialized   = false       // True if initialized by Radio hardware
-  private      var _rxSeq         : Int?              // Rx sequence number
-
+  private      var _initialized   = false
   private      let _log           = Log.sharedInstance
+  private      let _radio         : Radio
+  private      var _rxSeq         : Int?
 
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Class methods
   
   /// Parse a DAX Mic AudioStream status message
   ///
@@ -94,7 +117,7 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
+  // MARK: - Instance methods
 
   /// Parse Mic Audio Stream key/value pairs
   ///
@@ -104,13 +127,6 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
   ///
   func parseProperties(_ properties: KeyValuesArray) {
     
-    // function to change value and signal KVO
-//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<DaxMicAudioStream, T>) {
-//      willChangeValue(for: keyPath)
-//      property.pointee = value
-//      didChangeValue(for: keyPath)
-//    }
-
     // process each key/value pair, <key=value>
     for property in properties {
       
@@ -123,8 +139,7 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .clientHandle:
-        update(self, &_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
+      case .clientHandle: update(self, &_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
       }
     }
     // is the AudioStream acknowledged by the radio?
@@ -137,6 +152,26 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
       NC.post(.daxMicAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
+  /// Remove this DaxMicAudioStream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              success / failure
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // notify all observers
+    NC.post(.daxMicAudioStreamWillBeRemoved, object: self as Any?)
+    
+    // remove the stream
+    _radio.daxMicAudioStreams[id] = nil
+    
+    // tell the Radio to remove this Stream
+    _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
+  }
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Stream methods
+
   /// Process the Mic Audio Stream Vita struct
   ///
   ///   VitaProcessor protocol method, called by Radio, executes on the streamQ
@@ -208,67 +243,5 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
       
       _rxSeq = expectedSequenceNumber
     }
-  }
-}
-
-extension DaxMicAudioStream {
-  
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
-  
-  @objc dynamic public var clientHandle: Handle {
-    get { return _clientHandle  }
-    set { if _clientHandle != newValue { _clientHandle = newValue } } }
-  
-  @objc dynamic public var micGain: Int {
-    get { return _micGain  }
-    set {
-      if _micGain != newValue {
-        _micGain = newValue
-        if _micGain == 0 {
-          _micGainScalar = 0.0
-          return
-        }
-        let db_min:Float = -10.0;
-        let db_max:Float = +10.0;
-        let db:Float = db_min + (Float(_micGain) / 100.0) * (db_max - db_min);
-        _micGainScalar = pow(10.0, db / 20.0);
-      }
-    }
-  }
-  
-  // ----------------------------------------------------------------------------
-  // Public properties
-  
-  public var delegate: StreamHandler? {
-    get { return Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-  
-  // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
-
-  /// Remove this DaxMicAudioStream
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  /// - Returns:              success / failure
-  ///
-  public func remove(callback: ReplyHandler? = nil) {
-    
-    // notify all observers
-    NC.post(.daxMicAudioStreamWillBeRemoved, object: self as Any?)
-    
-    // remove the stream
-    _radio.daxMicAudioStreams[id] = nil
-    
-    // tell the Radio to remove this Stream
-    _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
-  }
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Properties
-  ///
-  internal enum Token: String {
-    case clientHandle      = "client_handle"
   }
 }

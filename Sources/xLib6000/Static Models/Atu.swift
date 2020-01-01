@@ -23,95 +23,13 @@ public final class Atu                      : NSObject, StaticModel {
   static let kStartCmd                      = "atu start"
   static let kBypassCmd                     = "atu bypass"
   static let kCmd                           = "atu "
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Internal properties
-  
-  @Barrier(false, Api.objectQ)                var _enabled
-  @Barrier(false, Api.objectQ)                var _memoriesEnabled
-  @Barrier(Status.none.rawValue, Api.objectQ) var _status
-  @Barrier(false, Api.objectQ)                var _usingMemories
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Private properties
-  
-  private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance
-
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize Atu
-  ///
-  /// - Parameters:
-  ///   - radio:        the Radio instance
-  ///
-  public init(radio: Radio) {
-    
-    _radio = radio
-    super.init()
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
-
-  /// Parse an Atu status message
-  ///
-  ///   PropertiesParser protocol method, executes on the parseQ
-  ///
-  /// - Parameter properties:       a KeyValuesArray
-  ///
-  func parseProperties(_ properties: KeyValuesArray) {
-    // Format: <"status", value> <"memories_enabled", 1|0> <"using_mem", 1|0>
-    
-    // function to change value and signal KVO
-//    func update<T>(_ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<Atu, T>) {
-//      willChangeValue(for: keyPath)
-//      property.pointee = value
-//      didChangeValue(for: keyPath)
-//    }
-
-    // process each key/value pair, <key=value>
-    for property in properties {
-      
-      // Check for Unknown Keys
-      guard let token = Token(rawValue: property.key)  else {
-        // log it and ignore the Key
-        _log.msg("Unknown Atu token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
-        continue
-      }
-      // Known tokens, in alphabetical order
-      switch token {
-        
-      case .enabled:
-        update(self, &_enabled, to: property.value.bValue, signal: \.enabled)
-
-      case .memoriesEnabled:
-        update(self, &_memoriesEnabled, to: property.value.bValue, signal: \.memoriesEnabled)
-
-      case .status:
-//        update(self, &_status, to: property.value, signal: \.status)
-        break
-
-      case .usingMemories:
-        update(self, &_usingMemories, to: property.value.bValue, signal: \.usingMemories)
-      }
-    }
-  }
-}
-
-extension Atu {
-  
   
   // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant) that send Commands
+  // MARK: - Public properties
   
   @objc dynamic public var memoriesEnabled: Bool {
     get {  return _memoriesEnabled }
     set { if _memoriesEnabled != newValue { _memoriesEnabled = newValue ; atuCmd( .memoriesEnabled, newValue.as1or0) } } }
-
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
   
   @objc dynamic public var status: String {
     var value = ""
@@ -145,8 +63,84 @@ extension Atu {
     return _enabled }
 
   // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
+  // MARK: - Internal properties
+  
+  @Barrier(false, Api.objectQ)                var _enabled
+  @Barrier(false, Api.objectQ)                var _memoriesEnabled
+  @Barrier(Status.none.rawValue, Api.objectQ) var _status
+  @Barrier(false, Api.objectQ)                var _usingMemories
 
+  enum Token: String {
+    case status
+    case enabled          = "atu_enabled"
+    case memoriesEnabled  = "memories_enabled"
+    case usingMemories    = "using_mem"
+  }
+  enum Status: String {
+    case none             = "NONE"
+    case tuneNotStarted   = "TUNE_NOT_STARTED"
+    case tuneInProgress   = "TUNE_IN_PROGRESS"
+    case tuneBypass       = "TUNE_BYPASS"
+    case tuneSuccessful   = "TUNE_SUCCESSFUL"
+    case tuneOK           = "TUNE_OK"
+    case tuneFailBypass   = "TUNE_FAIL_BYPASS"
+    case tuneFail         = "TUNE_FAIL"
+    case tuneAborted      = "TUNE_ABORTED"
+    case tuneManualBypass = "TUNE_MANUAL_BYPASS"
+  }
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Private properties
+  
+  private let _radio                        : Radio
+  private let _log                          = Log.sharedInstance
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize Atu
+  ///
+  /// - Parameters:
+  ///   - radio:        the Radio instance
+  ///
+  public init(radio: Radio) {
+    
+    _radio = radio
+    super.init()
+  }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Instance methods
+
+  /// Parse an Atu status message
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
+  ///
+  /// - Parameter properties:       a KeyValuesArray
+  ///
+  func parseProperties(_ properties: KeyValuesArray) {
+    // Format: <"status", value> <"memories_enabled", 1|0> <"using_mem", 1|0>
+
+    // process each key/value pair, <key=value>
+    for property in properties {
+      
+      // Check for Unknown Keys
+      guard let token = Token(rawValue: property.key)  else {
+        // log it and ignore the Key
+        _log.msg("Unknown Atu token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        continue
+      }
+      // Known tokens, in alphabetical order
+      switch token {
+        
+      case .enabled:          update(self, &_enabled,         to: property.value.bValue, signal: \.enabled)
+      case .memoriesEnabled:  update(self, &_memoriesEnabled, to: property.value.bValue, signal: \.memoriesEnabled)
+      case .status: //        update(self, &_status, to: property.value, signal: \.status)
+        break
+      case .usingMemories:    update(self, &_usingMemories,   to: property.value.bValue, signal: \.usingMemories)
+      }
+    }
+  }
   /// Clear the ATU
   ///
   /// - Parameter callback:   ReplyHandler (optional)
@@ -176,7 +170,7 @@ extension Atu {
   }
 
   // ----------------------------------------------------------------------------
-  // Private command helper methods
+  // MARK: - Private methods
 
   /// Set an ATU property on the Radio
   ///
@@ -185,33 +179,6 @@ extension Atu {
   ///   - value:      the new value
   ///
   private func atuCmd(_ token: Token, _ value: Any) {
-    
     _radio.sendCommand("atu " + token.rawValue + "=\(value)")
-  }
-
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Properties
-  ///
-  internal enum Token: String {
-    case status
-    case enabled          = "atu_enabled"
-    case memoriesEnabled  = "memories_enabled"
-    case usingMemories    = "using_mem"
-  }
-  /// Statuses
-  ///
-  internal enum Status: String {
-    case none             = "NONE"
-    case tuneNotStarted   = "TUNE_NOT_STARTED"
-    case tuneInProgress   = "TUNE_IN_PROGRESS"
-    case tuneBypass       = "TUNE_BYPASS"
-    case tuneSuccessful   = "TUNE_SUCCESSFUL"
-    case tuneOK           = "TUNE_OK"
-    case tuneFailBypass   = "TUNE_FAIL_BYPASS"
-    case tuneFail         = "TUNE_FAIL"
-    case tuneAborted      = "TUNE_ABORTED"
-    case tuneManualBypass = "TUNE_MANUAL_BYPASS"
   }
 }

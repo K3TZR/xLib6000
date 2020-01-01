@@ -17,47 +17,88 @@ import Accelerate
 ///      objects periodically receive IQ data in a UDP stream.
 ///
 public final class IqStream : NSObject, DynamicModelWithStream {
- 
-  // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-//  static let kCmd             = "dax iq "         // Command prefixes
-//  static let kStreamCreateCmd = "stream create "
-//  static let kStreamRemoveCmd = "stream remove "
 
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                             : DaxIqStreamId
-  public private(set) var rxLostPacketCount = 0       // Rx lost packet count
+  public weak         var delegate          : StreamHandler?
+  public              let id                : DaxIqStreamId
+  public private(set) var rxLostPacketCount = 0
+
+  @objc dynamic public var rate: Int {
+    get { return _rate }
+    set {
+      if _rate != newValue {
+        if newValue == 24000 || newValue == 48000 || newValue == 96000 || newValue == 192000 {
+          _rate = newValue
+          iqCmd( .rate, newValue)
+        }
+      }
+    }
+  }
   
+  @objc dynamic public var available: Int {
+    return _available }
+  
+  @objc dynamic public var capacity: Int {
+    return _capacity }
+  
+  @objc dynamic public var daxIqChannel: DaxIqChannel {
+    return _daxIqChannel }
+  
+  @objc dynamic public var inUse: Bool {
+    return _inUse }
+  
+  @objc dynamic public var ip: String {
+    return _ip }
+  
+  @objc dynamic public var port: Int {
+    return _port  }
+  
+  @objc dynamic public var pan: PanadapterStreamId {
+    return _pan }
+  
+  @objc dynamic public var streaming: Bool {
+    return _streaming  }
+  
+
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(0, Api.objectQ)      var _available                    // Number of available IQ Streams
-  @Barrier(0, Api.objectQ)      var _capacity                     // Total Number of  IQ Streams
-  @Barrier(0, Api.objectQ)      var _daxIqChannel : DaxIqChannel  // Channel in use (1 - 4)
-  @Barrier(false, Api.objectQ)  var _inUse                        // true = in use
-  @Barrier("", Api.objectQ)     var _ip                           // Ip Address
-  @Barrier(0, Api.objectQ)      var _pan : PanadapterStreamId     // Source Panadapter
-  @Barrier(0, Api.objectQ)      var _port                         // Port number
-  @Barrier(0, Api.objectQ)      var _rate                         // Stream rate
-  @Barrier(false, Api.objectQ)  var _streaming                    // Stream state
+  @Barrier(0, Api.objectQ)      var _available
+  @Barrier(0, Api.objectQ)      var _capacity
+  @Barrier(0, Api.objectQ)      var _daxIqChannel : DaxIqChannel
+  @Barrier(false, Api.objectQ)  var _inUse
+  @Barrier("", Api.objectQ)     var _ip
+  @Barrier(0, Api.objectQ)      var _pan          : PanadapterStreamId
+  @Barrier(0, Api.objectQ)      var _port
+  @Barrier(0, Api.objectQ)      var _rate
+  @Barrier(false, Api.objectQ)  var _streaming
   
-  
+  enum Token: String {
+    case available
+    case capacity
+    case daxIqChannel           = "daxiq"
+    case inUse                  = "in_use"
+    case ip
+    case pan
+    case port
+    case rate
+    case streaming
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private      var _initialized       = false
+  private      let _log               = Log.sharedInstance
   private      let _radio             : Radio
-  private weak var _delegate          : StreamHandler? // Delegate for IQ stream
-  private      var _initialized       = false  // True if initialized by Radio hardware
-  private      var _rxSeq             : Int?   // Rx sequence number
+  private      var _rxSeq             : Int?
+
   private      var _kOneOverZeroDBfs  : Float = 1.0 / pow(2.0, 15.0)
 
-  private      let _log               = Log.sharedInstance
-  
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Class methods
 
   /// Parse a Stream status message
   ///
@@ -104,25 +145,6 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       }
     }
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-//  /// Find the IQ Stream for a DaxIqChannel
-//  ///
-//  /// - Parameters:
-//  ///   - daxIqChannel:   a Dax IQ channel number
-//  /// - Returns:          an IQ Stream reference (or nil)
-//  ///
-//  public class func find(on radio: Radio, with daxIqChannel: DaxIqChannel) -> IqStream? {
-//
-//    // find the IQ Streams with the specified Channel (if any)
-//    let streams = radio.iqStreams.values.filter { $0.daxIqChannel == daxIqChannel }
-//    guard streams.count >= 1 else { return nil }
-//    
-//    // return the first one
-//    return streams[0]
-//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -141,7 +163,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   }
 
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
+  // MARK: - Instance methods
 
   /// Parse IQ Stream key/value pairs
   ///
@@ -163,50 +185,15 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .available:
-        willChangeValue(for: \.available)
-        _available = property.value.iValue
-        didChangeValue(for: \.available)
-
-      case .capacity:
-        willChangeValue(for: \.capacity)
-        _capacity = property.value.iValue
-        didChangeValue(for: \.capacity)
-
-      case .daxIqChannel:
-        willChangeValue(for: \.daxIqChannel)
-        _daxIqChannel = property.value.iValue
-        didChangeValue(for: \.daxIqChannel)
-
-      case .inUse:
-        willChangeValue(for: \.inUse)
-        _inUse = property.value.bValue
-        didChangeValue(for: \.inUse)
-
-      case .ip:
-        willChangeValue(for: \.ip)
-        _ip = property.value
-        didChangeValue(for: \.ip)
-
-      case .pan:
-        willChangeValue(for: \.pan)
-        _pan = UInt32(property.value.dropFirst(2), radix: 16) ?? 0
-        didChangeValue(for: \.pan)
-
-      case .port:
-        willChangeValue(for: \.port)
-        _port = property.value.iValue
-        didChangeValue(for: \.port)
-
-      case .rate:
-        willChangeValue(for: \.rate)
-        _rate = property.value.iValue
-        didChangeValue(for: \.rate)
-
-      case .streaming:
-        willChangeValue(for: \.streaming)
-        _streaming = property.value.bValue
-        didChangeValue(for: \.streaming)
+      case .available:    update(self, &_available,     to: property.value.iValue,        signal: \.available)
+      case .capacity:     update(self, &_capacity,      to: property.value.iValue,        signal: \.capacity)
+      case .daxIqChannel: update(self, &_daxIqChannel,  to: property.value.iValue,        signal: \.daxIqChannel)
+      case .inUse:        update(self, &_inUse,         to: property.value.bValue,        signal: \.inUse)
+      case .ip:           update(self, &_ip,            to: property.value,               signal: \.ip)
+      case .pan:          update(self, &_pan,           to: property.value.streamId ?? 0, signal: \.pan)
+      case .port:         update(self, &_port,          to: property.value.iValue,        signal: \.port)
+      case .rate:         update(self, &_rate,          to: property.value.iValue,        signal: \.rate)
+      case .streaming:    update(self, &_streaming,     to: property.value.bValue,        signal: \.streaming)
       }
     }
     // is the Stream initialized?
@@ -219,6 +206,20 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       NC.post(.iqStreamHasBeenAdded, object: self as Any?)
     }
   }
+  /// Remove this IQ Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+
+    // tell the Radio to remove the Stream
+    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
+  }
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Stream methods
+
   /// Process the IqStream Vita struct
   ///
   ///   VitaProcessor Protocol method, executes on the streamQ
@@ -279,75 +280,9 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       _rxSeq = expectedSequenceNumber
     }
   }
-}
-
-extension IqStream {
   
   // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant) that send Commands
-  
-  @objc dynamic public var rate: Int {
-    get { return _rate }
-    set {
-      if _rate != newValue {
-        if newValue == 24000 || newValue == 48000 || newValue == 96000 || newValue == 192000 {
-          _rate = newValue
-          iqCmd( .rate, newValue)
-        }
-      }
-    }
-  }
-
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
-  
-  @objc dynamic public var available: Int {
-    return _available }
-  
-  @objc dynamic public var capacity: Int {
-    return _capacity }
-  
-  @objc dynamic public var daxIqChannel: DaxIqChannel {
-    return _daxIqChannel }
-  
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
-  @objc dynamic public var ip: String {
-    return _ip }
-  
-  @objc dynamic public var port: Int {
-    return _port  }
-  
-  @objc dynamic public var pan: PanadapterStreamId {
-    return _pan }
-  
-  @objc dynamic public var streaming: Bool {
-    return _streaming  }
-  
-  // ----------------------------------------------------------------------------
-  // Public properties
-  
-  public var delegate: StreamHandler? {
-    get { return Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-  
-  // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
-
-  /// Remove this IQ Stream
-  ///
-  /// - Parameters:
-  ///   - callback:           ReplyHandler (optional)
-  ///
-  public func remove(callback: ReplyHandler? = nil) {
-
-    // tell the Radio to remove the Stream
-    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
-  }
-  
-  // ----------------------------------------------------------------------------
-  // Private command helper methods
+  // MARK: - Private methods
 
   /// Set an IQ Stream property on the Radio
   ///
@@ -356,25 +291,7 @@ extension IqStream {
   ///   - value:      the new value
   ///
   private func iqCmd(_ token: Token, _ value: Any) {
-    
     _radio.sendCommand("dax iq " + "\(_daxIqChannel) " + token.rawValue + "=\(value)")
-  }
-
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Properties
-  ///
-  internal enum Token: String {
-    case available
-    case capacity
-    case daxIqChannel                       = "daxiq"
-    case inUse                              = "in_use"
-    case ip
-    case pan
-    case port
-    case rate
-    case streaming
   }
 }
 

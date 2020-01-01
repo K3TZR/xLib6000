@@ -37,35 +37,54 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   @Barrier("", Api.objectQ) @objc dynamic public  var units
   @Barrier(0.0, Api.objectQ) @objc dynamic public var value: Float
 
+  public enum Source: String {
+    case codec      = "cod"
+    case tx
+    case slice      = "slc"
+    case radio      = "rad"
+  }
+  public enum Units : String {
+    case none
+    case amps
+    case db
+    case dbfs
+    case dbm
+    case degc
+    case degf
+    case percent
+    case rpm
+    case swr
+    case volts
+    case watts
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Internal properties
+  
+  enum Token : String {
+    case desc
+    case fps
+    case high       = "hi"
+    case low
+    case name       = "nam"
+    case group      = "num"
+    case source     = "src"
+    case units      = "unit"
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _radio                        : Radio
+  private var _initialized                  = false
   private let _log                          = Log.sharedInstance
-  private var _initialized                  = false                         // True if initialized by Radio (hardware)
+  private let _radio                        : Radio
+  private var _voltsAmpsDenom               : Float = 256.0  // denominator for voltage/amperage depends on API version
 
-  private var _voltsAmpsDenom               : Float = 256.0                 // denominator for voltage/amperage depends on API version
-
-  private let kDbDbmDbfsSwrDenom            : Float = 128.0                 // denominator for Db, Dbm, Dbfs, Swr
-  private let kDegDenom                     : Float = 64.0                  // denominator for Degc, Degf
-  
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-  //
-//  private var _desc                         = ""                            // long description
-//  private var _fps                          = 0                             // frames per second
-//  private var _high: Float                  = 0.0                           // high limit
-//  private var _low: Float                   = 0.0                           // low limit
-//  private var _group                        = ""                            // group
-//  private var _name                         = ""                            // abbreviated description
-//  private var _peak                         : Float = 0.0                   // peak value
-//  private var _source                       = ""                            // source
-//  private var _units                        = ""                            // value units
-//  private var _value                        : Float = 0.0                   // value
-  //
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
+  private let kDbDbmDbfsSwrDenom            : Float = 128.0  // denominator for Db, Dbm, Dbfs, Swr
+  private let kDegDenom                     : Float = 64.0   // denominator for Degc, Degf
   
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Class methods
   
   /// Process the Meter Vita struct
   ///
@@ -169,36 +188,6 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
     }
   }
 
-  // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-//  /// Find Meters by a Slice Id
-//  ///
-//  /// - Parameters:
-//  ///   - sliceId:    a Slice id
-//  /// - Returns:      an array of Meters
-//  ///
-//  public class func findBy(sliceId: SliceId, radio: Radio) -> [Meter] {
-//    
-//    // find the Meters on the specified Slice (if any)
-//    return radio.meters.values.filter { $0.source == "slc" && $0.group.objectId == sliceId }
-//  }
-//  /// Find a Meter by its ShortName
-//  ///
-//  /// - Parameters:
-//  ///   - name:       Short Name of a Meter
-//  /// - Returns:      a Meter reference
-//  ///
-//  public class func findBy(shortName name: MeterName, radio: Radio) -> Meter? {
-//
-//    // find the Meters with the specified Name (if any)
-//    let meters = radio.meters.values.filter { $0.name == name }
-//    guard meters.count >= 1 else { return nil }
-//    
-//    // return the first one
-//    return meters[0]
-//  }
-
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -222,7 +211,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
+  // MARK: - Instance methods
 
   /// Parse Meter key/value pairs
   ///
@@ -251,29 +240,14 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       // known Keys, in alphabetical order
       switch token {
         
-      case .desc:
-        desc = property.value
-        
-      case .fps:
-        fps = property.value.iValue
-        
-      case .high:
-        high = property.value.fValue
-        
-      case .low:
-        low = property.value.fValue
-        
-      case .name:
-        name = property.value.lowercased()
-        
-      case .group:
-        group = property.value
-
-      case .source:
-        source = property.value.lowercased()
-        
-      case .units:
-        units = property.value.lowercased()
+      case .desc:     desc = property.value
+      case .fps:      fps = property.value.iValue
+      case .high:     high = property.value.fValue
+      case .low:      low = property.value.fValue
+      case .name:     name = property.value.lowercased()
+      case .group:    group = property.value
+      case .source:   source = property.value.lowercased()
+      case .units:    units = property.value.lowercased()
       }
     }
     if !_initialized && group != "" && units != "" {
@@ -285,6 +259,10 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       NC.post(.meterHasBeenAdded, object: self as Any?)
     }
   }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Stream methods
+
   /// Process the UDP Stream Data for Meters
   ///
   ///   StreamHandler protocol method, executes on the streamQ
@@ -325,48 +303,5 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       // notify all observers
       NC.post(.meterUpdated, object: self as Any?)
     }
-  }
-}
-
-extension Meter {
-
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Properties
-  ///
-  internal enum Token : String {
-    case desc
-    case fps
-    case high       = "hi"
-    case low
-    case name       = "nam"
-    case group      = "num"
-    case source     = "src"
-    case units      = "unit"
-  }
-  /// Sources
-  ///
-  public enum Source: String {
-    case codec      = "cod"
-    case tx
-    case slice      = "slc"
-    case radio      = "rad"
-  }
-  /// Units
-  ///
-  public enum Units : String {
-    case none
-    case amps
-    case db
-    case dbfs
-    case dbm
-    case degc
-    case degf
-    case percent
-    case rpm
-    case swr
-    case volts
-    case watts
   }
 }

@@ -34,8 +34,22 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   // MARK: - Public properties
   
   public let id                             : RemoteTxStreamId
-  public var isStreaming                    = false
+
+  @objc dynamic public var clientHandle: Handle {
+    get { return _clientHandle  }
+    set { if _clientHandle != newValue { _clientHandle = newValue} } }
   
+  @objc dynamic public var compression: String {
+    get { return _compression  }
+    set { if _compression != newValue { _compression = newValue} } }
+  
+  @objc dynamic public var ip: String {
+    get { return _ip  }
+    set { if _ip != newValue { _ip = newValue} } }
+    
+  public weak var delegate                 : StreamHandler?
+  public      var isStreaming              = false
+
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -45,6 +59,12 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
 
   private weak var _delegate                : StreamHandler?                // Delegate for Opus Data Stream
   
+  enum Token : String {
+    case clientHandle         = "client_handle"
+    case compression
+    case ip
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -60,7 +80,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   private var _txSampleCount                = 0                             // Tx sample count
   
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Class methods
   
   /// Parse an RemoteTxAudioStream status message
   ///
@@ -111,44 +131,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Public instance methods
-  
-  /// Send a RemoteTxAudioStream to the Radio (hardware)
-  ///
-  /// - Parameters:
-  ///   - buffer:             array of encoded audio samples
-  /// - Returns:              success / failure
-  ///
-  public func sendRemoteTxAudioStream(buffer: [UInt8], samples: Int) {
-    
-    if _radio.interlock.state == "TRANSMITTING" {
-    
-      // get an OpusTx Vita
-      if _vita == nil { _vita = Vita(type: .opusTx, streamId: id) }
-    
-      // create new array for payload (interleaved L/R samples)
-      _vita!.payloadData = buffer
-      
-      // set the length of the packet
-      _vita!.payloadSize = samples                                              // 8-Bit encoded samples
-      _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size    // payload size + header size
-      
-      // set the sequence number
-      _vita!.sequence = _txSeq
-
-      // encode the Vita class as data and send to radio
-      if let data = Vita.encodeAsData(_vita!) {
-        
-        // send packet to radio
-        _radio.sendVita(data)
-      }
-      // increment the sequence number (mod 16)
-      _txSeq = (_txSeq + 1) % 16
-    }
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
+  // MARK: - Instance  methods
   
   ///  Parse RemoteTxAudioStream key/value pairs
   ///
@@ -186,7 +169,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
         didChangeValue(for: \.ip)
      }
     }
-    // the Radio (hardware) has acknowledged this Opus
+    // the Radio (hardware) has acknowledged this Stream
     if _initialized == false && _clientHandle != 0 {
       
       // YES, the Radio (hardware) has acknowledged this Opus
@@ -196,35 +179,6 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       NC.post(.remoteRxAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
-}
-
-extension RemoteTxAudioStream {
-  
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
-  
-  @objc dynamic public var clientHandle: Handle {
-    get { return _clientHandle  }
-    set { if _clientHandle != newValue { _clientHandle = newValue} } }
-  
-  @objc dynamic public var compression: String {
-    get { return _compression  }
-    set { if _compression != newValue { _compression = newValue} } }
-  
-  @objc dynamic public var ip: String {
-    get { return _ip  }
-    set { if _ip != newValue { _ip = newValue} } }
-    
-  // ----------------------------------------------------------------------------
-  // Public properties
-
-  public var delegate: StreamHandler? {
-    get { return Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-  
-  // ----------------------------------------------------------------------------
-  // Instance methods that send Commands
-  
   /// Remove this RemoteTxAudioStream
   ///
   /// - Parameter callback:   ReplyHandler (optional)
@@ -241,16 +195,42 @@ extension RemoteTxAudioStream {
     // tell the Radio to remove the Stream
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
   }
-
-  // ----------------------------------------------------------------------------
-  // Tokens
   
-  /// Properties
+  // ------------------------------------------------------------------------------
+  // MARK: - Stream methods
+  
+  /// Send a RemoteTxAudioStream to the Radio (hardware)
   ///
-  internal enum Token : String {
-    case clientHandle         = "client_handle"
-    case compression
-    case ip
+  /// - Parameters:
+  ///   - buffer:             array of encoded audio samples
+  /// - Returns:              success / failure
+  ///
+  public func sendRemoteTxAudioStream(buffer: [UInt8], samples: Int) {
+    
+    if _radio.interlock.state == "TRANSMITTING" {
+    
+      // get an OpusTx Vita
+      if _vita == nil { _vita = Vita(type: .opusTx, streamId: id) }
+    
+      // create new array for payload (interleaved L/R samples)
+      _vita!.payloadData = buffer
+      
+      // set the length of the packet
+      _vita!.payloadSize = samples                                              // 8-Bit encoded samples
+      _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size    // payload size + header size
+      
+      // set the sequence number
+      _vita!.sequence = _txSeq
+
+      // encode the Vita class as data and send to radio
+      if let data = Vita.encodeAsData(_vita!) {
+        
+        // send packet to radio
+        _radio.sendVita(data)
+      }
+      // increment the sequence number (mod 16)
+      _txSeq = (_txSeq + 1) % 16
+    }
   }
 }
 
