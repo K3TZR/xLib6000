@@ -32,7 +32,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   static let kCmd                           = "radio "
   static let kSetCmd                        = "radio set "
   static let kMixerCmd                      = "mixer "
-//  static let kUptimeCmd                     = "radio uptime"
+  static let kUptimeCmd                     = "radio uptime"
 //  static let kLicenseCmd                    = "license "
   static let kXmitCmd                       = "xmit "
   
@@ -2054,7 +2054,7 @@ extension Radio {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func requestDisplayProfile(callback: ReplyHandler? = nil) {
-    sendCommand("profile display info" replyTo: callback)
+    sendCommand("profile display info", replyTo: callback)
   }
   /// Request a Global Profile
   /// - Parameters:
