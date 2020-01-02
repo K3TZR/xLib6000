@@ -39,7 +39,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public                let discoveryPacket         : DiscoveredRadio
+  public                let discoveryPacket         : DiscoveryStruct
   public private(set)   var uptime                  = 0
   @objc dynamic public  var serialNumber            : String { return discoveryPacket.serialNumber }
   @objc dynamic public  var version                 : String { return discoveryPacket.firmwareVersion }
@@ -508,7 +508,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   /// - Parameters:
   ///   - api:        an Api instance
   ///
-  public init(_ discoveryPacket: DiscoveredRadio, api: Api) {
+  public init(_ discoveryPacket: DiscoveryStruct, api: Api) {
     
     self.discoveryPacket = discoveryPacket
     _api = api

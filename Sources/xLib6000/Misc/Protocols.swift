@@ -139,18 +139,22 @@ protocol TcpManagerDelegate: class {
   /// - Parameter text:             text of the message
   ///
   func didSend(_ text: String)
-  
-  /// Process a change of Tcp state
+    
+  /// Process a Tcp connection
   ///
   /// - Parameters:
-  ///   - connected:                is Connected
   ///   - host:                     host Ip address
   ///   - port:                     host Port number
   ///   - error:                    error message (may be blank)
   ///
-//  func tcpState(connected: Bool, host: String, port: UInt16, error: String)
-  
-  func didConnect(host: String, port: UInt16, error: String)
+  func didConnect(host: String, port: UInt16)
+  /// Process a Tcp disconnection
+  ///
+  /// - Parameters:
+  ///   - host:                     host Ip address
+  ///   - port:                     host Port number
+  ///   - error:                    error message (may be blank)
+  ///
   func didDisconnect(host: String, port: UInt16, error: String)
 }
 
@@ -167,8 +171,22 @@ protocol UdpManagerDelegate                 : class {
   ///   - port:                     Port number
   ///   - error:                    error message (may be blank)
   ///
-  func udpState(bound: Bool, port: UInt16, error: String)
+//  func udpState(bound: Bool, port: UInt16, error: String)
+
+  /// Process a Udp bind
+  ///
+  /// - Parameters:
+  ///   - port:                     Port number
+  ///   - error:                    error message (may be blank)
+  ///
+  func didBind(port: UInt16)
   
+  /// Process a Udp unbind
+  ///
+  /// - Parameters:
+  ///
+  func didUnbind()
+
   /// Process a Udp Vita packet
   ///
   /// - Parameter vita:             a Vita packet
@@ -182,7 +200,7 @@ public protocol WanServerDelegate           : class {
   
   /// Received radio list from server
   ///
-  func wanRadioListReceived(wanRadioList: [DiscoveredRadio])
+  func wanRadioListReceived(wanRadioList: [DiscoveryStruct])
   
   /// Received user settings from server
   ///

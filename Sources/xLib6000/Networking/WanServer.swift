@@ -400,12 +400,12 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // separate list into its components
     let radioMessages = msg.components(separatedBy: "|")
     
-    var wanRadioList = [DiscoveredRadio]()
+    var wanRadioList = [DiscoveryStruct]()
     
     for message in radioMessages where message != "" {
       
       // create a minimal DiscoveredRadio with now as "lastSeen"
-      let radio = DiscoveredRadio()
+      var radio = DiscoveryStruct()
       
       var publicTlsPortToUse = -1
       var publicUdpPortToUse = -1

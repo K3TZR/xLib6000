@@ -303,13 +303,13 @@ public class Vita {
   ///
   /// - Returns:        a RadioParameters struct (or nil)
   ///
-  public class func parseDiscovery(_ vita: Vita) -> DiscoveredRadio? {
+  public class func parseDiscovery(_ vita: Vita) -> DiscoveryStruct? {
 
     // is this a Discovery packet?
     if vita.classIdPresent && vita.classCode == .discovery {
       
       // YES, create a minimal DiscoveredRadio with now as "lastSeen"
-      let discoveredRadio = DiscoveredRadio()
+      var discoveredRadio = DiscoveryStruct()
 
       // Payload is a series of strings of the form <key=value> separated by ' ' (space)
       var payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize, encoding: String.Encoding.ascii.rawValue)! as String

@@ -28,7 +28,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  @Barrier([DiscoveredRadio](), radiosQ) public var discoveredRadios
+  @Barrier([DiscoveryStruct](), radiosQ) public var discoveredRadios
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -227,7 +227,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   }
 }
 
-public class DiscoveredRadio : Equatable {
+public struct DiscoveryStruct : Equatable {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -296,7 +296,7 @@ public class DiscoveredRadio : Equatable {
   ///   - lhs:            the left value
   ///   - rhs:            the right value
   ///
-  public static func ==(lhs: DiscoveredRadio, rhs: DiscoveredRadio) -> Bool {
+  public static func ==(lhs: DiscoveryStruct, rhs: DiscoveryStruct) -> Bool {
     return lhs.serialNumber == rhs.serialNumber && lhs.model == rhs.model
   }
 }

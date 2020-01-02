@@ -88,56 +88,47 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   /// Bind to the UDP Port
   ///
   /// - Parameters:
-  ///   - radioParameters:    a RadioParameters struct
+  ///   - selectedRadio:      a DiscoveredRadio struct
   ///   - isWan:              Wan enabled
   ///   - clientHandle:       handle
   ///
-  func bind(radioParameters: DiscoveredRadio, isWan: Bool, clientHandle: Handle? = nil) -> Bool {
+  func bind(selectedRadio: DiscoveryStruct, isWan: Bool, clientHandle: Handle? = nil) -> Bool {
     
     var success               = false
-    var tmpPort               : UInt16 = 0
+    var portToUse             : UInt16 = 0
     var tries                 = kMaxBindAttempts
     
-    // is this a Wan connection?
-    if (isWan) {
+    // identify the port
+    switch (isWan, selectedRadio.requiresHolePunch) {
       
-      // YES, do we need a "hole punch"?
-      if (radioParameters.requiresHolePunch) {
-        
-        // YES,
-        tmpPort = UInt16(radioParameters.negotiatedHolePunchPort)
-        _udpSendPort = UInt16(radioParameters.negotiatedHolePunchPort)
-        
-        // if hole punch port is occupied fail imediately
-        tries = 1
-        
-      } else {
-        
-        // NO, start from the Vita Default port number
-        tmpPort = _udpRcvPort
-        _udpSendPort = UInt16(radioParameters.publicUdpPort)
-      }
-      
-    } else {
-      
-      // NO, start from the Vita Default port number
-      tmpPort = _udpRcvPort
+    case (true, true):        // isWan w/hole punch
+      portToUse = UInt16(selectedRadio.negotiatedHolePunchPort)
+      _udpSendPort = UInt16(selectedRadio.negotiatedHolePunchPort)
+      tries = 1  // isWan w/hole punch
+
+    case (true, false):       // isWan
+      portToUse = UInt16(selectedRadio.publicUdpPort)
+      _udpSendPort = UInt16(selectedRadio.publicUdpPort)
+
+    default:                  // local
+      portToUse = _udpRcvPort
     }
+
     // Find a UDP port to receive on, scan from the default Port Number up looking for an available port
     for _ in 0..<tries {
       
       do {
-        try _udpSocket.bind(toPort: tmpPort)
+        try _udpSocket.bind(toPort: portToUse)
         
         success = true
         
       } catch {
         
         // We didn't get the port we wanted
-        _log.msg("Unable to bind to UDP port \(tmpPort)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg("Unable to bind to UDP port \(portToUse)", level: .info, function: #function, file: #file, line: #line)
 
         // try the next Port Number
-        tmpPort += 1
+        portToUse += 1
       }
       if success { break }
     }
@@ -146,13 +137,13 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     if success {
       
       // YES, capture the number of the actual port in use
-      _udpRcvPort = tmpPort
+      _udpRcvPort = portToUse
       
       // save the ip address
-      _udpSendIP = radioParameters.publicIp
+      _udpSendIP = selectedRadio.publicIp
       
       // change the state
-      _delegate?.udpState(bound: success, port: _udpRcvPort, error: "")
+      _delegate?.didBind(port: _udpRcvPort)
       
       _udpBound = true
       
@@ -186,7 +177,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     _udpSocket.close()
     
     // notify the delegate
-    _delegate?.udpState(bound: false, port: 0, error: "")
+    _delegate?.didUnbind()
   }
   /// Register UDP client handle and start pinger
   ///

@@ -132,7 +132,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     - subscriptionCmdTypes: array of "subscription" commandtypes (defaults to .all)
   /// - Returns:                  Success / Failure
   ///
-  public func connect(_ discoveryPacket: DiscoveredRadio,
+  public func connect(_ discoveryPacket: DiscoveryStruct,
                       clientStation: String = "",
                       programName: String,
                       clientId: UUID? = nil,
@@ -285,21 +285,21 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     radio?.requestMicProfile()
     radio?.requestDisplayProfile()
 
-    send("sub tx all")
-    send("sub atu all")
-    send("sub amplifier all")
-    send("sub meter all")
-    send("sub pan all")
-    send("sub slice all")
-    send("sub gps all")
-    send("sub audio_stream all")
-    send("sub cwx all")
-    send("sub xvtr all")
-    send("sub memories all")
-    send("sub daxiq all")
-    send("sub dax all")
-    send("sub usb_cable all")
-    if _isTnfSubscribed { send("sub tnf all") }
+    send(Command.subTx.rawValue)
+    send(Command.subAtu.rawValue)
+    send(Command.subAmplifier.rawValue)
+    send(Command.subMeter.rawValue)
+    send(Command.subPan.rawValue)
+    send(Command.subSlice.rawValue)
+    send(Command.subGps.rawValue)
+    send(Command.subAudioStream.rawValue)
+    send(Command.subCwx.rawValue)
+    send(Command.subXvtr.rawValue)
+    send(Command.subMemories.rawValue)
+    send(Command.subDaxIq.rawValue)
+    send(Command.subDax.rawValue)
+    send(Command.subUsbCable.rawValue)
+    if _isTnfSubscribed { send(Command.subTnf.rawValue) }
     
     //      send("sub spot all")    // TODO:
     
@@ -312,7 +312,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
   /// A Client has been connected
   ///
-  func clientConnected(_ discoveryPacket: DiscoveredRadio) {
+  func clientConnected(_ discoveryPacket: DiscoveryStruct) {
     
     // code to be executed after an IP Address has been obtained
     func connectionCompletion() {
@@ -323,7 +323,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // set the streaming UDP port
       if isWan {
         // Wan, establish a UDP port for the Data Streams
-        let _ = _udp.bind(radioParameters: discoveryPacket, isWan: true, clientHandle: connectionHandle)
+        let _ = _udp.bind(selectedRadio: discoveryPacket, isWan: true, clientHandle: connectionHandle)
         
       } else {
         // Local
@@ -381,7 +381,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameters:
   ///   - selectedRadio:      a RadioParameters struct
   ///
-  private func checkFirmware(_ selectedRadio: DiscoveredRadio) {
+  private func checkFirmware(_ selectedRadio: DiscoveryStruct) {
     
     // create the Version structs
     radioVersion = Version(selectedRadio.firmwareVersion)
@@ -545,7 +545,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     testerDelegate?.sentMessage( String(msg.dropLast()) )
   }
   
-  func didConnect(host: String, port: UInt16, error: String) {
+  func didConnect(host: String, port: UInt16) {
 
     // YES, set state
     apiState = .tcpConnected
@@ -570,7 +570,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     } else {
       
       // bind a UDP port for the Streams
-      guard _udp.bind(radioParameters: radio!.discoveryPacket, isWan: isWan) else {
+      guard _udp.bind(selectedRadio: radio!.discoveryPacket, isWan: isWan) else {
         
         // Bind failed, disconnect
         _tcp.disconnect()
@@ -698,6 +698,40 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - UdpManager delegate methods
   
+  /// Respond to a UDP bind event
+  ///
+  ///   UdpManager delegate method, arrives on the udpReceiveQ
+  ///
+  /// - Parameters:
+  ///   - port:   a port number
+  ///
+  func didBind(port: UInt16) {
+    
+    _log.msg("UDP bound to Port: \(port)", level: .debug, function: #function, file: #file, line: #line)
+
+    apiState = .udpBound
+    
+    localUDPPort = port
+    
+    // a UDP port has been bound, inform observers
+    NC.post(.udpDidBind, object: nil)
+    
+    // a UDP bind has been established
+    _udp.beginReceiving()
+    
+    // if WAN connection reset the state to .clientConnected as the true connection state
+    if isWan { apiState = .clientConnected }
+  }
+  /// Respond to a UDP unbind event
+  ///
+  ///   UdpManager delegate method, arrives on the udpReceiveQ
+  ///
+  /// - Parameters:
+  ///
+  func didUnbind() {
+    // TODO:
+  }
+
   /// Respond to a UDP Connection/Disconnection event
   ///
   ///   UdpManager delegate method, arrives on the udpReceiveQ
@@ -707,35 +741,35 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///   - port:   a port number
   ///   - error:  error message
   ///
-  func udpState(bound : Bool, port: UInt16, error: String) {
-    
-    // bound?
-    if bound {
-      
-      // YES, UDP (streams) connection established
-      
-      _log.msg("UDP bound to Port: \(port)", level: .debug, function: #function, file: #file, line: #line)
-
-      apiState = .udpBound
-      
-      localUDPPort = port
-      
-      // a UDP port has been bound, inform observers
-      NC.post(.udpDidBind, object: nil)
-      
-      // a UDP bind has been established
-      _udp.beginReceiving()
-      
-      // if WAN connection reset the state to .clientConnected as the true connection state
-      if isWan {
-        
-        apiState = .clientConnected
-      }
-    } else {
-    
-    // TODO: should there be a udpUnbound state ?
-    }
-  }
+//  func udpState(bound : Bool, port: UInt16, error: String) {
+//
+//    // bound?
+//    if bound {
+//
+//      // YES, UDP (streams) connection established
+//
+//      _log.msg("UDP bound to Port: \(port)", level: .debug, function: #function, file: #file, line: #line)
+//
+//      apiState = .udpBound
+//
+//      localUDPPort = port
+//
+//      // a UDP port has been bound, inform observers
+//      NC.post(.udpDidBind, object: nil)
+//
+//      // a UDP bind has been established
+//      _udp.beginReceiving()
+//
+//      // if WAN connection reset the state to .clientConnected as the true connection state
+//      if isWan {
+//
+//        apiState = .clientConnected
+//      }
+//    } else {
+//
+//    // TODO: should there be a udpUnbound state ?
+//    }
+//  }
   /// Receive a UDP Stream packet
   ///
   ///   UdpManager delegate method, arrives on the udpReceiveQ

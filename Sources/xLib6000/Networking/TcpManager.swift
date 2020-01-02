@@ -75,7 +75,7 @@ final class TcpManager                       : NSObject, GCDAsyncSocketDelegate 
   ///   - isWan:                  enable WAN connection
   /// - Returns:                  success / failure
   ///
-  func connect(_ selectedRadio: DiscoveredRadio, isWan: Bool) -> Bool {
+  func connect(_ selectedRadio: DiscoveryStruct, isWan: Bool) -> Bool {
     var portToUse = 0
     var localInterface: String?
     var success = true
@@ -196,7 +196,7 @@ final class TcpManager                       : NSObject, GCDAsyncSocketDelegate 
 
     } else {
       // NO, we're connected
-      _delegate?.didConnect(host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
+      _delegate?.didConnect(host: sock.connectedHost ?? "", port: sock.connectedPort)
     }
   }
   /// Called when data has been read from the TCP/IP connection
@@ -232,7 +232,7 @@ final class TcpManager                       : NSObject, GCDAsyncSocketDelegate 
     guard _isWan else { return }
     
     // now we're connected
-    _delegate?.didConnect(host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
+    _delegate?.didConnect(host: sock.connectedHost ?? "", port: sock.connectedPort)
   }
   /**
    * Allows a socket delegate to hook into the TLS handshake and manually validate the peer it's connecting to.
