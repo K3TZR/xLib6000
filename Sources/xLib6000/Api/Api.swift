@@ -82,15 +82,16 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private let _parseQ                       = DispatchQueue(label: Api.kName + ".parseQ", qos: .userInteractive)
   private let _workerQ                      = DispatchQueue(label: Api.kName + ".workerQ")
 
-  private var _pinger                       : Pinger?                       // Pinger class
-  private var _clientId                     : UUID?                         // Unique Id (V3 only)
-  private var _clientProgram                = ""                            // Client program
-  private var _clientStation                = ""                            // Station name (V3 only)
-  private var _isGui                        = true                          // GUI enable
-  private var _lowBW                        = false                         // low bandwidth connect
+  private var _pinger                       : Pinger?
+  private var _clientId                     : UUID?
+  private var _programName                  = ""
+  private var _clientStation                = ""
+  private var _isGui                        = true
+  private var _lowBandwidthConnect          = false
 
   private let _log                          = Log.sharedInstance
-
+  private let _isTnfSubscribed              = true // TODO:
+  
   // ----------------------------------------------------------------------------
   // MARK: - Singleton
   
@@ -133,7 +134,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   public func connect(_ discoveryPacket: DiscoveredRadio,
                       clientStation: String = "",
-                      clientProgram: String,
+                      programName: String,
                       clientId: UUID? = nil,
                       isGui: Bool = true,
                       isWan: Bool = false,
@@ -159,13 +160,13 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // check the versions
       checkFirmware(discoveryPacket)
       
-      _clientProgram = clientProgram
+      _programName = programName
       _clientId = clientId
       _clientStation = clientStation
       _isGui = isGui
       self.isWan = isWan
       wanConnectionHandle = wanHandle
-    
+            
     } else {
       radio = nil
     }
@@ -255,18 +256,55 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public func sendCommands() {
     
     // setup commands
-    _primaryCommands = setupCommands(_primaryCmdTypes)
-    _subscriptionCommands = setupCommands(_subscriptionCmdTypes)
-    _secondaryCommands = setupCommands(_secondaryCmdTypes)
+//    _primaryCommands = setupCommands(_primaryCmdTypes)
+//    _subscriptionCommands = setupCommands(_subscriptionCmdTypes)
+//    _secondaryCommands = setupCommands(_secondaryCmdTypes)
+//
+//    // send the initial commands
+//    sendCommandList(_primaryCommands)
+//
+//    // send the subscription commands
+//    sendCommandList(_subscriptionCommands)
+//
+//    // send the secondary commands
+//    sendCommandList(_secondaryCommands)
+
+    // clientIp
+    if _isGui { send("client gui") }
+    send("client program " + _programName)
+    // clientStation //v3
+    // clientBind    // v3
+    if _lowBandwidthConnect { send("client low_bw_connect") }
     
-    // send the initial commands
-    sendCommandList(_primaryCommands)
+    radio?.requestInfo()
+    radio?.requestVersion()
+    radio?.requestAntennaList()
+    radio?.requestMicList()
+    radio?.requestGlobalProfile()
+    radio?.requestTxProfile()
+    radio?.requestMicProfile()
+    radio?.requestDisplayProfile()
+
+    send("sub tx all")
+    send("sub atu all")
+    send("sub amplifier all")
+    send("sub meter all")
+    send("sub pan all")
+    send("sub slice all")
+    send("sub gps all")
+    send("sub audio_stream all")
+    send("sub cwx all")
+    send("sub xvtr all")
+    send("sub memories all")
+    send("sub daxiq all")
+    send("sub dax all")
+    send("sub usb_cable all")
+    if _isTnfSubscribed { send("sub tnf all") }
     
-    // send the subscription commands
-    sendCommandList(_subscriptionCommands)
+    //      send("sub spot all")    // TODO:
     
-    // send the secondary commands
-    sendCommandList(_secondaryCommands)
+    send("client set enforce_network_mtu=1 network_mtu=1500")
+    send("client set send_reduced_bw_dax=1")
   }
   
   // ----------------------------------------------------------------------------
@@ -338,7 +376,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
     
-  /// Determine if the Radio (hardware) Firmware version is compatable with the API version
+  /// Determine if the Radio Firmware version is compatable with the API version
   ///
   /// - Parameters:
   ///   - selectedRadio:      a RadioParameters struct
@@ -411,7 +449,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         case .setMtu where radioVersion.major == 2 && radioVersion.minor >= 3:  array.append( (command.rawValue, false, nil) )
         case .setMtu:                                 break
 
-        case .clientProgram:                          if _isGui { array.append( (command.rawValue + _clientProgram, false, nil) ) }
+        case .clientProgram:                          if _isGui { array.append( (command.rawValue + _programName, false, nil) ) }
 
         case .clientStation where Api.kVersion.isV3:  if _isGui { array.append( (command.rawValue + _clientStation, false, nil) ) }
         case .clientStation:                          break
@@ -479,12 +517,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   /// - Parameter msg:        text of the message
   ///
-  func receivedMessage(_ msg: String) {
+  func didReceive(_ msg: String) {
     
     // is it a non-empty message?
     if msg.count > 1 {
       
-      // YES, pass it to the parser (async on the parseQ)
+      // YES, pass it to any delegates (async on the parseQ)
       _parseQ.async { [ unowned self ] in
         
         self.delegate?.receivedMessage( String(msg.dropLast()) )
@@ -496,15 +534,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   }
   /// Process a sent message
   ///
-  ///   TcpManagerDelegate method, arrives on the tcpReceiveQ
+  ///   TcpManagerDelegate method
   ///
   /// - Parameter msg:         text of the message
   ///
-  func sentMessage(_ msg: String) {
+  func didSend(_ msg: String) {
     
+    // pass it to any delegates
     delegate?.sentMessage( String(msg.dropLast()) )
-    
-    // pass it to xAPITester (if present)
     testerDelegate?.sentMessage( String(msg.dropLast()) )
   }
   
@@ -524,13 +561,15 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     _tcp.readNext()
     
     if isWan {
-      let cmd = "wan validate handle=" + wanConnectionHandle // TODO: + "\n"
-      send(cmd, replyTo: nil)
       
-      _log.msg("Wan validate handle: \(wanConnectionHandle)", level: .info, function: #function, file: #file, line: #line)
+      // ask the Radio to validate
+      send("wan validate handle=" + wanConnectionHandle, replyTo: nil)
+      
+      _log.msg("Wan validate handle: \(wanConnectionHandle)", level: .debug, function: #function, file: #file, line: #line)
 
     } else {
-      // insure that a UDP port was bound (for the Data Streams)
+      
+      // bind a UDP port for the Streams
       guard _udp.bind(radioParameters: radio!.discoveryPacket, isWan: isWan) else {
         
         // Bind failed, disconnect
@@ -575,14 +614,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     apiState = .disconnected
   }
-  func didSecure(host: String, port: UInt16, error: String) {
-    
-    // FIXME: ????
-    Swift.print("didSecure")
-  }
-
-  
-  
   /// Respond to a TCP Connection/Disconnection event
   ///
   ///   TcpManagerDelegate method, arrives on the tcpReceiveQ

@@ -17,7 +17,7 @@ public typealias ReplyTuple = (replyTo: ReplyHandler?, command: String)
 ///
 ///      manages all TCP communication between the API and the Radio (hardware)
 ///
-final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
+final class TcpManager                       : NSObject, GCDAsyncSocketDelegate {
 
   public private(set) var interfaceIpAddress = "0.0.0.0"
 
@@ -80,55 +80,37 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
     var localInterface: String?
     var success = true
     
-    // Local or Remote connection?
-    if isWan {
+    // identify the port
+    switch (isWan, selectedRadio.requiresHolePunch) {
       
-      // Remote (WAN)
-      if selectedRadio.requiresHolePunch {
-        // If we require hole punching then the radio port and the source port will both be the same
-       
+    case (true, true):  portToUse = selectedRadio.negotiatedHolePunchPort   // isWan w/hole punch
+    case (true, false): portToUse = selectedRadio.publicTlsPort             // isWan
+    default:            portToUse = selectedRadio.port                      // local
+    }
+    // attempt a connection
+    do {
+      if isWan && selectedRadio.requiresHolePunch {
+
         // insure that the localInterfaceIp has been specified
         guard selectedRadio.localInterfaceIP != "0.0.0.0" else { return false }
-
-        // use the holePunchPort
-        portToUse = selectedRadio.negotiatedHolePunchPort
         // create the localInterfaceIp value
         localInterface = selectedRadio.localInterfaceIP + ":" + String(portToUse)
         
-      } else {
-        // use the TLS port
-        portToUse = selectedRadio.publicTlsPort
-      }
-    
-    } else {
-      
-      // Local (LAN), use the Radio's port
-      portToUse = selectedRadio.port
-    }
-    
-    do {
-      // attempt to connect to the Radio (with timeout)
-
-      // was a localInterface specified?
-      if let localInterface = localInterface {
-        
-        // YES, attempt to connect to the Radio (with timeout) via the localInterface
+        // connect via the localInterface
         try _tcpSocket.connect(toHost: selectedRadio.publicIp, onPort: UInt16(portToUse), viaInterface: localInterface, withTimeout: _timeout)
-      
+        
       } else {
-        // NO, attempt to connect to the Radio (with timeout) on the default interface
+        
+        // connect on the default interface
         try _tcpSocket.connect(toHost: selectedRadio.publicIp, onPort: UInt16(portToUse), withTimeout: _timeout)
       }
-      
+
     } catch _ {
       // connection attemp failed
       success = false
     }
     
-    if success {
-      _isWan = isWan
-      _seqNum = 0
-    }
+    if success { _isWan = isWan ; _seqNum = 0 }
     
     return success
   }
@@ -163,7 +145,7 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
       // increment the Sequence Number
       _seqNum += 1
     }
-    self._delegate?.sentMessage(command)
+    self._delegate?.didSend(command)
     
     // return the Sequence Number of the last command
     return lastSeqNum
@@ -173,6 +155,9 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   func readNext() {
     
     _tcpSocket.readData(to: GCDAsyncSocket.lfData(), withTimeout: -1, tag: 0)
+  }
+  func secureTheConnection() {
+    
   }
   
   // ----------------------------------------------------------------------------
@@ -186,9 +171,6 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   ///   - err:        the error
   ///
   @objc func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
-    
-    // set the state
-//    _delegate?.tcpState(connected: false, host: sock.connectedHost ?? "", port: sock.connectedPort, error: (err == nil) ? "" : err!.localizedDescription)
     
     _delegate?.didDisconnect(host: sock.connectedHost ?? "", port: sock.connectedPort, error: (err == nil) ? "" : err!.localizedDescription)
   }
@@ -207,16 +189,13 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
     // is this a Wan connection?
     if _isWan {
       
-      // YES, start radio TLS connection
-      var tlsSettings = [String : NSObject]()
-      tlsSettings[GCDAsyncSocketManuallyEvaluateTrust as String] = 1 as NSObject
-
-      sock.startTLS(tlsSettings)
+      // TODO: Is this needed? Could we call with no param and skip the didReceiveTrust?
+      
+      // YES, secure the connection using TLS
+      sock.startTLS( [GCDAsyncSocketManuallyEvaluateTrust : 1 as NSObject] )
 
     } else {
-      
-      // NO, set the state
-//      _delegate?.tcpState(connected: true, host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
+      // NO, we're connected
       _delegate?.didConnect(host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
     }
   }
@@ -229,12 +208,10 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   ///
   @objc func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
     
-    // get the bytes that were read
-    let text = String(data: data, encoding: .ascii)!
-    
-    // pass them to our delegate
-    _delegate?.receivedMessage(text)
-    
+    // pass the bytes read to the delegate
+    if let text = String(data: data, encoding: .ascii) {
+      _delegate?.didReceive(text)
+    }
     // trigger the next read
     readNext()
   }
@@ -253,10 +230,9 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
     
     // should not happen but...
     guard _isWan else { return }
-
-    // set the state
-//    _delegate?.tcpState(connected: true, host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
-    _delegate?.didSecure(host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
+    
+    // now we're connected
+    _delegate?.didConnect(host: sock.connectedHost ?? "", port: sock.connectedPort, error: "")
   }
   /**
    * Allows a socket delegate to hook into the TLS handshake and manually validate the peer it's connecting to.

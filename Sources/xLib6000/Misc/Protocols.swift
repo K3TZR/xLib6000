@@ -128,17 +128,17 @@ protocol TcpManagerDelegate: class {
   
   // if any of theses are not needed, implement a stub in the delegate that does nothing
   
-  /// Process a Tcp message from the Radio
+  /// A Tcp message was received the Radio
   ///
   /// - Parameter text:             text of the message
   ///
-  func receivedMessage(_ text: String)
+  func didReceive(_ text: String)
   
-  /// Process a Tcp message sent to the Radio
+  /// A Tcp message was sent to the Radio
   ///
   /// - Parameter text:             text of the message
   ///
-  func sentMessage(_ text: String)
+  func didSend(_ text: String)
   
   /// Process a change of Tcp state
   ///
@@ -152,7 +152,6 @@ protocol TcpManagerDelegate: class {
   
   func didConnect(host: String, port: UInt16, error: String)
   func didDisconnect(host: String, port: UInt16, error: String)
-  func didSecure(host: String, port: UInt16, error: String)
 }
 
 /// Delegate protocol for the UdpManager class

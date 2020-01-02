@@ -32,8 +32,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   static let kCmd                           = "radio "
   static let kSetCmd                        = "radio set "
   static let kMixerCmd                      = "mixer "
-  static let kUptimeCmd                     = "radio uptime"
-  static let kLicenseCmd                    = "license "
+//  static let kUptimeCmd                     = "radio uptime"
+//  static let kLicenseCmd                    = "license "
   static let kXmitCmd                       = "xmit "
   
   // ----------------------------------------------------------------------------
@@ -1731,15 +1731,6 @@ extension Radio {
     // tell the Radio to create a Stream
     sendCommand("stream create type=dax_mic", replyTo: callback)
   }
-  /// Request a List of Mic sources
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  ///
-  public func requestMicList(callback: ReplyHandler? = nil) {
-    
-    // ask the Radio for a list of Mic Sources
-    sendCommand("mic list", replyTo: callback == nil ? defaultReplyHandler : callback)
-  }
   
   // ----------------------------------------------------------------------------
   // MARK: - DaxRxAudioStream methods
@@ -1907,15 +1898,6 @@ extension Radio {
     // tell the Radio to create a Stream
     sendCommand("stream create daxmic", replyTo: callback)
   }
-  /// Request a List of Mic sources
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  ///
-  public func requestMicSources(callback: ReplyHandler? = nil) {
-    
-    // ask the Radio for a list of Mic Sources
-    sendCommand(Api.Command.micList.rawValue, replyTo: callback == nil ? defaultReplyHandler : callback)
-  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Opus methods
@@ -1937,88 +1919,6 @@ extension Radio {
   // ----------------------------------------------------------------------------
   // MARK: - Panadapter methods
   
-  /// Request a list of antenns
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  ///
-  public func requestAntennaList(callback: ReplyHandler? = nil) {
-    
-    // ask the Radio to send a list of antennas
-    sendCommand(Api.Command.antList.rawValue, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
-  }
-  /// Identify a low Bandwidth connection
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  ///
-  public func clientLowBandwidthConnect(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to limit the connection bandwidth
-    sendCommand(Api.Command.clientProgram.rawValue + "low_bw_connect", replyTo: callback)
-  }
-  /// Turn off persistence
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  ///
-  public func clientPersistenceOff(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to turn off persistence
-    sendCommand(Api.Command.clientProgram.rawValue + "start_persistence off", replyTo: callback)
-  }
-  /// Key CW
-  ///
-  /// - Parameters:
-  ///   - state:              Key Up = 0, Key Down = 1
-  ///   - callback:           ReplyHandler (optional)
-  ///
-  public func requestCwKeyImmediate(state: Bool, callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to change the keydown state
-    sendCommand(Transmit.kCwCmd + "key immediate" + " \(state.as1or0)", replyTo: callback)
-  }
-  
-  /// Refresh the Radio License
-  ///
-  /// - Parameters:
-  ///   - callback:           ReplyHandler (optional)
-  ///
-  public func refreshLicense(callback: ReplyHandler? = nil) {
-    
-    // ask the Radio for its license info
-    return sendCommand(Radio.kLicenseCmd + "refresh", replyTo: callback)
-  }
-  /// Set Static Network properties on the Radio
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  ///
-  public func staticNetParamsSet(callback: ReplyHandler? = nil) {
-    
-    sendCommand(Radio.kCmd + "static_net_params" + " " + RadioStaticNet.ip.rawValue + "=\(staticIp) " + RadioStaticNet.gateway.rawValue + "=\(staticGateway) " + RadioStaticNet.netmask.rawValue + "=\(staticNetmask)")
-  }
-  /// Reset the Static Net Params
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  ///
-  public func staticNetParamsReset(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to reset the Static Net Params
-    sendCommand(Radio.kCmd + "static_net_params" + " reset", replyTo: callback)
-  }
-  /// Reboot the Radio
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  ///
-  public func requestReboot(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to reboot
-    sendCommand(Radio.kCmd + "reboot", replyTo: callback)
-  }
-  /// Request the elapsed uptime
-  ///
-  public func requestUptime(callback: ReplyHandler? = nil) {
-    
-    // ask the Radio for the elapsed uptime
-    sendCommand(Radio.kUptimeCmd, replyTo: callback == nil ? defaultReplyHandler : callback)
-  }
   /// Create a Panafall
   ///
   /// - Parameters:
@@ -2080,6 +1980,146 @@ extension Radio {
     return selectedPanadapters[0]
   }
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Radio methods
+  
+  /// Request a List of Antenna sources
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func requestAntennaList(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for a list of Mic Sources
+    sendCommand("ant list", replyTo: callback == nil ? defaultReplyHandler : callback)
+  }
+  /// Key CW
+  ///
+  /// - Parameters:
+  ///   - state:              Key Up = 0, Key Down = 1
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func requestCwKeyImmediate(state: Bool, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to change the keydown state
+    sendCommand("cw key immediate" + " \(state.as1or0)", replyTo: callback)
+  }
+  /// Request Radio information
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func requestInfo(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for a list of Mic Sources
+    sendCommand("info", replyTo: callback == nil ? defaultReplyHandler : callback)
+  }
+  /// Refresh the Radio License
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func requestLicense(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for its license info
+    return sendCommand("license refresh", replyTo: callback)
+  }
+  /// Identify a low Bandwidth connection
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func requestLowBandwidthConnect(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to limit the connection bandwidth
+    sendCommand("client low_bw_connect", replyTo: callback)
+  }
+  /// Request a List of Mic sources
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func requestMicList(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for a list of Mic Sources
+    sendCommand("mic list", replyTo: callback == nil ? defaultReplyHandler : callback)
+  }
+  /// Turn off persistence
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func requestPersistenceOff(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to turn off persistence
+    sendCommand("client program start_persistence off", replyTo: callback)
+  }
+  /// Request a Display Profile
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func requestDisplayProfile(callback: ReplyHandler? = nil) {
+    sendCommand("profile display info" replyTo: callback)
+  }
+  /// Request a Global Profile
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func requestGlobalProfile(callback: ReplyHandler? = nil) {
+    sendCommand("profile global info", replyTo: callback)
+  }
+  /// Request a Mic Profile
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func requestMicProfile(callback: ReplyHandler? = nil) {
+    sendCommand("profile mic info", replyTo: callback)
+  }
+  /// Request a Tx Profile
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func requestTxProfile(callback: ReplyHandler? = nil) {
+    sendCommand("profile tx info", replyTo: callback)
+  }
+  /// Reboot the Radio
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func requestReboot(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to reboot
+    sendCommand("radio reboot", replyTo: callback)
+  }
+  /// Request the elapsed uptime
+  ///
+  public func requestUptime(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for the elapsed uptime
+    sendCommand("radio uptime", replyTo: callback == nil ? defaultReplyHandler : callback)
+  }
+  /// Request Version information
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func requestVersion(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for a list of Mic Sources
+    sendCommand("version", replyTo: callback == nil ? defaultReplyHandler : callback)
+  }
+  /// Reset the Static Net Params
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func staticNetParamsReset(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to reset the Static Net Params
+    sendCommand("radio static_net_params" + " reset", replyTo: callback)
+  }
+  /// Set Static Network properties on the Radio
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func staticNetParamsSet(callback: ReplyHandler? = nil) {
+    
+    sendCommand("radio static_net_params" + " " + RadioStaticNet.ip.rawValue + "=\(staticIp) " + RadioStaticNet.gateway.rawValue + "=\(staticGateway) " + RadioStaticNet.netmask.rawValue + "=\(staticNetmask)")
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Slice methods
   
