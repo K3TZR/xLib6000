@@ -212,7 +212,7 @@ public final class Interlock                : NSObject, StaticModel {
       case .source:           update(self, &_source,            to: property.value,         signal: \.source)
       case .state:            update(self, &_state,             to: property.value,         signal: \.state)
         // determine if a Mox change is needed
-        _radio.stateChange(_state)
+        _radio.interlockStateChange(_state)
 
       case .timeout:          update(self, &_timeout,           to: property.value.iValue,  signal: \.timeout)
       case .txAllowed:        update(self, &_txAllowed,         to: property.value.bValue,  signal: \.txAllowed)
