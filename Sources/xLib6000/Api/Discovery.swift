@@ -28,7 +28,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  @Barrier([DiscoveryStruct](), Api.objectQ) public var discoveredRadios
+  public var discoveredRadios = [DiscoveryStruct]()
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -108,7 +108,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
               
             } else {
               // NO, update the timestamp
-              Api.objectQ.sync(flags: .barrier) { self.discoveredRadios[i].lastSeen = Date() }
+              Api.objectQ.async(flags: .barrier) { self.discoveredRadios[i].lastSeen = Date() }
             }
           }
           // are there any deletions?
@@ -117,8 +117,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
             // YES, remove the Radio(s)
             for index in deleteList.reversed() {
               // remove a Radio
-              
-              Api.objectQ.sync(flags: .barrier) { self.discoveredRadios.remove(at: index) }
+              Api.objectQ.async(flags: .barrier) { self.discoveredRadios.remove(at: index) }
             }
             // send the list of radios to all observers
             NC.post(.discoveredRadios, object: self.discoveredRadios as Any?)
