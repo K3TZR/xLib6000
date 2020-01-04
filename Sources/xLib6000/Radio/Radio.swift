@@ -747,7 +747,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
-  /// Parse a Message. format: <messageNumber>|<messageText>
+  /// Parse a Message.
+  ///   format: <messageNumber>|<messageText>
   ///
   ///   executed on the parseQ
   ///
@@ -771,7 +772,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // FIXME: Take action on some/all errors?
   }
-  /// Parse a Reply. format: <sequenceNumber>|<hexResponse>|<message>[|<debugOutput>]
+  /// Parse a Reply
+  ///   format: <sequenceNumber>|<hexResponse>|<message>[|<debugOutput>]
   ///
   ///   executed on the parseQ
   ///
@@ -816,7 +818,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     }
   }
-  /// Parse a Status. format: <apiHandle>|<message>, where <message> is of the form: <msgType> <otherMessageComponents>
+  /// Parse a Status
+  ///   format: <apiHandle>|<message>, where <message> is of the form: <msgType> <otherMessageComponents>
   ///
   ///   executed on the parseQ
   ///
@@ -847,165 +850,39 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       _log("Unknown Status token: \(msgType)", .warning, #function, #file, #line)
       return
     }
-    
-    
-    // FIXME: ***** file, mixer & turf Not currently implemented *****
-    
-    
     // Known Message Types, in alphabetical order
     switch token {
       
-    case .amplifier:
-      // FIXME: Need format(s)
-      Amplifier.parseStatus(remainder.keyValuesArray(), radio: self, inUse: !remainder.contains(Api.kRemoved))
-      
-    case .audioStream where Api.kVersion.isV3:
-      _log("Invalid Status token: \(msgType) for Version \(Api.kVersion.shortString)", .warning, #function, #file, #line)
-      
-    case .audioStream:
-      //      format: <AudioStreamId> <key=value> <key=value> ...<key=value>
-      AudioStream.parseStatus(remainder.keyValuesArray(), radio: self)
-      
-    case .atu:
-      //      format: <key=value> <key=value> ...<key=value>
-      atu.parseProperties( remainder.keyValuesArray() )
-      
-    case .client:
-      // formats are different in V3 API
-      let keyValues = remainder.keyValuesArray()
-      if Api.kVersion.isV3 {
-        //      kv                0         1            2
-        //      format: client <handle> connected <client_id=ID> <program=Program> <station=Station> <local_ptt=0/1>
-        //      format: client <handle> disconnected <forced=0/1>
-        //        GuiClient.parseStatus(keyValues, radio: self, queue: _q, log: Log.sharedInstance)
-        
-      } else {
-        //      kv                0         1            2
-        //      format: client <handle> connected
-        //      format: client <handle> disconnected <forced=1/0>
-        parseClient(keyValues, radio: self)
-      }
-      
-    case .cwx:
-      // replace some characters to avoid parsing conflicts
-      cwx.parseProperties( remainder.fix().keyValuesArray() )
-      
-    case .daxiq:
-      //      format: <daxChannel> <key=value> <key=value> ...<key=value>
-      //            parseDaxiq( remainder.keyValuesArray())
-      
-      break // obsolete token, included to prevent log messages
-      
-    case .display:
-      //     format: <displayType> <streamId> <key=value> <key=value> ...<key=value>
-      let keyValues = remainder.keyValuesArray()
-      
-      // what Display Type is it?
-      switch keyValues[0].key {
-      case DisplayToken.panadapter.rawValue:
-        Panadapter.parseStatus(keyValues, radio: self, inUse: !remainder.contains(Api.kRemoved))
-        
-      case DisplayToken.waterfall.rawValue:
-        Waterfall.parseStatus(keyValues, radio: self, inUse: !remainder.contains(Api.kRemoved))
-        
-      default:
-        // unknown Display Type, log it and ignore the message
-        _log("Unknown Display type: \(keyValues[0].key)", .warning, #function, #file, #line)
-      }
-      
-    case .eq:
-      //      format: txsc <key=value> <key=value> ...<key=value>
-      //      format: rxsc <key=value> <key=value> ...<key=value>
-      Equalizer.parseStatus( remainder.keyValuesArray(), radio: self)
-      
-    case .file:
-      _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
-      
-    case .gps:
-      //     format: <key=value>#<key=value>#...<key=value>
-      gps.parseProperties( remainder.keyValuesArray(delimiter: "#") )
-      
-    case .interlock:
-      //      format: <key=value> <key=value> ...<key=value>
-      interlock.parseProperties( remainder.keyValuesArray())
-      
-    case .memory:
-      //      format: <memoryId> <key=value>,<key=value>,...<key=value>
-      Memory.parseStatus( remainder.keyValuesArray(), radio: self, inUse: !remainder.contains(Api.kRemoved))
-      
-    case .meter:
-      //     format: <meterNumber.key=value>#<meterNumber.key=value>#...<meterNumber.key=value>
-      Meter.parseStatus( remainder.keyValuesArray(delimiter: "#"), radio: self, inUse: !remainder.contains(Api.kRemoved))
-      
-    case .micAudioStream where Api.kVersion.isV3:
-      _log("Invalid Status token: \(msgType) for Version \(Api.kVersion.shortString)", .warning, #function, #file, #line)
-      
-    case .micAudioStream:
-      //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
-      MicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self)
-      
-    case .mixer:
-      _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
-      
-    case .opusStream:
-      //     format: <opusId> <key=value> <key=value> ...<key=value>
-      Opus.parseStatus( remainder.keyValuesArray(), radio: self)
-      
-    case .profile:
-      //     format: global list=<value>^<value>^...<value>^
-      //     format: global current=<value>
-      //     format: tx list=<value>^<value>^...<value>^
-      //     format: tx current=<value>
-      //     format: mic list=<value>^<value>^...<value>^
-      //     format: mic current=<value>
-      Profile.parseStatus( remainder.keyValuesArray(delimiter: "="), radio: self)
-      
-    case .radio:
-      //     format: <key=value> <key=value> ...<key=value>
-      parseProperties( remainder.keyValuesArray())
-      
-    case .slice:
-      //     format: <sliceId> <key=value> <key=value> ...<key=value>
-      xLib6000.Slice.parseStatus( remainder.keyValuesArray(), radio: self, inUse: !remainder.contains(Api.kNotInUse))
-      
-    case .stream:
-      //     format: <streamId> <key=value> <key=value> ...<key=value>
-      IqStream.parseStatus( remainder.keyValuesArray(), radio: self, inUse: !remainder.contains(Api.kNotInUse))
-      
-    case .tnf:
-      //     format: <tnfId> <key=value> <key=value> ...<key=value>
-      Tnf.parseStatus( remainder.keyValuesArray(), radio: self, inUse: !remainder.contains(Api.kRemoved))
-      
-    case .transmit:
-      //      format: <key=value> <key=value> ...<key=value>
-      transmit.parseProperties( remainder.keyValuesArray())
-      
-    case .turf:
-      _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
-      
-    case .txAudioStream where Api.kVersion.isV3:
-      _log("Invalid Status token: \(msgType) for Version \(Api.kVersion.shortString)", .warning, #function, #file, #line)
-      
-    case .txAudioStream:
-      //      format: <TxAudioStreamId> <key=value> <key=value> ...<key=value>
-      TxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self)
-      
-    case .usbCable:
-      //      format:
-      UsbCable.parseStatus( remainder.keyValuesArray(), radio: self)
-      
-    case .wan:
-      wan.parseProperties( remainder.keyValuesArray() )
-      
-    case .waveform:
-      //      format: <key=value> <key=value> ...<key=value>
-      waveform.parseProperties( remainder.keyValuesArray())
-      
-    case .xvtr:
-      //      format: <name> <key=value> <key=value> ...<key=value>
-      Xvtr.parseStatus( remainder.keyValuesArray(), radio: self, inUse: !remainder.contains(Api.kNotInUse))
+    case .amplifier:      Amplifier.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
+    case .audioStream:    AudioStream.parseStatus(self, remainder.keyValuesArray())
+    case .atu:            atu.parseProperties(self, remainder.keyValuesArray() )
+    case .client:         parseClient(self, remainder.keyValuesArray())
+    case .cwx:            cwx.parseProperties(self, remainder.fix().keyValuesArray() )
+    case .daxiq:          break // obsolete token, included to prevent log messages
+    case .display:        parseDisplay(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
+    case .eq:             Equalizer.parseStatus(self, remainder.keyValuesArray())
+    case .file:           _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
+    case .gps:            gps.parseProperties(self, remainder.keyValuesArray(delimiter: "#") )
+    case .interlock:      interlock.parseProperties(self, remainder.keyValuesArray())
+    case .memory:         Memory.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
+    case .meter:          Meter.parseStatus(self, remainder.keyValuesArray(delimiter: "#"), !remainder.contains(Api.kRemoved))
+    case .micAudioStream: MicAudioStream.parseStatus(self, remainder.keyValuesArray())
+    case .mixer:          _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
+    case .opusStream:     Opus.parseStatus(self, remainder.keyValuesArray())
+    case .profile:        Profile.parseStatus(self, remainder.keyValuesArray(delimiter: "="))
+    case .radio:          parseProperties(self, remainder.keyValuesArray())
+    case .slice:          xLib6000.Slice.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
+    case .stream:         IqStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
+    case .tnf:            Tnf.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
+    case .transmit:       transmit.parseProperties(self, remainder.keyValuesArray())
+    case .turf:           _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
+    case .txAudioStream:  TxAudioStream.parseStatus(self, remainder.keyValuesArray())
+    case .usbCable:       UsbCable.parseStatus(self, remainder.keyValuesArray())
+    case .wan:            wan.parseProperties(self, remainder.keyValuesArray())
+    case .waveform:       waveform.parseProperties(self, remainder.keyValuesArray())
+    case .xvtr:           Xvtr.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
     }
-    if Api.kVersion.isV3 {
+    if version.isV3 {
       // check if we received a status message for our handle to see if our client is connected now
       if !_clientInitialized && components[0].handle == _api.connectionHandle {
         
@@ -1018,6 +895,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
   }
   /// Parse a Client status message (pre V3 only)
+  ///   Format: client <handle> connected
+  ///   Format: client <handle> disconnected <forced=1/0>
   ///
   ///   executed on the parseQ
   ///
@@ -1027,8 +906,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  private func parseClient(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
-    
+  private func parseClient(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+
     guard keyValues.count >= 2 else {
       _log("Invalid client status", .warning, #function, #file, #line)
       return
@@ -1049,6 +928,27 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     } else {
       // Unrecognized
       _log("Unprocessed Client message: \(keyValues[0].key)", .warning, #function, #file, #line)
+    }
+  }
+  /// Parse a Display status message
+  ///   Format:
+  ///
+  ///   executed on the parseQ
+  ///
+  /// - Parameters:
+  ///   - keyValues:      a KeyValuesArray
+  ///   - radio:          the current Radio class
+  ///   - queue:          a parse Queue for the object
+  ///   - inUse:          false = "to be deleted"
+  ///
+  private func parseDisplay(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+    
+    switch keyValues[0].key {
+      
+    case DisplayToken.panadapter.rawValue:  Panadapter.parseStatus(radio, keyValues, inUse)
+    case DisplayToken.waterfall.rawValue:   Waterfall.parseStatus(radio, keyValues, inUse)
+      
+    default:            _log("Unknown Display type: \(keyValues[0].key)", .warning, #function, #file, #line)
     }
   }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
@@ -1304,14 +1204,15 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // MARK: - StaticModel Protocol methods
   
   /// Parse a Radio status message
+  ///   Format: <key=value> <key=value> ...<key=value>
   ///
   ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - properties:      a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
-    
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
+
     // FIXME: What about a 6700 with two scu's?
     
     // separate by category

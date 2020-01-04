@@ -100,12 +100,13 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   private weak var _delegate                : StreamHandler? = nil
   private      var _initialized             = false
   private      var _rxSeq                   : Int?
-  private      let _log                     = Log.sharedInstance
+  private      let _log                     = Log.sharedInstance.msg
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
 
   /// Parse an AudioStream status message
+  ///   Format:  <streamId, > <"dax", channel> <"in_use", 1|0> <"slice", number> <"ip", ip> <"port", port>
   ///
   ///   StatusParser Protocol method, executes on the parseQ
   ///
@@ -115,8 +116,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
-    // Format:  <streamId, > <"dax", channel> <"in_use", 1|0> <"slice", number> <"ip", ip> <"port", port>
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
     //get the Id
     if let audioStreamId =  keyValues[0].key.streamId {
@@ -134,7 +134,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
           radio.audioStreams[audioStreamId] = AudioStream(radio: radio, id: audioStreamId)
         }
         // pass the remaining key values for parsing (dropping the Id)
-        radio.audioStreams[audioStreamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        radio.audioStreams[audioStreamId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
@@ -245,7 +245,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -253,7 +253,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown AudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown AudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -355,7 +355,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      _log.msg("Missing AudioStream packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", level: .debug, function: #function, file: #file, line: #line)
+      _log("Missing AudioStream packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .debug, #function, #file, #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1

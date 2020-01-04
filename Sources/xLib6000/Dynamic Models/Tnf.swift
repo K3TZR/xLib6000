@@ -74,7 +74,7 @@ public final class Tnf : NSObject, DynamicModel {
   // MARK: - Private properties
 
   private var _initialized  = false
-  private let _log          = Log.sharedInstance
+  private let _log          = Log.sharedInstance.msg
   private let _radio        : Radio
     
   // ----------------------------------------------------------------------------
@@ -98,6 +98,7 @@ public final class Tnf : NSObject, DynamicModel {
   // MARK: - Class methods
 
   /// Parse a Tnf status message
+  ///   format: <tnfId> <key=value> <key=value> ...<key=value>
   ///
   ///   StatusParser Protocol method, executes on the parseQ
   ///
@@ -107,8 +108,8 @@ public final class Tnf : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
-    
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+
     // get the Tnf Id as a UInt
     if let tnfId = keyValues[0].key.objectId {
       
@@ -122,7 +123,7 @@ public final class Tnf : NSObject, DynamicModel {
           radio.tnfs[tnfId] = Tnf(radio: radio, id: tnfId)
         }
         // pass the remaining key values to the Tnf for parsing (dropping the Id)
-        radio.tnfs[tnfId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        radio.tnfs[tnfId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
@@ -144,7 +145,7 @@ public final class Tnf : NSObject, DynamicModel {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -152,7 +153,7 @@ public final class Tnf : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Tnf token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown Tnf token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order

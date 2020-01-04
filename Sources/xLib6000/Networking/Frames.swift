@@ -28,7 +28,7 @@ public class PanadapterFrame {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
+  private var _log                          = Log.sharedInstance.msg
   
   private struct PayloadHeaderOld {                                        // struct to mimic payload layout
     var startingBin                         : UInt32
@@ -109,12 +109,12 @@ public class PanadapterFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log.msg("Ignored frame(s): expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
+      _log("Ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       return false
       
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
-      _log.msg("Missing frame(s): expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
+      _log("Missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       expectedFrame = received
       fallthrough
       
@@ -161,7 +161,7 @@ public class WaterfallFrame {
   
   private var _binsProcessed                = 0
   private var _byteOffsetToBins             = 0
-  private var _log                          = Log.sharedInstance
+  private var _log                          = Log.sharedInstance.msg
   
   private struct PayloadHeaderOld {                                         // struct to mimic payload layout
     var firstBinFreq                        : UInt64                        // 8 bytes
@@ -257,12 +257,12 @@ public class WaterfallFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log.msg("Waterfall ignored frame(s): expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
+      _log("Waterfall ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       return false
       
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
-      _log.msg("Waterfall missing frame(s): expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
+      _log("Waterfall missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       expectedFrame = received
       fallthrough
       

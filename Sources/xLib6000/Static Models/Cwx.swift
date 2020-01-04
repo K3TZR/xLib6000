@@ -56,7 +56,7 @@ public final class Cwx                      : NSObject, StaticModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _log                          = Log.sharedInstance
+  private let _log                          = Log.sharedInstance.msg
   private let _radio                        : Radio
 
   // ------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ public final class Cwx                      : NSObject, StaticModel {
     
     // if zero or anything greater than 2 it's an error, log it and ignore the Reply
     guard components == 1 || components == 2 else {
-      _log.msg("\(command), Invalid Cwx reply", level: .warning, function: #function, file: #file, line: #line)
+      _log("\(command), Invalid Cwx reply", .warning, #function, #file, #line)
       return
     }
     // get the character position
@@ -127,7 +127,7 @@ public final class Cwx                      : NSObject, StaticModel {
     
     // if not an integer, log it and ignore the Reply
     guard charPos != nil else {
-      _log.msg("\(command), Invalid Cwx character position", level: .warning, function: #function, file: #file, line: #line)
+      _log("\(command), Invalid Cwx character position", .warning, #function, #file, #line)
       return
     }
 
@@ -146,7 +146,7 @@ public final class Cwx                      : NSObject, StaticModel {
       // not an integer, log it and ignore the Reply
       guard block != nil else {
         
-        _log.msg("\(command), Invalid Cwx block", level: .warning, function: #function, file: #file, line: #line)
+        _log("\(command), Invalid Cwx block", .warning, #function, #file, #line)
         return
       }
       // inform the Event Handler (if any)
@@ -154,12 +154,13 @@ public final class Cwx                      : NSObject, StaticModel {
     }
   }
   /// Parse Cwx key/value pairs, called by Radio
+  ///   Format:
   ///
   ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray)  {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray)  {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -183,7 +184,7 @@ public final class Cwx                      : NSObject, StaticModel {
         // Check for Unknown Keys
         guard let token = Token(rawValue: property.key) else {
           // log it and ignore the Key
-          _log.msg("Unknown Cwx token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+          _log("Unknown Cwx token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
           continue
         }
         // Known tokens, in alphabetical order

@@ -72,7 +72,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private let _radio                        : Radio
-  private var _log                          = Log.sharedInstance
+  private var _log                          = Log.sharedInstance.msg
   private var _initialized                  = false
   private var _rxSeq                        : Int?
   
@@ -80,6 +80,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // MARK: - Class methods
   
   /// Parse a Mic AudioStream status message
+  ///   Format:  <streamId, > <"in_use", 1|0> <"ip", ip> <"port", port>
   ///
   ///   StatusParser Protocol method, executes on the parseQ
   ///
@@ -89,8 +90,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
-    // Format:  <streamId, > <"in_use", 1|0> <"ip", ip> <"port", port>
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
     //get the MicAudioStreamId (remove the "0x" prefix)
     if let daxMicStreamId =  keyValues[0].key.streamId {
@@ -108,7 +108,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
           radio.micAudioStreams[daxMicStreamId] = MicAudioStream(radio: radio, id: daxMicStreamId)
         }
         // pass the remaining key values for parsing (dropping the Id)
-        radio.micAudioStreams[daxMicStreamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        radio.micAudioStreams[daxMicStreamId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
@@ -150,7 +150,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -158,7 +158,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown MicAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown MicAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -261,7 +261,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      _log.msg("Missing AudioStream packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", level: .debug, function: #function, file: #file, line: #line)
+      _log("Missing AudioStream packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .debug, #function, #file, #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1

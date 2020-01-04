@@ -261,7 +261,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance
+  private let _log                          = Log.sharedInstance.msg
   private var _initialized                  = false
 
   private var _panadapterframes             = [PanadapterFrame]()
@@ -281,7 +281,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     // Format: <"pan", ""> <streamId, ""> <"wnb", 1|0> <"wnb_level", value> <"wnb_updating", 1|0> <"x_pixels", value> <"y_pixels", value>
     //          <"center", value>, <"bandwidth", value> <"min_dbm", value> <"max_dbm", value> <"fps", value> <"average", value>
     //          <"weighted_average", 1|0> <"rfgain", value> <"rxant", value> <"wide", 1|0> <"loopa", 1|0> <"loopb", 1|0>
@@ -311,7 +311,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
           radio.panadapters[streamId] = Panadapter(radio: radio, id: streamId)
         }
         // pass the key values to the Panadapter for parsing (dropping the Type and Id)
-        radio.panadapters[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
+        radio.panadapters[streamId]!.parseProperties(radio, Array(keyValues.dropFirst(2)))
         
       } else {
         
@@ -360,7 +360,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // Anything other than 0 is an error
     guard responseValue == Api.kNoError else {
       // log it and ignore the Reply
-      _log.msg("\(command), non-zero reply: \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .warning, function: #function, file: #file, line: #line)
+      _log("\(command), non-zero reply: \(responseValue), \(flexErrorString(errorCode: responseValue))", .warning, #function, #file, #line)
       return
     }
     // parse out the values
@@ -376,7 +376,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -384,7 +384,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Panadapter token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown Panadapter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order

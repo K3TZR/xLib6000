@@ -76,7 +76,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   // MARK: - Private properties
   
   private var _initialized                  = false
-  private let _log                          = Log.sharedInstance
+  private let _log                          = Log.sharedInstance.msg
   private let _radio                        : Radio
   private var _voltsAmpsDenom               : Float = 256.0  // denominator for voltage/amperage depends on API version
 
@@ -131,6 +131,9 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
     }
   }
   /// Parse a Meter status message
+  ///   Format: <number."src", src> <number."nam", name> <number."hi", highValue> <number."desc", description> <number."unit", unit> ,number."fps", fps>
+  ///           OR
+  ///   Format: <number "removed", "">
   ///
   ///   StatusParser Protocol method, executes on the parseQ
   ///
@@ -140,10 +143,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
-    // Format: <number."src", src> <number."nam", name> <number."hi", highValue> <number."desc", description> <number."unit", unit> ,number."fps", fps>
-    //      OR
-    // Format: <number "removed", "">
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
     // is the Meter in use?
     if inUse {
@@ -163,7 +163,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
         }
         
         // pass the key values to the Meter for parsing
-        radio.meters[meterId]!.parseProperties( keyValues )
+        radio.meters[meterId]!.parseProperties(radio, keyValues )
       }
       
     } else {
@@ -213,7 +213,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <n.key=value>
     for property in properties {
@@ -227,7 +227,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       // check for unknown Keys
       guard let token = Token(rawValue: key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Meter token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown Meter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       
@@ -272,7 +272,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
     // check for unknown Units
     guard let token = Units(rawValue: units) else {
       // log it and ignore it
-      _log.msg("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", level: .warning, function: #function, file: #file, line: #line)
+      _log("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", .warning, #function, #file, #line)
       return
     }
     var adjNewValue: Float = 0.0

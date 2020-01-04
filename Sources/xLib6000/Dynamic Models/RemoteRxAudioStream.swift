@@ -70,7 +70,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance
+  private let _log                          = Log.sharedInstance.msg
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
   private var _vita                         : Vita?                         // a Vita class
@@ -93,7 +93,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   ///   - queue:              a parse Queue for the object
   ///   - inUse:              false = "to be deleted"
   ///
-  class func parseStatus(_ properties: KeyValuesArray, radio: Radio, inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "remote_audio_rx"> <"compression", "none"|"opus"> <"client_handle", handle> <"ip", ip>
     
     // get the Id
@@ -109,7 +109,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
         radio.remoteRxAudioStreams[remoteRxStreamId] = RemoteRxAudioStream(radio: radio, id: remoteRxStreamId)
       }
       // pass the remaining key values for parsing (dropping the Id & Type)
-      radio.remoteRxAudioStreams[remoteRxStreamId]!.parseProperties( Array(properties.dropFirst(2)) )
+      radio.remoteRxAudioStreams[remoteRxStreamId]!.parseProperties(radio, Array(properties.dropFirst(2)) )
     }
   }
 
@@ -140,7 +140,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   ///
   /// - Parameter properties: a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair
     for property in properties {
@@ -148,7 +148,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown RemoteRxAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown RemoteRxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -218,7 +218,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
 
 //    case (let expected, let received) where received < expected:
 //      // from a previous group, ignore it
-//      _log.msg("Delayed frame(s): expected \(expected), received \(received)", level: .warning, function: #function, file: #file, line: #line)
+//      _log("Delayed frame(s): expected \(expected), received \(received)", .warning, #function, #file, #line)
 //      return
       
     case (let expected, let received) where received > expected:
@@ -226,7 +226,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       
       // from a later group, jump forward
       let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
-      _log.msg("Missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", level: .warning, function: #function, file: #file, line: #line)
+      _log("Missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
 
       // Pass an error frame (count == 0) to the Opus delegate
       delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: 0) )

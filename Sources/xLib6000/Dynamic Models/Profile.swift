@@ -59,13 +59,19 @@ public final class Profile                  : NSObject, StaticModel {
   // MARK: - Private properties
   
   private var _initialized                  = false
-  private let _log                          = Log.sharedInstance
+  private let _log                          = Log.sharedInstance.msg
   private var _radio                        : Radio
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
   /// Parse a Profile status message
+  ///   Format: global list=<value>^<value>^...<value>^
+  ///   Format: global current=<value>
+  ///   Format: tx list=<value>^<value>^...<value>^
+  ///   Format: tx current=<value>
+  ///   Format: mic list=<value>^<value>^...<value>^
+  ///   Format: mic current=<value>
   ///
   ///   StatusParser protocol method, executes on the parseQ
   ///
@@ -75,8 +81,8 @@ public final class Profile                  : NSObject, StaticModel {
   ///   - queue:              a parse Queue for the object
   ///   - inUse:              false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
-    
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+
     let components = keyValues[0].key.split(separator: " ")
     
     // get the Profile Id
@@ -85,7 +91,7 @@ public final class Profile                  : NSObject, StaticModel {
     // check for unknown Keys
     guard let _ = Group(rawValue: profileId) else {
       // log it and ignore the Key
-      Log.sharedInstance.msg("Unknown Profile group: \(profileId)", level: .warning, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg("Unknown Profile group: \(profileId)", .warning, #function, #file, #line)
       return
     }
     // remove the Id from the KeyValues
@@ -99,7 +105,7 @@ public final class Profile                  : NSObject, StaticModel {
       radio.profiles[profileId] = Profile(radio: radio, id: profileId)
     }
     // pass the key values to Profile for parsing (dropping the Id)
-    radio.profiles[profileId]!.parseProperties( adjustedKeyValues )
+    radio.profiles[profileId]!.parseProperties(radio, adjustedKeyValues )
   }
 
   // ------------------------------------------------------------------------------
@@ -127,7 +133,7 @@ public final class Profile                  : NSObject, StaticModel {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     //              <-properties[0]->     <--- properties[1] (if any) --->
     //     format:  <global list, "">     <value, "">^<value, "">^...<value, "">^
     //     format:  <global current, "">  <value, "">
@@ -139,7 +145,7 @@ public final class Profile                  : NSObject, StaticModel {
     // check for unknown Keys
     guard let token = Token(rawValue: properties[0].key) else {
       // log it and ignore the Key
-      _log.msg("Unknown Profile token: \(properties[0].key) = \(properties[0].value)", level: .warning, function: #function, file: #file, line: #line)
+      _log("Unknown Profile token: \(properties[0].key) = \(properties[0].value)", .warning, #function, #file, #line)
       return
     }
     // Known keys, in alphabetical order

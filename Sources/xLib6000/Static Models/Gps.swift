@@ -68,7 +68,7 @@ public final class Gps                      : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _log                          = Log.sharedInstance
+  private let _log                          = Log.sharedInstance.msg
   private var _radio                        : Radio
 
   // ----------------------------------------------------------------------------
@@ -114,14 +114,14 @@ public final class Gps                      : NSObject, StaticModel {
   // MARK: - Instance methods
 
   /// Parse a Gps status message
+  ///   Format: <"lat", value> <"lon", value> <"grid", value> <"altitude", value> <"tracked", value> <"visible", value> <"speed", value>
+  ///         <"freq_error", value> <"status", "Not Present" | "Present"> <"time", value> <"track", value>
   ///
   ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
-    // Format: <"lat", value> <"lon", value> <"grid", value> <"altitude", value> <"tracked", value> <"visible", value> <"speed", value>
-    //          <"freq_error", value> <"status", "Not Present" | "Present"> <"time", value> <"track", value>
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -129,7 +129,7 @@ public final class Gps                      : NSObject, StaticModel {
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log.msg("Unknown Gps token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown Gps token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order

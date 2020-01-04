@@ -91,7 +91,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private      var _initialized       = false
-  private      let _log               = Log.sharedInstance
+  private      let _log               = Log.sharedInstance.msg
   private      let _radio             : Radio
   private      var _rxSeq             : Int?
 
@@ -101,6 +101,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   // MARK: - Class methods
 
   /// Parse a Stream status message
+  ///   Format: <streamId, > <"daxiq", value> <"pan", panStreamId> <"rate", value> <"ip", ip> <"port", port> <"streaming", 1|0> ,"capacity", value> <"available", value>
   ///
   ///   StatusParser Protocol method, executes on the parseQ
   ///
@@ -110,8 +111,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
-    // Format: <streamId, > <"daxiq", value> <"pan", panStreamId> <"rate", value> <"ip", ip> <"port", port> <"streaming", 1|0> ,"capacity", value> <"available", value>
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
     //get the Id
     if let daxIqStreamId =  keyValues[0].key.streamId {
@@ -129,7 +129,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
           radio.iqStreams[daxIqStreamId] = IqStream(radio: radio, id: daxIqStreamId)
         }
         // pass the remaining key values for parsing (dropping the Id)
-        radio.iqStreams[daxIqStreamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        radio.iqStreams[daxIqStreamId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
@@ -171,7 +171,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -179,7 +179,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown IqStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown IqStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -271,7 +271,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      _log.msg("Missing IqStream packet(s), rcvdSeq: \(vita.sequence), != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
+      _log("Missing IqStream packet(s), rcvdSeq: \(vita.sequence), != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1

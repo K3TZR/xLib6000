@@ -151,7 +151,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance
+  private let _log                          = Log.sharedInstance.msg
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
   // ------------------------------------------------------------------------------
@@ -167,7 +167,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     // TYPE: CAT
     //      <id, > <type, > <enable, > <pluggedIn, > <name, > <source, > <sourceTxAnt, > <sourceRxAnt, > <sourceSLice, >
     //      <autoReport, > <preamp, > <polarity, > <log, > <speed, > <dataBits, > <stopBits, > <parity, > <flowControl, >
@@ -190,13 +190,13 @@ public final class UsbCable                 : NSObject, DynamicModel {
       } else {
         
         // NO, log the error and ignore it
-        Log.sharedInstance.msg("Invalid UsbCable Type: \(keyValues[1].value)", level: .warning, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Invalid UsbCable Type: \(keyValues[1].value)", .warning, #function, #file, #line)
 
         return
       }
     }
     // pass the remaining key values to the Usb Cable for parsing (dropping the Id)
-    radio.usbCables[usbCableId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+    radio.usbCables[usbCableId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
   }
 
   // ------------------------------------------------------------------------------
@@ -226,7 +226,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     // TYPE: CAT
     //      <type, > <enable, > <pluggedIn, > <name, > <source, > <sourceTxAnt, > <sourceRxAnt, > <sourceSLice, > <autoReport, >
     //      <preamp, > <polarity, > <log, > <speed, > <dataBits, > <stopBits, > <parity, > <flowControl, >
@@ -246,7 +246,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
         // check for unknown Keys
         guard let token = Token(rawValue: property.key) else {
           // log it and ignore the Key
-          _log.msg("Unknown UsbCable token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+          _log("Unknown UsbCable token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
           continue
         }
         // Known keys, in alphabetical order
@@ -282,7 +282,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
     } else {
       
       // NO, log the error
-      _log.msg("Status type: \(properties[0].key) != Cable type: \(cableType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
+      _log("Status type: \(properties[0].key) != Cable type: \(cableType.rawValue)", .warning, #function, #file, #line)
     }
     
     // is the waterfall initialized?

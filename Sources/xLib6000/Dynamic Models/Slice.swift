@@ -515,7 +515,7 @@ public final class Slice                    : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance
+  private let _log                          = Log.sharedInstance.msg
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
 
   private let kTuneStepList                 =                               // tuning steps
@@ -527,6 +527,7 @@ public final class Slice                    : NSObject, DynamicModel {
   // MARK: - Class methods
   
   /// Parse a Slice status message
+  ///   Format: <sliceId> <key=value> <key=value> ...<key=value>
   ///
   ///   StatusParser Protocol method, executes on the parseQ
   ///
@@ -536,8 +537,8 @@ public final class Slice                    : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
-    
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+
     // get the Slice Id
     if let sliceId = keyValues[0].key.objectId {
     
@@ -562,7 +563,7 @@ public final class Slice                    : NSObject, DynamicModel {
 //        }
       }
       // pass the remaining key values to the Slice for parsing (dropping the Id)
-      radio.slices[sliceId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      radio.slices[sliceId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
       
     } else {
       
@@ -745,7 +746,7 @@ public final class Slice                    : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-        _log.msg("Cannot change Filter width in FM mode", level: .info, function: #function, file: #file, line: #line)
+        _log("Cannot change Filter width in FM mode", .info, #function, #file, #line)
         newValue = value
         
       case .CW:
@@ -782,7 +783,7 @@ public final class Slice                    : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-        _log.msg("Cannot change Filter width in FM mode", level: .info, function: #function, file: #file, line: #line)
+        _log("Cannot change Filter width in FM mode", .info, #function, #file, #line)
         newValue = value
         
       case .CW:
@@ -811,7 +812,7 @@ public final class Slice                    : NSObject, DynamicModel {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -819,7 +820,7 @@ public final class Slice                    : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Slice token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown Slice token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -864,7 +865,7 @@ public final class Slice                    : NSObject, DynamicModel {
       case .fmToneMode:               update(self, &_fmToneMode,              to: property.value,         signal: \.fmToneMode)
       case .fmToneFreq:               update(self, &_fmToneFreq,              to: property.value.fValue,  signal: \.fmToneFreq)
       case .frequency:                update(self, &_frequency,               to: property.value.mhzToHz, signal: \.frequency)
-      case .ghost:                    _log.msg("Unprocessed Slice property: \( property.key).\(property.value)", level: .warning, function: #function, file: #file, line: #line)
+      case .ghost:                    _log("Unprocessed Slice property: \( property.key).\(property.value)", .warning, #function, #file, #line)
       case .inUse:                    update(self, &_inUse,                   to: property.value.bValue,  signal: \.inUse)
       case .locked:                   update(self, &_locked,                  to: property.value.bValue,  signal: \.locked)
       case .loopAEnabled:             update(self, &_loopAEnabled,            to: property.value.bValue,  signal: \.loopAEnabled)

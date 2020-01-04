@@ -78,7 +78,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private let _radio                        : Radio
-  private var _log                          = Log.sharedInstance
+  private var _log                          = Log.sharedInstance.msg
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
   private var _txSeq                        = 0                             // Tx sequence number (modulo 16)
@@ -87,6 +87,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   // MARK: - Class methods
   
   /// Parse a TxAudioStream status message
+  ///   format: <TxAudioStreamId> <key=value> <key=value> ...<key=value>
   ///
   ///   StatusParser protocol method, executes on the parseQ
   ///
@@ -96,7 +97,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"dax_tx", channel> <"in_use", 1|0> <"ip", ip> <"port", port>
     
     //get the Id
@@ -115,7 +116,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
           radio.txAudioStreams[txAudioStreamId] = TxAudioStream(radio: radio, id: txAudioStreamId)
         }
         // pass the remaining key values for parsing (dropping the Id)
-        radio.txAudioStreams[txAudioStreamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        radio.txAudioStreams[txAudioStreamId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
@@ -157,7 +158,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -165,7 +166,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown TxAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown TxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order

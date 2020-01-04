@@ -107,7 +107,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   
   private var _index              = 0
   private var _initialized        = false
-  private let _log                = Log.sharedInstance
+  private let _log                = Log.sharedInstance.msg
   private let _numberOfDataFrames = 10
   private let _radio              : Radio
   private var _waterfallframes    = [WaterfallFrame]()
@@ -149,7 +149,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     // Format: <"waterfall", ""> <streamId, ""> <"x_pixels", value> <"center", value> <"bandwidth", value> <"line_duration", value>
     //          <"rfgain", value> <"rxant", value> <"wide", 1|0> <"loopa", 1|0> <"loopb", 1|0> <"band", value> <"daxiq", value>
     //          <"daxiq_rate", value> <"capacity", value> <"available", value> <"panadapter", streamId>=40000000 <"color_gain", value>
@@ -174,7 +174,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
           radio.waterfalls[waterfallStreamId] = Waterfall(radio: radio, id: waterfallStreamId)
         }
         // pass the key values to the Waterfall for parsing (dropping the Type and Id)
-        radio.waterfalls[waterfallStreamId]!.parseProperties(Array(keyValues.dropFirst(2)))
+        radio.waterfalls[waterfallStreamId]!.parseProperties(radio, Array(keyValues.dropFirst(2)))
         
       } else {
         
@@ -199,7 +199,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -207,7 +207,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Waterfall token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown Waterfall token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order

@@ -69,7 +69,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance
+  private let _log                          = Log.sharedInstance.msg
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
   private var _vita                         : Vita?                         // a Vita class
@@ -92,7 +92,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   ///   - queue:              a parse Queue for the object
   ///   - inUse:              false = "to be deleted"
   ///
-  class func parseStatus(_ properties: KeyValuesArray, radio: Radio, inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "remote_audio_tx"> <"compression", "1"|"0"> <"client_handle", handle> <"ip", value>
 
     // get the Id
@@ -108,7 +108,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
         radio.remoteTxAudioStreams[remoteRxStreamId] = RemoteTxAudioStream(radio: radio, id: remoteRxStreamId)
       }
       // pass the remaining key values for parsing (dropping the Id & Type)
-      radio.remoteTxAudioStreams[remoteRxStreamId]!.parseProperties( Array(properties.dropFirst(2)) )
+      radio.remoteTxAudioStreams[remoteRxStreamId]!.parseProperties(radio, Array(properties.dropFirst(2)) )
     }
   }
 
@@ -139,7 +139,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   ///
   /// - Parameter properties: a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair
     for property in properties {
@@ -147,7 +147,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown RemoteTxAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown RemoteTxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order

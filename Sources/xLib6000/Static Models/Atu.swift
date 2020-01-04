@@ -93,7 +93,7 @@ public final class Atu                      : NSObject, StaticModel {
   // MARK: - Private properties
   
   private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance
+  private let _log                          = Log.sharedInstance.msg
 
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
@@ -113,13 +113,13 @@ public final class Atu                      : NSObject, StaticModel {
   // MARK: - Instance methods
 
   /// Parse an Atu status message
+  ///   Format: <"status", value> <"memories_enabled", 1|0> <"using_mem", 1|0>
   ///
   ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
-    // Format: <"status", value> <"memories_enabled", 1|0> <"using_mem", 1|0>
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
 
     // process each key/value pair, <key=value>
     for property in properties {
@@ -127,7 +127,7 @@ public final class Atu                      : NSObject, StaticModel {
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log.msg("Unknown Atu token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown Atu token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order

@@ -67,7 +67,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized    = false
-  private let _log            = Log.sharedInstance
+  private let _log            = Log.sharedInstance.msg
   private let _radio          : Radio
   private var _txSeq          = 0
 
@@ -84,7 +84,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ properties: KeyValuesArray, radio: Radio, inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_tx"> <"client_handle", handle> <"dax_tx", isTransmitChannel>
     
     //get the Id
@@ -100,7 +100,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
         radio.daxTxAudioStreams[daxTxStreamId] = DaxTxAudioStream(radio: radio, id: daxTxStreamId)
       }
       // pass the remaining key values parsing (dropping the Id)
-      radio.daxTxAudioStreams[daxTxStreamId]!.parseProperties( Array(properties.dropFirst(1)) )
+      radio.daxTxAudioStreams[daxTxStreamId]!.parseProperties(radio, Array(properties.dropFirst(1)) )
     }
   }
   
@@ -129,7 +129,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -137,7 +137,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _log.msg("Unknown DaxTxAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown DaxTxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order

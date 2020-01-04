@@ -84,7 +84,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private      var _initialized     = false
-  private      let _log             = Log.sharedInstance
+  private      let _log             = Log.sharedInstance.msg
   private      let _radio           : Radio
   private      var _rxSeq           : Int?
 
@@ -101,7 +101,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ properties: KeyValuesArray, radio: Radio, inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_rx"> <"dax_channel", channel> <"slice", sliceNumber> <"dax_clients", number> <"client_handle", handle>
     
     //get the StreamId
@@ -117,7 +117,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
         radio.daxRxAudioStreams[daxRxStreamId] = DaxRxAudioStream(radio: radio, id: daxRxStreamId)
       }
       // pass the remaining key values for parsing (dropping the Id & Type)
-      radio.daxRxAudioStreams[daxRxStreamId]!.parseProperties( Array(properties.dropFirst(2)) )
+      radio.daxRxAudioStreams[daxRxStreamId]!.parseProperties(radio, Array(properties.dropFirst(2)) )
     }
   }
   /// Check if an Stream belongs to us
@@ -182,7 +182,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -190,7 +190,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown DaxRxAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown DaxRxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -295,7 +295,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      _log.msg( "Missing AudioStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
+      _log( "Missing AudioStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1

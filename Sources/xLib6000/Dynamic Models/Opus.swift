@@ -58,7 +58,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private var _radio                        : Radio
-  private let _log                          = Log.sharedInstance
+  private let _log                          = Log.sharedInstance.msg
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
   private var _clientHandle                 : UInt32 = 0                    //
@@ -72,6 +72,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // MARK: - Protocol class methods
   
   /// Parse an Opus status message
+  ///   Format:  <streamId, > <"ip", ip> <"port", port> <"opus_rx_stream_stopped", 1|0>  <"rx_on", 1|0> <"tx_on", 1|0>
   ///
   ///   StatusParser Protocol method, executes on the parseQ
   ///
@@ -81,8 +82,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   ///   - queue:              a parse Queue for the object
   ///   - inUse:              false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
-    // Format:  <streamId, > <"ip", ip> <"port", port> <"opus_rx_stream_stopped", 1|0>  <"rx_on", 1|0> <"tx_on", 1|0>
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
     // get the Opus Id (without the "0x" prefix)
     //        let opusId = String(keyValues[0].key.characters.dropFirst(2))
@@ -95,7 +95,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
         radio.opusStreams[streamId] = Opus(radio: radio, id: streamId)
       }
       // pass the key values to Opus for parsing  (dropping the Id)
-      radio.opusStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      radio.opusStreams[streamId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
     }
   }
 
@@ -163,7 +163,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   ///
   /// - Parameter properties: a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair
     for property in properties {
@@ -171,7 +171,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Opus token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown Opus token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -242,7 +242,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
 
 //    case (let expected, let received) where received < expected:
 //      // from a previous group, ignore it
-//      _log.msg("Delayed frame(s): expected \(expected), received \(received)", level: .warning, function: #function, file: #file, line: #line)
+//      _log("Delayed frame(s): expected \(expected), received \(received)", .warning, #function, #file, #line)
 //      return
       
     case (let expected, let received) where received > expected:
@@ -250,7 +250,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       
       // from a later group, jump forward
       let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
-      _log.msg("Opus Missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", level: .warning, function: #function, file: #file, line: #line)
+      _log("Opus Missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
 
       // Pass an error frame (count == 0) to the Opus delegate
       delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: 0) )

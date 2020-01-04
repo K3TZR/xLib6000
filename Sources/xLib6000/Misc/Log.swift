@@ -47,7 +47,7 @@ public final class Log {
   ///   - file:       the file where the message originated
   ///   - line:       the line where the message originated
   ///
-  public func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int ) {
+  public func msg(_ msg: String, _ level: MessageLevel, _ function: StaticString, _ file: StaticString, _ line: Int ) {
     
     // pass the entry to the delegate (if any)
     delegate?.msg(msg, level: level, function: function, file: file, line: line)

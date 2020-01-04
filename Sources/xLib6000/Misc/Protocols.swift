@@ -37,7 +37,7 @@ protocol StaticModel                        : class {
   ///
   /// - Parameter keyValues:    a KeyValues array containing object property values
   ///
-  func parseProperties(_ keyValues: KeyValuesArray)
+  func parseProperties(_ radio: Radio, _ keyValues: KeyValuesArray)
 }
 
 /// Models for which there can be multiple instances
@@ -54,7 +54,7 @@ protocol DynamicModel                       : StaticModel {
   ///   - radio:                the current Radio object
   ///   - inUse:                a flag indicating whether the object in the status message is active
   ///
-  static func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool)
+  static func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool)
 }
 
 /// Dynamic models which have an accompanying UDP Stream

@@ -99,13 +99,15 @@ public final class Equalizer : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized  = false
-  private let _log          = Log.sharedInstance
+  private let _log          = Log.sharedInstance.msg
   private let _radio        : Radio
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
   /// Parse a Stream status message
+  ///   Format: <type, ""> <"mode", 1|0>, <"63Hz", value> <"125Hz", value> <"250Hz", value> <"500Hz", value>
+  ///         <"1000Hz", value> <"2000Hz", value> <"4000Hz", value> <"8000Hz", value>
   ///
   ///   StatusParser Protocol method, executes on the parseQ
   ///
@@ -115,10 +117,7 @@ public final class Equalizer : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true) {
-    // Format: <type, ""> <"mode", 1|0>, <"63Hz", value> <"125Hz", value> <"250Hz", value> <"500Hz", value>
-    //          <"1000Hz", value> <"2000Hz", value> <"4000Hz", value> <"8000Hz", value>
-    
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     var equalizer: Equalizer?
     
     // get the Type
@@ -141,13 +140,13 @@ public final class Equalizer : NSObject, DynamicModel {
       
     default:
       // unknown type, log & ignore it
-      Log.sharedInstance.msg("Unknown Equalizer type: \(type)", level: .warning, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg("Unknown Equalizer type: \(type)", .warning, #function, #file, #line)
     }
     // if an equalizer was found
     if let equalizer = equalizer {
       
       // pass the key values to the Equalizer for parsing (dropping the Type)
-      equalizer.parseProperties( Array(keyValues.dropFirst(1)) )
+      equalizer.parseProperties(radio, Array(keyValues.dropFirst(1)) )
     }
   }
   
@@ -176,7 +175,7 @@ public final class Equalizer : NSObject, DynamicModel {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -184,7 +183,7 @@ public final class Equalizer : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Equalizer token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown Equalizer token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order

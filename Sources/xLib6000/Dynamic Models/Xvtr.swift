@@ -103,7 +103,7 @@ public final class Xvtr : NSObject, DynamicModel {
   // MARK: - Private properties
 
   private var _initialized = false
-  private let _log         = Log.sharedInstance
+  private let _log         = Log.sharedInstance.msg
   private let _radio       : Radio
 
   // ----------------------------------------------------------------------------
@@ -134,7 +134,7 @@ public final class Xvtr : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, inUse: Bool = true ) {
+  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true ) {
     // Format:  <name, > <"rf_freq", value> <"if_freq", value> <"lo_error", value> <"max_power", value>
     //              <"rx_gain",value> <"order", value> <"rx_only", 1|0> <"is_valid", 1|0> <"preferred", 1|0>
     //              <"two_meter_int", value>
@@ -154,7 +154,7 @@ public final class Xvtr : NSObject, DynamicModel {
         radio.xvtrs[name] = Xvtr(radio: radio, id: name)
       }
       // pass the remaining key values to the Xvtr for parsing (dropping the Id)
-      radio.xvtrs[name]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      radio.xvtrs[name]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
       
     } else {
       
@@ -175,7 +175,7 @@ public final class Xvtr : NSObject, DynamicModel {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -183,7 +183,7 @@ public final class Xvtr : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Xvtr token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log("Unknown Xvtr token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
