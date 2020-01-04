@@ -164,7 +164,11 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @objc dynamic public var xvtrLabel: String {
     return _xvtrLabel }
     
-  public weak           var delegate          : StreamHandler?
+  public var delegate: StreamHandler? {
+    get { return Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
+
+  public weak           var _delegate         : StreamHandler?
   public                var isStreaming       = false
   public private(set)   var packetFrame       = -1                            // Frame index of next Vita payload
   public private(set)   var droppedPackets    = 0                             // Number of dropped (out of sequence) packets

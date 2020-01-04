@@ -54,7 +54,11 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   @objc dynamic public var panadapterId: PanadapterStreamId {
     return _panadapterId }
   
-  public weak         var delegate        : StreamHandler?
+  public var delegate: StreamHandler? {
+    get { return Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
+
+  public weak         var _delegate       : StreamHandler?
   public private(set) var droppedPackets  = 0
   public              var isStreaming     = false
   public private(set) var packetFrame     = -1
