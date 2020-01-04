@@ -23,16 +23,19 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   // GCD Queues
   static let udpQ                           = DispatchQueue(label: "Discovery" + ".udpQ")
   static let timerQ                         = DispatchQueue(label: "Discovery" + ".timerQ")
-//  static let radiosQ                        = DispatchQueue(label: "Discovery" + ".radiosQ", attributes: .concurrent)
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var discoveredRadios = [DiscoveryStruct]()
+  public var discoveredRadios: [DiscoveryStruct] {
+    get { return Api.objectQ.sync { _discoveredRadios } }
+    set { Api.objectQ.sync(flags: .barrier) { _discoveredRadios = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
-  
+
+  private var _discoveredRadios             = [DiscoveryStruct]()
+
   private var _udpSocket                    : GCDAsyncUdpSocket?            // socket to receive broadcasts
   private var _timeoutTimer                 : DispatchSourceTimer!          // timer fired every "checkInterval"
   
@@ -108,7 +111,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
               
             } else {
               // NO, update the timestamp
-              Api.objectQ.async(flags: .barrier) { self.discoveredRadios[i].lastSeen = Date() }
+              self.discoveredRadios[i].lastSeen = Date()
             }
           }
           // are there any deletions?
@@ -117,7 +120,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
             // YES, remove the Radio(s)
             for index in deleteList.reversed() {
               // remove a Radio
-              Api.objectQ.async(flags: .barrier) { self.discoveredRadios.remove(at: index) }
+              self.discoveredRadios.remove(at: index)
             }
             // send the list of radios to all observers
             NC.post(.discoveredRadios, object: self.discoveredRadios as Any?)
