@@ -317,9 +317,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public var tcxoPresent          : Bool { _tcxoPresent }
   
   @objc dynamic public var serialNumber         : String { return discoveryPacket.serialNumber }
-  @objc dynamic public var version              : String { return discoveryPacket.firmwareVersion }
 
   public               let discoveryPacket      : DiscoveryStruct
+  public               let version              : Version
   public private(set)  var sliceErrors          = [String]()  // milliHz
   public private(set)  var uptime               = 0
 
@@ -605,6 +605,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     self.discoveryPacket = discoveryPacket
     _api = api
+    version = Version(discoveryPacket.firmwareVersion)
     super.init()
     
     _api.delegate = self

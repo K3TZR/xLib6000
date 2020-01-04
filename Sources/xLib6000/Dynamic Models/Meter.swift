@@ -198,10 +198,8 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
     _radio = radio
     self.id = id
     
-    // FIXME:
-    
     // set voltage/amperage denominator for older API versions (before 1.11)
-    if Api.kVersion.major == 1 && Api.kVersion.minor <= 10 {
+    if radio.version.major == 1 && radio.version.minor <= 10 {
       _voltsAmpsDenom = 1024.0
     }
   }
