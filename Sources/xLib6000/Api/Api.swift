@@ -185,7 +185,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _log.msg("Pinger stopped", level: .info, function: #function, file: #file, line: #line)
     }
     // the radio (if any) will be removed, inform observers
-    if radio != nil { NC.post(.radioWillBeRemoved, object: nil) }
+    if radio != nil { NC.post(.radioWillBeRemoved, object: radio as Any?) }
     
     if apiState != .disconnected {
       // disconnect TCP
