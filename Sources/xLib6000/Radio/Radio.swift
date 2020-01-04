@@ -60,30 +60,150 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   
   public private(set) var sliceErrors       = [String]()            // frequency error of a Slice (milliHz)
   
+
   // object collections
-  @Barrier([AmplifierId: Amplifier](), Api.objectQ)                 public var amplifiers
-  @Barrier([AudioStreamId: AudioStream](), Api.objectQ)             public var audioStreams
-  @Barrier([DaxIqStreamId: DaxIqStream](), Api.objectQ)             public var daxIqStreams
-  @Barrier([DaxMicStreamId: DaxMicAudioStream](), Api.objectQ)      public var daxMicAudioStreams
-  @Barrier([DaxRxStreamId: DaxRxAudioStream](), Api.objectQ)        public var daxRxAudioStreams
-  @Barrier([DaxTxStreamId: DaxTxAudioStream](), Api.objectQ)        public var daxTxAudioStreams
-  @Barrier([Equalizer.EqType: Equalizer](), Api.objectQ)            public var equalizers
-  @Barrier([DaxIqStreamId: IqStream](), Api.objectQ)                public var iqStreams
-  @Barrier([MemoryId: Memory](), Api.objectQ)                       public var memories
-  @Barrier([MeterId: Meter](), Api.objectQ)                         public var meters
-  @Barrier([DaxMicStreamId: MicAudioStream](), Api.objectQ)         public var micAudioStreams
-  @Barrier([OpusId: Opus](), Api.objectQ)                           public var opusStreams
-  @Barrier([PanadapterStreamId: Panadapter](), Api.objectQ)         public var panadapters
-  @Barrier([ProfileId: Profile](), Api.objectQ)                     public var profiles
-  @Barrier([RemoteRxStreamId: RemoteRxAudioStream](), Api.objectQ)  public var remoteRxAudioStreams
-  @Barrier([RemoteTxStreamId: RemoteTxAudioStream](), Api.objectQ)  public var remoteTxAudioStreams
-  @Barrier([SequenceNumber: ReplyTuple](), Api.objectQ)             public var replyHandlers
-  @Barrier([SliceId: xLib6000.Slice](), Api.objectQ)                public var slices
-  @Barrier([TnfId: Tnf](), Api.objectQ)                             public var tnfs
-  @Barrier([TxStreamId: TxAudioStream](), Api.objectQ)              public var txAudioStreams
-  @Barrier([UsbCableId: UsbCable](), Api.objectQ)                   public var usbCables
-  @Barrier([WaterfallStreamId: Waterfall](), Api.objectQ)           public var waterfalls
-  @Barrier([XvtrId: Xvtr](), Api.objectQ)                           public var xvtrs
+  private var _amplifiers                   = [AmplifierId: Amplifier]()
+  private var _audioStreams                 = [AudioStreamId: AudioStream]()
+  private var _daxIqStreams                 = [DaxIqStreamId: DaxIqStream]()
+  private var _daxMicAudioStreams           = [DaxMicStreamId: DaxMicAudioStream]()
+  private var _daxRxAudioStreams            = [DaxRxStreamId: DaxRxAudioStream]()
+  private var _daxTxAudioStreams            = [DaxTxStreamId: DaxTxAudioStream]()
+  private var _equalizers                   = [Equalizer.EqType: Equalizer]()
+  private var _iqStreams                    = [DaxIqStreamId: IqStream]()
+  private var _memories                     = [MemoryId: Memory]()
+  private var _meters                       = [MeterId: Meter]()
+  private var _micAudioStreams              = [DaxMicStreamId: MicAudioStream]()
+  private var _opusStreams                  = [OpusId: Opus]()
+  private var _panadapters                  = [PanadapterStreamId: Panadapter]()
+  private var _profiles                     = [ProfileId: Profile]()
+  private var _remoteRxAudioStreams         = [RemoteRxStreamId: RemoteRxAudioStream]()
+  private var _remoteTxAudioStreams         = [RemoteTxStreamId: RemoteTxAudioStream]()
+  private var _replyHandlers                = [SequenceNumber: ReplyTuple]()
+  private var _slices                       = [SliceId: Slice]()
+  private var _tnfs                         = [TnfId: Tnf]()
+  private var _txAudioStreams               = [TxStreamId: TxAudioStream]()
+  private var _usbCables                    = [UsbCableId: UsbCable]()
+  private var _waterfalls                   = [WaterfallStreamId: Waterfall]()
+  private var _xvtrs                        = [XvtrId: Xvtr]()
+
+  public var amplifiers: [AmplifierId: Amplifier] {
+    get { return Api.objectQ.sync { _amplifiers } }
+    set { Api.objectQ.sync(flags: .barrier) { _amplifiers = newValue } } }
+  
+  public var audioStreams: [AudioStreamId: AudioStream] {
+    get { return Api.objectQ.sync { _audioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _audioStreams = newValue } } }
+  
+  public var daxIqStreams: [DaxIqStreamId: DaxIqStream] {
+    get { return Api.objectQ.sync { _daxIqStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _daxIqStreams = newValue } } }
+  
+  public var daxMicAudioStreams: [DaxMicStreamId: DaxMicAudioStream] {
+    get { return Api.objectQ.sync { _daxMicAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _daxMicAudioStreams = newValue } } }
+  
+  public var daxRxAudioStreams: [DaxRxStreamId: DaxRxAudioStream] {
+    get { return Api.objectQ.sync { _daxRxAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _daxRxAudioStreams = newValue } } }
+  
+  public var daxTxAudioStreams: [DaxTxStreamId: DaxTxAudioStream] {
+    get { return Api.objectQ.sync { _daxTxAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _daxTxAudioStreams = newValue } } }
+  
+  public var equalizers: [Equalizer.EqType: Equalizer] {
+    get { return Api.objectQ.sync { _equalizers } }
+    set { Api.objectQ.sync(flags: .barrier) { _equalizers = newValue } } }
+  
+  public var iqStreams: [DaxIqStreamId: IqStream] {
+    get { return Api.objectQ.sync { _iqStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _iqStreams = newValue } } }
+  
+  public var memories: [MemoryId: Memory] {
+    get { return Api.objectQ.sync { _memories } }
+    set { Api.objectQ.sync(flags: .barrier) { _memories = newValue } } }
+  
+  public var meters: [MeterId: Meter] {
+    get { return Api.objectQ.sync { _meters } }
+    set { Api.objectQ.sync(flags: .barrier) { _meters = newValue } } }
+  
+  public var micAudioStreams: [DaxMicStreamId: MicAudioStream] {
+    get { return Api.objectQ.sync { _micAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _micAudioStreams = newValue } } }
+  
+  public var opusStreams: [OpusId: Opus] {
+    get { return Api.objectQ.sync { _opusStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _opusStreams = newValue } } }
+  
+  public var panadapters: [PanadapterStreamId: Panadapter] {
+    get { return Api.objectQ.sync { _panadapters } }
+    set { Api.objectQ.sync(flags: .barrier) { _panadapters = newValue } } }
+  
+  public var profiles: [ProfileId: Profile] {
+    get { return Api.objectQ.sync { _profiles } }
+    set { Api.objectQ.sync(flags: .barrier) { _profiles = newValue } } }
+  
+  public var remoteRxAudioStreams: [RemoteRxStreamId: RemoteRxAudioStream] {
+    get { return Api.objectQ.sync { _remoteRxAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _remoteRxAudioStreams = newValue } } }
+  
+  public var remoteTxAudioStreams: [RemoteTxStreamId: RemoteTxAudioStream] {
+    get { return Api.objectQ.sync { _remoteTxAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _remoteTxAudioStreams = newValue } } }
+  
+  public var replyHandlers: [SequenceNumber: ReplyTuple] {
+    get { return Api.objectQ.sync { _replyHandlers } }
+    set { Api.objectQ.sync(flags: .barrier) { _replyHandlers = newValue } } }
+  
+  public var slices: [SliceId: Slice] {
+    get { return Api.objectQ.sync { _slices } }
+    set { Api.objectQ.sync(flags: .barrier) { _slices = newValue } } }
+  
+  public var tnfs: [TnfId: Tnf] {
+    get { return Api.objectQ.sync { _tnfs } }
+    set { Api.objectQ.sync(flags: .barrier) { _tnfs = newValue } } }
+  
+  public var txAudioStreams: [TxStreamId: TxAudioStream] {
+    get { return Api.objectQ.sync { _txAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _txAudioStreams = newValue } } }
+  
+  public var usbCables: [UsbCableId: UsbCable] {
+    get { return Api.objectQ.sync { _usbCables } }
+    set { Api.objectQ.sync(flags: .barrier) { _usbCables = newValue } } }
+  
+  public var waterfalls: [WaterfallStreamId: Waterfall] {
+    get { return Api.objectQ.sync { _waterfalls } }
+    set { Api.objectQ.sync(flags: .barrier) { _waterfalls = newValue } } }
+  
+  public var xvtrs: [XvtrId: Xvtr] {
+    get { return Api.objectQ.sync { _xvtrs } }
+    set { Api.objectQ.sync(flags: .barrier) { _xvtrs = newValue } } }
+
+  
+
+  // object collections
+//  @Barrier([AmplifierId: Amplifier](), Api.objectQ)                 public var amplifiers
+//  @Barrier([AudioStreamId: AudioStream](), Api.objectQ)             public var audioStreams
+//  @Barrier([DaxIqStreamId: DaxIqStream](), Api.objectQ)             public var daxIqStreams
+//  @Barrier([DaxMicStreamId: DaxMicAudioStream](), Api.objectQ)      public var daxMicAudioStreams
+//  @Barrier([DaxRxStreamId: DaxRxAudioStream](), Api.objectQ)        public var daxRxAudioStreams
+//  @Barrier([DaxTxStreamId: DaxTxAudioStream](), Api.objectQ)        public var daxTxAudioStreams
+//  @Barrier([Equalizer.EqType: Equalizer](), Api.objectQ)            public var equalizers
+//  @Barrier([DaxIqStreamId: IqStream](), Api.objectQ)                public var iqStreams
+//  @Barrier([MemoryId: Memory](), Api.objectQ)                       public var memories
+//  @Barrier([MeterId: Meter](), Api.objectQ)                         public var meters
+//  @Barrier([DaxMicStreamId: MicAudioStream](), Api.objectQ)         public var micAudioStreams
+//  @Barrier([OpusId: Opus](), Api.objectQ)                           public var opusStreams
+//  @Barrier([PanadapterStreamId: Panadapter](), Api.objectQ)         public var panadapters
+//  @Barrier([ProfileId: Profile](), Api.objectQ)                     public var profiles
+//  @Barrier([RemoteRxStreamId: RemoteRxAudioStream](), Api.objectQ)  public var remoteRxAudioStreams
+//  @Barrier([RemoteTxStreamId: RemoteTxAudioStream](), Api.objectQ)  public var remoteTxAudioStreams
+//  @Barrier([SequenceNumber: ReplyTuple](), Api.objectQ)             public var replyHandlers
+//  @Barrier([SliceId: xLib6000.Slice](), Api.objectQ)                public var slices
+//  @Barrier([TnfId: Tnf](), Api.objectQ)                             public var tnfs
+//  @Barrier([TxStreamId: TxAudioStream](), Api.objectQ)              public var txAudioStreams
+//  @Barrier([UsbCableId: UsbCable](), Api.objectQ)                   public var usbCables
+//  @Barrier([WaterfallStreamId: Waterfall](), Api.objectQ)           public var waterfalls
+//  @Barrier([XvtrId: Xvtr](), Api.objectQ)                           public var xvtrs
   
   @objc dynamic public var apfEnabled: Bool {
     get {  return _apfEnabled }

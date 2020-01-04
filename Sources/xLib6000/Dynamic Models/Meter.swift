@@ -26,16 +26,16 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   
   public let id                             : MeterId
 
-  @Barrier("", Api.objectQ) @objc dynamic public  var desc
-  @Barrier(0, Api.objectQ) @objc dynamic public   var fps
-  @Barrier(0.0, Api.objectQ) @objc dynamic public var high: Float
-  @Barrier(0.0, Api.objectQ) @objc dynamic public var low: Float
-  @Barrier("", Api.objectQ) @objc dynamic public  var group
-  @Barrier("", Api.objectQ) @objc dynamic public  var name
-  @Barrier(0.0, Api.objectQ) @objc dynamic public var peak: Float
-  @Barrier("", Api.objectQ) @objc dynamic public  var source
-  @Barrier("", Api.objectQ) @objc dynamic public  var units
-  @Barrier(0.0, Api.objectQ) @objc dynamic public var value: Float
+  @Barrier("", Api.objectQ)   @objc dynamic public  var desc
+  @Barrier(0, Api.objectQ)    @objc dynamic public  var fps
+  @Barrier(0.0, Api.objectQ)  @objc dynamic public  var high    : Float
+  @Barrier(0.0, Api.objectQ)  @objc dynamic public  var low     : Float
+  @Barrier("", Api.objectQ)   @objc dynamic public  var group
+  @Barrier("", Api.objectQ)   @objc dynamic public  var name
+  @Barrier(0.0, Api.objectQ)  @objc dynamic public  var peak    : Float
+  @Barrier("", Api.objectQ)   @objc dynamic public  var source
+  @Barrier("", Api.objectQ)   @objc dynamic public  var units
+  @Barrier(0.0, Api.objectQ)  @objc dynamic public  var value   : Float
 
   public enum Source: String {
     case codec      = "cod"
@@ -97,7 +97,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   ///
   class func vitaProcessor(_ vita: Vita, radio: Radio?) {
     var metersFound = [UInt16]()
-
+    
     // NOTE:  there is a bug in the Radio (as of v2.2.8) that sends
     //        multiple copies of meters, this code ignores the duplicates
     
@@ -123,12 +123,8 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
         metersFound.append(number)
         
         // find the meter (if present) & update it
-//        if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", number)] {
-          if let meter = radio?.meters[number] {
-
-//          // interpret it as a signed value
-//          meter.streamHandler( Int16(bitPattern: value) )
-          //
+        //        if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", number)] {
+        if let meter = radio?.meters[number] {
           meter.streamHandler( value)
         }
       }
