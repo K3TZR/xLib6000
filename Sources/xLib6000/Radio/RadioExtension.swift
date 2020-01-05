@@ -337,6 +337,44 @@ extension Radio {
   // ----------------------------------------------------------------------------
   // MARK: - Radio methods
   
+  /// Request all subscriptions
+  ///
+  /// - Parameter callback: ReplyHandler (optional)
+  ///
+  public func requestSubAll(callback: ReplyHandler? = nil) {
+    sendCommand("sub tx all")
+    sendCommand("sub atu all")
+    sendCommand("sub amplifier all")
+    sendCommand("sub meter all")
+    sendCommand("sub pan all")
+    sendCommand("sub slice all")
+    sendCommand("sub gps all")
+    sendCommand("sub audio_stream all")
+    sendCommand("sub cwx all")
+    sendCommand("sub xvtr all")
+    sendCommand("sub memories all")
+    sendCommand("sub daxiq all")
+    sendCommand("sub dax all")
+    sendCommand("sub usb_cable all")
+    if version.isV3 { sendCommand("sub tnf all") }
+    //      send("sub spot all")    // TODO:
+  }
+  /// Request MTU limit
+  /// - Parameters:
+  ///   - size:         MTU size
+  ///   - callback:     ReplyHandler (optional)
+  ///
+  public func requestMtuLimit(_ size: Int, callback: ReplyHandler? = nil) {
+    sendCommand("client set enforce_network_mtu=1 network_mtu=\(size)"
+  }
+  /// Request limited Dax bandwidth
+  /// - Parameters:
+  ///   - size:         MTU size
+  ///   - callback:     ReplyHandler (optional)
+  ///
+  public func requestDaxBandwidthLimit(_ enable: Bool, callback: ReplyHandler? = nil) {
+    sendCommand("client set send_reduced_bw_dax=\(enable.as1or0)")
+  }
   /// Request a List of Antenna sources
   ///
   /// - Parameter callback:   ReplyHandler (optional)

@@ -21,40 +21,36 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("1.0.0")
-  public static let kSupportsVersion        = Version("2.4.9")
-  public static let kName                   = "xLib6000"
-
   public static let kBundleIdentifier       = "net.k3tzr." + Api.kName
   public static let kDaxChannels            = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
   public static let kDaxIqChannels          = ["None", "1", "2", "3", "4"]
+  public static let kName                   = "xLib6000"
   public static let kNoError                = "0"
+  public static let kSupportsVersion        = Version("2.4.9")
+  public static let kVersion                = Version("1.0.0")
 
-  static let objectQ                        = DispatchQueue(label: Api.kName + ".objectQ", attributes: [.concurrent])
-  static let kTcpTimeout                    = 0.5                           // seconds
-  static let kControlMin                    = 0                             // control ranges
-  static let kControlMax                    = 100
-  static let kMinApfQ                       = 0
-  static let kMaxApfQ                       = 33
-  static let kNotInUse                      = "in_use=0"                    // removal indicators
-  static let kRemoved                       = "removed"
+
+  static        let objectQ                 = DispatchQueue(label: Api.kName + ".objectQ", attributes: [.concurrent])
+  static        let kTcpTimeout             = 0.5     // seconds
+  static        let kNotInUse               = "in_use=0"
+  static        let kRemoved                = "removed"
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
-  @objc dynamic public var radio            : Radio?                        // current Radio class
 
-  public private(set) var radioVersion      = Version()
-  public var apiState                       : Api.State! {
+  public                var apiState              : Api.State! {
     didSet { _log( "Api state = \(apiState.rawValue)", .debug, #function, #file, #line)}}
 
-  public var delegate                       : ApiDelegate?                  // API delegate
-  public var testerModeEnabled              = false                         // Library being used by xAPITester
-  public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
-  public var pingerEnabled                  = true                          // Pinger enable
-  public var isWan                          = false                         // Remote connection
-  public var wanConnectionHandle            = ""                            // Wan connection handle
-  public var connectionHandle               : Handle?                       // Status messages handle
+  public                var connectionHandle      : Handle?
+  public                var delegate              : ApiDelegate?
+  public                var isWan                 = false
+  @objc dynamic public  var radio                 : Radio?
+  public private(set)   var radioVersion          = Version()
+  public                var testerDelegate        : ApiDelegate?
+  public                var testerModeEnabled     = false
+  public                var pingerEnabled         = true
+  public                var wanConnectionHandle   = ""
 
   @Barrier("0.0.0.0", Api.objectQ)            public var localIP
   @Barrier(0, Api.objectQ)                    public var localUDPPort: UInt16
@@ -110,32 +106,31 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  internal var _tcp                          : TcpManager!                   // TCP commands
-  internal var _udp                          : UdpManager!                   // UDP streams
+  internal var _tcp                          : TcpManager!  // commands
+  internal var _udp                          : UdpManager!  // streams
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _clientIpSemaphore            = DispatchSemaphore(value: 0)   // semaphore to signal that we have got the client ip
-  
+  private var _clientId                     : UUID?
+  private var _clientStation                = ""
+  private var _isGui                        = true
+  private var _lowBandwidthConnect          = false
+  private var _pinger                       : Pinger?
+  private var _programName                  = ""
+
   // GCD Serial Queues
+  private let _pingQ                        = DispatchQueue(label: Api.kName + ".pingQ")
+  private let _parseQ                       = DispatchQueue(label: Api.kName + ".parseQ", qos: .userInteractive)
   private let _tcpReceiveQ                  = DispatchQueue(label: Api.kName + ".tcpReceiveQ")
   private let _tcpSendQ                     = DispatchQueue(label: Api.kName + ".tcpSendQ")
   private let _udpReceiveQ                  = DispatchQueue(label: Api.kName + ".udpReceiveQ", qos: .userInteractive)
   private let _udpRegisterQ                 = DispatchQueue(label: Api.kName + ".udpRegisterQ")
-  private let _pingQ                        = DispatchQueue(label: Api.kName + ".pingQ")
-  private let _parseQ                       = DispatchQueue(label: Api.kName + ".parseQ", qos: .userInteractive)
   private let _workerQ                      = DispatchQueue(label: Api.kName + ".workerQ")
 
-  private var _pinger                       : Pinger?
-  private var _clientId                     : UUID?
-  private var _programName                  = ""
-  private var _clientStation                = ""
-  private var _isGui                        = true
-  private var _lowBandwidthConnect          = false
-
-  private let _log                          = Log.sharedInstance.msg
+  private let _clientIpSemaphore            = DispatchSemaphore(value: 0)
   private let _isTnfSubscribed              = true // TODO:
+  private let _log                          = Log.sharedInstance.msg
 
   // ----------------------------------------------------------------------------
   // MARK: - Singleton
@@ -206,11 +201,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     }
     return radio
   }
-  /// Shutdown the active Radio
+  /// Disconnect the active Radio
   ///
   /// - Parameter reason:         a reason code
   ///
-  public func shutdown(reason: DisconnectReason = .normal) {
+  public func disconnect(reason: DisconnectReason = .normal) {
     
     // stop pinging (if active)
     if _pinger != nil {
@@ -235,6 +230,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // the radio (if any)) has been removed, inform observers
     NC.post(.radioHasBeenRemoved, object: nil)
   }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Internal methods
+  
   /// Send a command to the Radio (hardware)
   ///
   /// - Parameters:
@@ -242,7 +241,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///   - flag:           use "D"iagnostic form
   ///   - callback:       a callback function (if any)
   ///
-  public func send(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) {
+  func send(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) {
     
     // tell the TcpManager to send the command
     let sequenceNumber = _tcp.send(command, diagnostic: flag)
@@ -261,7 +260,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///   - callback:       a callback function (if any)
   /// - Returns:          Success / Failure
   ///
-  public func sendWithCheck(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) -> Bool {
+  func sendWithCheck(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) -> Bool {
     
     // abort if no connection
     guard _tcp.isConnected else { return false }
@@ -276,7 +275,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameters:
   ///   - data:       a Vita-49 packet as Data
   ///
-  public func send(_ data: Data?) {
+  func send(_ data: Data?) {
     
     // if data present
     if let dataToSend = data {
@@ -285,51 +284,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _udp.sendData(dataToSend)
     }
   }
-  /// Send the collection of commands to configure the connection
-  ///
-  public func sendCommands() {
-    
-    // clientIp
-    if _isGui { send("client gui") }
-    send("client program " + _programName)
-    // clientStation //v3
-    // clientBind    // v3
-    if _lowBandwidthConnect { send("client low_bw_connect") }
-    
-    radio?.requestInfo()
-    radio?.requestVersion()
-    radio?.requestAntennaList()
-    radio?.requestMicList()
-    radio?.requestGlobalProfile()
-    radio?.requestTxProfile()
-    radio?.requestMicProfile()
-    radio?.requestDisplayProfile()
-
-    send("sub tx all")
-    send("sub atu all")
-    send("sub amplifier all")
-    send("sub meter all")
-    send("sub pan all")
-    send("sub slice all")
-    send("sub gps all")
-    send("sub audio_stream all")
-    send("sub cwx all")
-    send("sub xvtr all")
-    send("sub memories all")
-    send("sub daxiq all")
-    send("sub dax all")
-    send("sub usb_cable all")
-    if _isTnfSubscribed { send("sub tnf all") }
-    
-    //      send("sub spot all")    // TODO:
-    
-    send("client set enforce_network_mtu=1 network_mtu=1500")
-    send("client set send_reduced_bw_dax=1")
-  }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Internal methods
-  
   /// A Client has been connected
   ///
   func clientConnected(_ discoveryPacket: DiscoveryStruct) {
@@ -396,6 +350,32 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
     
+  /// Send commands to configure the connection
+  ///
+  private func sendCommands() {
+    
+    if let radio = radio {
+      
+      // clientIp
+      if _isGui { radio.sendCommand("client gui") }
+      radio.sendCommand("client program " + _programName)
+      // clientStation
+      // clientBind
+      
+      if _lowBandwidthConnect { radio.requestLowBandwidthConnect() }
+      radio.requestInfo()
+      radio.requestVersion()
+      radio.requestAntennaList()
+      radio.requestMicList()
+      radio.requestGlobalProfile()
+      radio.requestTxProfile()
+      radio.requestMicProfile()
+      radio.requestDisplayProfile()
+      radio.requestSubAll()
+      radio.requestMtuLimit(1_500)
+      radio.requestDaxBandwidthLimit(true)
+    }
+  }
   /// Determine if the Radio Firmware version is compatable with the API version
   ///
   /// - Parameters:
@@ -410,16 +390,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _log("Radio may need to be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kSupportsVersion.shortString)", .warning, #function, #file, #line)
       NC.post(.radioDowngrade, object: [Api.kVersion, radioVersion])
     }
-  }
-  /// Send a command list to the Radio
-  ///
-  /// - Parameters:
-  ///   - commands:       an array of CommandTuple
-  ///
-  private func sendCommandList(_ commands: [CommandTuple]) {
-    
-    // send the commands to the Radio (hardware)
-    commands.forEach { send($0.command, diagnostic: $0.diagnostic, replyTo: $0.replyHandler) }
   }
   /// Reply handler for the "client ip" command
   ///

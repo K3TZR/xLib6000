@@ -42,11 +42,11 @@ public final class Slice                    : NSObject, DynamicModel {
   
   @objc dynamic public var agcOffLevel: Int {
     get { return _agcOffLevel }
-    set { if _agcOffLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) {  _agcOffLevel = newValue ; sliceCmd( .agcOffLevel, newValue) } } } }
+    set { if _agcOffLevel != newValue {  _agcOffLevel = newValue ; sliceCmd( .agcOffLevel, newValue) } } }
   
   @objc dynamic public var agcThreshold: Int {
     get { return _agcThreshold }
-    set { if _agcThreshold != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _agcThreshold = newValue ; sliceCmd( .agcThreshold, newValue) } } } }
+    set { if _agcThreshold != newValue { _agcThreshold = newValue ; sliceCmd( .agcThreshold, newValue) } } }
   
   @objc dynamic public var anfEnabled: Bool {
     get { return _anfEnabled }
@@ -54,7 +54,7 @@ public final class Slice                    : NSObject, DynamicModel {
   
   @objc dynamic public var anfLevel: Int {
     get { return _anfLevel }
-    set { if _anfLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _anfLevel = newValue ; sliceCmd( .anfLevel, newValue) } } } }
+    set { if _anfLevel != newValue { _anfLevel = newValue ; sliceCmd( .anfLevel, newValue) } } }
   
   @objc dynamic public var apfEnabled: Bool {
     get { return _apfEnabled }
@@ -62,11 +62,11 @@ public final class Slice                    : NSObject, DynamicModel {
   
   @objc dynamic public var apfLevel: Int {
     get { return _apfLevel }
-    set { if _apfLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _apfLevel = newValue ; sliceCmd( .apfLevel, newValue) } } } }
+    set { if _apfLevel != newValue { _apfLevel = newValue ; sliceCmd( .apfLevel, newValue) } } }
   
   @objc dynamic public var audioGain: Int {
     get { return _audioGain }
-    set { if _audioGain != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioGain = newValue ; audioCmd("gain", value: newValue) } } } }
+    set { if _audioGain != newValue { _audioGain = newValue ; audioCmd("gain", value: newValue) } } }
   
   @objc dynamic public var audioMute: Bool {
     get { return _audioMute }
@@ -74,7 +74,7 @@ public final class Slice                    : NSObject, DynamicModel {
   
   @objc dynamic public var audioPan: Int {
     get { return _audioPan }
-    set { if _audioPan != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioPan = newValue ; audioCmd("pan", value: newValue) } } } }
+    set { if _audioPan != newValue { _audioPan = newValue ; audioCmd("pan", value: newValue) } } }
   
   @objc dynamic public var daxChannel: Int {
     get { return _daxChannel }
@@ -150,7 +150,7 @@ public final class Slice                    : NSObject, DynamicModel {
   
   @objc dynamic public var nbLevel: Int {
     get { return _nbLevel }
-    set { if _nbLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) {  _nbLevel = newValue ; sliceCmd( .nbLevel, newValue) } } } }
+    set { if _nbLevel != newValue {  _nbLevel = newValue ; sliceCmd( .nbLevel, newValue) } } }
   
   @objc dynamic public var nrEnabled: Bool {
     get { return _nrEnabled }
@@ -158,7 +158,7 @@ public final class Slice                    : NSObject, DynamicModel {
   
   @objc dynamic public var nrLevel: Int {
     get { return _nrLevel }
-    set { if _nrLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) {  _nrLevel = newValue ; sliceCmd( .nrLevel, newValue) } } } }
+    set { if _nrLevel != newValue {  _nrLevel = newValue ; sliceCmd( .nrLevel, newValue) } } }
   
   @objc dynamic public var playbackEnabled: Bool {
     get { return _playbackEnabled }
@@ -210,7 +210,7 @@ public final class Slice                    : NSObject, DynamicModel {
   
   @objc dynamic public var squelchLevel: Int {
     get { return _squelchLevel }
-    set { if _squelchLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) {  _squelchLevel = newValue ; sliceCmd( .squelchLevel, newValue) } } } }
+    set { if _squelchLevel != newValue {  _squelchLevel = newValue ; sliceCmd( .squelchLevel, newValue) } } }
   
   @objc dynamic public var txAnt: String {
     get { return _txAnt }
@@ -230,7 +230,7 @@ public final class Slice                    : NSObject, DynamicModel {
   
   @objc dynamic public var wnbLevel: Int {
     get { return _wnbLevel }
-    set { if wnbLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) {  _wnbLevel = newValue ; sliceCmd( .wnbLevel, newValue) } } } }
+    set { if wnbLevel != newValue {  _wnbLevel = newValue ; sliceCmd( .wnbLevel, newValue) } } }
   
   @objc dynamic public var xitEnabled: Bool {
     get { return _xitEnabled }
@@ -360,26 +360,20 @@ public final class Slice                    : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @BarrierClamped(0, Api.objectQ, range: 0...100)           var _apfLevel
-  @BarrierClamped(0, Api.objectQ, range: 1...8)             var _daxChannel
-  @BarrierClamped(0, Api.objectQ, range: -99_999...99_999)  var _ritOffset
-  @BarrierClamped(0, Api.objectQ, range: 0...100)           var _audioGain
-  @BarrierClamped(50, Api.objectQ, range: 0...100)          var _audioPan
-  @BarrierClamped(0, Api.objectQ, range: 0...100)           var _nbLevel
-  @BarrierClamped(0, Api.objectQ, range: 0...100)           var _nrLevel
-  @BarrierClamped(0, Api.objectQ, range: 0...100)           var _squelchLevel
-
-  @Barrier(0, Api.objectQ)                        var _daxClients
-  //
   @Barrier(false, Api.objectQ)                    var _active
   @Barrier(AgcMode.off.rawValue, Api.objectQ)     var _agcMode
-  @Barrier(0, Api.objectQ)                        var _agcOffLevel
-  @Barrier(0, Api.objectQ)                        var _agcThreshold
+  @BarrierClamped(0, Api.objectQ, range: 0...100) var _agcOffLevel
+  @BarrierClamped(0, Api.objectQ, range: 0...100) var _agcThreshold
   @Barrier(false, Api.objectQ)                    var _anfEnabled
-  @Barrier(0, Api.objectQ)                        var _anfLevel
+  @BarrierClamped(0, Api.objectQ, range: 0...100) var _anfLevel
   @Barrier(false, Api.objectQ)                    var _apfEnabled
+  @BarrierClamped(0, Api.objectQ, range: 0...100) var _apfLevel
+  @BarrierClamped(0, Api.objectQ, range: 0...100) var _audioGain
   @Barrier(false, Api.objectQ)                    var _audioMute
+  @BarrierClamped(50, Api.objectQ, range: 0...100)  var _audioPan
   @Barrier(false, Api.objectQ)                    var _autoPan
+  @BarrierClamped(0, Api.objectQ, range: 1...8)   var _daxChannel
+  @Barrier(0, Api.objectQ)                        var _daxClients
   @Barrier(false, Api.objectQ)                    var _daxTxEnabled
   @Barrier(false, Api.objectQ)                    var _detached
   @Barrier(false, Api.objectQ)                    var _dfmPreDeEmphasisEnabled
@@ -404,7 +398,9 @@ public final class Slice                    : NSObject, DynamicModel {
   @Barrier(Mode.LSB.rawValue, Api.objectQ)        var _mode
   @Barrier([String](), Api.objectQ)               var _modeList
   @Barrier(false, Api.objectQ)                    var _nbEnabled
+  @BarrierClamped(0, Api.objectQ, range: 0...100) var _nbLevel
   @Barrier(false, Api.objectQ)                    var _nrEnabled
+  @BarrierClamped(0, Api.objectQ, range: 0...100) var _nrLevel
   @Barrier(0, Api.objectQ)                        var _nr2
   @Barrier(0, Api.objectQ)                        var _owner
   @Barrier(0, Api.objectQ)                        var _panadapterId : PanadapterStreamId
@@ -418,6 +414,7 @@ public final class Slice                    : NSObject, DynamicModel {
   @Barrier(Offset.simplex.rawValue, Api.objectQ)  var _repeaterOffsetDirection
   @Barrier(0, Api.objectQ)                        var _rfGain
   @Barrier(false, Api.objectQ)                    var _ritEnabled
+  @BarrierClamped(0, Api.objectQ, range: -99_999...99_999)  var _ritOffset
   @Barrier(0, Api.objectQ)                        var _rttyMark
   @Barrier(0, Api.objectQ)                        var _rttyShift
   @Barrier("", Api.objectQ)                       var _rxAnt
@@ -425,14 +422,15 @@ public final class Slice                    : NSObject, DynamicModel {
   @Barrier(nil, Api.objectQ)                      var _sliceLetter : String?
   @Barrier(0, Api.objectQ)                        var _step
   @Barrier(false, Api.objectQ)                    var _squelchEnabled
+  @BarrierClamped(0, Api.objectQ, range: 0...100) var _squelchLevel
   @Barrier("", Api.objectQ)                       var _stepList
   @Barrier("", Api.objectQ)                       var _txAnt
   @Barrier([String](), Api.objectQ)               var _txAntList
   @Barrier(false, Api.objectQ)                    var _txEnabled
-  @Barrier(0.0, Api.objectQ)                      var _txOffsetFreq                : Float
+  @Barrier(0.0, Api.objectQ)                      var _txOffsetFreq : Float
   @Barrier(false, Api.objectQ)                    var _wide
   @Barrier(false, Api.objectQ)                    var _wnbEnabled
-  @Barrier(0, Api.objectQ)                        var _wnbLevel
+  @BarrierClamped(0, Api.objectQ, range: 0...100) var _wnbLevel
   @Barrier(false, Api.objectQ)                    var _xitEnabled
   @Barrier(0, Api.objectQ)                        var _xitOffset                                                
 
