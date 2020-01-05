@@ -20,6 +20,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // MARK: - Static properties
   
   public static let kVersion                = Version("1.0.0")
+  public static let kSupportsVersion        = Version("2.4.9")
   public static let kName                   = "xLib6000"
 
 //  public static let kDomainName             = "net.k3tzr"
@@ -58,19 +59,23 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   @Barrier("0.0.0.0", Api.objectQ)            public var localIP
   @Barrier(0, Api.objectQ)                    public var localUDPPort: UInt16
   @Barrier([Handle:GuiClient](), Api.objectQ) public var guiClients
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Internal properties
+  
+  internal var _tcp                          : TcpManager!                   // TCP commands
+  internal var _udp                          : UdpManager!                   // UDP streams
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  internal var _tcp                          : TcpManager!                   // TCP connection class (commands)
-  internal var _udp                          : UdpManager!                   // UDP connection class (streams)
-  private var _primaryCmdTypes              = [Api.Command]()               // Primary command types to be sent
-  private var _secondaryCmdTypes            = [Api.Command]()               // Secondary command types to be sent
-  private var _subscriptionCmdTypes         = [Api.Command]()               // Subscription command types to be sent
-  
-  private var _primaryCommands              = [CommandTuple]()              // Primary commands to be sent
-  private var _secondaryCommands            = [CommandTuple]()              // Secondary commands to be sent
-  private var _subscriptionCommands         = [CommandTuple]()              // Subscription commands to be sent
+//  private var _primaryCmdTypes              = [Api.Command]()               // Primary command types to be sent
+//  private var _secondaryCmdTypes            = [Api.Command]()               // Secondary command types to be sent
+//  private var _subscriptionCmdTypes         = [Api.Command]()               // Subscription command types to be sent
+//
+//  private var _primaryCommands              = [CommandTuple]()              // Primary commands to be sent
+//  private var _secondaryCommands            = [CommandTuple]()              // Secondary commands to be sent
+//  private var _subscriptionCommands         = [CommandTuple]()              // Subscription commands to be sent
   private let _clientIpSemaphore            = DispatchSemaphore(value: 0)   // semaphore to signal that we have got the client ip
   
   // GCD Serial Queues
@@ -91,7 +96,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   private let _log                          = Log.sharedInstance.msg
   private let _isTnfSubscribed              = true // TODO:
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Singleton
   
@@ -138,18 +143,19 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       clientId: UUID? = nil,
                       isGui: Bool = true,
                       isWan: Bool = false,
-                      wanHandle: String = "",
-                      primaryCmdTypes: [Api.Command] = [.allPrimary],
-                      secondaryCmdTypes: [Api.Command] = [.allSecondary],
-                      subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) -> Radio? {
+                      wanHandle: String = ""
+//                      primaryCmdTypes: [Api.Command] = [.allPrimary],
+//                      secondaryCmdTypes: [Api.Command] = [.allSecondary],
+//                      subscriptionCmdTypes: [Api.Command] = [.allSubscription]
+  ) -> Radio? {
 
     // must be in the Disconnected state to connect
     guard apiState == .disconnected else { return nil }
         
     // save the Command types
-    _primaryCmdTypes = primaryCmdTypes
-    _secondaryCmdTypes = secondaryCmdTypes
-    _subscriptionCmdTypes = subscriptionCmdTypes
+//    _primaryCmdTypes = primaryCmdTypes
+//    _secondaryCmdTypes = secondaryCmdTypes
+//    _subscriptionCmdTypes = subscriptionCmdTypes
     
     // Create a Radio class
     radio = Radio(discoveryPacket, api: self)
@@ -158,7 +164,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     if _tcp.connect(discoveryPacket, isWan: isWan) {
       
       // check the versions
-      checkFirmware(discoveryPacket)
+      checkVersion(discoveryPacket)
       
       _programName = programName
       _clientId = clientId
@@ -381,28 +387,13 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameters:
   ///   - selectedRadio:      a RadioParameters struct
   ///
-  private func checkFirmware(_ selectedRadio: DiscoveryStruct) {
+  private func checkVersion(_ selectedRadio: DiscoveryStruct) {
     
-    // create the Version structs
+    // get the Radio Version
     radioVersion = Version(selectedRadio.firmwareVersion)
-    // make sure they are valid
-    // compare them
-    switch (radioVersion, Api.kVersion) {
-      
-    case (let radio, let api) where radio == api:
-      break
 
-    case (let radio, let api) where radio < api:
-      // Radio may need update
-      if api.isV3 && !radio.isV3 {
-        _log("Radio must be upgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", .warning, #function, #file, #line)
-        NC.post(.radioUpgrade, object: [Api.kVersion, radioVersion])
-      } else {
-        _log("Radio may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", .warning, #function, #file, #line)
-      }
-    default:
-      // Radio may need downgrade (radio > api)
-      _log("Radio must be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", .warning, #function, #file, #line)
+    if Api.kSupportsVersion < radioVersion  {
+      _log("Radio may need to be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kSupportsVersion.shortString)", .warning, #function, #file, #line)
       NC.post(.radioDowngrade, object: [Api.kVersion, radioVersion])
     }
   }
@@ -426,62 +417,62 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///   - commands:       an array of Commands
   /// - Returns:          an array of CommandTuple
   ///
-  private func setupCommands(_ commands: [Api.Command]) -> [(CommandTuple)] {
-    var array = [(CommandTuple)]()
-    
-    // return immediately if none required
-    if !commands.contains(.none) {
-      
-      // check for the "all..." cases
-      var adjustedCommands : [Api.Command]
-      switch commands {
-      case [.allPrimary]:       adjustedCommands = Api.Command.allPrimaryCommands()
-      case [.allSecondary]:     adjustedCommands = Api.Command.allSecondaryCommands()
-      case [.allSubscription]:  adjustedCommands = Api.Command.allSubscriptionCommands()
-      default:                  adjustedCommands = commands
-      }
-
-      // add all the specified commands
-      for command in adjustedCommands {
-
-        switch command {
-
-        case .setMtu where radioVersion.major == 2 && radioVersion.minor >= 3:  array.append( (command.rawValue, false, nil) )
-        case .setMtu:                                 break
-
-        case .clientProgram:                          if _isGui { array.append( (command.rawValue + _programName, false, nil) ) }
-
-        case .clientStation where Api.kVersion.isV3:  if _isGui { array.append( (command.rawValue + _clientStation, false, nil) ) }
-        case .clientStation:                          break
-
-          // case .clientLowBW:  if _lowBW { array.append( (command.rawValue, false, nil) ) }
-
-        // Capture the replies from the following
-        case .meterList:    array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .info:         array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .version:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .antList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .micList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-
-        case .clientGui where Api.kVersion.isV3:      if _isGui { array.append( (command.rawValue + " " + (_clientId?.uuidString ?? ""), false, delegate?.defaultReplyHandler) ) }
-        case .clientGui:                              if _isGui { array.append( (command.rawValue, false, delegate?.defaultReplyHandler) ) }
-
-        case .clientBind where Api.kVersion.isV3:     if !_isGui && _clientId != nil { array.append( (command.rawValue + " client_id=" + _clientId!.uuidString, false, nil) ) }
-        case .clientBind:                             break
-          
-        case .subClient where Api.kVersion.isV3:      array.append( (command.rawValue, false, nil) )
-        case .subClient:                              break
-          
-        // ignore the following
-        case .none, .allPrimary, .allSecondary, .allSubscription:   break
-
-        // all others
-        default:    array.append( (command.rawValue, false, nil) )
-        }
-      }
-    }
-    return array
-  }
+//  private func setupCommands(_ commands: [Api.Command]) -> [(CommandTuple)] {
+//    var array = [(CommandTuple)]()
+//
+//    // return immediately if none required
+//    if !commands.contains(.none) {
+//
+//      // check for the "all..." cases
+//      var adjustedCommands : [Api.Command]
+//      switch commands {
+//      case [.allPrimary]:       adjustedCommands = Api.Command.allPrimaryCommands()
+//      case [.allSecondary]:     adjustedCommands = Api.Command.allSecondaryCommands()
+//      case [.allSubscription]:  adjustedCommands = Api.Command.allSubscriptionCommands()
+//      default:                  adjustedCommands = commands
+//      }
+//
+//      // add all the specified commands
+//      for command in adjustedCommands {
+//
+//        switch command {
+//
+//        case .setMtu where radioVersion.major == 2 && radioVersion.minor >= 3:  array.append( (command.rawValue, false, nil) )
+//        case .setMtu:                                 break
+//
+//        case .clientProgram:                          if _isGui { array.append( (command.rawValue + _programName, false, nil) ) }
+//
+//        case .clientStation where Api.kVersion.isV3:  if _isGui { array.append( (command.rawValue + _clientStation, false, nil) ) }
+//        case .clientStation:                          break
+//
+//          // case .clientLowBW:  if _lowBW { array.append( (command.rawValue, false, nil) ) }
+//
+//        // Capture the replies from the following
+//        case .meterList:    array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
+//        case .info:         array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
+//        case .version:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
+//        case .antList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
+//        case .micList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
+//
+//        case .clientGui where Api.kVersion.isV3:      if _isGui { array.append( (command.rawValue + " " + (_clientId?.uuidString ?? ""), false, delegate?.defaultReplyHandler) ) }
+//        case .clientGui:                              if _isGui { array.append( (command.rawValue, false, delegate?.defaultReplyHandler) ) }
+//
+//        case .clientBind where Api.kVersion.isV3:     if !_isGui && _clientId != nil { array.append( (command.rawValue + " client_id=" + _clientId!.uuidString, false, nil) ) }
+//        case .clientBind:                             break
+//
+//        case .subClient where Api.kVersion.isV3:      array.append( (command.rawValue, false, nil) )
+//        case .subClient:                              break
+//
+//        // ignore the following
+//        case .none, .allPrimary, .allSecondary, .allSubscription:   break
+//
+//        // all others
+//        default:    array.append( (command.rawValue, false, nil) )
+//        }
+//      }
+//    }
+//    return array
+//  }
   /// Reply handler for the "client ip" command
   ///
   /// - Parameters:
