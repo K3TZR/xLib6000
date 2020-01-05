@@ -24,19 +24,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   public typealias RfGainValue              = String
   
   // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kApfCmd                        = "eq apf "                     // Text of command messages
-  static let kClientCmd                     = "client "                     // (V3 only)
-  static let kClientSetCmd                  = "client set "                 // (V3 only)
-  static let kCmd                           = "radio "
-  static let kSetCmd                        = "radio set "
-  static let kMixerCmd                      = "mixer "
-  static let kUptimeCmd                     = "radio uptime"
-//  static let kLicenseCmd                    = "license "
-  static let kXmitCmd                       = "xmit "
-  
-  // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   // Object Collections
@@ -1297,11 +1284,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // switch on the first character
     switch msg[msg.startIndex] {
       
-    case "H", "h":  _api.connectionHandle = suffix.handle // Handle type
-    case "M", "m":  parseMessage(suffix)                  // Message Type
-    case "R", "r":  parseReply(suffix)                    // Reply Type
-    case "S", "s":  parseStatus(suffix)                   // Status type
-    case "V", "v":  _hardwareVersion = suffix             // Version Type
+    case "H", "h":  _api.connectionHandle = suffix.handle
+    case "M", "m":  parseMessage(suffix)
+    case "R", "r":  parseReply(suffix)
+    case "S", "s":  parseStatus(suffix)
+    case "V", "v":  _hardwareVersion = suffix
       
     default:    // Unknown Type
       _log("Unexpected message: \(msg)", .warning, #function, #file, #line)
@@ -1404,7 +1391,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // save the list
       sliceList = reply.valuesArray().compactMap {$0.objectId}
       
-    case Radio.kUptimeCmd:
+    case "radio uptime":
       // save the returned Uptime (seconds)
       uptime = Int(reply) ?? 0
       
@@ -1492,7 +1479,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
       // Dax IQ
       if let daxIq = iqStreams[vitaPacket.streamId] {
-        
         daxIq.vitaProcessor(vitaPacket)
       }
       
@@ -1553,8 +1539,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - value:      the new value
   ///
   private func apfCmd( _ token: EqApfToken, _ value: Any) {
-    
-    Api.sharedInstance.send(Radio.kApfCmd + token.rawValue + "=\(value)")
+    sendCommand("eq apf " + token.rawValue + "=\(value)")
   }
   /// Set a Mixer property on the Radio
   ///
@@ -1563,10 +1548,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - value:      the new value
   ///
   private func mixerCmd( _ token: String, _ value: Any) {
-    // NOTE: commands use this format when the Token received does not match the Token sent
-    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    
-    Api.sharedInstance.send(Radio.kMixerCmd + token + " \(value)")
+   sendCommand("mixer " + token + " \(value)")
   }
   /// Set a Radio property on the Radio
   ///
@@ -1575,14 +1557,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - value:      the new value
   ///
   private func radioSetCmd( _ token: RadioToken, _ value: Any) {
-    
-    Api.sharedInstance.send(Radio.kSetCmd + token.rawValue + "=\(value)")
+    sendCommand("radio set " + token.rawValue + "=\(value)")
   }
   private func radioSetCmd( _ token: String, _ value: Any) {
-    // NOTE: commands use this format when the Token received does not match the Token sent
-    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    
-    Api.sharedInstance.send(Radio.kSetCmd + token + "=\(value)")
+    sendCommand("radio set " + token + "=\(value)")
   }
   /// Set a Radio property on the Radio
   ///
@@ -1591,13 +1569,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - value:      the new value
   ///
   private func radioCmd( _ token: RadioToken, _ value: Any) {
-    
-    Api.sharedInstance.send(Radio.kCmd + token.rawValue + " \(value)")
+    sendCommand("radio " + token.rawValue + " \(value)")
   }
   private func radioCmd( _ token: String, _ value: Any) {
-    // NOTE: commands use this format when the Token received does not match the Token sent
-    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    Api.sharedInstance.send(Radio.kCmd + token + " \(value)")
+    sendCommand("radio " + token + " \(value)")
   }
   /// Set a Radio Filter property on the Radio
   ///
@@ -1606,8 +1581,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - value:      the new value
   ///
   private func radioFilterCmd( _ token1: RadioFilterSharpness,  _ token2: RadioFilterSharpness, _ value: Any) {
-    
-    Api.sharedInstance.send(Radio.kCmd + "filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
+    sendCommand("radio filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
   }
   /// Set Xmit on the Radio
   ///
@@ -1616,7 +1590,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - value:      the new value
   ///
   private func xmitCmd(_ value: Any) {
-    
-    Api.sharedInstance.send(Radio.kXmitCmd + "\(value)")
+    sendCommand("xmit " + "\(value)")
   }
 }

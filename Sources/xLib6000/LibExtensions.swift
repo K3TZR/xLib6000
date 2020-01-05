@@ -111,6 +111,13 @@ public extension Sequence {
 }
 
 public extension String {
+  /// Trim whitespace from a String
+  ///
+  /// - Returns:      a trimmedf String
+  ///
+  var trimmed: String {
+    return self.trimmingCharacters(in: CharacterSet.whitespaces)
+  }
   /// Convert a comma delimited String to aa array
   ///
   /// - Returns:      an array of Stringl

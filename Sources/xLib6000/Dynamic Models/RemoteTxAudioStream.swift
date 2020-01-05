@@ -153,20 +153,9 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       // known Keys, in alphabetical order
       switch token {
         
-      case .clientHandle:        
-        willChangeValue(for: \.clientHandle)
-        _clientHandle = property.value.handle ?? 0
-        didChangeValue(for: \.clientHandle)
-
-      case .compression:
-        willChangeValue(for: \.compression)
-        _compression = property.value.lowercased()
-        didChangeValue(for: \.compression)
-        
-      case .ip:
-        willChangeValue(for: \.ip)
-        _ip = property.value
-        didChangeValue(for: \.ip)
+      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0,   signal: \.clientHandle)
+      case .compression:  update(self, &_compression,   to: property.value.lowercased(),  signal: \.compression)
+      case .ip:           update(self, &_ip,            to: property.value,               signal: \.ip)
      }
     }
     // the Radio (hardware) has acknowledged this Stream

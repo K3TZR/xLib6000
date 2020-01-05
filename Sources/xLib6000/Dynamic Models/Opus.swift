@@ -177,35 +177,12 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       // known Keys, in alphabetical order
       switch token {
         
-      case .clientHandle:        
-        willChangeValue(for: \.clientHandle)
-        _clientHandle = UInt32(String(property.value.dropFirst(2)), radix: 16) ?? 0
-        didChangeValue(for: \.clientHandle)
-
-      case .ipAddress:
-        willChangeValue(for: \.ip)
-        _ip = property.value.trimmingCharacters(in: CharacterSet.whitespaces)
-        didChangeValue(for: \.ip)
-
-      case .port:
-        willChangeValue(for: \.port)
-        _port = property.value.iValue
-        didChangeValue(for: \.port)
-
-      case .rxEnabled:
-        willChangeValue(for: \.rxEnabled)
-        _rxEnabled = property.value.bValue
-        didChangeValue(for: \.rxEnabled)
-
-      case .txEnabled:
-        willChangeValue(for: \.txEnabled)
-        _txEnabled = property.value.bValue
-        didChangeValue(for: \.txEnabled)
-
-      case .rxStopped:
-        willChangeValue(for: \.rxStopped)
-        _rxStopped = property.value.bValue
-        didChangeValue(for: \.rxStopped)
+      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
+      case .ipAddress:    update(self, &_ip,            to: property.value.trimmed,     signal: \.ip)
+      case .port:         update(self, &_port,          to: property.value.iValue,      signal: \.port)
+      case .rxEnabled:    update(self, &_rxEnabled,     to: property.value.bValue,      signal: \.rxEnabled)
+      case .txEnabled:    update(self, &_txEnabled,     to: property.value.bValue,      signal: \.txEnabled)
+      case .rxStopped:    update(self, &_rxStopped,     to: property.value.bValue,      signal: \.rxStopped)
      }
     }
     // the Radio (hardware) has acknowledged this Opus

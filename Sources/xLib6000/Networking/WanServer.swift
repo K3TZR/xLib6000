@@ -311,10 +311,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       // Known tokens, in alphabetical order
       switch token {
       
-      case .publicIp:
-        willChangeValue(forKey: "sslClientPublicIp")
-        _sslClientPublicIp = property.value
-        didChangeValue(forKey: "sslClientPublicIp")
+      case .publicIp:   update(self, &_sslClientPublicIp, to: property.value, signal: \.sslClientPublicIp)
       }
     }
   }
