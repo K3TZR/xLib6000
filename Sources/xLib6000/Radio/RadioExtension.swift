@@ -223,7 +223,7 @@ extension Radio {
   public func requestMeterList(callback: ReplyHandler? = nil) {
     
     // ask the Radio for a list of Meters
-    sendCommand(Api.Command.meterList.rawValue, replyTo: callback)
+    sendCommand("meter list", replyTo: callback)
   }
   
   // ----------------------------------------------------------------------------

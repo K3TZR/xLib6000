@@ -1329,7 +1329,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     guard responseValue == Api.kNoError else {
       
       // ignore non-zero reply from "client program" command
-      if !command.hasPrefix(Api.Command.clientProgram.rawValue) {
+      if !command.hasPrefix("client program ") {
         
         // Anything other than 0 is an error, log it and ignore the Reply
         let errorLevel = flexErrorLevel(errorCode: responseValue)
@@ -1363,19 +1363,19 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // which command?
     switch command {
       
-    case Api.Command.clientGui.rawValue:          // (V3 only)
+    case "client gui":          // (V3 only)
       // process the reply
       parseGuiReply( reply.keyValuesArray() )
       
-    case Api.Command.clientIp.rawValue:
+    case "client ip":
       // process the reply
       parseIpReply( reply.keyValuesArray() )
       
-    case Api.Command.info.rawValue:
+    case "info":
       // process the reply
       parseInfoReply( (reply.replacingOccurrences(of: "\"", with: "")).keyValuesArray(delimiter: ",") )
       
-    case Api.Command.antList.rawValue:
+    case "ant list":
       // save the list
       antennaList = reply.valuesArray( delimiter: "," )
       
@@ -1383,7 +1383,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       //      // process the reply
       //      parseMeterListReply( reply )
       
-    case Api.Command.micList.rawValue:
+    case "mic list":
       // save the list
       micList = reply.valuesArray(  delimiter: "," )
       
@@ -1395,7 +1395,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // save the returned Uptime (seconds)
       uptime = Int(reply) ?? 0
       
-    case Api.Command.version.rawValue:
+    case "version":
       // process the reply
       parseVersionReply( reply.keyValuesArray(delimiter: "#") )
       

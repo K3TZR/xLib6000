@@ -15,7 +15,9 @@ import Foundation
 ///      Radio hardware)
 ///
 public final class Api                      : NSObject, TcpManagerDelegate, UdpManagerDelegate {
-  
+
+  public typealias CommandTuple = (command: String, diagnostic: Bool, replyHandler: ReplyHandler?)
+
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
@@ -23,7 +25,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public static let kSupportsVersion        = Version("2.4.9")
   public static let kName                   = "xLib6000"
 
-//  public static let kDomainName             = "net.k3tzr"
   public static let kBundleIdentifier       = "net.k3tzr." + Api.kName
   public static let kDaxChannels            = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
   public static let kDaxIqChannels          = ["None", "1", "2", "3", "4"]
@@ -50,7 +51,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var delegate                       : ApiDelegate?                  // API delegate
   public var testerModeEnabled              = false                         // Library being used by xAPITester
   public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
-//  public var activeRadio                    : DiscoveredRadio?              // Radio params
   public var pingerEnabled                  = true                          // Pinger enable
   public var isWan                          = false                         // Remote connection
   public var wanConnectionHandle            = ""                            // Wan connection handle
@@ -60,6 +60,53 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   @Barrier(0, Api.objectQ)                    public var localUDPPort: UInt16
   @Barrier([Handle:GuiClient](), Api.objectQ) public var guiClients
   
+  public enum MeterShortName : String, CaseIterable {
+    case codecOutput            = "codec"
+    case microphoneAverage      = "mic"
+    case microphoneOutput       = "sc_mic"
+    case microphonePeak         = "micpeak"
+    case postClipper            = "comppeak"
+    case postFilter1            = "sc_filt_1"
+    case postFilter2            = "sc_filt_2"
+    case postGain               = "gain"
+    case postRamp               = "aframp"
+    case postSoftwareAlc        = "alc"
+    case powerForward           = "fwdpwr"
+    case powerReflected         = "refpwr"
+    case preRamp                = "b4ramp"
+    case preWaveAgc             = "pre_wave_agc"
+    case preWaveShim            = "pre_wave"
+    case signal24Khz            = "24khz"
+    case signalPassband         = "level"
+    case signalPostNrAnf        = "nr/anf"
+    case signalPostAgc          = "agc+"
+    case swr                    = "swr"
+    case temperaturePa          = "patemp"
+    case voltageAfterFuse       = "+13.8b"
+    case voltageBeforeFuse      = "+13.8a"
+    case voltageHwAlc           = "hwalc"
+  }
+  public enum DisconnectReason: Equatable {
+    public static func ==(lhs: Api.DisconnectReason, rhs: Api.DisconnectReason) -> Bool {
+      
+      switch (lhs, rhs) {
+      case (.normal, .normal): return true
+      case let (.error(l), .error(r)): return l == r
+      default: return false
+      }
+    }
+    case normal
+    case error (errorMessage: String)
+  }
+  public enum State: String {
+    case start
+    case tcpConnected
+    case udpBound
+    case clientConnected
+    case disconnected
+    case update
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -69,13 +116,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-//  private var _primaryCmdTypes              = [Api.Command]()               // Primary command types to be sent
-//  private var _secondaryCmdTypes            = [Api.Command]()               // Secondary command types to be sent
-//  private var _subscriptionCmdTypes         = [Api.Command]()               // Subscription command types to be sent
-//
-//  private var _primaryCommands              = [CommandTuple]()              // Primary commands to be sent
-//  private var _secondaryCommands            = [CommandTuple]()              // Secondary commands to be sent
-//  private var _subscriptionCommands         = [CommandTuple]()              // Subscription commands to be sent
   private let _clientIpSemaphore            = DispatchSemaphore(value: 0)   // semaphore to signal that we have got the client ip
   
   // GCD Serial Queues
@@ -132,9 +172,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     - isGui:                whether this is a GUI connection
   ///     - isWan:                whether this is a Wan connection
   ///     - wanHandle:            Wan Handle (if any)
-  ///     - primaryCmdTypes:      array of "primary" command types (defaults to .all)
-  ///     - secondaryCmdTYpes:    array of "secondary" command types (defaults to .all)
-  ///     - subscriptionCmdTypes: array of "subscription" commandtypes (defaults to .all)
   /// - Returns:                  Success / Failure
   ///
   public func connect(_ discoveryPacket: DiscoveryStruct,
@@ -143,20 +180,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       clientId: UUID? = nil,
                       isGui: Bool = true,
                       isWan: Bool = false,
-                      wanHandle: String = ""
-//                      primaryCmdTypes: [Api.Command] = [.allPrimary],
-//                      secondaryCmdTypes: [Api.Command] = [.allSecondary],
-//                      subscriptionCmdTypes: [Api.Command] = [.allSubscription]
-  ) -> Radio? {
+                      wanHandle: String = "") -> Radio? {
 
     // must be in the Disconnected state to connect
     guard apiState == .disconnected else { return nil }
         
-    // save the Command types
-//    _primaryCmdTypes = primaryCmdTypes
-//    _secondaryCmdTypes = secondaryCmdTypes
-//    _subscriptionCmdTypes = subscriptionCmdTypes
-    
     // Create a Radio class
     radio = Radio(discoveryPacket, api: self)
 
@@ -261,20 +289,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   public func sendCommands() {
     
-    // setup commands
-//    _primaryCommands = setupCommands(_primaryCmdTypes)
-//    _subscriptionCommands = setupCommands(_subscriptionCmdTypes)
-//    _secondaryCommands = setupCommands(_secondaryCmdTypes)
-//
-//    // send the initial commands
-//    sendCommandList(_primaryCommands)
-//
-//    // send the subscription commands
-//    sendCommandList(_subscriptionCommands)
-//
-//    // send the secondary commands
-//    sendCommandList(_secondaryCommands)
-
     // clientIp
     if _isGui { send("client gui") }
     send("client program " + _programName)
@@ -291,21 +305,21 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     radio?.requestMicProfile()
     radio?.requestDisplayProfile()
 
-    send(Command.subTx.rawValue)
-    send(Command.subAtu.rawValue)
-    send(Command.subAmplifier.rawValue)
-    send(Command.subMeter.rawValue)
-    send(Command.subPan.rawValue)
-    send(Command.subSlice.rawValue)
-    send(Command.subGps.rawValue)
-    send(Command.subAudioStream.rawValue)
-    send(Command.subCwx.rawValue)
-    send(Command.subXvtr.rawValue)
-    send(Command.subMemories.rawValue)
-    send(Command.subDaxIq.rawValue)
-    send(Command.subDax.rawValue)
-    send(Command.subUsbCable.rawValue)
-    if _isTnfSubscribed { send(Command.subTnf.rawValue) }
+    send("sub tx all")
+    send("sub atu all")
+    send("sub amplifier all")
+    send("sub meter all")
+    send("sub pan all")
+    send("sub slice all")
+    send("sub gps all")
+    send("sub audio_stream all")
+    send("sub cwx all")
+    send("sub xvtr all")
+    send("sub memories all")
+    send("sub daxiq all")
+    send("sub dax all")
+    send("sub usb_cable all")
+    if _isTnfSubscribed { send("sub tnf all") }
     
     //      send("sub spot all")    // TODO:
     
@@ -333,7 +347,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         
       } else {
         // Local
-        send(Api.Command.clientUdpPort.rawValue + "\(localUDPPort)")
+        send("client udpport " + "\(localUDPPort)")
       }
       // start pinging
       if pingerEnabled {
@@ -407,72 +421,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // send the commands to the Radio (hardware)
     commands.forEach { send($0.command, diagnostic: $0.diagnostic, replyTo: $0.replyHandler) }
   }
-  ///
-  ///     Note: commands will be in default order if one of the .all... values is passed
-  ///             otherwise commands will be in the order found in the incoming array
-  ///
-  /// Populate a Commands array
-  ///
-  /// - Parameters:
-  ///   - commands:       an array of Commands
-  /// - Returns:          an array of CommandTuple
-  ///
-//  private func setupCommands(_ commands: [Api.Command]) -> [(CommandTuple)] {
-//    var array = [(CommandTuple)]()
-//
-//    // return immediately if none required
-//    if !commands.contains(.none) {
-//
-//      // check for the "all..." cases
-//      var adjustedCommands : [Api.Command]
-//      switch commands {
-//      case [.allPrimary]:       adjustedCommands = Api.Command.allPrimaryCommands()
-//      case [.allSecondary]:     adjustedCommands = Api.Command.allSecondaryCommands()
-//      case [.allSubscription]:  adjustedCommands = Api.Command.allSubscriptionCommands()
-//      default:                  adjustedCommands = commands
-//      }
-//
-//      // add all the specified commands
-//      for command in adjustedCommands {
-//
-//        switch command {
-//
-//        case .setMtu where radioVersion.major == 2 && radioVersion.minor >= 3:  array.append( (command.rawValue, false, nil) )
-//        case .setMtu:                                 break
-//
-//        case .clientProgram:                          if _isGui { array.append( (command.rawValue + _programName, false, nil) ) }
-//
-//        case .clientStation where Api.kVersion.isV3:  if _isGui { array.append( (command.rawValue + _clientStation, false, nil) ) }
-//        case .clientStation:                          break
-//
-//          // case .clientLowBW:  if _lowBW { array.append( (command.rawValue, false, nil) ) }
-//
-//        // Capture the replies from the following
-//        case .meterList:    array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-//        case .info:         array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-//        case .version:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-//        case .antList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-//        case .micList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-//
-//        case .clientGui where Api.kVersion.isV3:      if _isGui { array.append( (command.rawValue + " " + (_clientId?.uuidString ?? ""), false, delegate?.defaultReplyHandler) ) }
-//        case .clientGui:                              if _isGui { array.append( (command.rawValue, false, delegate?.defaultReplyHandler) ) }
-//
-//        case .clientBind where Api.kVersion.isV3:     if !_isGui && _clientId != nil { array.append( (command.rawValue + " client_id=" + _clientId!.uuidString, false, nil) ) }
-//        case .clientBind:                             break
-//
-//        case .subClient where Api.kVersion.isV3:      array.append( (command.rawValue, false, nil) )
-//        case .subClient:                              break
-//
-//        // ignore the following
-//        case .none, .allPrimary, .allSecondary, .allSubscription:   break
-//
-//        // all others
-//        default:    array.append( (command.rawValue, false, nil) )
-//        }
-//      }
-//    }
-//    return array
-//  }
   /// Reply handler for the "client ip" command
   ///
   /// - Parameters:
@@ -605,86 +553,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     apiState = .disconnected
   }
-  /// Respond to a TCP Connection/Disconnection event
-  ///
-  ///   TcpManagerDelegate method, arrives on the tcpReceiveQ
-  ///
-  /// - Parameters:
-  ///   - connected:  state of connection
-  ///   - host:       host address
-  ///   - port:       port number
-  ///   - error:      error message
-  ///
-//  func tcpState(connected: Bool, host: String, port: UInt16, error: String) {
-//    
-//    // connected?
-//    if connected {
-//      
-//      // log it
-//      let wanStatus = isWan ? "REMOTE" : "LOCAL"
-//      let guiStatus = _isGui ? "(GUI) " : ""
-//      _log("TCP connected to \(host), port \(port) \(guiStatus)(\(wanStatus))", .info, #function, #file, #line)
-//
-//      // YES, set state
-//      apiState = .tcpConnected
-//      
-//      // a tcp connection has been established, inform observers
-//      NC.post(.tcpDidConnect, object: nil)
-//      
-//      _tcp.readNext()
-//      
-//      if isWan {
-//        let cmd = "wan validate handle=" + wanConnectionHandle // TODO: + "\n"
-//        send(cmd, replyTo: nil)
-//        
-//        _log("Wan validate handle: \(wanConnectionHandle)", .info, #function, #file, #line)
-//
-//      } else {
-//        // insure that a UDP port was bound (for the Data Streams)
-//        guard _udp.bind(radioParameters: radio!.discoveryPacket, isWan: isWan) else {
-//          
-//          // Bind failed, disconnect
-//          _tcp.disconnect()
-//
-//          // the tcp connection was disconnected, inform observers
-//          NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: "Udp bind failure"))
-//
-//          return
-//        }
-//      }
-//      // if another Gui client connected, disconnect it
-//      if radio?.discoveryPacket.status == "In_Use" && _isGui {
-//        
-//        send("client disconnect")
-//        _log("client disconnect sent", .info, #function, #file, #line)
-//        sleep(1)
-//      }
-//
-//    } else {
-//      
-//      // NO, error?
-//      if error == "" {
-//        
-//        // the tcp connection was disconnected, inform observers
-//        NC.post(.tcpDidDisconnect, object: DisconnectReason.normal)
-//
-//        _log("Tcp Disconnected", .info, #function, #file, #line)
-//
-//      } else {
-//        
-//        // YES, disconnect with error (don't keep the UDP port open as it won't be reused with a new connection)
-//        
-//        _udp.unbind()
-//        
-//        // the tcp connection was disconnected, inform observers
-//        NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: error))
-//
-//        _log("Tcp Disconnected with message = \(error)", .info, #function, #file, #line)
-//      }
-//
-//      apiState = .disconnected
-//    }
-//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - UdpManager delegate methods
@@ -722,45 +590,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   func didUnbind() {
     // TODO:
   }
-
-  /// Respond to a UDP Connection/Disconnection event
-  ///
-  ///   UdpManager delegate method, arrives on the udpReceiveQ
-  ///
-  /// - Parameters:
-  ///   - bound:  state of binding
-  ///   - port:   a port number
-  ///   - error:  error message
-  ///
-//  func udpState(bound : Bool, port: UInt16, error: String) {
-//
-//    // bound?
-//    if bound {
-//
-//      // YES, UDP (streams) connection established
-//
-//      _log("UDP bound to Port: \(port)", .debug, #function, #file, #line)
-//
-//      apiState = .udpBound
-//
-//      localUDPPort = port
-//
-//      // a UDP port has been bound, inform observers
-//      NC.post(.udpDidBind, object: nil)
-//
-//      // a UDP bind has been established
-//      _udp.beginReceiving()
-//
-//      // if WAN connection reset the state to .clientConnected as the true connection state
-//      if isWan {
-//
-//        apiState = .clientConnected
-//      }
-//    } else {
-//
-//    // TODO: should there be a udpUnbound state ?
-//    }
-//  }
   /// Receive a UDP Stream packet
   ///
   ///   UdpManager delegate method, arrives on the udpReceiveQ
@@ -774,148 +603,4 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // pass it to xAPITester (if present)
     testerDelegate?.vitaParser(vitaPacket)
   }
-}
-
-extension Api {
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Enums
-  
-  /// Commands
-  ///
-  ///     The "clientUdpPort" command must be sent AFTER the actual Udp port number has been determined.
-  ///     The default port number may already be in use by another application.
-  ///
-  public enum Command: String, Equatable {
-    
-    // GROUP A: none of this group should be included in one of the command sets
-    case none
-    case allPrimary
-    case allSecondary
-    case allSubscription
-    case clientIp                           = "client ip"
-    case clientUdpPort                      = "client udpport "
-    case keepAliveEnabled                   = "keepalive_enable"
-    
-    // GROUP B: members of this group can be included in the command sets
-    case antList                            = "ant list"
-    case clientBind                         = "client bind"
-    case clientDisconnect                   = "client disconnect"
-    case clientGui                          = "client gui"
-    case clientProgram                      = "client program "
-//    case clientLowBW                        = "client low_bw_connect"
-    case clientStation                      = "client station "
-    case eqRx                               = "eq rxsc info"
-    case eqTx                               = "eq txsc info"
-    case info
-    case meterList                          = "meter list"
-    case micList                            = "mic list"
-    case profileDisplay                     = "profile display info"
-    case profileGlobal                      = "profile global info"
-    case profileMic                         = "profile mic info"
-    case profileTx                          = "profile tx info"
-    case setMtu                             = "client set enforce_network_mtu=1 network_mtu=1500"
-    case setReducedDaxBw                    = "client set send_reduced_bw_dax=1"
-    case subAmplifier                       = "sub amplifier all"
-    case subAudioStream                     = "sub audio_stream all"
-    case subAtu                             = "sub atu all"
-    case subClient                          = "sub client all"
-    case subCwx                             = "sub cwx all"
-    case subDax                             = "sub dax all"
-    case subDaxIq                           = "sub daxiq all"
-    case subFoundation                      = "sub foundation all"
-    case subGps                             = "sub gps all"
-    case subMemories                        = "sub memories all"
-    case subMeter                           = "sub meter all"
-    case subPan                             = "sub pan all"
-    case subRadio                           = "sub radio all"
-    case subScu                             = "sub scu all"
-    case subSlice                           = "sub slice all"
-    case subSpot                            = "sub spot all"
-    case subTnf                             = "sub tnf all"
-    case subTx                              = "sub tx all"
-    case subUsbCable                        = "sub usb_cable all"
-    case subXvtr                            = "sub xvtr all"
-    case version
-    
-    // Note: Do not include GROUP A values in these return vales
-    
-    static func allPrimaryCommands() -> [Command] {
-      return [.clientIp, .clientGui, .clientProgram, .clientStation, .clientBind, .info, .version, .antList, .micList, .profileGlobal, .profileTx, .profileMic, .profileDisplay]
-    }
-    static func allSubscriptionCommands() -> [Command] {
-      return [.subClient, .subTx, .subAtu, .subAmplifier, .subMeter, .subPan, .subSlice, .subGps,
-              .subAudioStream, .subCwx, .subXvtr, .subMemories, .subDaxIq, .subDax,
-              .subUsbCable, .subTnf, .subSpot]
-    }
-    static func allSecondaryCommands() -> [Command] {
-      return [.setMtu, .setReducedDaxBw, .clientStation]
-    }
-  }
-    
-  /// Meter names
-  ///
-  public enum MeterShortName : String, CaseIterable {
-    case codecOutput            = "codec"
-    case microphoneAverage      = "mic"
-    case microphoneOutput       = "sc_mic"
-    case microphonePeak         = "micpeak"
-    case postClipper            = "comppeak"
-    case postFilter1            = "sc_filt_1"
-    case postFilter2            = "sc_filt_2"
-    case postGain               = "gain"
-    case postRamp               = "aframp"
-    case postSoftwareAlc        = "alc"
-    case powerForward           = "fwdpwr"
-    case powerReflected         = "refpwr"
-    case preRamp                = "b4ramp"
-    case preWaveAgc             = "pre_wave_agc"
-    case preWaveShim            = "pre_wave"
-    case signal24Khz            = "24khz"
-    case signalPassband         = "level"
-    case signalPostNrAnf        = "nr/anf"
-    case signalPostAgc          = "agc+"
-    case swr                    = "swr"
-    case temperaturePa          = "patemp"
-    case voltageAfterFuse       = "+13.8b"
-    case voltageBeforeFuse      = "+13.8a"
-    case voltageHwAlc           = "hwalc"
-  }
-  
-  /// Disconnect reasons
-  ///
-  public enum DisconnectReason: Equatable {
-    public static func ==(lhs: Api.DisconnectReason, rhs: Api.DisconnectReason) -> Bool {
-      
-      switch (lhs, rhs) {
-      case (.normal, .normal): return true
-      case let (.error(l), .error(r)): return l == r
-      default: return false
-      }
-    }
-    case normal
-    case error (errorMessage: String)
-  }
-  /// States
-  ///
-  public enum State: String {
-    case start
-    case tcpConnected
-    case udpBound
-    case clientConnected
-    case disconnected
-    case update
-  }
-
-  // --------------------------------------------------------------------------------
-  // MARK: - Aliases
-  
-  /// Definition for a Command Tuple
-  ///
-  ///   command:        a Radio command String
-  ///   diagnostic:     if true, send as a Diagnostic command
-  ///   replyHandler:   method to process the reply (may be nil)
-  ///
-  public typealias CommandTuple = (command: String, diagnostic: Bool, replyHandler: ReplyHandler?)
-  
 }
