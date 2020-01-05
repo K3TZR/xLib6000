@@ -365,7 +365,7 @@ extension Radio {
   ///   - callback:     ReplyHandler (optional)
   ///
   public func requestMtuLimit(_ size: Int, callback: ReplyHandler? = nil) {
-    sendCommand("client set enforce_network_mtu=1 network_mtu=\(size)"
+    sendCommand("client set enforce_network_mtu=1 network_mtu=\(size)")
   }
   /// Request limited Dax bandwidth
   /// - Parameters:
