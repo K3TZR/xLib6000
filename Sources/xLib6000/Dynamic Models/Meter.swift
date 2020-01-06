@@ -19,7 +19,7 @@ public typealias MeterName = String
 ///      stream containing multiple Meters. They are collected in the
 ///      meters collection on the Radio object.
 ///
-public final class Meter                    : NSObject, DynamicModel, StreamHandler {
+public final class Meter                    : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -106,8 +106,8 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   private let _radio                        : Radio
   private var _voltsAmpsDenom               : Float = 256.0  // denominator for voltage/amperage depends on API version
 
-  private let kDbDbmDbfsSwrDenom            : Float = 128.0  // denominator for Db, Dbm, Dbfs, Swr
-  private let kDegDenom                     : Float = 64.0   // denominator for Degc, Degf
+  static let kDbDbmDbfsSwrDenom             : Float = 128.0  // denominator for Db, Dbm, Dbfs, Swr
+  static let kDegDenom                      : Float = 64.0   // denominator for Degc, Degf
   
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -121,7 +121,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   /// - Parameters:
   ///   - vita:        a Vita struct
   ///
-  class func vitaProcessor(_ vita: Vita, radio: Radio?) {
+  class func vitaProcessor(_ vita: Vita, radio: Radio) {
     var metersFound = [UInt16]()
     
     // NOTE:  there is a bug in the Radio (as of v2.2.8) that sends
@@ -150,8 +150,45 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
         
         // find the meter (if present) & update it
         //        if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", number)] {
-        if let meter = radio?.meters[number] {
-          meter.streamHandler( value)
+        if let meter = radio.meters[number] {
+          //          meter.streamHandler( value)
+          
+          let newValue = Int16(bitPattern: value)
+          
+          let previousValue = meter.value
+          
+          // check for unknown Units
+          guard let token = Units(rawValue: meter.units) else {
+            //      // log it and ignore it
+            //      _log("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", .warning, #function, #file, #line)
+            return
+          }
+          var adjNewValue: Float = 0.0
+          switch token {
+            
+          case .db, .dbm, .dbfs, .swr:
+            adjNewValue = Float(exactly: newValue)! / kDbDbmDbfsSwrDenom
+            
+          case .volts, .amps:
+            var denom :Float = 256.0
+            if radio.version.major == 1 && radio.version.minor <= 10 {
+              denom = 1024.0
+            }
+            adjNewValue = Float(exactly: newValue)! / denom
+            
+          case .degc, .degf:
+            adjNewValue = Float(exactly: newValue)! / kDegDenom
+            
+          case .rpm, .watts, .percent, .none:
+            adjNewValue = Float(exactly: newValue)!
+          }
+          // did it change?
+          if adjNewValue != previousValue {
+            meter.value = adjNewValue
+            
+            // notify all observers
+            NC.post(.meterUpdated, object: meter as Any?)
+          }
         }
       }
     }
@@ -289,39 +326,39 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   ///
   /// - Parameter streamFrame:        a Meter frame (Int16)
   ///
-  public func streamHandler<T>(_ meterFrame: T) {
-
-    let newValue = Int16(bitPattern: meterFrame as! UInt16)
-    
-    let previousValue = value
-    
-    // check for unknown Units
-    guard let token = Units(rawValue: units) else {
-      // log it and ignore it
-      _log("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", .warning, #function, #file, #line)
-      return
-    }
-    var adjNewValue: Float = 0.0
-    switch token {
-      
-    case .db, .dbm, .dbfs, .swr:
-      adjNewValue = Float(exactly: newValue)! / kDbDbmDbfsSwrDenom
-      
-    case .volts, .amps:
-      adjNewValue = Float(exactly: newValue)! / _voltsAmpsDenom
-      
-    case .degc, .degf:
-      adjNewValue = Float(exactly: newValue)! / kDegDenom
-    
-    case .rpm, .watts, .percent, .none:
-      adjNewValue = Float(exactly: newValue)!
-    }
-    // did it change?
-    if adjNewValue != previousValue {
-      value = adjNewValue
-
-      // notify all observers
-      NC.post(.meterUpdated, object: self as Any?)
-    }
-  }
+//  public func streamHandler<T>(_ meterFrame: T) {
+//
+//    let newValue = Int16(bitPattern: meterFrame as! UInt16)
+//
+//    let previousValue = value
+//
+//    // check for unknown Units
+//    guard let token = Units(rawValue: units) else {
+//      // log it and ignore it
+//      _log("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", .warning, #function, #file, #line)
+//      return
+//    }
+//    var adjNewValue: Float = 0.0
+//    switch token {
+//
+//    case .db, .dbm, .dbfs, .swr:
+//      adjNewValue = Float(exactly: newValue)! / kDbDbmDbfsSwrDenom
+//
+//    case .volts, .amps:
+//      adjNewValue = Float(exactly: newValue)! / _voltsAmpsDenom
+//
+//    case .degc, .degf:
+//      adjNewValue = Float(exactly: newValue)! / kDegDenom
+//
+//    case .rpm, .watts, .percent, .none:
+//      adjNewValue = Float(exactly: newValue)!
+//    }
+//    // did it change?
+//    if adjNewValue != previousValue {
+//      value = adjNewValue
+//
+//      // notify all observers
+//      NC.post(.meterUpdated, object: self as Any?)
+//    }
+//  }
 }
