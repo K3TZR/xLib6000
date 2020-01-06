@@ -57,7 +57,33 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
     case volts
     case watts
   }
-  
+  public enum ShortName : String, CaseIterable {
+    case codecOutput            = "codec"
+    case microphoneAverage      = "mic"
+    case microphoneOutput       = "sc_mic"
+    case microphonePeak         = "micpeak"
+    case postClipper            = "comppeak"
+    case postFilter1            = "sc_filt_1"
+    case postFilter2            = "sc_filt_2"
+    case postGain               = "gain"
+    case postRamp               = "aframp"
+    case postSoftwareAlc        = "alc"
+    case powerForward           = "fwdpwr"
+    case powerReflected         = "refpwr"
+    case preRamp                = "b4ramp"
+    case preWaveAgc             = "pre_wave_agc"
+    case preWaveShim            = "pre_wave"
+    case signal24Khz            = "24khz"
+    case signalPassband         = "level"
+    case signalPostNrAnf        = "nr/anf"
+    case signalPostAgc          = "agc+"
+    case swr                    = "swr"
+    case temperaturePa          = "patemp"
+    case voltageAfterFuse       = "+13.8b"
+    case voltageBeforeFuse      = "+13.8a"
+    case voltageHwAlc           = "hwalc"
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   

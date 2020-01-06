@@ -271,40 +271,39 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     get {  return _tnfsEnabled }
     set { if _tnfsEnabled != newValue { _tnfsEnabled = newValue ; radioSetCmd( .tnfsEnabled, newValue.asTrueFalse) } } }
   
-  @objc dynamic public var atuPresent           : Bool { _atuPresent }
-  @objc dynamic public var availablePanadapters : Int { _availablePanadapters }
-  @objc dynamic public var availableSlices      : Int { _availableSlices }
-  @objc dynamic public var chassisSerial        : String { _chassisSerial }
-  @objc dynamic public var clientIp             : String {  _clientIp }
-  @objc dynamic public var daxIqAvailable       : Int { _daxIqAvailable }
-  @objc dynamic public var daxIqCapacity        : Int { _daxIqCapacity }
-  @objc dynamic public var extPresent           : Bool { _extPresent }
-  @objc dynamic public var fpgaMbVersion        : String { _fpgaMbVersion }
-  @objc dynamic public var gateway              : String { _gateway }
-  @objc dynamic public var gpsPresent           : Bool { _gpsPresent }
-  @objc dynamic public var gpsdoPresent         : Bool { _gpsdoPresent }
-  @objc dynamic public var ipAddress            : String { _ipAddress }
-  @objc dynamic public var location             : String { _location }
-  @objc dynamic public var locked               : Bool { _locked }
-  @objc dynamic public var macAddress           : String { _macAddress }
-  @objc dynamic public var netmask              : String { _netmask }
-  @objc dynamic public var numberOfScus         : Int { _numberOfScus }
-  @objc dynamic public var numberOfSlices       : Int { _numberOfSlices }
-  @objc dynamic public var numberOfTx           : Int { _numberOfTx }
-  @objc dynamic public var picDecpuVersion      : String { _picDecpuVersion }
-  @objc dynamic public var psocMbPa100Version   : String { _psocMbPa100Version }
-  @objc dynamic public var psocMbtrxVersion     : String { _psocMbtrxVersion }
-  @objc dynamic public var radioModel           : String { _radioModel }
-  @objc dynamic public var radioOptions         : String { _radioOptions }
-  @objc dynamic public var region               : String { _region }
-  @objc dynamic public var setting              : String { _setting }
-  @objc dynamic public var smartSdrMB           : String { _smartSdrMB }
-  @objc dynamic public var state                : String { _state }
-  @objc dynamic public var softwareVersion      : String { _softwareVersion }
-  @objc dynamic public var tcxoPresent          : Bool { _tcxoPresent }
+  @objc dynamic public var atuPresent           : Bool    { _atuPresent }
+  @objc dynamic public var availablePanadapters : Int     { _availablePanadapters }
+  @objc dynamic public var availableSlices      : Int     { _availableSlices }
+  @objc dynamic public var chassisSerial        : String  { _chassisSerial }
+  @objc dynamic public var clientIp             : String  {  _clientIp }
+  @objc dynamic public var daxIqAvailable       : Int     { _daxIqAvailable }
+  @objc dynamic public var daxIqCapacity        : Int     { _daxIqCapacity }
+  @objc dynamic public var extPresent           : Bool    { _extPresent }
+  @objc dynamic public var fpgaMbVersion        : String  { _fpgaMbVersion }
+  @objc dynamic public var gateway              : String  { _gateway }
+  @objc dynamic public var gpsPresent           : Bool    { _gpsPresent }
+  @objc dynamic public var gpsdoPresent         : Bool    { _gpsdoPresent }
+  @objc dynamic public var ipAddress            : String  { _ipAddress }
+  @objc dynamic public var location             : String  { _location }
+  @objc dynamic public var locked               : Bool    { _locked }
+  @objc dynamic public var macAddress           : String  { _macAddress }
+  @objc dynamic public var netmask              : String  { _netmask }
+  @objc dynamic public var numberOfScus         : Int     { _numberOfScus }
+  @objc dynamic public var numberOfSlices       : Int     { _numberOfSlices }
+  @objc dynamic public var numberOfTx           : Int     { _numberOfTx }
+  @objc dynamic public var picDecpuVersion      : String  { _picDecpuVersion }
+  @objc dynamic public var psocMbPa100Version   : String  { _psocMbPa100Version }
+  @objc dynamic public var psocMbtrxVersion     : String  { _psocMbtrxVersion }
+  @objc dynamic public var radioModel           : String  { _radioModel }
+  @objc dynamic public var radioOptions         : String  { _radioOptions }
+  @objc dynamic public var region               : String  { _region }
+  @objc dynamic public var serialNumber         : String  { discoveryPacket.serialNumber }
+  @objc dynamic public var setting              : String  { _setting }
+  @objc dynamic public var smartSdrMB           : String  { _smartSdrMB }
+  @objc dynamic public var state                : String  { _state }
+  @objc dynamic public var softwareVersion      : String  { _softwareVersion }
+  @objc dynamic public var tcxoPresent          : Bool    { _tcxoPresent }
   
-  @objc dynamic public var serialNumber         : String { return discoveryPacket.serialNumber }
-
   public               let discoveryPacket      : DiscoveryStruct
   public               let version              : Version
   public private(set)  var sliceErrors          = [String]()  // milliHz
@@ -319,7 +318,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     var txFilterLow     : Int
   }
   public struct TxFilter {
-    var high    = 0
+    var high     = 0
     var low      = 0
   }
   
@@ -622,16 +621,26 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///
   public func sendCommand(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) {
     
-    // forward to the Api function
-    _api.send(command, diagnostic: flag, replyTo: callback)
+    // tell the TcpManager to send the command
+    let sequenceNumber = _api.tcp.send(command, diagnostic: flag)
+
+    // register to be notified when reply received
+    addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
+    
+    // pass it to xAPITester (if present)
+    _api.testerDelegate?.addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
   }
   /// Send Vita UDP data
   /// - Parameter data:   the contents as Data
   ///
   public func sendVita(_ data: Data?) {
     
-    // forward to the Api function
-    _api.send(data)
+    // if data present
+    if let dataToSend = data {
+      
+      // send it (no validity checks are performed)
+      _api.udp.sendData(dataToSend)
+    }
   }
   
   /// Remove all Radio objects
@@ -877,7 +886,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         _clientInitialized = true
         
         // Finish the UDP initialization & set the API state
-        _api.clientConnected(discoveryPacket)
+        _api.clientConnected(self)
       }
     }
   }
@@ -905,7 +914,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // what is the message?
     if keyValues[1].key == "connected" {
       // Connected
-      _api.clientConnected(discoveryPacket)
+      _api.clientConnected(radio)
       
     } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
       // FIXME: Handle the disconnect?
@@ -1186,7 +1195,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     }
   }
-
+  
   // --------------------------------------------------------------------------------
   // MARK: - StaticModel Protocol methods
   

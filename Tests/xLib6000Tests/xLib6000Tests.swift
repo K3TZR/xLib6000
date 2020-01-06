@@ -6,8 +6,8 @@ final class xLib6000Tests: XCTestCase {
   func testApi() {
     XCTAssertNotNil(Api.sharedInstance, "Api singleton not present")
     XCTAssertEqual(Api.sharedInstance.testerModeEnabled, false)
-    XCTAssertNotNil(Api.sharedInstance._tcp, "Failed to instantiate TcpManager")
-    XCTAssertNotNil(Api.sharedInstance._udp, "Failed to instantiate UdpManager")
+    XCTAssertNotNil(Api.sharedInstance.tcp, "Failed to instantiate TcpManager")
+    XCTAssertNotNil(Api.sharedInstance.udp, "Failed to instantiate UdpManager")
   }
 
   func testDiscovery() {
