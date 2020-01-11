@@ -33,11 +33,10 @@ public final class Profile                  : NSObject, StaticModel {
   public let id                             : ProfileId
 
   @objc dynamic public var selection: ProfileName {
-    get {  return _selection }
+    get { _selection }
     set { if _selection != newValue { _selection = newValue ; profileCmd(newValue) } } }
   
-  @objc dynamic public var list: [ProfileName] {
-    return _list }
+  @objc dynamic public var list: [ProfileName] { _list }
 
   public enum Group : String {
     case global
@@ -119,8 +118,8 @@ public final class Profile                  : NSObject, StaticModel {
   ///
   public init(radio: Radio, id: ProfileId) {
     
-    self.id = id
     _radio = radio
+    self.id = id
     super.init()
   }
   

@@ -14,15 +14,7 @@ import Foundation
 ///      processing of the Antenna Tuning Unit (if installed). Atu objects are
 ///      added, removed and updated by the incoming TCP messages.
 ///
-public final class Atu                      : NSObject, StaticModel {
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kClearCmd                      = "atu clear"                   // Command prefixes
-  static let kStartCmd                      = "atu start"
-  static let kBypassCmd                     = "atu bypass"
-  static let kCmd                           = "atu "
+public final class Atu : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -56,11 +48,8 @@ public final class Atu                      : NSObject, StaticModel {
     }
     return value }
   
-  @objc dynamic public var usingMemories: Bool {
-    return _usingMemories }
-  
-  @objc dynamic public var enabled: Bool {
-    return _enabled }
+  @objc dynamic public var usingMemories  : Bool { _usingMemories }
+  @objc dynamic public var enabled        : Bool { _enabled }
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -148,7 +137,7 @@ public final class Atu                      : NSObject, StaticModel {
   public func atuClear(callback: ReplyHandler? = nil) {
     
     // tell the Radio to clear the ATU
-    _radio.sendCommand(Atu.kClearCmd, replyTo: callback)
+    _radio.sendCommand("atu clear", replyTo: callback)
   }
   /// Start the ATU
   ///
@@ -157,7 +146,7 @@ public final class Atu                      : NSObject, StaticModel {
   public func atuStart(callback: ReplyHandler? = nil) {
     
     // tell the Radio to start the ATU
-    _radio.sendCommand(Atu.kStartCmd, replyTo: callback)
+    _radio.sendCommand("atu start", replyTo: callback)
   }
   /// Bypass the ATU
   ///
@@ -166,7 +155,7 @@ public final class Atu                      : NSObject, StaticModel {
   public func atuBypass(callback: ReplyHandler? = nil) {
     
     // tell the Radio to bypass the ATU
-    _radio.sendCommand(Atu.kBypassCmd, replyTo: callback)
+    _radio.sendCommand("atu bypass", replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------

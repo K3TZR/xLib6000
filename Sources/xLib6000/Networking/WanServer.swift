@@ -46,18 +46,20 @@ public struct WanTestConnectionResults {
 ///      creates a WanServer instance to communicate with the SmartLink server
 ///      to get access to a remote Flexradio
 ///
-public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
+public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kAddress                       = "smartlink.flexradio.com"
-  static let kPort                          = 443
   static let pingQ                          = DispatchQueue(label: Api.kName + ".WanServer.pingQ")
   static let socketQ                        = DispatchQueue(label: Api.kName + ".WanServer.socketQ")
   
-  public static let kDefaultTimeout         = 0.5
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
   
+  @objc dynamic public var isConnected        : Bool    { _isConnected }
+  @objc dynamic public var sslClientPublicIp  : String  { _sslClientPublicIp }
+
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -67,8 +69,8 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private weak var _delegate                : WanServerDelegate?
-  private let _log                          = Log.sharedInstance.msg
+  private weak  var _delegate               : WanServerDelegate?
+  private       let _log                    = Log.sharedInstance.msg
 
   private let _api                          = Api.sharedInstance
   private var _appName                      = ""
@@ -76,35 +78,18 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   private var _currentPort                  : UInt16 = 0
   private var _platform                     = ""
   private var _ping                         = false
-  private var _pingTimer                    : DispatchSourceTimer?          // periodic timer for ping
-  private var _timeout                      = 0.0                           // timeout in seconds
+  private var _pingTimer                    : DispatchSourceTimer?
+  private var _timeout                      = 0.0                // seconds
   private var _tlsSocket                    : GCDAsyncSocket!
   private var _token                        = ""
 
-//  private let _objectQ                      = DispatchQueue(label: Api.kName + ".WanServer.objectQ")
-
-  private let kAppConnectCmd                = "application connect serial"
-  private let kAppRegisterCmd               = "application register name"
-  private let kDisconnectUsersCmd           = "application disconnect_users serial"
-  private let kHolePunchPort                = "hole_punch_port"
-  private let kPingServerCmd                = "ping from client"
-  private let kPlatform                     = "platform"
-  private let kTestCmd                      = "application test_connection serial"
-  private let kToken                        = "token"
-  private let kHostName                     = WanServer.kAddress            // SmartLink server address
-  private let kHostPort                     = WanServer.kPort               // SmartLink server SSL port
-
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
-  //
-//  private var __isConnected                 = false
-//  private var __sslClientPublicIp           = ""                            // public IP of the radio
-  //
-  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
+  private let kHostName                     = "smartlink.flexradio.com"
+  private let kHostPort                     = 443
 
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
   
-  public init(delegate: WanServerDelegate?, timeout: Double = WanServer.kDefaultTimeout) {
+  public init(delegate: WanServerDelegate?, timeout: Double = 0.5) {
     
     _timeout = timeout
     _delegate = delegate
@@ -166,7 +151,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       return
     }
     // send a command to SmartLink to request a connection to the specified Radio
-    let command = kAppConnectCmd + "=\(radioSerial) " + kHolePunchPort + "=\(String(holePunchPort))"
+    let command = "application connect serial" + "=\(radioSerial)" + " hole_punch_port" + "=\(String(holePunchPort))"
     sendCommand(command)
   }
   /// Disconnect users
@@ -181,7 +166,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       return
     }
     // send a command to SmartLink to request disconnection from the specified Radio
-    sendCommand(kDisconnectUsersCmd + "=\(radioSerial)" )
+    sendCommand("application disconnect_users serial" + "=\(radioSerial)" )
   }
   /// Test connection
   ///
@@ -195,7 +180,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       return
     }
     // send a command to SmartLink to test the connection for the specified Radio
-    sendCommand(kTestCmd + "=\(radioSerial)" )
+    sendCommand("application test_connection serial" + "=\(radioSerial)" )
   }
 
   // ------------------------------------------------------------------------------
@@ -540,7 +525,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     _pingTimer?.setEventHandler { [ unowned self] in
       
       // send another Ping
-      self.sendCommand(self.kPingServerCmd)
+      self.sendCommand("ping from client")
     }
     // start the timer
     _pingTimer?.resume()
@@ -646,7 +631,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   @objc public func socketDidSecure(_ sock: GCDAsyncSocket) {
     
     // starting the communication with the server over TLS
-    let command = kAppRegisterCmd + "=\(_appName) " + kPlatform + "=\(_platform) " + kToken + "=\(_token)"
+    let command = "application register name" + "=\(_appName)" + " platform" + "=\(_platform)" + " token" + "=\(_token)"
     
     _log("TLS connection to SmartLink server \"Did Secure\"", .info, #function, #file, #line)
 
@@ -663,11 +648,6 @@ extension WanServer {
   // ----------------------------------------------------------------------------
   // Public properties (KVO compliant)
   
-  @objc dynamic public var isConnected: Bool {
-    return _isConnected }
-  
-  @objc dynamic public var sslClientPublicIp: String {
-    return _sslClientPublicIp }
   
   // ----------------------------------------------------------------------------
   // Tokens

@@ -17,24 +17,24 @@ public typealias ReplyTuple = (replyTo: ReplyHandler?, command: String)
 ///
 ///      manages all TCP communication between the API and the Radio (hardware)
 ///
-final class TcpManager                       : NSObject, GCDAsyncSocketDelegate {
+final class TcpManager : NSObject, GCDAsyncSocketDelegate {
 
   public private(set) var interfaceIpAddress = "0.0.0.0"
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  internal var isConnected                  : Bool { return _tcpSocket.isConnected }
+  internal var isConnected                  : Bool { _tcpSocket.isConnected }
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private weak var _delegate                : TcpManagerDelegate?           // class to receive TCP data
+  private weak var _delegate                : TcpManagerDelegate?
 
-  private var _tcpReceiveQ                  : DispatchQueue                 // serial GCD Queue for receiving Radio Commands
-  private var _tcpSendQ                     : DispatchQueue                 // serial GCD Queue for sending Radio Commands
-  private var _tcpSocket                    : GCDAsyncSocket!               // GCDAsync TCP socket object
-  private var _timeout                      = 0.0                           // timeout in seconds
+  private var _tcpReceiveQ                  : DispatchQueue
+  private var _tcpSendQ                     : DispatchQueue
+  private var _tcpSocket                    : GCDAsyncSocket!
+  private var _timeout                      = 0.0   // seconds
 
   @Barrier(false, Api.objectQ)  private var _isWan
   @Barrier(0, Api.objectQ)      private var _seqNum : UInt
@@ -117,8 +117,6 @@ final class TcpManager                       : NSObject, GCDAsyncSocketDelegate 
   /// Disconnect from the Radio (hardware)
   ///
   func disconnect() {
-    
-    // tell the socket to close
     _tcpSocket.disconnect()
   }
   /// Send a Command to the Radio (hardware)
@@ -153,7 +151,6 @@ final class TcpManager                       : NSObject, GCDAsyncSocketDelegate 
   /// Read the next data block (with an indefinite timeout)
   ///
   func readNext() {
-    
     _tcpSocket.readData(to: GCDAsyncSocket.lfData(), withTimeout: -1, tag: 0)
   }
   func secureTheConnection() {

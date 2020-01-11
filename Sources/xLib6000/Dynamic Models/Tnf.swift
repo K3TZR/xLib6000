@@ -34,19 +34,19 @@ public final class Tnf : NSObject, DynamicModel {
   public let id : TnfId
 
   @objc dynamic public var depth: UInt {
-    get { return _depth }
+    get { _depth }
     set { if _depth != newValue { _depth = newValue ; tnfCmd( .depth, newValue) } } }
 
-  @objc dynamic public var frequency: UInt {
-    get { return _frequency }
+  @objc dynamic public var frequency: Frequency {
+    get { _frequency }
     set { if _frequency != newValue { _frequency = newValue ; tnfCmd( .frequency, newValue.hzToMhz) } } }
   
   @objc dynamic public var permanent: Bool {
-    get { return _permanent }
+    get { _permanent }
     set { if _permanent != newValue { _permanent = newValue ; tnfCmd( .permanent, newValue.as1or0) } } }
   
   @objc dynamic public var width: UInt {
-    get { return _width  }
+    get { _width  }
     set { if _width != newValue { _width = newValue ; tnfCmd( .width, newValue.hzToMhz) } } }
   
   public enum Depth : UInt {
@@ -59,7 +59,7 @@ public final class Tnf : NSObject, DynamicModel {
   // MARK: - Internal properties
 
   @BarrierClamped(kNormal, Api.objectQ, range: kNormal...kVeryDeep) var _depth      : UInt
-  @Barrier(0, Api.objectQ)                                          var _frequency  : UInt
+  @Barrier(0, Api.objectQ)                                          var _frequency  : Frequency
   @Barrier(false, Api.objectQ)                                      var _permanent
   @BarrierClamped(0, Api.objectQ, range: kWidthMin...kWidthMax)     var _width      : UInt
   
@@ -88,7 +88,7 @@ public final class Tnf : NSObject, DynamicModel {
   ///
   public init(radio: Radio, id: TnfId) {
     
-    self._radio = radio
+    _radio = radio
     self.id = id
     
     super.init()
@@ -160,7 +160,7 @@ public final class Tnf : NSObject, DynamicModel {
       switch token {
         
       case .depth:      update(self, &_depth,     to: property.value.uValue,      signal: \.depth)
-      case .frequency:  update(self, &_frequency, to: property.value.mhzToHzUInt, signal: \.frequency)
+      case .frequency:  update(self, &_frequency, to: property.value.mhzToHz,     signal: \.frequency)
       case .permanent:  update(self, &_permanent, to: property.value.bValue,      signal: \.permanent)
       case .width:      update(self, &_width,     to: property.value.mhzToHzUInt, signal: \.width)
       }

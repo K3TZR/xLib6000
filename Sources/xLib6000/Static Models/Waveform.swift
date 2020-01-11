@@ -14,7 +14,7 @@ import Foundation
 ///      processing of installed Waveform functions. Waveform objects are added,
 ///      removed and updated by the incoming TCP messages.
 ///
-public final class Waveform                 : NSObject, StaticModel {
+public final class Waveform : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -33,8 +33,8 @@ public final class Waveform                 : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _log                          = Log.sharedInstance.msg
-  private var _radio                        : Radio
+  private let _log           = Log.sharedInstance.msg
+  private var _radio         : Radio
 
   // ------------------------------------------------------------------------------
   // MARK: - Initialization

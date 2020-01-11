@@ -28,95 +28,95 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   
   // Object Collections
   public var amplifiers: [AmplifierId: Amplifier] {
-    get { return Api.objectQ.sync { _amplifiers } }
+    get { Api.objectQ.sync { _amplifiers } }
     set { Api.objectQ.sync(flags: .barrier) { _amplifiers = newValue } } }
   
   public var audioStreams: [AudioStreamId: AudioStream] {
-    get { return Api.objectQ.sync { _audioStreams } }
+    get { Api.objectQ.sync { _audioStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _audioStreams = newValue } } }
   
   public var daxIqStreams: [DaxIqStreamId: DaxIqStream] {
-    get { return Api.objectQ.sync { _daxIqStreams } }
+    get { Api.objectQ.sync { _daxIqStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _daxIqStreams = newValue } } }
   
   public var daxMicAudioStreams: [DaxMicStreamId: DaxMicAudioStream] {
-    get { return Api.objectQ.sync { _daxMicAudioStreams } }
+    get { Api.objectQ.sync { _daxMicAudioStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _daxMicAudioStreams = newValue } } }
   
   public var daxRxAudioStreams: [DaxRxStreamId: DaxRxAudioStream] {
-    get { return Api.objectQ.sync { _daxRxAudioStreams } }
+    get { Api.objectQ.sync { _daxRxAudioStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _daxRxAudioStreams = newValue } } }
   
   public var daxTxAudioStreams: [DaxTxStreamId: DaxTxAudioStream] {
-    get { return Api.objectQ.sync { _daxTxAudioStreams } }
+    get { Api.objectQ.sync { _daxTxAudioStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _daxTxAudioStreams = newValue } } }
   
   public var equalizers: [Equalizer.EqType: Equalizer] {
-    get { return Api.objectQ.sync { _equalizers } }
+    get { Api.objectQ.sync { _equalizers } }
     set { Api.objectQ.sync(flags: .barrier) { _equalizers = newValue } } }
   
   public var iqStreams: [DaxIqStreamId: IqStream] {
-    get { return Api.objectQ.sync { _iqStreams } }
+    get { Api.objectQ.sync { _iqStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _iqStreams = newValue } } }
   
   public var memories: [MemoryId: Memory] {
-    get { return Api.objectQ.sync { _memories } }
+    get { Api.objectQ.sync { _memories } }
     set { Api.objectQ.sync(flags: .barrier) { _memories = newValue } } }
   
   public var meters: [MeterId: Meter] {
-    get { return Api.objectQ.sync { _meters } }
+    get { Api.objectQ.sync { _meters } }
     set { Api.objectQ.sync(flags: .barrier) { _meters = newValue } } }
   
   public var micAudioStreams: [DaxMicStreamId: MicAudioStream] {
-    get { return Api.objectQ.sync { _micAudioStreams } }
+    get { Api.objectQ.sync { _micAudioStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _micAudioStreams = newValue } } }
   
   public var opusStreams: [OpusId: Opus] {
-    get { return Api.objectQ.sync { _opusStreams } }
+    get { Api.objectQ.sync { _opusStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _opusStreams = newValue } } }
   
   public var panadapters: [PanadapterStreamId: Panadapter] {
-    get { return Api.objectQ.sync { _panadapters } }
+    get { Api.objectQ.sync { _panadapters } }
     set { Api.objectQ.sync(flags: .barrier) { _panadapters = newValue } } }
   
   public var profiles: [ProfileId: Profile] {
-    get { return Api.objectQ.sync { _profiles } }
+    get { Api.objectQ.sync { _profiles } }
     set { Api.objectQ.sync(flags: .barrier) { _profiles = newValue } } }
   
   public var remoteRxAudioStreams: [RemoteRxStreamId: RemoteRxAudioStream] {
-    get { return Api.objectQ.sync { _remoteRxAudioStreams } }
+    get { Api.objectQ.sync { _remoteRxAudioStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _remoteRxAudioStreams = newValue } } }
   
   public var remoteTxAudioStreams: [RemoteTxStreamId: RemoteTxAudioStream] {
-    get { return Api.objectQ.sync { _remoteTxAudioStreams } }
+    get { Api.objectQ.sync { _remoteTxAudioStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _remoteTxAudioStreams = newValue } } }
   
   public var replyHandlers: [SequenceNumber: ReplyTuple] {
-    get { return Api.objectQ.sync { _replyHandlers } }
+    get { Api.objectQ.sync { _replyHandlers } }
     set { Api.objectQ.sync(flags: .barrier) { _replyHandlers = newValue } } }
   
   public var slices: [SliceId: Slice] {
-    get { return Api.objectQ.sync { _slices } }
+    get { Api.objectQ.sync { _slices } }
     set { Api.objectQ.sync(flags: .barrier) { _slices = newValue } } }
   
   public var tnfs: [TnfId: Tnf] {
-    get { return Api.objectQ.sync { _tnfs } }
+    get { Api.objectQ.sync { _tnfs } }
     set { Api.objectQ.sync(flags: .barrier) { _tnfs = newValue } } }
   
   public var txAudioStreams: [TxStreamId: TxAudioStream] {
-    get { return Api.objectQ.sync { _txAudioStreams } }
+    get { Api.objectQ.sync { _txAudioStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _txAudioStreams = newValue } } }
   
   public var usbCables: [UsbCableId: UsbCable] {
-    get { return Api.objectQ.sync { _usbCables } }
+    get { Api.objectQ.sync { _usbCables } }
     set { Api.objectQ.sync(flags: .barrier) { _usbCables = newValue } } }
   
   public var waterfalls: [WaterfallStreamId: Waterfall] {
-    get { return Api.objectQ.sync { _waterfalls } }
+    get { Api.objectQ.sync { _waterfalls } }
     set { Api.objectQ.sync(flags: .barrier) { _waterfalls = newValue } } }
   
   public var xvtrs: [XvtrId: Xvtr] {
-    get { return Api.objectQ.sync { _xvtrs } }
+    get { Api.objectQ.sync { _xvtrs } }
     set { Api.objectQ.sync(flags: .barrier) { _xvtrs = newValue } } }
 
   // Static models
@@ -159,7 +159,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     get {  return _binauralRxEnabled }
     set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) } } }
   
-  @objc dynamic public var calFreq: Int {
+  @objc dynamic public var calFreq: UInt {
     get {  return _calFreq }
     set { if _calFreq != newValue { _calFreq = newValue ; radioSetCmd( .calFreq, newValue.hzToMhz) } } }
   
@@ -224,11 +224,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     set { if _lineoutMute != newValue { _lineoutMute = newValue ; mixerCmd( "lineout mute", newValue.as1or0) } } }
   
   @objc dynamic public var mox: Bool {
-    get { return _mox }
+    get { _mox }
     set { if _mox != newValue { _mox = newValue ; xmitCmd( newValue.as1or0) } } }
   
   @objc dynamic public var muteLocalAudio: Bool {
-    get { return _muteLocalAudio }
+    get { _muteLocalAudio }
     set { if _muteLocalAudio != newValue { _muteLocalAudio = newValue ; radioSetCmd( "mute_local_audio", newValue.as1or0) } } }
   
   @objc dynamic public var nickname: String {
@@ -252,7 +252,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; radioSetCmd( .snapTuneEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var startCalibration: Bool {
-    get { return _startCalibration }
+    get { _startCalibration }
     set { if _startCalibration != newValue { _startCalibration = newValue ; if newValue { radioCmd("pll_start", "") } } } }
   
   @objc dynamic public var staticGateway: String {
@@ -337,7 +337,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @Barrier(false, Api.objectQ) var _binauralRxEnabled         // Binaural enable
   @Barrier(nil, Api.objectQ)   var _boundClientId : UUID?     // The Client Id of this client's GUI (V3 only)
   // C
-  @Barrier(0, Api.objectQ)     var _calFreq                   // Calibration frequency
+  @Barrier(0, Api.objectQ)     var _calFreq  : Frequency                 // Calibration frequency
   @Barrier("", Api.objectQ)    var _callsign                  // Callsign
   @Barrier("", Api.objectQ)    var _chassisSerial             // Radio serial number (read only)
   @Barrier("", Api.objectQ)    var _clientIp                  // Ip address returned by "client ip" command
@@ -1396,7 +1396,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // save the list
       micList = reply.valuesArray(  delimiter: "," )
       
-    case xLib6000.Slice.kListCmd:
+    case "slice list":
       // save the list
       sliceList = reply.valuesArray().compactMap {$0.objectId}
       

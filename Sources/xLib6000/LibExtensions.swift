@@ -8,13 +8,13 @@
 
 import Foundation
 
-typealias NC = NotificationCenter
+typealias NC                    = NotificationCenter
 
 public typealias KeyValuesArray = [(key:String, value:String)]
-public typealias ValuesArray = [String]
-public typealias StreamId = UInt32
-public typealias Handle = UInt32
-public typealias ObjectId = UInt16
+public typealias ValuesArray    = [String]
+public typealias StreamId       = UInt32
+public typealias Handle         = UInt32
+public typealias ObjectId       = UInt16
 
 
 public extension Date {
@@ -41,7 +41,6 @@ public extension NotificationCenter {
   ///   - object:         associated object
   ///
   class func post(_ name: String, object: Any?) {
-    
     NotificationCenter.default.post(name: NSNotification.Name(rawValue: name), object: object)
     
   }
@@ -52,7 +51,6 @@ public extension NotificationCenter {
   ///   - object:         associated object
   ///
   class func post(_ notification: NotificationType, object: Any?) {
-    
     NotificationCenter.default.post(name: Notification.Name(rawValue: notification.rawValue), object: object)
     
   }
@@ -65,7 +63,6 @@ public extension NotificationCenter {
   ///   - object:         associated object (if any)
   ///
   class func makeObserver(_ observer: Any, with selector: Selector, of name: String, object: Any? = nil) {
-    
     NotificationCenter.default.addObserver(observer, selector: selector, name: NSNotification.Name(rawValue: name), object: object)
   }
   /// setup a Notification Observer by Type
@@ -77,7 +74,6 @@ public extension NotificationCenter {
   ///   - object:         associated object (if any)
   ///
   class func makeObserver(_ observer: Any, with selector: Selector, of type: NotificationType, object: Any? = nil) {
-    
     NotificationCenter.default.addObserver(observer, selector: selector, name: NSNotification.Name(rawValue: type.rawValue), object: object)
   }
   /// remove a Notification Observer by Type
@@ -88,7 +84,6 @@ public extension NotificationCenter {
   ///   - object:         associated object (if any)
   ///
   class func deleteObserver(_ observer: Any, of type: NotificationType, object: Any?) {
-    
     NotificationCenter.default.removeObserver(observer, name: NSNotification.Name(rawValue: type.rawValue), object: object)
   }
 }
@@ -111,111 +106,23 @@ public extension Sequence {
 }
 
 public extension String {
-  /// Trim whitespace from a String
-  ///
-  /// - Returns:      a trimmedf String
-  ///
-  var trimmed: String {
-    return self.trimmingCharacters(in: CharacterSet.whitespaces)
-  }
-  /// Convert a comma delimited String to aa array
-  ///
-  /// - Returns:      an array of Stringl
-  ///
-  var list: [String] {
-    return self.components(separatedBy: ",")
-  }
-  /// Convert a String to a UInt16
-  ///
-  /// - Returns:      the UInt6 equivalent or nil
-  ///
-  var objectId: ObjectId? {
-    return UInt16(self, radix: 10)
-  }
-  /// Convert a String to a UInt32
-  ///
-  /// - Returns:      the UInt32 equivalent or nil
-  ///
-  var streamId: StreamId? {
-    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16)
-  }
-  /// Convert a String to a UInt32
-  ///
-  /// - Returns:      the UInt32 equivalent or nil
-  ///
-  var handle: Handle? {
-    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16)
-  }
-  /// Convert a Mhz string to a Hz Int
-  ///
-  /// - Returns:      the Int equivalent
-  ///
-  var mhzToHz : Int {
-    return Int( (Double(self) ?? 0) * 1_000_000 )
-  }
-  /// Convert a Mhz string to a Hz UInt
-  ///
-  /// - Returns:      the Int equivalent
-  ///
-  var mhzToHzUInt : UInt {
-    return UInt( (Double(self) ?? 0) * 1_000_000 )
-  }
-  /// Convert a String to a UInt16
-  ///
-  /// - Returns:      the UInt6 equivalent or nil
-  ///
-  var sequenceNumber: SequenceNumber {
-    return UInt(self, radix: 10) ?? 0
-  }
-  /// Return the Integer value (or 0 if invalid)
-  ///
-  /// - Returns:      the Int equivalent
-  ///
-  var iValue : Int {
-    return Int(self) ?? 0
-  }
-  /// Return the Bool value (or false if invalid)
-  ///
-  /// - Returns:      a Bool equivalent
-  ///
-  var bValue : Bool {
-    return (Int(self) ?? 0) == 1 ? true : false
-  }
-  /// Return the Bool value (or false if invalid)
-  ///
-  /// - Returns:      a Bool equivalent
-  ///
-  var tValue : Bool {
-    return self.lowercased() == "true" ? true : false
-  }
-  /// Return the Float value (or 0 if invalid)
-  ///
-  /// - Returns:      a Float equivalent
-  ///
-  var fValue : Float {
-    return Float(self) ?? 0
-  }
-  /// Return the CGFloat value (or 0 if invalid)
-  ///
-  /// - Returns:      a CGFloat equivalent
-  ///
-  var cgValue : CGFloat {
-    return CGFloat(self)
-  }
-  /// Return the Double value (or 0 if invalid)
-  ///
-  /// - Returns:      a Double equivalent
-  ///
-  var dValue : Double {
-    return Double(self) ?? 0
-  }
-  /// Return the Unsigned Int value (or 0 if invalid)
-  ///
-  /// - Returns:      a Uint equivalent
-  ///
-  var uValue : UInt {
-    return UInt(self) ?? 0
-  }
+  
+  var bValue          : Bool            { (Int(self) ?? 0) == 1 ? true : false }
+  var cgValue         : CGFloat         { CGFloat(self) }
+  var dValue          : Double          { Double(self) ?? 0 }
+  var fValue          : Float           { Float(self) ?? 0 }
+  var handle          : Handle?         { self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16) }
+  var iValue          : Int             { Int(self) ?? 0 }
+  var list            : [String]        { self.components(separatedBy: ",") }
+  var mhzToHz         : UInt            { UInt( (Double(self) ?? 0) * 1_000_000 ) }
+  var mhzToHzUInt     : UInt            { UInt( (Double(self) ?? 0) * 1_000_000 ) }
+  var objectId        : ObjectId?       { UInt16(self, radix: 10) }
+  var sequenceNumber  : SequenceNumber  { UInt(self, radix: 10) ?? 0 }
+  var streamId        : StreamId?       { self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16) }
+  var trimmed         : String          { self.trimmingCharacters(in: CharacterSet.whitespaces) }
+  var tValue          : Bool            { self.lowercased() == "true" ? true : false }
+  var uValue          : UInt            { UInt(self) ?? 0 }
+
   /// Replace spaces with a specified value
   ///
   /// - Parameters:
@@ -354,77 +261,19 @@ public extension String {
 
 public extension Bool {
   
-  /// Return 1 / 0 for true / false Booleans
-  ///
-  /// - Returns:      a String
-  ///
-  var as1or0Int : Int {
-    return (self ? 1 : 0)
-  }
-  /// Return "1" / "0" for true / false Booleans
-  ///
-  /// - Returns:      a String
-  ///
-  var as1or0 : String {
-    return (self ? "1" : "0")
-  }
-  /// Return "True" / "False" Strings for true / false Booleans
-  ///
-  /// - Returns:      a String
-  ///
-  var asTrueFalse : String {
-    return (self ? "True" : "False")
-  }
-  /// Return "T" / "F" Strings for true / false Booleans
-  ///
-  /// - Returns:      a String
-  ///
-  var asTF : String {
-    return (self ? "T" : "F")
-  }
-  /// Return "on" / "off" Strings for true / false Booleans
-  ///
-  /// - Returns:      a String
-  ///
-  var asOnOff : String {
-    return (self ? "on" : "off")
-  }
-  /// Return "PASS" / "FAIL" Strings for true / false Booleans
-  ///
-  /// - Returns:      a String
-  ///
-  var asPassFail : String  {
-    return self == true ? "PASS" : "FAIL"
-  }
-  /// Return "YES" / "NO" Strings for true / false Booleans
-  ///
-  /// - Returns:      a String
-  ///
-  var asYesNo : String {
-    return self == true ? "YES" : "NO"
-  }
+  var as1or0Int   : Int     { self ? 1 : 0 }
+  var as1or0      : String  { self ? "1" : "0" }
+  var asTrueFalse : String  { self ? "True" : "False" }
+  var asTF        : String  { self ? "T" : "F" }
+  var asOnOff     : String  { self ? "on" : "off" }
+  var asPassFail  : String  { self ? "PASS" : "FAIL" }
+  var asYesNo     : String  { self ? "YES" : "NO" }
 }
 
 public extension Int {
   
-  /// Convert an Int Hz value to a Mhz string
-  ///
-  /// - Returns:      the String equivalent
-  ///
-  var hzToMhz : String {
-    
-    // convert to a String with up to 2 leading & with 6 trailing places
-    return String(format: "%02.6f", Float(self) / 1_000_000.0)
-  }
-  /// Convert a UInt Hz value to a Mhz string
-  ///
-  /// - Returns:      the String equivalent
-  ///
-  var hzToMhzUInt : String {
-    
-    // convert to a String with up to 2 leading & with 6 trailing places
-    return String(format: "%02.6f", Float(self) / 1_000_000.0)
-  }
+  var hzToMhz     : String { String(format: "%02.6f", Float(self) / 1_000_000.0) }
+  var hzToMhzUInt : String { String(format: "%02.6f", Float(self) / 1_000_000.0) }
   /// Determine if a value is between two other values (inclusive)
   ///
   /// - Parameters:
@@ -432,35 +281,12 @@ public extension Int {
   ///   - value2:     high value (may be + or -)
   /// - Returns:      true - self within two values
   ///
-  func within(_ value1: Int, _ value2: Int) -> Bool {
-    
-    return (self >= value1) && (self <= value2)
-  }
-  
-  /// Force a value to be between two other values (inclusive)
-  ///
-  /// - Parameters:
-  ///   - value1:     the Minimum
-  ///   - value2:     the Maximum
-  /// - Returns:      the coerced value
-  ///
-//  func bound(_ value1: Int, _ value2: Int) -> Int {
-//    let newValue = self < value1 ? value1 : self
-//    return newValue > value2 ? value2 : newValue
-//  }
+  func within(_ value1: Int, _ value2: Int) -> Bool { (self >= value1) && (self <= value2) }
 }
 
 public extension UInt {
   
-  /// Convert a UInt Hz value to a Mhz string
-  ///
-  /// - Returns:      the String equivalent
-  ///
-  var hzToMhz : String {
-    
-    // convert to a String with up to 2 leading & with 6 trailing places
-    return String(format: "%02.6f", Float(self) / 1_000_000.0)
-  }
+  var hzToMhz : String { String(format: "%02.6f", Float(self) / 1_000_000.0) }
 }
 
 //public extension UInt16 {
@@ -469,14 +295,9 @@ public extension UInt {
 
 public extension UInt32 {
   
-  // convert a UInt32 to a hax String (defaults to "0xXXXXXXXX")
-  func toHex(_ format: String = "0x%08X") -> String {
-    
-    return String(format: format, self)
-  }
-  
-  // convert a UInt32 to a hex String (uppercase, leading zeros, 8 characters, 0x prefix)
   var hex: String { return String(format: "0x%08X", self) }
+
+  func toHex(_ format: String = "0x%08X") -> String { String(format: format, self) }
 }
 
 public extension CGFloat {
@@ -546,44 +367,22 @@ public struct Version {
     }
   }
   
-  public var string : String {
-    return "\(major).\(minor).\(build).\(revision)"
-  }
-  
-  public var shortString : String {
-    return "\(major).\(minor).\(build).x"
-  }
-  
-  public var isV3 : Bool {
-    return major >= 2 && minor >= 5
-  }
+  public var string       : String  { "\(major).\(minor).\(build).\(revision)" }
+  public var shortString  : String  { "\(major).\(minor).\(build).x" }
+  public var isV3         : Bool    { return major >= 2 && minor >= 5 }
+  public var isV2         : Bool    { return major >= 2 && minor < 5 }
+  public var isV1         : Bool    { major == 1 }
 
-  public var isV2 : Bool {
-    return major >= 2 && minor < 5
-  }
-
-  public var isV1 : Bool {
-    return major == 1
-  }
-
-  static func ==(lhs: Version, rhs: Version) -> Bool {
-    return lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.build == rhs.build
-  }
-  
+  static func ==(lhs: Version, rhs: Version) -> Bool { lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.build == rhs.build }
   static func <(lhs: Version, rhs: Version) -> Bool {
     
     switch (lhs, rhs) {
       
-    case (let l, let r) where l == r:
-      return false
-    case (let l, let r) where l.major < r.major:
-      return true
-    case (let l, let r) where l.major == r.major && l.minor < r.minor:
-      return true
-    case (let l, let r) where l.major == r.major && l.minor == r.minor && l.build < r.build:
-      return true
-    default:
-      return false
+    case (let l, let r) where l == r: return false
+    case (let l, let r) where l.major < r.major: return true
+    case (let l, let r) where l.major == r.major && l.minor < r.minor: return true
+    case (let l, let r) where l.major == r.major && l.minor == r.minor && l.build < r.build: return true
+    default: return false
     }
   }
 }
@@ -635,20 +434,21 @@ public func isForThisClient(_ properties: KeyValuesArray) -> Bool {
 public struct Barrier<Element> {
   private var _value      : Element
   private let _q          : DispatchQueue
-  
+
   public var wrappedValue: Element {
-    get { return _q.sync { _value }}
+    get { _q.sync { _value }}
     set { _q.sync(flags: .barrier) { _value = newValue }}
   }
   
   init(_ value: Element, _ queue: DispatchQueue) {
-    _value = value
     _q = queue
+    _value = value
   }
 }
 
 @propertyWrapper
 /// Protect a property using a concurrent queue and a barrier for writes
+///     while limiting its value to arange
 ///
 struct BarrierClamped<Element: Comparable> {
   private var _value      : Element
@@ -656,7 +456,7 @@ struct BarrierClamped<Element: Comparable> {
   private let _range      : ClosedRange<Element>
   
   var wrappedValue: Element {
-    get { return _q.sync { _value }}
+    get { _q.sync { _value }}
     set { _q.sync(flags: .barrier) { _value = min( max(_range.lowerBound, newValue), _range.upperBound) }}
   }
   
@@ -668,24 +468,7 @@ struct BarrierClamped<Element: Comparable> {
   }
 }
 
-@propertyWrapper
-///
-///
-public struct Shadow<Element> {
-  private var _ptr  : UnsafeMutablePointer<Element>
-  
-  public var wrappedValue: Element {
-    get { return _ptr.pointee }
-    set { _ptr.pointee = newValue }
-  }
-  
-  init(_ ptr: UnsafeMutablePointer<Element>) {
-    _ptr = ptr
-  }
-}
-
-
-/// Function to change value and signal KVO
+/// Function to change a value and signal KVO
 ///
 func update<S:NSObject, T>(_ object: S, _ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<S,T>) {
   object.willChangeValue(for: keyPath)

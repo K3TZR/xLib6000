@@ -25,27 +25,27 @@ public final class Amplifier  : NSObject, DynamicModel {
   public let id               : AmplifierId
 
   @objc dynamic public var ant: String {
-    get { return _ant }
+    get { _ant }
     set { if _ant != newValue { _ant = newValue ; amplifierCmd(.ant, newValue) } } }
   
   @objc dynamic public var ip: String {
-    get { return _ip }
+    get { _ip }
     set { if _ip != newValue { _ip = newValue ; amplifierCmd(.ip, newValue) } } }
   
   @objc dynamic public var model: String {
-    get { return _model }
+    get { _model }
     set { if _model != newValue { _model = newValue ; amplifierCmd(.model, newValue) } } }
   
   @objc dynamic public var mode: String {
-    get { return _mode }
+    get { _mode }
     set { if _mode != newValue { _mode = newValue ; amplifierCmd(.mode, newValue) } } }
   
   @objc dynamic public var port: Int {
-    get { return _port }
+    get { _port }
     set { if _port != newValue { _port = newValue ; amplifierCmd( .port, newValue) } } }
   
   @objc dynamic public var serialNumber: String {
-    get { return _serialNumber }
+    get { _serialNumber }
     set { if _serialNumber != newValue { _serialNumber = newValue ; amplifierCmd( .serialNumber, newValue) } } }
 
   // ----------------------------------------------------------------------------
@@ -70,9 +70,9 @@ public final class Amplifier  : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _radio        : Radio
   private var _initialized  = false
   private let _log          = Log.sharedInstance.msg
+  private let _radio        : Radio
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods

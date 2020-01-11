@@ -21,14 +21,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
+  public static let kVersion                = Version("1.0.37")
+  public static let kVersionSupported       = Version("2.4.9")
+
   public static let kBundleIdentifier       = "net.k3tzr." + Api.kName
   public static let kDaxChannels            = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
   public static let kDaxIqChannels          = ["None", "1", "2", "3", "4"]
   public static let kName                   = "xLib6000"
   public static let kNoError                = "0"
-  public static let kSupportsVersion        = Version("2.4.9")
-  public static let kVersion                = Version("1.0.0")
-
 
   static        let objectQ                 = DispatchQueue(label: Api.kName + ".objectQ", attributes: [.concurrent])
   static        let kTcpTimeout             = 0.5     // seconds
@@ -329,8 +329,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // get the Radio Version
     radioVersion = Version(selectedRadio.firmwareVersion)
 
-    if Api.kSupportsVersion < radioVersion  {
-      _log("Radio may need to be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kSupportsVersion.shortString)", .warning, #function, #file, #line)
+    if Api.kVersionSupported < radioVersion  {
+      _log("Radio may need to be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersionSupported.shortString)", .warning, #function, #file, #line)
       NC.post(.radioDowngrade, object: [Api.kVersion, radioVersion])
     }
   }

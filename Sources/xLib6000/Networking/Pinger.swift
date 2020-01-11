@@ -37,8 +37,8 @@ final class Pinger {
   ///
   init(tcpManager: TcpManager, pingQ: DispatchQueue) {
     
-    self._tcpManager = tcpManager
-    self._pingQ = pingQ
+    _tcpManager = tcpManager
+    _pingQ = pingQ
     
     // start pinging
     startPingTimer()

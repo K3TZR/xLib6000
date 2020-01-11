@@ -13,7 +13,7 @@ import Foundation
 
 /// Logging is deferred to the hosting application
 ////
-public protocol LogHandler {
+public protocol LogHandler: class {
   /// Method to process Log entries
   ///
   /// - Parameters:

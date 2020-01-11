@@ -18,21 +18,20 @@ import Cocoa
 ///      objects periodically receive Mic Audio in a UDP stream. They are collected
 ///      in the daxMicAudioStreams collection on the Radio object.
 ///
-public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
+public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public      let id                  : DaxMicStreamId
-  public weak var delegate            : StreamHandler?
-  public var rxLostPacketCount        = 0
+  public      let id          : DaxMicStreamId
+  public weak var delegate    : StreamHandler?
 
-  @objc dynamic public var clientHandle: Handle {
-    get { return _clientHandle  }
+  @objc dynamic public var clientHandle : Handle {
+    get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue } } }
   
-  @objc dynamic public var micGain: Int {
-    get { return _micGain  }
+  @objc dynamic public var micGain      : Int {
+    get { _micGain  }
     set {
       if _micGain != newValue {
         _micGain = newValue
@@ -48,6 +47,8 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
     }
   }
 
+  public var rxLostPacketCount          = 0
+  
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -182,11 +183,6 @@ public final class DaxMicAudioStream  : NSObject, DynamicModelWithStream {
   ///   - vitaPacket:         a Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    
-    if vita.classCode != .daxAudio {
-      // not for us
-      return
-    }
     
     // if there is a delegate, process the Mic Audio stream
     if let delegate = delegate {

@@ -42,7 +42,21 @@ extension Radio {
     // tell the Radio to create a Stream
     sendCommand("stream create " + "dax" + "=\(channel)", replyTo: callback)
   }
-  
+  /// Find an AudioStream by DAX Channel
+  ///
+  /// - Parameter channel:    Dax channel number
+  /// - Returns:              an AudioStream (if any)
+  ///
+  public func findAudioStream(with channel: Int) -> AudioStream? {
+    
+    // find the AudioStream with the specified Channel (if any)
+    let streams = audioStreams.values.filter { $0.daxChannel == channel }
+    guard streams.count >= 1 else { return nil }
+    
+    // return the first one
+    return streams[0]
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - DaxIqStream methods
   
@@ -63,7 +77,7 @@ extension Radio {
   ///   - daxIqChannel:   a Dax IQ channel number
   /// - Returns:          an IQ Stream reference (or nil)
   ///
-  public func findDaxIqStream(using channel: DaxIqChannel) -> DaxIqStream? {
+  public func findDaxIqStream(using channel: Int) -> DaxIqStream? {
     
     // find the IQ Streams with the specified Channel (if any)
     let selectedStreams = daxIqStreams.values.filter { $0.channel == channel }
@@ -100,7 +114,21 @@ extension Radio {
     // tell the Radio to create a Stream
     sendCommand("stream create type=dax_rx dax_channel=\(channel)", replyTo: callback)
   }
-  
+  /// Find a DaxRxAudioStream by DAX Channel
+  ///
+  /// - Parameter channel:    Dax channel number
+  /// - Returns:              a DaxRxAudioStream (if any)
+  ///
+  public func findDaxRxAudioStream(with channel: Int) -> DaxRxAudioStream? {
+    
+    // find the DaxRxAudioStream with the specified Channel (if any)
+    let streams = daxRxAudioStreams.values.filter { $0.daxChannel == channel }
+    guard streams.count >= 1 else { return nil }
+    
+    // return the first one
+    return streams[0]
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - DaxTxAudioStream methods
   
@@ -161,7 +189,7 @@ extension Radio {
   ///   - daxIqChannel:   a Dax IQ channel number
   /// - Returns:          an IQ Stream reference (or nil)
   ///
-  public func findIqStream(using channel: DaxIqChannel) -> IqStream? {
+  public func findIqStream(using channel: Int) -> IqStream? {
     
     // find the IQ Streams with the specified Channel (if any)
     let selectedStreams = iqStreams.values.filter { $0.daxIqChannel == channel }
@@ -294,7 +322,7 @@ extension Radio {
   ///   - dimensions:         Panafall dimensions
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestPanadapter(frequency: Int, antenna: String? = nil, dimensions: CGSize? = nil, callback: ReplyHandler? = nil) {
+  public func requestPanadapter(frequency: Frequency, antenna: String? = nil, dimensions: CGSize? = nil, callback: ReplyHandler? = nil) {
     
     // tell the Radio to create a Panafall (if any available)
     if availablePanadapters > 0 {
@@ -324,7 +352,7 @@ extension Radio {
   ///   - daxIqChannel:   a Dax channel number
   /// - Returns:          a Panadapter reference (or nil)
   ///
-  public func findPanadapter(using channel: DaxIqChannel) -> Panadapter? {
+  public func findPanadapter(using channel: Int) -> Panadapter? {
     
     // find the Panadapters with the specified Channel (if any)
     let selectedPanadapters = panadapters.values.filter { $0.daxIqChannel == channel }
@@ -523,7 +551,7 @@ extension Radio {
   ///   - mode:               selected mode
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestSlice(frequency: Int, antenna: String, mode: String, callback: ReplyHandler? = nil) {
+  public func requestSlice(frequency: Frequency, antenna: String, mode: String, callback: ReplyHandler? = nil) {
     if availableSlices > 0 {
       // tell the Radio to create a Slice
       sendCommand("slice create " + "\(frequency.hzToMhz) \(antenna) \(mode)", replyTo: callback)
@@ -536,7 +564,7 @@ extension Radio {
   ///   - frequency:          frequency (Hz)
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestSlice(panadapter: Panadapter, frequency: Int = 0, callback: ReplyHandler? = nil) {
+  public func requestSlice(panadapter: Panadapter, frequency: Frequency = 0, callback: ReplyHandler? = nil) {
     if availableSlices > 0 {
       // tell the Radio to create a Slice
       sendCommand("slice create " + "pan" + "=\(panadapter.id.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz)")", replyTo: callback)
@@ -574,14 +602,14 @@ extension Radio {
   ///   - width:      frequenct width
   /// - Returns:      a reference to a Slice (or nil)
   ///
-  public func findSlice(on id: PanadapterStreamId, at freq: Int, width: Int) -> xLib6000.Slice? {
+  public func findSlice(on id: PanadapterStreamId, at freq: Frequency, width: Int) -> xLib6000.Slice? {
     
     // find the Slices on the Panadapter (if any)
     let filteredSlices = findAllSlices(on: id)
     guard filteredSlices != nil else {return nil}
     
     // find the ones in the frequency range
-    let selectedSlices = filteredSlices!.filter { freq >= $0.frequency + min(-width/2, $0.filterLow) && freq <= $0.frequency + max(width/2, $0.filterHigh)}
+    let selectedSlices = filteredSlices!.filter { freq >= $0.frequency + Frequency(min(-width/2, $0.filterLow)) && freq <= $0.frequency + Frequency(max(width/2, $0.filterHigh))}
     guard selectedSlices.count >= 1 else { return nil }
     
     // return the first one
@@ -620,7 +648,7 @@ extension Radio {
   /// - Parameter channel:    Dax channel number
   /// - Returns:              a Slice (if any)
   ///
-  public func findSlice(using channel: DaxChannel) -> xLib6000.Slice? {
+  public func findSlice(using channel: Int) -> xLib6000.Slice? {
     
     // find the Slices with the specified Channel (if any)
     let filteredSlices = slices.values.filter { $0.daxChannel == channel }
@@ -671,7 +699,7 @@ extension Radio {
   ///   - frequency:          frequency (Hz)
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestTnf(frequency: String, callback: ReplyHandler? = nil) {
+  public func requestTnf(at frequency: Frequency, callback: ReplyHandler? = nil) {
     
     // tell the Radio to create a Tnf
     sendCommand("tnf create " + "freq" + "=\(frequency)", replyTo: callback)
@@ -679,14 +707,14 @@ extension Radio {
   /// Given a Frequency, return a reference to the Tnf containing it (if any)
   ///
   /// - Parameters:
-  ///   - frequency:      a Frequency (in hz)
-  ///   - minWidth:       panadapter bandwidth (hz)
+  ///   - frequency:      a Frequency (hz)
+  ///   - minWidth:       bandwidth (hz)
   /// - Returns:          a Tnf reference (or nil)
   ///
-  public func findTnf(at freq: UInt, width: UInt) -> Tnf? {
+  public func findTnf(at freq: Frequency, minWidth: UInt) -> Tnf? {
     
     // return the Tnfs within the specified Frequency / minimum width (if any)
-    let filteredTnfs = tnfs.values.filter { freq >= ($0.frequency - max(width, $0.width/2)) && freq <= ($0.frequency + max(width, $0.width/2)) }
+    let filteredTnfs = tnfs.values.filter { freq >= ($0.frequency - Frequency(max(minWidth, $0.width/2))) && freq <= ($0.frequency + Frequency(max(minWidth, $0.width/2))) }
     guard filteredTnfs.count >= 1 else { return nil }
     
     // return the first one

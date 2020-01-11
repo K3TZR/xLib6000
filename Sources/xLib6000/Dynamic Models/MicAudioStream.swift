@@ -20,23 +20,22 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public weak var delegate                 : StreamHandler?
-  public      let id                       : DaxMicStreamId
-  public      var rxLostPacketCount        = 0
+  public      let id          : DaxMicStreamId
+  public weak var delegate    : StreamHandler?
 
   @objc dynamic public var inUse: Bool {
     return _inUse }
   
   @objc dynamic public var ip: String {
-    get { return _ip }
+    get { _ip }
     set { if _ip != newValue { _ip = newValue } } }
   
   @objc dynamic public var port: Int {
-    get { return _port  }
+    get { _port  }
     set { if _port != newValue { _port = newValue } } }
   
   @objc dynamic public var micGain: Int {
-    get { return _micGain  }
+    get { _micGain  }
     set {
       if _micGain != newValue {
           _micGain = newValue
@@ -51,7 +50,9 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
         }
       }
   }
-  
+
+  public      var rxLostPacketCount        = 0
+
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -71,9 +72,9 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _radio                        : Radio
-  private var _log                          = Log.sharedInstance.msg
   private var _initialized                  = false
+  private var _log                          = Log.sharedInstance.msg
+  private let _radio                        : Radio
   private var _rxSeq                        : Int?
   
   // ------------------------------------------------------------------------------
@@ -102,7 +103,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
         if radio.micAudioStreams[daxMicStreamId] == nil {
           
           // NO, is this stream for this client?
-          if !AudioStream.isStatusForThisClient(keyValues) { return }
+          if !isForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
           radio.micAudioStreams[daxMicStreamId] = MicAudioStream(radio: radio, id: daxMicStreamId)
@@ -208,11 +209,6 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   ///   - vitaPacket:         a Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    
-    if vita.classCode != .daxAudio {
-      // not for us
-      return
-    }
     
     // if there is a delegate, process the Mic Audio stream
     if let delegate = delegate {

@@ -8,25 +8,25 @@
 
 import Foundation
 
-public class GuiClient        : Equatable {
+public struct GuiClient       : Equatable {
   
   public var handle           : Handle
-  public var clientId         : String?
-  public var program          : String
-  public var station          : String
-  public var isAvailable      : Bool
-  public var isLocalPtt       : Bool
-  public var isThisClient     : Bool
+  public var clientId         : String? = nil
+  public var program          : String  = ""
+  public var station          : String  = ""
+  public var isAvailable      : Bool    = false
+  public var isLocalPtt       : Bool    = false
+  public var isThisClient     : Bool    = false
   
-  public init(handle: Handle, clientId: String? = nil, program: String = "", station: String = "", isAvailable: Bool = false, isLocalPtt: Bool = false, isThisClient: Bool = false) {
-    self.handle = handle
-    self.clientId = clientId
-    self.program = program
-    self.station = station
-    self.isAvailable = isAvailable
-    self.isLocalPtt = isLocalPtt
-    self.isThisClient = isThisClient
-  }
+//  public init(handle: Handle, clientId: String? = nil, program: String = "", station: String = "", isAvailable: Bool = false, isLocalPtt: Bool = false, isThisClient: Bool = false) {
+//    self.handle = handle
+//    self.clientId = clientId
+//    self.program = program
+//    self.station = station
+//    self.isAvailable = isAvailable
+//    self.isLocalPtt = isLocalPtt
+//    self.isThisClient = isThisClient
+//  }
   
   public static func ==(lhs: GuiClient, rhs: GuiClient) -> Bool {
     

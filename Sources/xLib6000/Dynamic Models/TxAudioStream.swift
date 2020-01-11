@@ -17,7 +17,7 @@ import Cocoa
 ///      objects are added / removed by the incoming TCP messages. TxAudioStream
 ///      objects periodically send Tx Audio in a UDP stream.
 ///
-public final class TxAudioStream            : NSObject, DynamicModel {
+public final class TxAudioStream : NSObject, DynamicModel {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
@@ -25,22 +25,22 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   public let id                             : TxStreamId
   
   @objc dynamic public var transmit: Bool {
-    get { return _transmit  }
+    get { _transmit  }
     set { if _transmit != newValue { _transmit = newValue ; txAudioCmd( newValue.as1or0) } } }
 
   @objc dynamic public var inUse: Bool {
     return _inUse }
   
   @objc dynamic public var ip: String {
-    get { return _ip }
+    get { _ip }
     set { if _ip != newValue { _ip = newValue } } }
   
   @objc dynamic public var port: Int {
-    get { return _port  }
+    get { _port  }
     set { if _port != newValue { _port = newValue } } }
   
   @objc dynamic public var txGain: Int {
-    get { return _txGain  }
+    get { _txGain  }
     set {
       if _txGain != newValue {
         _txGain = newValue
@@ -77,11 +77,10 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _radio                        : Radio
+  private var _initialized                  = false
   private var _log                          = Log.sharedInstance.msg
-  private var _initialized                  = false                         // True if initialized by Radio hardware
-
-  private var _txSeq                        = 0                             // Tx sequence number (modulo 16)
+  private let _radio                        : Radio
+  private var _txSeq                        = 0
   
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -110,7 +109,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
         if radio.txAudioStreams[txAudioStreamId] == nil {
           
           // NO, is the stream for this client?
-          if !AudioStream.isStatusForThisClient(keyValues) { return }
+          if !isForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
           radio.txAudioStreams[txAudioStreamId] = TxAudioStream(radio: radio, id: txAudioStreamId)
@@ -144,7 +143,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   ///
   init(radio: Radio, id: TxStreamId) {
     
-    self._radio = radio
+    _radio = radio
     self.id = id
     super.init()
   }

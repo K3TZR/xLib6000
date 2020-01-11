@@ -17,7 +17,7 @@ public typealias UsbCableId = String
 ///      are added, removed and updated by the incoming TCP messages. They are
 ///      collected in the usbCables collection on the Radio object.
 ///
-public final class UsbCable                 : NSObject, DynamicModel {
+public final class UsbCable : NSObject, DynamicModel {
     
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -25,71 +25,71 @@ public final class UsbCable                 : NSObject, DynamicModel {
   public let id                             : UsbCableId
 
   @objc dynamic public var autoReport: Bool {
-    get { return _autoReport }
+    get { _autoReport }
     set { if _autoReport != newValue { _autoReport = newValue ; usbCableCmd( .autoReport, newValue.as1or0) } } }
   
   @objc dynamic public var band: String {
-    get { return _band }
+    get { _band }
     set { if _band != newValue { _band = newValue ; usbCableCmd( .band, newValue) } } }
   
   @objc dynamic public var dataBits: Int {
-    get { return _dataBits }
+    get { _dataBits }
     set { if _dataBits != newValue { _dataBits = newValue ; usbCableCmd( .dataBits, newValue) } } }
   
   @objc dynamic public var enable: Bool {
-    get { return _enable }
+    get { _enable }
     set { if _enable != newValue { _enable = newValue ; usbCableCmd( .enable, newValue.as1or0) } } }
   
   @objc dynamic public var flowControl: String {
-    get { return _flowControl }
+    get { _flowControl }
     set { if _flowControl != newValue { _flowControl = newValue ; usbCableCmd( .flowControl, newValue) } } }
   
   @objc dynamic public var name: String {
-    get { return _name }
+    get { _name }
     set { if _name != newValue { _name = newValue ; usbCableCmd( .name, newValue) } } }
   
   @objc dynamic public var parity: String {
-    get { return _parity }
+    get { _parity }
     set { if _parity != newValue { _parity = newValue ; usbCableCmd( .parity, newValue) } } }
   
   @objc dynamic public var pluggedIn: Bool {
-    get { return _pluggedIn }
+    get { _pluggedIn }
     set { if _pluggedIn != newValue { _pluggedIn = newValue ; usbCableCmd( .pluggedIn, newValue.as1or0) } } }
   
   @objc dynamic public var polarity: String {
-    get { return _polarity }
+    get { _polarity }
     set { if _polarity != newValue { _polarity = newValue ; usbCableCmd( .polarity, newValue) } } }
   
   @objc dynamic public var preamp: String {
-    get { return _preamp }
+    get { _preamp }
     set { if _preamp != newValue { _preamp = newValue ; usbCableCmd( .preamp, newValue) } } }
   
   @objc dynamic public var source: String {
-    get { return _source }
+    get { _source }
     set { if _source != newValue { _source = newValue ; usbCableCmd( .source, newValue) } } }
   
   @objc dynamic public var sourceRxAnt: String {
-    get { return _sourceRxAnt }
+    get { _sourceRxAnt }
     set { if _sourceRxAnt != newValue { _sourceRxAnt = newValue ; usbCableCmd( .sourceRxAnt, newValue) } } }
   
   @objc dynamic public var sourceSlice: Int {
-    get { return _sourceSlice }
+    get { _sourceSlice }
     set { if _sourceSlice != newValue { _sourceSlice = newValue ; usbCableCmd( .sourceSlice, newValue) } } }
   
   @objc dynamic public var sourceTxAnt: String {
-    get { return _sourceTxAnt }
+    get { _sourceTxAnt }
     set { if _sourceTxAnt != newValue { _sourceTxAnt = newValue ; usbCableCmd( .sourceTxAnt, newValue) } } }
   
   @objc dynamic public var speed: Int {
-    get { return _speed }
+    get { _speed }
     set { if _speed != newValue { _speed = newValue ; usbCableCmd( .speed, newValue) } } }
   
   @objc dynamic public var stopBits: Int {
-    get { return _stopBits }
+    get { _stopBits }
     set { if _stopBits != newValue { _stopBits = newValue ; usbCableCmd( .stopBits, newValue) } } }
   
   @objc dynamic public var usbLog: Bool {
-    get { return _usbLog }
+    get { _usbLog }
     set { if _usbLog != newValue { _usbLog = newValue ; usbCableCmd( .usbLog, newValue.as1or0) } } }
 
   public private(set) var cableType         : UsbCableType
@@ -150,9 +150,9 @@ public final class UsbCable                 : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _radio                        : Radio
+  private var _initialized                  = false
   private let _log                          = Log.sharedInstance.msg
-  private var _initialized                  = false                         // True if initialized by Radio hardware
+  private let _radio                        : Radio
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -211,7 +211,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
   ///
   public init(radio: Radio, id: UsbCableId, cableType: UsbCableType) {
     
-    self._radio = radio
+    _radio = radio
     self.id = id
     self.cableType = cableType
     super.init()
@@ -275,7 +275,6 @@ public final class UsbCable                 : NSObject, DynamicModel {
           //                    willChangeValue(forKey: "usbLogLine")
           //                    _usbLogLine = property.value
           //                    didChangeValue(forKey: "usbLogLine")
-          
         }
       }
       

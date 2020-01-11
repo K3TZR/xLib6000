@@ -25,80 +25,80 @@ public final class Memory                   : NSObject, DynamicModel {
   public let id                             : MemoryId                  // Id that uniquely identifies this Memory
   
   @objc dynamic public var digitalLowerOffset: Int {
-    get { return _digitalLowerOffset }
+    get { _digitalLowerOffset }
     set { if _digitalLowerOffset != newValue { _digitalLowerOffset = newValue ; memCmd( .digitalLowerOffset, newValue) } } }
   
   @objc dynamic public var digitalUpperOffset: Int {
-    get { return _digitalUpperOffset }
+    get { _digitalUpperOffset }
     set { if _digitalUpperOffset != newValue { _digitalUpperOffset = newValue ; memCmd( .digitalUpperOffset, newValue) } } }
   
   @objc dynamic public var filterHigh: Int {
-    get { return _filterHigh }
+    get { _filterHigh }
     set { let value = filterHighLimits(newValue) ; if _filterHigh != value { _filterHigh = value ; memCmd( .rxFilterHigh, newValue) } } }
   
   @objc dynamic public var filterLow: Int {
-    get { return _filterLow }
+    get { _filterLow }
     set { let value = filterLowLimits(newValue) ; if _filterLow != value { _filterLow = value ; memCmd( .rxFilterLow, newValue) } } }
   
-  @objc dynamic public var frequency: Int {
-    get { return _frequency }
+  @objc dynamic public var frequency: Frequency {
+    get { _frequency }
     set { if _frequency != newValue { _frequency = newValue ; memCmd( .frequency, newValue) } } }
   
   @objc dynamic public var group: String {
-    get { return _group }
+    get { _group }
     set { let value = newValue.replacingSpaces() ; if _group != value { _group = value ; memCmd( .group, newValue) } } }
   
   @objc dynamic public var mode: String {
-    get { return _mode }
+    get { _mode }
     set { if _mode != newValue { _mode = newValue ; memCmd( .mode, newValue) } } }
   
   @objc dynamic public var name: String {
-    get { return _name }
+    get { _name }
     set { let value = newValue.replacingSpaces() ; if _name != value { _name = newValue ; memCmd( .name, newValue) } } }
   
   @objc dynamic public var offset: Int {
-    get { return _offset }
+    get { _offset }
     set { if _offset != newValue { _offset = newValue ; memCmd( .repeaterOffset, newValue) } } }
   
   @objc dynamic public var offsetDirection: String {
-    get { return _offsetDirection }
+    get { _offsetDirection }
     set { if _offsetDirection != newValue { _offsetDirection = newValue ; memCmd( .repeaterOffsetDirection, newValue) } } }
   
   @objc dynamic public var owner: String {
-    get { return _owner }
+    get { _owner }
     set { let value = newValue.replacingSpaces() ; if _owner != value { _owner = newValue ; memCmd( .owner, newValue) } } }
   
   @objc dynamic public var rfPower: Int {
-    get { return _rfPower }
+    get { _rfPower }
     set { if _rfPower != newValue { _rfPower = newValue ; memCmd( .rfPower, newValue) } } }
   
   @objc dynamic public var rttyMark: Int {
-    get { return _rttyMark }
+    get { _rttyMark }
     set { if _rttyMark != newValue { _rttyMark = newValue ; memCmd( .rttyMark, newValue) } } }
   
   @objc dynamic public var rttyShift: Int {
-    get { return _rttyShift }
+    get { _rttyShift }
     set { if _rttyShift != newValue { _rttyShift = newValue ; memCmd( .rttyShift, newValue) } } }
   
   @objc dynamic public var squelchEnabled: Bool {
-    get { return _squelchEnabled }
+    get { _squelchEnabled }
     set { if _squelchEnabled != newValue { _squelchEnabled = newValue ; memCmd( .squelchEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var squelchLevel: Int {
-    get { return _squelchLevel }
+    get { _squelchLevel }
     set { if _squelchLevel != newValue { _squelchLevel = newValue ; memCmd( .squelchLevel, newValue) } } }
   
   @objc dynamic public var step: Int {
-    get { return _step }
+    get { _step }
     set { if _step != newValue { _step = newValue ; memCmd( .step, newValue) } } }
   
   @objc dynamic public var toneMode: String {
-    get { return _toneMode }
+    get { _toneMode }
     set { if _toneMode != newValue { _toneMode = newValue ; memCmd( .toneMode, newValue) } } }
   
   @objc dynamic public var toneValue: Int {
-    get { return _toneValue }
-    set { if _toneValue != newValue && toneValueValid(newValue) { _toneValue = newValue ; memCmd( .toneValue, newValue) } } }
+    get { _toneValue }
+    set { if _toneValue != newValue { _toneValue = newValue ; memCmd( .toneValue, newValue) } } }
 
   public enum TXOffsetDirection : String {
     case down
@@ -117,21 +117,21 @@ public final class Memory                   : NSObject, DynamicModel {
   @Barrier(0, Api.objectQ)      var _digitalUpperOffset
   @Barrier(0, Api.objectQ)      var _filterHigh
   @Barrier(0, Api.objectQ)      var _filterLow
-  @Barrier(0, Api.objectQ)      var _frequency
+  @Barrier(0, Api.objectQ)      var _frequency    : Frequency
   @Barrier("", Api.objectQ)     var _group
   @Barrier("", Api.objectQ)     var _mode
   @Barrier("", Api.objectQ)     var _name
   @Barrier(0, Api.objectQ)      var _offset
   @Barrier("", Api.objectQ)     var _offsetDirection
   @Barrier("", Api.objectQ)     var _owner
-  @BarrierClamped(0, Api.objectQ, range: 0...100)      var _rfPower
+  @BarrierClamped(0, Api.objectQ, range: 0...100)   var _rfPower
   @Barrier(0, Api.objectQ)      var _rttyMark
   @Barrier(0, Api.objectQ)      var _rttyShift
   @Barrier(false, Api.objectQ)  var _squelchEnabled
-  @BarrierClamped(0, Api.objectQ, range: 0...100)      var _squelchLevel
+  @BarrierClamped(0, Api.objectQ, range: 0...100)   var _squelchLevel
   @Barrier(0, Api.objectQ)      var _step
   @Barrier("", Api.objectQ)     var _toneMode
-  @Barrier(0, Api.objectQ)      var _toneValue
+  @BarrierClamped(0, Api.objectQ, range: 0...301)   var _toneValue
 
   enum Token : String {
     case digitalLowerOffset                 = "digl_offset"

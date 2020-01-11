@@ -22,20 +22,13 @@ public func flexErrorLevel(errorCode: String) -> MessageLevel {
   let number = UInt32(errorCode, radix: 16) ?? 0
   
   switch number {
-  case 0x10000001...0x10000003:
-    errorLevel = .info
-  case 0x31000001...0x31000009:
-    errorLevel = .warning
-  case 0x50000001...0x500000A3:
-    errorLevel = .error
-  case 0x50001000...0x50001017:
-    errorLevel = .error
-  case 0xE2000000:
-    errorLevel = .error
-  case 0xF3000001...0xF3000004:
-    errorLevel = .error
-  default:
-    errorLevel = .info
+  case 0x10000001...0x10000003: errorLevel = .info
+  case 0x31000001...0x31000009: errorLevel = .warning
+  case 0x50000001...0x500000A3: errorLevel = .error
+  case 0x50001000...0x50001017: errorLevel = .error
+  case 0xE2000000:              errorLevel = .error
+  case 0xF3000001...0xF3000004: errorLevel = .error
+  default:                      errorLevel = .info
   }
   return errorLevel
 }
@@ -51,22 +44,14 @@ public func flexErrorString(errorCode: String) -> String {
   let number = UInt32(errorCode, radix: 16) ?? 0
   
   switch number {
-  case 0:
-    errorString = ""
-  case 0x10000001...0x10000003:
-    errorString = FlexErrors(rawValue: number )!.toString()
-  case 0x31000001...0x31000009:
-    errorString = FlexErrors(rawValue: number )!.toString()
-  case 0x50000001...0x500000A3:
-    errorString = FlexErrors(rawValue: number )!.toString()
-  case 0x50001000...0x50001017:
-    errorString = FlexErrors(rawValue: number )!.toString()
-  case 0xE2000000:
-    errorString = FlexErrors(rawValue: number )!.toString()
-  case 0xF3000001...0xF3000004:
-    errorString = FlexErrors(rawValue: number )!.toString()
-  default:
-    errorString = "Unknown error"
+  case 0:errorString = ""
+  case 0x10000001...0x10000003: errorString = FlexErrors(rawValue: number )!.toString()
+  case 0x31000001...0x31000009: errorString = FlexErrors(rawValue: number )!.toString()
+  case 0x50000001...0x500000A3: errorString = FlexErrors(rawValue: number )!.toString()
+  case 0x50001000...0x50001017: errorString = FlexErrors(rawValue: number )!.toString()
+  case 0xE2000000:              errorString = FlexErrors(rawValue: number )!.toString()
+  case 0xF3000001...0xF3000004: errorString = FlexErrors(rawValue: number )!.toString()
+  default:                      errorString = "Unknown error"
   }
   return errorString
 }
@@ -427,105 +412,103 @@ enum FlexErrors: UInt32 {
     case .SLM_INVALID_CLIENT_NOT_PAN: return "Invalid client not pan"                   // 0x5000006E
     case .SL_NO_VALID_CLIENT: return "No valid client"                                  // 0x5000006F
       
-    case .SL_EXCESS_TX_COMPRESSION_FAIL: return "Excess TX compression fail"            // 0x50000070
-    case .SL_NO_RECORDED_DATA: return "No recorder data"                                // 0x50000071
-    case .SL_BAD_ECO_TABLE_TYPE: return "Bad ECO table type"                            // 0x50000072
-    case .SL_EMPTY_ECO_TABLE: return "Empty ECO table"                                  // 0x50000073
-    case .SL_FULL_ECO_TABLE: return "Full ECO table"                                    // 0x50000074
-    case .SL_BAD_ECO_NUMBER: return "Bad ECO number"                                    // 0x50000075
-    case .SL_ECO_NOT_FOUND: return "ECO not found"                                      // 0x50000076
-    case .SL_NO_HEADLESS_SLCS: return "No headless SLCS"                                // 0x50000077
-    case .SL_INVALID_PROFILE: return "Invalid profile"                                  // 0x50000078
-    case .SL_INVALID_CMD_WHILE_XMIT: return "Invalid cmd while TX"                      // 0x50000079
-    case .SL_CWX_BAD_MACRO: return "CWX bad macro"                                      // 0x5000007A
-    case .SL_CWX_BUFFER_OVERFLOW: return "CWX buffer overflow"                          // 0x5000007B
-    case .SL_XVTR_NOT_FOUND: return "XVTR not found"                                    // 0x5000007C
-    case .SL_XVTR_CREATE_FAIL: return "XVTR create fail"                                // 0x5000007D
-    case .SL_XVTR_DELETED: return "XVTR deleted"                                        // 0x5000007E
-    case .SL_DIVERSITY_ANT_MISMATCH: return "Diversity ant mismatch"                    // 0x5000007F
+    case .SL_EXCESS_TX_COMPRESSION_FAIL:      return "Excess TX compression fail"       // 0x50000070
+    case .SL_NO_RECORDED_DATA:                return "No recorder data"                 // 0x50000071
+    case .SL_BAD_ECO_TABLE_TYPE:              return "Bad ECO table type"               // 0x50000072
+    case .SL_EMPTY_ECO_TABLE:                 return "Empty ECO table"                  // 0x50000073
+    case .SL_FULL_ECO_TABLE:                  return "Full ECO table"                   // 0x50000074
+    case .SL_BAD_ECO_NUMBER:                  return "Bad ECO number"                   // 0x50000075
+    case .SL_ECO_NOT_FOUND:                   return "ECO not found"                    // 0x50000076
+    case .SL_NO_HEADLESS_SLCS:                return "No headless SLCS"                 // 0x50000077
+    case .SL_INVALID_PROFILE:                 return "Invalid profile"                  // 0x50000078
+    case .SL_INVALID_CMD_WHILE_XMIT:          return "Invalid cmd while TX"             // 0x50000079
+    case .SL_CWX_BAD_MACRO:                   return "CWX bad macro"                    // 0x5000007A
+    case .SL_CWX_BUFFER_OVERFLOW:             return "CWX buffer overflow"              // 0x5000007B
+    case .SL_XVTR_NOT_FOUND:                  return "XVTR not found"                   // 0x5000007C
+    case .SL_XVTR_CREATE_FAIL:                return "XVTR create fail"                 // 0x5000007D
+    case .SL_XVTR_DELETED:                    return "XVTR deleted"                     // 0x5000007E
+    case .SL_DIVERSITY_ANT_MISMATCH:          return "Diversity ant mismatch"           // 0x5000007F
       
     case .SL_INVALID_DATABASE_SCHEMA_VERSION: return "Invalid database schema version"  // 0x50000080
-    case .SL_INVALID_WAVEFORM: return "Invalid waveform"                                // 0x50000081
-    case .SL_RESPONSE_WITHOUT_COMMAND: return "Response without command"                // 0x50000082
-    case .SL_UNABLE_TO_SEND_RESPONSE: return "Unable to send response"                  // 0x50000083
-    case .SL_INVALID_MEMORY_INDEX: return "Invalid memory index"                        // 0x50000084
-    case .SL_INVALID_CMD_FOR_MODE: return "Invalid cmd for mode"                        // 0x50000085
-    case .SL_LOCK_NOT_FOUND: return "Lock not found"                                    // 0x50000086
-    case .SL_KEEPALIVE_FAIL: return "Keepalive fail"                                    // 0x50000087
-    case .SL_REMOVE_CLIENT: return "Remove client"                                      // 0x50000088
-    case .SL_CLIENT_CLOSED_SOCKET: return "Client closed socket"                        // 0x50000089
-    case .SL_INVALID_ATU_PROFILE_ID: return "Invalid ATU profile id"                    // 0x5000008A
-    case .SL_INVALID_ATU_PROFILE_NAME: return "Invalid ATU profile name"                // 0x5000008B
+    case .SL_INVALID_WAVEFORM:                return "Invalid waveform"                 // 0x50000081
+    case .SL_RESPONSE_WITHOUT_COMMAND:        return "Response without command"         // 0x50000082
+    case .SL_UNABLE_TO_SEND_RESPONSE:         return "Unable to send response"          // 0x50000083
+    case .SL_INVALID_MEMORY_INDEX:            return "Invalid memory index"             // 0x50000084
+    case .SL_INVALID_CMD_FOR_MODE:            return "Invalid cmd for mode"             // 0x50000085
+    case .SL_LOCK_NOT_FOUND:                  return "Lock not found"                   // 0x50000086
+    case .SL_KEEPALIVE_FAIL:                  return "Keepalive fail"                   // 0x50000087
+    case .SL_REMOVE_CLIENT:                   return "Remove client"                    // 0x50000088
+    case .SL_CLIENT_CLOSED_SOCKET:            return "Client closed socket"             // 0x50000089
+    case .SL_INVALID_ATU_PROFILE_ID:          return "Invalid ATU profile id"           // 0x5000008A
+    case .SL_INVALID_ATU_PROFILE_NAME:        return "Invalid ATU profile name"         // 0x5000008B
     case .SL_ATU_PROFILE_NAME_ALREADY_EXISTS: return "ATU profile name already exists"  // 0x5000008C
-    case .SL_INVALID_EINTERLOCK: return "Invalid einterlock"                            // 0x5000008D
-    case .SL_COULD_NOT_CREATE_AUDIO_CLIENT: return "Could not create audio client"      // 0x5000008E
-    case .SL_NULL_POINTER: return "Null pointer"                                        // 0x5000008F
+    case .SL_INVALID_EINTERLOCK:              return "Invalid einterlock"               // 0x5000008D
+    case .SL_COULD_NOT_CREATE_AUDIO_CLIENT:   return "Could not create audio client"    // 0x5000008E
+    case .SL_NULL_POINTER:                    return "Null pointer"                     // 0x5000008F
       
-    case .SL_CWX_INVALID_INDEX: return "CWX invalid endex"                              // 0x50000090
-    case .SL_CWX_INSERT_FAILED: return "CWX insert failed"                              // 0x50000091
+    case .SL_CWX_INVALID_INDEX:               return "CWX invalid endex"                // 0x50000090
+    case .SL_CWX_INSERT_FAILED:               return "CWX insert failed"                // 0x50000091
     case .SL_CLIENT_DISCONNECTED_BY_ANOTHER_CLIENT: return "Client disconnected by another client" // = 0x50000092
-    case .SL_BAD_NTP_RATE: return "Bad NTP rate"                                        // 0x50000093
-    case .SL_INVALID_IPV4_IP: return "Invalid IPV4 ip address"                          // 0x50000094
-    case .SL_CLIENT_DISCONNECTED_BY_ABORT: return "Client disconnected by abort"        // 0x50000095
-    case .SL_INVALID_PTT_CMD_IN_CW_MESSAGE: return "Invalid PTT cmd in CW message"      // 0x50000096
-    case .SL_USB_SERIAL_NUMBER_NOT_FOUND: return "USB serial number not found"          // 0x50000097
-    case .SL_INVALID_CABLE_TYPE: return "Invalid cable type"                            // 0x50000098
-    case .SL_INVALID_FREQUENCY_RANGE: return "Invalid frequency range"                  // 0x50000099
-    case .SL_EXCEEDS_MAX_CHAR_LIMIT: return "Exceeds max char limit"                    // 0x5000009A
-    case .SL_INVALID_SOURCE_TYPE: return "Invalid source type"                          // 0x5000009B
-    case .SL_INVALID_OUTPUT_TYPE: return "Invalid output type"                          // 0x5000009C
-    case .SL_INVALID_BCD_BIT_VALUE: return "Invalid BCD bit value"                      // 0x5000009D
-    case .SL_INVALID_BIT_CABLE: return "Invalid BIT cable"                              // 0x5000009E
-    case .SL_USB_CABLE_DELETE_FAILED: return "USB cable delete failed"                  // 0x5000009F
+    case .SL_BAD_NTP_RATE:                    return "Bad NTP rate"                     // 0x50000093
+    case .SL_INVALID_IPV4_IP:                 return "Invalid IPV4 ip address"          // 0x50000094
+    case .SL_CLIENT_DISCONNECTED_BY_ABORT:    return "Client disconnected by abort"     // 0x50000095
+    case .SL_INVALID_PTT_CMD_IN_CW_MESSAGE:   return "Invalid PTT cmd in CW message"    // 0x50000096
+    case .SL_USB_SERIAL_NUMBER_NOT_FOUND:     return "USB serial number not found"      // 0x50000097
+    case .SL_INVALID_CABLE_TYPE:              return "Invalid cable type"               // 0x50000098
+    case .SL_INVALID_FREQUENCY_RANGE:         return "Invalid frequency range"          // 0x50000099
+    case .SL_EXCEEDS_MAX_CHAR_LIMIT:          return "Exceeds max char limit"           // 0x5000009A
+    case .SL_INVALID_SOURCE_TYPE:             return "Invalid source type"              // 0x5000009B
+    case .SL_INVALID_OUTPUT_TYPE:             return "Invalid output type"              // 0x5000009C
+    case .SL_INVALID_BCD_BIT_VALUE:           return "Invalid BCD bit value"            // 0x5000009D
+    case .SL_INVALID_BIT_CABLE:               return "Invalid BIT cable"                // 0x5000009E
+    case .SL_USB_CABLE_DELETE_FAILED:         return "USB cable delete failed"          // 0x5000009F
       
     case .SL_USB_CABLE_CANT_CHANGE_INVALID_TYPE: return ""                              // 0x500000A0
-    case .SL_CWX_UNTERMINATED_INLINE_CMD: return ""                                     // 0x500000A1
-    case .SL_CWX_INVALID_INLINE_CMD: return ""                                          // 0x500000A2
-    case .SL_INVALID_SUBSCRIPTION: return ""                                            // 0x500000A3
+    case .SL_CWX_UNTERMINATED_INLINE_CMD:     return ""                                 // 0x500000A1
+    case .SL_CWX_INVALID_INLINE_CMD:          return ""                                 // 0x500000A2
+    case .SL_INVALID_SUBSCRIPTION:            return ""                                 // 0x500000A3
       
-    case .SL_RESP_UNKNOWN: return "Response unknown"                                    // 0x50001000
+    case .SL_RESP_UNKNOWN:                    return "Response unknown"                 // 0x50001000
       
-    case .SL_MYSQL_CONNECTION_FAIL: return "SQL connection fail"                        // 0x50001001
-    case .SL_MYSQL_LOGIN_FAIL: return "SQL login fail"                                  // 0x50001002
-    case .SL_MYSQL_NOT_CONNECTED: return "SQL not connected"                            // 0x50001003
-    case .SL_MYSQL_PCB_ALREADY_REG: return "SQL pcb already registered"                 // 0x50001004
-    case .SL_MYSQL_PCB_NOT_REGISTERED: return "SQL pcb not registered"                  // 0x50001005
-    case .SL_MYSQL_PCB_SN_BLANK: return "SQL pcb serail number blank"                   // 0x50001006
-    case .SL_MYSQL_PCB_SN_TOO_LONG: return "SQL pcb serial number too long"             // 0x50001007
-    case .SL_MYSQL_MNEMONIC_BLANK: return "SQL mnemonic blank"                          // 0x50001008
-    case .SL_MYSQL_MNEMONIC_TOO_LONG: return "SQL mnemonic too long"                    // 0x50001009
-    case .SL_MYSQL_PCB_REV_BLANK: return "SQL pcb rev blank"                            // 0x5000100A
-    case .SL_MYSQL_PCB_REV_TOO_LONG: return "SQL pcb rev too long"                      // 0x5000100B
-    case .SL_MYSQL_PCB_MODEL_BLANK: return "SQL pcb model blank"                        // 0x5000100C
-    case .SL_MYSQL_PCB_MODEL_TOO_LONG: return "SQL pcb model too long"                  // 0x5000100D
-    case .SL_MYSQL_BAD_TESTID: return "SQL bad test id"                                 // 0x5000100E
-    case .SL_MYSQL_PART_DESIG_BLANK: return "SQL part desig blank"                      // 0x5000100F
+    case .SL_MYSQL_CONNECTION_FAIL:           return "SQL connection fail"              // 0x50001001
+    case .SL_MYSQL_LOGIN_FAIL:                return "SQL login fail"                   // 0x50001002
+    case .SL_MYSQL_NOT_CONNECTED:             return "SQL not connected"                // 0x50001003
+    case .SL_MYSQL_PCB_ALREADY_REG:           return "SQL pcb already registered"       // 0x50001004
+    case .SL_MYSQL_PCB_NOT_REGISTERED:        return "SQL pcb not registered"           // 0x50001005
+    case .SL_MYSQL_PCB_SN_BLANK:              return "SQL pcb serail number blank"      // 0x50001006
+    case .SL_MYSQL_PCB_SN_TOO_LONG:           return "SQL pcb serial number too long"   // 0x50001007
+    case .SL_MYSQL_MNEMONIC_BLANK:            return "SQL mnemonic blank"               // 0x50001008
+    case .SL_MYSQL_MNEMONIC_TOO_LONG:         return "SQL mnemonic too long"            // 0x50001009
+    case .SL_MYSQL_PCB_REV_BLANK:             return "SQL pcb rev blank"                // 0x5000100A
+    case .SL_MYSQL_PCB_REV_TOO_LONG:          return "SQL pcb rev too long"             // 0x5000100B
+    case .SL_MYSQL_PCB_MODEL_BLANK:           return "SQL pcb model blank"              // 0x5000100C
+    case .SL_MYSQL_PCB_MODEL_TOO_LONG:        return "SQL pcb model too long"           // 0x5000100D
+    case .SL_MYSQL_BAD_TESTID:                return "SQL bad test id"                  // 0x5000100E
+    case .SL_MYSQL_PART_DESIG_BLANK:          return "SQL part desig blank"             // 0x5000100F
       
-    case .SL_MYSQL_SW_NAME_BLANK: return "SQL sw name blank"                            // 0x50001010
-    case .SL_MYSQL_SW_VERSION_BLANK: return "SQL sw version blank"                      // 0x50001011
-    case .SL_MYSQL_BOM_REV_BLANK: return "SQL bom rev blank"                            // 0x50001012
-    case .SL_MYSQL_BOM_REV_TOO_LONG: return "SQL bom rev too long"                      // 0x50001013
-    case .SL_MYSQL_BOM_BLANK: return "SQL bom blank"                                    // 0x50001014
-    case .SL_MYSQL_BOM_TOO_LONG: return "SQL bom too long"                              // 0x50001015
-    case .SL_MYSQL_MODEL_BLANK: return "SQL model blank"                                // 0x50001016
-    case .SL_MYSQL_MODEL_TOO_LONG: return "SQL model too long"                          // 0x50001017
-      
+    case .SL_MYSQL_SW_NAME_BLANK:             return "SQL sw name blank"                // 0x50001010
+    case .SL_MYSQL_SW_VERSION_BLANK:          return "SQL sw version blank"             // 0x50001011
+    case .SL_MYSQL_BOM_REV_BLANK:             return "SQL bom rev blank"                // 0x50001012
+    case .SL_MYSQL_BOM_REV_TOO_LONG:          return "SQL bom rev too long"             // 0x50001013
+    case .SL_MYSQL_BOM_BLANK:                 return "SQL bom blank"                    // 0x50001014
+    case .SL_MYSQL_BOM_TOO_LONG:              return "SQL bom too long"                 // 0x50001015
+    case .SL_MYSQL_MODEL_BLANK:               return "SQL model blank"                  // 0x50001016
+    case .SL_MYSQL_MODEL_TOO_LONG:            return "SQL model too long"               // 0x50001017
       
     // Warning
-    case .SLM_W_SERVICE: return "Service"                                               // 0x31000001
-    case .SLM_W_NO_TRANSMITTER: return "No transmitter"                                 // 0x31000002
-    case .SLM_W_INTERLOCK: return "Interlock"                                           // 0x31000003
-    case .SL_W_NOTHING_TO_SEND: return "Nothing to send"                                // 0x31000004
-    case .SLM_W_FPGA_TEMP_WARN: return "FPGA temperature"                               // 0x31000005
-    case .SL_W_CWX_NO_MORE: return "CWX no more"                                        // 0x31000007
-    case .SLM_W_DEFAULT_PROFILE: return "Default profile"                               // 0x31000008
-    case .SL_W_ATU_MAX_POWER_INTERFERENCE: return "ATU max power interference"          // 0x31000009
-      
+    case .SLM_W_SERVICE:                      return "Service"                          // 0x31000001
+    case .SLM_W_NO_TRANSMITTER:               return "No transmitter"                   // 0x31000002
+    case .SLM_W_INTERLOCK:                    return "Interlock"                        // 0x31000003
+    case .SL_W_NOTHING_TO_SEND:               return "Nothing to send"                  // 0x31000004
+    case .SLM_W_FPGA_TEMP_WARN:               return "FPGA temperature"                 // 0x31000005
+    case .SL_W_CWX_NO_MORE:                   return "CWX no more"                      // 0x31000007
+    case .SLM_W_DEFAULT_PROFILE:              return "Default profile"                  // 0x31000008
+    case .SL_W_ATU_MAX_POWER_INTERFERENCE:    return "ATU max power interference"       // 0x31000009
       
     // Info
-    case .SLM_I_CLIENT_CONNECTED: return "Client connected"                             // 0x10000001
-    case .SLM_I_UNKNOWN_CLIENT: return "Unknown client"                                 // 0x10000002
-    case .SL_I_CWX_NOTHING_TO_ERASE: return "CWX Nothing to erase"                      // 0x10000003
+    case .SLM_I_CLIENT_CONNECTED:             return "Client connected"                 // 0x10000001
+    case .SLM_I_UNKNOWN_CLIENT:               return "Unknown client"                   // 0x10000002
+    case .SL_I_CWX_NOTHING_TO_ERASE:          return "CWX Nothing to erase"             // 0x10000003
     }
   }
 }

@@ -14,25 +14,25 @@ import Foundation
 ///      rendering of a Cwx. Cwx objects are added, removed and updated
 ///      by the incoming TCP messages.
 ///
-public final class Cwx                      : NSObject, StaticModel {
+public final class Cwx : NSObject, StaticModel {
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var messageQueuedEventHandler      : ((_ sequence: Int, _ bufferIndex: Int) -> Void)?
   public var charSentEventHandler           : ((_ index: Int) -> Void)?
   public var eraseSentEventHandler          : ((_ start: Int, _ stop: Int) -> Void)?
+  public var messageQueuedEventHandler      : ((_ sequence: Int, _ bufferIndex: Int) -> Void)?
 
   @objc dynamic public var breakInDelay: Int {
-    get { return _breakInDelay }
+    get { _breakInDelay }
     set { if _breakInDelay != newValue { let value = newValue ;  _breakInDelay = value ; cwxCmd( "delay", value) } } }
   
   @objc dynamic public var qskEnabled: Bool {
-    get { return _qskEnabled }
+    get { _qskEnabled }
     set { if _qskEnabled != newValue { _qskEnabled = newValue ; cwxCmd( .qskEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var wpm: Int {
-    get { return _wpm }
+    get { _wpm }
     set { if _wpm != newValue { let value = newValue ; if _wpm != value  { _wpm = value ; cwxCmd( .wpm, value) } } } }
 
   // ------------------------------------------------------------------------------

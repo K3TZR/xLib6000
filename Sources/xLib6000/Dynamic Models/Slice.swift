@@ -8,7 +8,8 @@
 
 import Foundation
 
-public typealias SliceId = ObjectId
+public typealias SliceId    = ObjectId
+public typealias Frequency  = UInt
 
 /// Slice Class implementation
 ///
@@ -17,14 +18,13 @@ public typealias SliceId = ObjectId
 ///      updated by the incoming TCP messages. They are collected in the
 ///      slices collection on the Radio object.
 ///
-public final class Slice                    : NSObject, DynamicModel {
+public final class Slice  : NSObject, DynamicModel {
+  
   
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kListCmd                       = "slice list"
-  
-  static let kMinOffset                     = -99_999                       // frequency offset range
+  static let kMinOffset                     = -99_999      // frequency offset range
   static let kMaxOffset                     = 99_999
   
   // ----------------------------------------------------------------------------
@@ -33,295 +33,296 @@ public final class Slice                    : NSObject, DynamicModel {
   public                let id              : SliceId
 
   @objc dynamic public var active: Bool {
-    get { return _active }
+    get { _active }
     set { if _active != newValue { _active = newValue ; sliceCmd( .active, newValue.as1or0) } } }
   
   @objc dynamic public var agcMode: String {
-    get { return _agcMode }
+    get { _agcMode }
     set { if _agcMode != newValue { _agcMode = newValue ; sliceCmd( .agcMode, newValue) } } }
   
   @objc dynamic public var agcOffLevel: Int {
-    get { return _agcOffLevel }
+    get { _agcOffLevel }
     set { if _agcOffLevel != newValue {  _agcOffLevel = newValue ; sliceCmd( .agcOffLevel, newValue) } } }
   
   @objc dynamic public var agcThreshold: Int {
-    get { return _agcThreshold }
+    get { _agcThreshold }
     set { if _agcThreshold != newValue { _agcThreshold = newValue ; sliceCmd( .agcThreshold, newValue) } } }
   
   @objc dynamic public var anfEnabled: Bool {
-    get { return _anfEnabled }
+    get { _anfEnabled }
     set { if _anfEnabled != newValue { _anfEnabled = newValue ; sliceCmd( .anfEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var anfLevel: Int {
-    get { return _anfLevel }
+    get { _anfLevel }
     set { if _anfLevel != newValue { _anfLevel = newValue ; sliceCmd( .anfLevel, newValue) } } }
   
   @objc dynamic public var apfEnabled: Bool {
-    get { return _apfEnabled }
+    get { _apfEnabled }
     set { if _apfEnabled != newValue { _apfEnabled = newValue ; sliceCmd( .apfEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var apfLevel: Int {
-    get { return _apfLevel }
+    get { _apfLevel }
     set { if _apfLevel != newValue { _apfLevel = newValue ; sliceCmd( .apfLevel, newValue) } } }
   
   @objc dynamic public var audioGain: Int {
-    get { return _audioGain }
+    get { _audioGain }
     set { if _audioGain != newValue { _audioGain = newValue ; audioCmd("gain", value: newValue) } } }
   
   @objc dynamic public var audioMute: Bool {
-    get { return _audioMute }
+    get { _audioMute }
     set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue.as1or0) } } }
   
   @objc dynamic public var audioPan: Int {
-    get { return _audioPan }
+    get { _audioPan }
     set { if _audioPan != newValue { _audioPan = newValue ; audioCmd("pan", value: newValue) } } }
   
   @objc dynamic public var daxChannel: Int {
-    get { return _daxChannel }
+    get { _daxChannel }
     set { if _daxChannel != newValue { _daxChannel = newValue ; sliceCmd(.daxChannel, newValue) } } }
   
   @objc dynamic public var dfmPreDeEmphasisEnabled: Bool {
-    get { return _dfmPreDeEmphasisEnabled }
+    get { _dfmPreDeEmphasisEnabled }
     set { if _dfmPreDeEmphasisEnabled != newValue { _dfmPreDeEmphasisEnabled = newValue ; sliceCmd(.dfmPreDeEmphasisEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var digitalLowerOffset: Int {
-    get { return _digitalLowerOffset }
+    get { _digitalLowerOffset }
     set { if _digitalLowerOffset != newValue { _digitalLowerOffset = newValue ; sliceCmd(.digitalLowerOffset, newValue) } } }
   
   @objc dynamic public var digitalUpperOffset: Int {
-    get { return _digitalUpperOffset }
+    get { _digitalUpperOffset }
     set { if _digitalUpperOffset != newValue { _digitalUpperOffset = newValue ; sliceCmd(.digitalUpperOffset, newValue) } } }
   
   @objc dynamic public var diversityEnabled: Bool {
-    get { return _diversityEnabled }
+    get { _diversityEnabled }
     set { if _diversityEnabled != newValue { _diversityEnabled = newValue ; sliceCmd(.diversityEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var filterHigh: Int {
-    get { return _filterHigh }
+    get { _filterHigh }
     set { if _filterHigh != newValue { let value = filterHighLimits(newValue) ; _filterHigh = value ; filterCmd( low: _filterLow, high: value) } } }
   
   @objc dynamic public var filterLow: Int {
-    get { return _filterLow }
+    get { _filterLow }
     set { if _filterLow != newValue { let value = filterLowLimits(newValue) ; _filterLow = value ; filterCmd( low: value, high: _filterHigh) } } }
   
   @objc dynamic public var fmDeviation: Int {
-    get { return _fmDeviation }
+    get { _fmDeviation }
     set { if _fmDeviation != newValue { _fmDeviation = newValue ; sliceCmd(.fmDeviation, newValue) } } }
   
   @objc dynamic public var fmRepeaterOffset: Float {
-    get { return _fmRepeaterOffset }
+    get { _fmRepeaterOffset }
     set { if _fmRepeaterOffset != newValue { _fmRepeaterOffset = newValue ; sliceCmd( .fmRepeaterOffset, newValue) } } }
   
   @objc dynamic public var fmToneBurstEnabled: Bool {
-    get { return _fmToneBurstEnabled }
+    get { _fmToneBurstEnabled }
     set { if _fmToneBurstEnabled != newValue { _fmToneBurstEnabled = newValue ; sliceCmd( .fmToneBurstEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var fmToneFreq: Float {
-    get { return _fmToneFreq }
+    get { _fmToneFreq }
     set { if _fmToneFreq != newValue { _fmToneFreq = newValue ; sliceCmd( .fmToneFreq, newValue) } } }
   
   @objc dynamic public var fmToneMode: String {
-    get { return _fmToneMode }
+    get { _fmToneMode }
     set { if _fmToneMode != newValue { _fmToneMode = newValue ; sliceCmd( .fmToneMode, newValue) } } }
   
-  @objc dynamic public var frequency: Int {
-    get { return _frequency }
+  @objc dynamic public var frequency: Frequency {
+    get { _frequency }
     set { if !_locked { if _frequency != newValue { _frequency = newValue ; sliceTuneCmd( newValue.hzToMhz) } } } }
 
   @objc dynamic public var locked: Bool {
-    get { return _locked }
+    get { _locked }
     set { if _locked != newValue { _locked = newValue ; sliceLock( newValue == true ? "lock" : "unlock") } } }
   
   @objc dynamic public var loopAEnabled: Bool {
-    get { return _loopAEnabled }
+    get { _loopAEnabled }
     set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; sliceCmd( .loopAEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var loopBEnabled: Bool {
-    get { return _loopBEnabled }
+    get { _loopBEnabled }
     set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; sliceCmd( .loopBEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var mode: String {
-    get { return _mode }
+    get { _mode }
     set { if _mode != newValue { _mode = newValue ; sliceCmd( .mode, newValue) } } }
   
   @objc dynamic public var nbEnabled: Bool {
-    get { return _nbEnabled }
+    get { _nbEnabled }
     set { if _nbEnabled != newValue { _nbEnabled = newValue ; sliceCmd( .nbEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var nbLevel: Int {
-    get { return _nbLevel }
+    get { _nbLevel }
     set { if _nbLevel != newValue {  _nbLevel = newValue ; sliceCmd( .nbLevel, newValue) } } }
   
   @objc dynamic public var nrEnabled: Bool {
-    get { return _nrEnabled }
+    get { _nrEnabled }
     set { if _nrEnabled != newValue { _nrEnabled = newValue ; sliceCmd( .nrEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var nrLevel: Int {
-    get { return _nrLevel }
+    get { _nrLevel }
     set { if _nrLevel != newValue {  _nrLevel = newValue ; sliceCmd( .nrLevel, newValue) } } }
   
   @objc dynamic public var playbackEnabled: Bool {
-    get { return _playbackEnabled }
+    get { _playbackEnabled }
     set { if _playbackEnabled != newValue { _playbackEnabled = newValue ; sliceCmd( .playbackEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var recordEnabled: Bool {
-    get { return _recordEnabled }
+    get { _recordEnabled }
     set { if recordEnabled != newValue { _recordEnabled = newValue ; sliceCmd( .recordEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var repeaterOffsetDirection: String {
-    get { return _repeaterOffsetDirection }
+    get { _repeaterOffsetDirection }
     set { if _repeaterOffsetDirection != newValue { _repeaterOffsetDirection = newValue ; sliceCmd( .repeaterOffsetDirection, newValue) } } }
   
   @objc dynamic public var rfGain: Int {
-    get { return _rfGain }
+    get { _rfGain }
     set { if _rfGain != newValue { _rfGain = newValue ; sliceCmd( .rfGain, newValue) } } }
   
   @objc dynamic public var ritEnabled: Bool {
-    get { return _ritEnabled }
+    get { _ritEnabled }
     set { if _ritEnabled != newValue { _ritEnabled = newValue ; sliceCmd( .ritEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var ritOffset: Int {
-    get { return _ritOffset }
-    set { if _ritOffset != newValue { if newValue.within(xLib6000.Slice.kMinOffset, xLib6000.Slice.kMaxOffset) {  _ritOffset = newValue ; sliceCmd( .ritOffset, newValue) } } } }
+    get { _ritOffset }
+    set { if _ritOffset != newValue {  _ritOffset = newValue ; sliceCmd( .ritOffset, newValue) } } } 
   
   @objc dynamic public var rttyMark: Int {
-    get { return _rttyMark }
+    get { _rttyMark }
     set { if _rttyMark != newValue { _rttyMark = newValue ; sliceCmd( .rttyMark, newValue) } } }
   
   @objc dynamic public var rttyShift: Int {
-    get { return _rttyShift }
+    get { _rttyShift }
     set { if _rttyShift != newValue { _rttyShift = newValue ; sliceCmd( .rttyShift, newValue) } } }
   
   @objc dynamic public var rxAnt: Radio.AntennaPort {
-    get { return _rxAnt }
+    get { _rxAnt }
     set { if _rxAnt != newValue { _rxAnt = newValue ; sliceCmd( .rxAnt, newValue) } } }
   
   @objc dynamic public var step: Int {
-    get { return _step }
+    get { _step }
     set { if _step != newValue { _step = newValue ; sliceCmd( .step, newValue) } } }
   
   @objc dynamic public var stepList: String {
-    get { return _stepList }
+    get { _stepList }
     set { if _stepList != newValue { _stepList = newValue ; sliceCmd( .stepList, newValue) } } }
   
   @objc dynamic public var squelchEnabled: Bool {
-    get { return _squelchEnabled }
+    get { _squelchEnabled }
     set { if _squelchEnabled != newValue { _squelchEnabled = newValue ; sliceCmd( .squelchEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var squelchLevel: Int {
-    get { return _squelchLevel }
+    get { _squelchLevel }
     set { if _squelchLevel != newValue {  _squelchLevel = newValue ; sliceCmd( .squelchLevel, newValue) } } }
   
   @objc dynamic public var txAnt: String {
-    get { return _txAnt }
+    get { _txAnt }
     set { if _txAnt != newValue { _txAnt = newValue ; sliceCmd( .txAnt, newValue) } } }
   
   @objc dynamic public var txEnabled: Bool {
-    get { return _txEnabled }
+    get { _txEnabled }
     set { if _txEnabled != newValue { _txEnabled = newValue ; sliceCmd( .txEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var txOffsetFreq: Float {
-    get { return _txOffsetFreq }
+    get { _txOffsetFreq }
     set { if _txOffsetFreq != newValue { _txOffsetFreq = newValue ;sliceCmd( .txOffsetFreq, newValue) } } }
   
   @objc dynamic public var wnbEnabled: Bool {
-    get { return _wnbEnabled }
+    get { _wnbEnabled }
     set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; sliceCmd( .wnbEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var wnbLevel: Int {
-    get { return _wnbLevel }
+    get { _wnbLevel }
     set { if wnbLevel != newValue {  _wnbLevel = newValue ; sliceCmd( .wnbLevel, newValue) } } }
   
   @objc dynamic public var xitEnabled: Bool {
-    get { return _xitEnabled }
+    get { _xitEnabled }
     set { if _xitEnabled != newValue { _xitEnabled = newValue ; sliceCmd( .xitEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var xitOffset: Int {
-    get { return _xitOffset }
-    set { if _xitOffset != newValue { if newValue.within(xLib6000.Slice.kMinOffset, xLib6000.Slice.kMaxOffset) {  _xitOffset = newValue ; sliceCmd( .xitOffset, newValue) } } } }
+    get { _xitOffset }
+    set { if _xitOffset != newValue { _xitOffset = newValue ; sliceCmd( .xitOffset, newValue) } } }
 
   
   @objc dynamic public var autoPan: Bool {
-    get { return _autoPan }
+    get { _autoPan }
     set { if _autoPan != newValue { _autoPan = newValue } } }
   
   @objc dynamic public var daxClients: Int {
-    get { return _daxClients }
+    get { _daxClients }
     set { if _daxClients != newValue {  _daxClients = newValue } } }
   
   @objc dynamic public var daxTxEnabled: Bool {
-    get { return _daxTxEnabled }
+    get { _daxTxEnabled }
     set { if _daxTxEnabled != newValue { _daxTxEnabled = newValue } } }
   
   @objc dynamic public var detached: Bool {
-    get { return _detached }
+    get { _detached }
     set { if _detached != newValue { _detached = newValue } } }
   
   @objc dynamic public var diversityChild: Bool {
-    get { return _diversityChild }
+    get { _diversityChild }
     set { if _diversityChild != newValue { if _diversityIsAllowed { _diversityChild = newValue } } } }
   
   @objc dynamic public var diversityIndex: Int {
-    get { return _diversityIndex }
+    get { _diversityIndex }
     set { if _diversityIndex != newValue { if _diversityIsAllowed { _diversityIndex = newValue } } } }
   
   @objc dynamic public var diversityParent: Bool {
-    get { return _diversityParent }
+    get { _diversityParent }
     set { if _diversityParent != newValue { if _diversityIsAllowed { _diversityParent = newValue } } } }
   
   @objc dynamic public var inUse: Bool {
     return _inUse }
   
   @objc dynamic public var modeList: [String] {
-    get { return _modeList }
+    get { _modeList }
     set { if _modeList != newValue { _modeList = newValue } } }
   
   @objc dynamic public var nr2: Int {
-    get { return _nr2 }
+    get { _nr2 }
     set { if _nr2 != newValue { _nr2 = newValue } } }
   
   @objc dynamic public var owner: Int {
-    get { return _owner }
+    get { _owner }
     set { if _owner != newValue { _owner = newValue } } }
   
   @objc dynamic public var panadapterId: PanadapterStreamId {
-    get { return _panadapterId }
+    get { _panadapterId }
     set {if _panadapterId != newValue {  _panadapterId = newValue } } }
   
   @objc dynamic public var postDemodBypassEnabled: Bool {
-    get { return _postDemodBypassEnabled }
+    get { _postDemodBypassEnabled }
     set { if _postDemodBypassEnabled != newValue { _postDemodBypassEnabled = newValue } } }
   
   @objc dynamic public var postDemodHigh: Int {
-    get { return _postDemodHigh }
+    get { _postDemodHigh }
     set { if _postDemodHigh != newValue { _postDemodHigh = newValue } } }
   
   @objc dynamic public var postDemodLow: Int {
-    get { return _postDemodLow }
+    get { _postDemodLow }
     set { if _postDemodLow != newValue { _postDemodLow = newValue } } }
   
   @objc dynamic public var qskEnabled: Bool {
-    get { return _qskEnabled }
+    get { _qskEnabled }
     set { if _qskEnabled != newValue { _qskEnabled = newValue } } }
   
   @objc dynamic public var recordLength: Float {
-    get { return _recordLength }
+    get { _recordLength }
     set { if _recordLength != newValue { _recordLength = newValue } } }
   
   @objc dynamic public var rxAntList: [Radio.AntennaPort] {
-    get { return _rxAntList }
+    get { _rxAntList }
     set { _rxAntList = newValue } }
   
   @objc dynamic public var sliceLetter: String? {
     return _sliceLetter }
   
   @objc dynamic public var txAntList: [Radio.AntennaPort] {
-    get { return _txAntList }
+    get { _txAntList }
     set { _txAntList = newValue } }
   
   @objc dynamic public var wide: Bool {
-    get { return _wide }
+    get { _wide }
     set { _wide = newValue } }
+
   @objc dynamic public  var agcNames        = AgcMode.names()
   @objc dynamic public  let daxChoices      = Api.kDaxChannels
 
@@ -390,7 +391,7 @@ public final class Slice                    : NSObject, DynamicModel {
   @Barrier(false, Api.objectQ)                    var _fmToneBurstEnabled
   @Barrier(0.0, Api.objectQ)                      var _fmToneFreq : Float
   @Barrier("", Api.objectQ)                       var _fmToneMode
-  @Barrier(0, Api.objectQ)                        var _frequency
+  @Barrier(0, Api.objectQ)                        var _frequency        : Frequency
   @Barrier(false, Api.objectQ)                    var _inUse
   @Barrier(false, Api.objectQ)                    var _locked
   @Barrier(false, Api.objectQ)                    var _loopAEnabled
@@ -403,18 +404,18 @@ public final class Slice                    : NSObject, DynamicModel {
   @BarrierClamped(0, Api.objectQ, range: 0...100) var _nrLevel
   @Barrier(0, Api.objectQ)                        var _nr2
   @Barrier(0, Api.objectQ)                        var _owner
-  @Barrier(0, Api.objectQ)                        var _panadapterId : PanadapterStreamId
+  @Barrier(0, Api.objectQ)                        var _panadapterId     : PanadapterStreamId
   @Barrier(false, Api.objectQ)                    var _playbackEnabled
   @Barrier(false, Api.objectQ)                    var _postDemodBypassEnabled
   @Barrier(0, Api.objectQ)                        var _postDemodHigh
   @Barrier(0, Api.objectQ)                        var _postDemodLow
   @Barrier(false, Api.objectQ)                    var _qskEnabled
   @Barrier(false, Api.objectQ)                    var _recordEnabled
-  @Barrier(0.0, Api.objectQ)                      var _recordLength : Float
+  @Barrier(0.0, Api.objectQ)                      var _recordLength     : Float
   @Barrier(Offset.simplex.rawValue, Api.objectQ)  var _repeaterOffsetDirection
   @Barrier(0, Api.objectQ)                        var _rfGain
   @Barrier(false, Api.objectQ)                    var _ritEnabled
-  @BarrierClamped(0, Api.objectQ, range: -99_999...99_999)  var _ritOffset
+  @BarrierClamped(0, Api.objectQ, range: -99_999...99_999) var _ritOffset
   @Barrier(0, Api.objectQ)                        var _rttyMark
   @Barrier(0, Api.objectQ)                        var _rttyShift
   @Barrier("", Api.objectQ)                       var _rxAnt
@@ -432,7 +433,7 @@ public final class Slice                    : NSObject, DynamicModel {
   @Barrier(false, Api.objectQ)                    var _wnbEnabled
   @BarrierClamped(0, Api.objectQ, range: 0...100) var _wnbLevel
   @Barrier(false, Api.objectQ)                    var _xitEnabled
-  @Barrier(0, Api.objectQ)                        var _xitOffset                                                
+  @BarrierClamped(0, Api.objectQ, range: -99_999...99_999) var _xitOffset
 
   enum Token : String {
     case active
@@ -443,9 +444,9 @@ public final class Slice                    : NSObject, DynamicModel {
     case anfLevel                   = "anf_level"
     case apfEnabled                 = "apf"
     case apfLevel                   = "apf_level"
-    case audioGain                  = "audio_gain"                  // "gain"
-    case audioMute                  = "audio_mute"                  // "mute"
-    case audioPan                   = "audio_pan"                   // "pan"
+    case audioGain                  = "audio_gain"
+    case audioMute                  = "audio_mute"
+    case audioPan                   = "audio_pan"
     case daxChannel                 = "dax"
     case daxClients                 = "dax_clients"
     case daxTxEnabled               = "dax_tx"
@@ -467,7 +468,7 @@ public final class Slice                    : NSObject, DynamicModel {
     case frequency                  = "rf_frequency"
     case ghost
     case inUse                      = "in_use"
-    case locked                     = "lock"                        // "lock" / "unlock"
+    case locked                     = "lock"
     case loopAEnabled               = "loopa"
     case loopBEnabled               = "loopb"
     case mode
@@ -512,14 +513,12 @@ public final class Slice                    : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance.msg
-  private var _initialized                  = false                         // True if initialized by Radio (hardware)
+  private var _diversityIsAllowed   : Bool { return _radio.radioModel == "FLEX-6700" || _radio.radioModel == "FLEX-6700R" }
+  private var _initialized          = false
+  private let _log                  = Log.sharedInstance.msg
+  private let _radio                : Radio
 
-  private let kTuneStepList                 =                               // tuning steps
-    [1, 10, 50, 100, 500, 1_000, 2_000, 3_000]
-  private var _diversityIsAllowed          : Bool
-    { return _radio.radioModel == "FLEX-6700" || _radio.radioModel == "FLEX-6700R" }
+  private let kTuneStepList         = [1, 10, 50, 100, 500, 1_000, 2_000, 3_000]
   
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -536,134 +535,44 @@ public final class Slice                    : NSObject, DynamicModel {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
-
+    
     // get the Slice Id
     if let sliceId = keyValues[0].key.objectId {
-    
-    // is the Slice in use?
-    if inUse {
       
-      // YES, does the Slice exist?
-      if radio.slices[sliceId] == nil {
+      // is the Slice in use?
+      if inUse {
         
-        // NO, create a new Slice & add it to the Slices collection
-        radio.slices[sliceId] = xLib6000.Slice(radio: radio, id: sliceId)
+        // YES, does the Slice exist?
+        if radio.slices[sliceId] == nil {
+          
+          // NO, create a new Slice & add it to the Slices collection
+          radio.slices[sliceId] = xLib6000.Slice(radio: radio, id: sliceId)
+          
+          //        // scan the meters
+          //        for (_, meter) in radio.meters {
+          //
+          //          // is this meter associated with this slice?
+          //          if meter.source == Meter.Source.slice.rawValue && meter.number == sliceId {
+          //
+          //            // YES, add it to this Slice
+          //            radio.slices[sliceId]!.addMeter(meter)
+          //          }
+          //        }
+        }
+        // pass the remaining key values to the Slice for parsing (dropping the Id)
+        radio.slices[sliceId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
-//        // scan the meters
-//        for (_, meter) in radio.meters {
-//
-//          // is this meter associated with this slice?
-//          if meter.source == Meter.Source.slice.rawValue && meter.number == sliceId {
-//
-//            // YES, add it to this Slice
-//            radio.slices[sliceId]!.addMeter(meter)
-//          }
-//        }
+      } else {
+        
+        // NO, notify all observers
+        NC.post(.sliceWillBeRemoved, object: radio.slices[sliceId] as Any?)
+        
+        // remove it
+        radio.slices[sliceId] = nil
+        
       }
-      // pass the remaining key values to the Slice for parsing (dropping the Id)
-      radio.slices[sliceId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
-      
-    } else {
-      
-      // NO, notify all observers
-      NC.post(.sliceWillBeRemoved, object: radio.slices[sliceId] as Any?)
-      
-      // remove it
-      radio.slices[sliceId] = nil
-      
-    }
     }
   }
-  
-//  /// Disable all TxEnabled
-//  ///
-//  public class func disableTx(on radio: Radio) {
-//    
-//    // for all Slices, turn off txEnabled
-//    for (_, slice) in radio.slices where slice.txEnabled {
-//      
-//      slice.txEnabled = false
-//    }
-//  }
-//  /// Return references to all Slices on the specified Panadapter
-//  ///
-//  /// - Parameters:
-//  ///   - pan:        a Panadapter Id
-//  /// - Returns:      an array of Slices (may be empty)
-//  ///
-//  public class func findAll(on radio: Radio, and id: PanadapterStreamId) -> [xLib6000.Slice] {
-//    var sliceValues = [xLib6000.Slice]()
-//    
-//    // for all Slices on the specified Panadapter
-//    for (_, slice) in radio.slices where slice.panadapterId == id {
-//      
-//      // append to the result
-//      sliceValues.append(slice)
-//    }
-//    return sliceValues
-//  }
-//  /// Given a Frequency, return the Slice on the specified Panadapter containing it (if any)
-//  ///
-//  /// - Parameters:
-//  ///   - pan:        a reference to A Panadapter
-//  ///   - freq:       a Frequency (in hz)
-//  /// - Returns:      a reference to a Slice (or nil)
-//  ///
-//  public class func find(on radio: Radio, and id: PanadapterStreamId, byFrequency freq: Int, minWidth: Int) -> xLib6000.Slice? {
-//    
-//    // find the Slices on the Panadapter (if any)
-//    let slices = radio.slices.values.filter { $0.panadapterId == id }
-//    guard slices.count >= 1 else { return nil }
-//    
-//    // find the ones in the frequency range
-//    let selected = slices.filter { freq >= $0.frequency + min(-minWidth/2, $0.filterLow) && freq <= $0.frequency + max(minWidth/2, $0.filterHigh)}
-//    guard selected.count >= 1 else { return nil }
-//    
-//    // return the first one
-//    return selected[0]
-//  }
-//  /// Return the Active Slice (if any)
-//  ///
-//  /// - Returns:      a Slice reference (or nil)
-//  ///
-//  public class func findActive(on radio: Radio) -> xLib6000.Slice? {
-//
-//    // find the active Slices (if any)
-//    let slices = radio.slices.values.filter { $0.active }
-//    guard slices.count >= 1 else { return nil }
-//    
-//    // return the first one
-//    return slices[0]
-//  }
-//  /// Return the Active Slice on the specified Panadapter (if any)
-//  ///
-//  /// - Parameters:
-//  ///   - pan:        a Panadapter reference
-//  /// - Returns:      a Slice reference (or nil)
-//  ///
-//  public class func findActive(on radio: Radio, and id: PanadapterStreamId) -> xLib6000.Slice? {
-//    
-//    // find the active Slices on the specified Panadapter (if any)
-//    let slices = Api.sharedInstance.radio!.slices.values.filter { $0.active && $0.panadapterId == id }
-//    guard slices.count >= 1 else { return nil }
-//    
-//    // return the first one
-//    return slices[0]
-//  }
-//  /// Find a Slice by DAX Channel
-//  ///
-//  /// - Parameter channel:    Dax channel number
-//  /// - Returns:              a Slice (if any)
-//  ///
-//  public class func find(on radio: Radio, with channel: DaxChannel) -> xLib6000.Slice? {
-//
-//    // find the Slices with the specified Channel (if any)
-//    let slices = radio.slices.values.filter { $0.daxChannel == channel }
-//    guard slices.count >= 1 else { return nil }
-//    
-//    // return the first one
-//    return slices[0]
-//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -676,9 +585,8 @@ public final class Slice                    : NSObject, DynamicModel {
   ///
   public init(radio: Radio, id: SliceId) {
 
-    self._radio = radio
+    _radio = radio
     self.id = id
-    
     super.init()
     
     // setup the Step List
@@ -839,7 +747,7 @@ public final class Slice                    : NSObject, DynamicModel {
       case .daxChannel:
         if _daxChannel != 0 && property.value.iValue == 0 {
           // remove this slice from the AudioStream it was using
-          if let audioStream = AudioStream.find(with: _daxChannel) {
+          if let audioStream = radio.findAudioStream(with: _daxChannel) {
             audioStream.slice = nil
           }
         }

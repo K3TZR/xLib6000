@@ -23,44 +23,38 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
     
-  public let id : WaterfallStreamId
-  
+  public      let id              : WaterfallStreamId
+  public weak var delegate        : StreamHandler?
+  public      var isStreaming     = false
+
   @objc dynamic public var autoBlackEnabled: Bool {
-    get { return _autoBlackEnabled }
+    get { _autoBlackEnabled }
     set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; waterfallCmd( .autoBlackEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var autoBlackLevel: UInt32 {
     return _autoBlackLevel }
   
   @objc dynamic public var blackLevel: Int {
-    get { return _blackLevel }
+    get { _blackLevel }
     set { if _blackLevel != newValue { _blackLevel = newValue ; waterfallCmd( .blackLevel, newValue) } } }
   
-  @objc dynamic public var clientHandle: Handle {
-    return _clientHandle }
+  @objc dynamic public var clientHandle: Handle { _clientHandle }
   
   @objc dynamic public var colorGain: Int {
-    get { return _colorGain }
+    get { _colorGain }
     set { if _colorGain != newValue { _colorGain = newValue ; waterfallCmd( .colorGain, newValue) } } }
   
   @objc dynamic public var gradientIndex: Int {
-    get { return _gradientIndex }
+    get { _gradientIndex }
     set { if _gradientIndex != newValue { _gradientIndex = newValue ; waterfallCmd( .gradientIndex, newValue) } } }
   
   @objc dynamic public var lineDuration: Int {
-    get { return _lineDuration }
+    get { _lineDuration }
     set { if _lineDuration != newValue { _lineDuration = newValue ; waterfallCmd( .lineDuration, newValue) } } }
   
-  @objc dynamic public var panadapterId: PanadapterStreamId {
-    return _panadapterId }
+  @objc dynamic public var panadapterId: PanadapterStreamId { _panadapterId }
   
-  public var delegate: StreamHandler? {
-    get { return Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-
-  public weak         var _delegate       : StreamHandler?
   public private(set) var droppedPackets  = 0
-  public              var isStreaming     = false
   public private(set) var packetFrame     = -1
 
   // ----------------------------------------------------------------------------
@@ -123,14 +117,13 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   ///
   public init(radio: Radio, id: WaterfallStreamId) {
     
+    _radio = radio
     self.id = id
-    self._radio = radio
     
     // allocate two dataframes
     for _ in 0..<_numberOfDataFrames {
       _waterfallframes.append(WaterfallFrame(frameSize: 4096))
     }
-
     super.init()
     
     isStreaming = false

@@ -44,7 +44,7 @@ public class Vita {
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let DiscoveryStreamId              : UInt32 = 0x00000800
+//  static let DiscoveryStreamId              : UInt32 = 0x00000800
   // Flex specific codes
   static let kFlexOui                       : UInt32 = 0x1c2d
   static let kOuiMask                       : UInt32 = 0x00ffffff
@@ -650,26 +650,16 @@ extension Vita {
     
     func description() -> String {
       switch self {
-      case .meter:
-        return "Meter"
-      case .panadapter:
-        return "Panadapter"
-      case .waterfall:
-        return "Waterfall"
-      case .opus:
-        return "Opus"
-      case .daxIq24:
-        return "DaxIq24"
-      case .daxIq48:
-        return "DaxIq48"
-      case .daxIq96:
-        return "DaxIq96"
-      case .daxIq192:
-        return "DaxIq192"
-      case .daxAudio:
-        return "DaxAudio"
-      case .discovery:
-        return "Discovery"
+      case .meter:      return "Meter"
+      case .panadapter: return "Panadapter"
+      case .waterfall:  return "Waterfall"
+      case .opus:       return "Opus"
+      case .daxIq24:    return "DaxIq24"
+      case .daxIq48:    return "DaxIq48"
+      case .daxIq96:    return "DaxIq96"
+      case .daxIq192:   return "DaxIq192"
+      case .daxAudio:   return "DaxAudio"
+      case .discovery:  return "Discovery"
       }
     }
   }

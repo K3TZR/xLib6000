@@ -29,100 +29,102 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public                let id                : PanadapterStreamId
+  public      let id                : PanadapterStreamId
+  public weak var delegate          : StreamHandler?
+  public      var isStreaming       = false
 
   @objc dynamic public var average: Int {
-    get { return _average }
+    get { _average }
     set {if _average != newValue { _average = newValue ; panadapterSet( .average, newValue) } } }
   
   @objc dynamic public var band: String {
-    get { return _band }
+    get { _band }
     set { if _band != newValue { _band = newValue ; panadapterSet( .band, newValue) } } }
   
-  @objc dynamic public var bandwidth: Int {
-    get { return _bandwidth }
+  @objc dynamic public var bandwidth: Frequency {
+    get { _bandwidth }
     set { if _bandwidth != newValue { _bandwidth = newValue ; panadapterSet( .bandwidth, newValue.hzToMhz + " autocenter=1") } } }
   
   @objc dynamic public var bandZoomEnabled: Bool {
-    get { return _bandZoomEnabled }
+    get { _bandZoomEnabled }
     set { if _bandZoomEnabled != newValue { _bandZoomEnabled = newValue ; panadapterSet( .bandZoomEnabled, newValue.as1or0) } } }
   
   // FIXME: Where does autoCenter come from?
   
-  @objc dynamic public var center: Int {
-    get { return _center }
+  @objc dynamic public var center: Frequency {
+    get { _center }
     set { if _center != newValue { _center = newValue ; panadapterSet( .center, newValue.hzToMhz) } } }
   
   @objc dynamic public var daxIqChannel: Int {
-    get { return _daxIqChannel }
+    get { _daxIqChannel }
     set { if _daxIqChannel != newValue { _daxIqChannel = newValue ; panadapterSet( .daxIqChannel, newValue) } } }
   
   @objc dynamic public var fps: Int {
-    get { return _fps }
+    get { _fps }
     set { if _fps != newValue { _fps = newValue ; panadapterSet( .fps, newValue) } } }
   
   @objc dynamic public var loggerDisplayEnabled: Bool {
-    get { return _loggerDisplayEnabled }
+    get { _loggerDisplayEnabled }
     set { if _loggerDisplayEnabled != newValue { _loggerDisplayEnabled = newValue ; panadapterSet( .n1mmSpectrumEnable, newValue.as1or0) } } }
   
   @objc dynamic public var loggerDisplayIpAddress: String {
-    get { return _loggerDisplayIpAddress }
+    get { _loggerDisplayIpAddress }
     set { if _loggerDisplayIpAddress != newValue { _loggerDisplayIpAddress = newValue ; panadapterSet( .n1mmAddress, newValue) } } }
   
   @objc dynamic public var loggerDisplayPort: Int {
-    get { return _loggerDisplayPort }
+    get { _loggerDisplayPort }
     set { if _loggerDisplayPort != newValue { _loggerDisplayPort = newValue ; panadapterSet( .n1mmPort, newValue) } } }
   
   @objc dynamic public var loggerDisplayRadioNumber: Int {
-    get { return _loggerDisplayRadioNumber }
+    get { _loggerDisplayRadioNumber }
     set { if _loggerDisplayRadioNumber != newValue { _loggerDisplayRadioNumber = newValue ; panadapterSet( .n1mmRadio, newValue) } } }
   
   @objc dynamic public var loopAEnabled: Bool {
-    get { return _loopAEnabled }
+    get { _loopAEnabled }
     set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; panadapterSet( .loopAEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var loopBEnabled: Bool {
-    get { return _loopBEnabled }
+    get { _loopBEnabled }
     set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; panadapterSet( .loopBEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var maxDbm: CGFloat {
-    get { return _maxDbm }
+    get { _maxDbm }
     set { let value = newValue > 20.0 ? 20.0 : newValue ; if _maxDbm != value { _maxDbm = value ; panadapterSet( .maxDbm, value) } } }
   
   @objc dynamic public var minDbm: CGFloat {
-    get { return _minDbm }
+    get { _minDbm }
     set { let value  = newValue < -180.0 ? -180.0 : newValue ; if _minDbm != value { _minDbm = value ; panadapterSet( .minDbm, value) } } }
   
   @objc dynamic public var rfGain: Int {
-    get { return _rfGain }
+    get { _rfGain }
     set { if _rfGain != newValue { _rfGain = newValue ; panadapterSet( .rfGain, newValue) } } }
   
   @objc dynamic public var rxAnt: String {
-    get { return _rxAnt }
+    get { _rxAnt }
     set { if _rxAnt != newValue { _rxAnt = newValue ; panadapterSet( .rxAnt, newValue) } } }
   
   @objc dynamic public var segmentZoomEnabled: Bool {
-    get { return _segmentZoomEnabled }
+    get { _segmentZoomEnabled }
     set { if _segmentZoomEnabled != newValue { _segmentZoomEnabled = newValue ; panadapterSet( .segmentZoomEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var weightedAverageEnabled: Bool {
-    get { return _weightedAverageEnabled }
+    get { _weightedAverageEnabled }
     set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; panadapterSet( .weightedAverageEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var wnbEnabled: Bool {
-    get { return _wnbEnabled }
+    get { _wnbEnabled }
     set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; panadapterSet( .wnbEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var wnbLevel: Int {
-    get { return _wnbLevel }
+    get { _wnbLevel }
     set { if _wnbLevel != newValue { _wnbLevel = newValue ; panadapterSet( .wnbLevel, newValue) } } }
   
   @objc dynamic public var xPixels: CGFloat {
-    get { return _xPixels }
+    get { _xPixels }
     set { if _xPixels != newValue { _xPixels = newValue ; panadapterSet( "xpixels", newValue) } } }
   
   @objc dynamic public var yPixels: CGFloat {
-    get { return _yPixels }
+    get { _yPixels }
     set { if _yPixels != newValue { _yPixels = newValue ; panadapterSet( "ypixels", newValue) } } }
   
   @objc dynamic public var antList: [String] {
@@ -131,47 +133,20 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @objc dynamic public var clientHandle: UInt32 {       // (V3 only)
     return _clientHandle }
   
-  @objc dynamic public var maxBw: Int {
-    return _maxBw }
-  
-  @objc dynamic public var minBw: Int {
-    return _minBw }
-  
-  @objc dynamic public var preamp: String {
-    return _preamp }
-  
-  @objc dynamic public var rfGainHigh: Int {
-    return _rfGainHigh }
-  
-  @objc dynamic public var rfGainLow: Int {
-    return _rfGainLow }
-  
-  @objc dynamic public var rfGainStep: Int {
-    return _rfGainStep }
-  
-  @objc dynamic public var rfGainValues: String {
-    return _rfGainValues }
-  
-  @objc dynamic public var waterfallId: UInt32 {
-    return _waterfallId }
-  
-  @objc dynamic public var wide: Bool {
-    return _wide }
-  
-  @objc dynamic public var wnbUpdating: Bool {
-    return _wnbUpdating }
-  
-  @objc dynamic public var xvtrLabel: String {
-    return _xvtrLabel }
+  @objc dynamic public var maxBw        : Frequency { _maxBw }
+  @objc dynamic public var minBw        : Frequency { _minBw }
+  @objc dynamic public var preamp       : String    { _preamp }
+  @objc dynamic public var rfGainHigh   : Int       { _rfGainHigh }
+  @objc dynamic public var rfGainLow    : Int       { _rfGainLow }
+  @objc dynamic public var rfGainStep   : Int       { _rfGainStep }
+  @objc dynamic public var rfGainValues : String    {_rfGainValues }
+  @objc dynamic public var waterfallId  : UInt32    { _waterfallId }
+  @objc dynamic public var wide         : Bool      { _wide }
+  @objc dynamic public var wnbUpdating  : Bool      { _wnbUpdating }
+  @objc dynamic public var xvtrLabel    : String    { _xvtrLabel }
     
-  public var delegate: StreamHandler? {
-    get { return Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-
-  public weak           var _delegate         : StreamHandler?
-  public                var isStreaming       = false
-  public private(set)   var packetFrame       = -1                            // Frame index of next Vita payload
-  public private(set)   var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
+  public private(set)   var packetFrame       = -1   // Frame index of next Vita payload
+  public private(set)   var droppedPackets    = 0
   
   @objc dynamic public  let daxIqChoices      = Api.kDaxIqChannels
   
@@ -183,9 +158,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @Barrier(false, Api.objectQ)      var _autoCenterEnabled
   @BarrierClamped(0, Api.objectQ, range: 1...100) var _average
   @Barrier("", Api.objectQ)         var _band
-  @Barrier(0, Api.objectQ)          var _bandwidth
+  @Barrier(0, Api.objectQ)          var _bandwidth    : Frequency
   @Barrier(false, Api.objectQ)      var _bandZoomEnabled
-  @Barrier(0, Api.objectQ)          var _center
+  @Barrier(0, Api.objectQ)          var _center       : Frequency
   @Barrier(0, Api.objectQ)          var _clientHandle : Handle
   @Barrier(0, Api.objectQ)          var _daxIqChannel
   @Barrier(0, Api.objectQ)          var _fps
@@ -195,8 +170,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @Barrier("", Api.objectQ)         var _loggerDisplayIpAddress
   @Barrier(0, Api.objectQ)          var _loggerDisplayPort
   @Barrier(0, Api.objectQ)          var _loggerDisplayRadioNumber
-  @Barrier(0, Api.objectQ)          var _maxBw
-  @Barrier(0, Api.objectQ)          var _minBw
+  @Barrier(0, Api.objectQ)          var _maxBw  : UInt
+  @Barrier(0, Api.objectQ)          var _minBw  : UInt
   @Barrier(0.0, Api.objectQ)        var _maxDbm : CGFloat
   @Barrier(0.0, Api.objectQ)        var _minDbm : CGFloat
   @Barrier("", Api.objectQ)         var _preamp
@@ -260,12 +235,12 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance.msg
-  private var _initialized                  = false
-
-  private var _panadapterframes             = [PanadapterFrame]()
   private var _index                        = 0
+  private var _initialized                  = false
+  private let _log                          = Log.sharedInstance.msg
+  private var _panadapterframes             = [PanadapterFrame]()
+  private let _radio                        : Radio
+
   private let _numberOfPanadapterFrames     = 6
 
   // ------------------------------------------------------------------------------
@@ -477,7 +452,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - frequency:          Frequency (Hz)
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func clickTune(_ frequency: Int, callback: ReplyHandler? = nil) {
+  public func clickTune(_ frequency: Frequency, callback: ReplyHandler? = nil) {
     
     // FIXME: ???
     _radio.sendCommand("slice " + "m " + "\(frequency.hzToMhz)" + " pan=\(id.hex)", replyTo: callback)

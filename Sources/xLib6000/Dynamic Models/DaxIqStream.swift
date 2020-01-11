@@ -24,12 +24,11 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public              let id                  : DaxIqStreamId
-  public weak         var delegate            : StreamHandler?
-  public private(set) var rxLostPacketCount   = 0
+  public      let id          : DaxIqStreamId
+  public weak var delegate    : StreamHandler?
   
-  @objc dynamic public var rate: Int {
-    get { return _rate }
+  @objc dynamic public  var rate        : Int {
+    get { _rate }
     set {
       if _rate != newValue {
         if newValue == 24000 || newValue == 48000 || newValue == 96000 || newValue == 192000 {
@@ -40,24 +39,19 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
     }
   }
   
-  @objc dynamic public var channel: DaxIqChannel {
-    return _channel }
-  
-  @objc dynamic public var clientHandle: Handle {
-    return _clientHandle }
-  
-  @objc dynamic public var pan: PanadapterStreamId {
-    return _pan }
-  
-  @objc dynamic public var isActive: Bool {
-    return _isActive  }
-  
+  @objc dynamic public var channel      : Int     { _channel }
+  @objc dynamic public var clientHandle : Handle  { _clientHandle }
+  @objc dynamic public var pan          : PanadapterStreamId { _pan }
+  @objc dynamic public var isActive     : Bool    { _isActive  }
+
+  public private(set)  var rxLostPacketCount   = 0
+
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(0, Api.objectQ)      var _channel : DaxIqChannel
+  @Barrier(0, Api.objectQ)      var _channel      : Int
   @Barrier(0, Api.objectQ)      var _clientHandle : Handle
-  @Barrier(0, Api.objectQ)      var _pan : PanadapterStreamId
+  @Barrier(0, Api.objectQ)      var _pan          : PanadapterStreamId
   @Barrier(0, Api.objectQ)      var _rate
   @Barrier(false, Api.objectQ)  var _isActive
 
@@ -123,7 +117,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   ///
   init(radio: Radio, id: DaxIqStreamId) {
     
-    self._radio = radio
+    _radio = radio
     self.id = id
     super.init()
   }

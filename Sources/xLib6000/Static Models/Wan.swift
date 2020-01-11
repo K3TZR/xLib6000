@@ -14,7 +14,7 @@ import Foundation
 ///      processing of the Wan-related activities. Wan objects are added,
 ///      removed and updated by the incoming TCP messages.
 ///
-public final class Wan                      : NSObject, StaticModel {
+public final class Wan : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -36,8 +36,8 @@ public final class Wan                      : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _log                          = Log.sharedInstance.msg
-  private var _radio                        : Radio
+  private let _log          = Log.sharedInstance.msg
+  private var _radio        : Radio
 
   // ------------------------------------------------------------------------------
   // MARK: - Initialization

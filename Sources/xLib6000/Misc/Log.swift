@@ -22,7 +22,7 @@ public final class Log {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var delegate: LogHandler?
+  public weak var delegate: LogHandler?
   
   // ----------------------------------------------------------------------------
   // MARK: - Singleton

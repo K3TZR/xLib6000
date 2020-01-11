@@ -21,12 +21,11 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public weak         var delegate          : StreamHandler?
-  public              let id                : DaxIqStreamId
-  public private(set) var rxLostPacketCount = 0
+  public      let id           : DaxIqStreamId
+  public weak var delegate     : StreamHandler?
 
   @objc dynamic public var rate: Int {
-    get { return _rate }
+    get { _rate }
     set {
       if _rate != newValue {
         if newValue == 24000 || newValue == 48000 || newValue == 96000 || newValue == 192000 {
@@ -37,37 +36,23 @@ public final class IqStream : NSObject, DynamicModelWithStream {
     }
   }
   
-  @objc dynamic public var available: Int {
-    return _available }
+  @objc dynamic public var available    : Int     { _available }
+  @objc dynamic public var capacity     : Int     { _capacity }
+  @objc dynamic public var daxIqChannel : Int     { _daxIqChannel }
+  @objc dynamic public var inUse        : Bool    { _inUse }
+  @objc dynamic public var ip           : String  { _ip }
+  @objc dynamic public var port         : Int     { _port  }
+  @objc dynamic public var pan          : PanadapterStreamId { _pan }
+  @objc dynamic public var streaming    : Bool    { _streaming  }
   
-  @objc dynamic public var capacity: Int {
-    return _capacity }
-  
-  @objc dynamic public var daxIqChannel: DaxIqChannel {
-    return _daxIqChannel }
-  
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
-  @objc dynamic public var ip: String {
-    return _ip }
-  
-  @objc dynamic public var port: Int {
-    return _port  }
-  
-  @objc dynamic public var pan: PanadapterStreamId {
-    return _pan }
-  
-  @objc dynamic public var streaming: Bool {
-    return _streaming  }
-  
+  public private(set) var rxLostPacketCount = 0
 
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
   @Barrier(0, Api.objectQ)      var _available
   @Barrier(0, Api.objectQ)      var _capacity
-  @Barrier(0, Api.objectQ)      var _daxIqChannel : DaxIqChannel
+  @Barrier(0, Api.objectQ)      var _daxIqChannel : Int
   @Barrier(false, Api.objectQ)  var _inUse
   @Barrier("", Api.objectQ)     var _ip
   @Barrier(0, Api.objectQ)      var _pan          : PanadapterStreamId
@@ -123,7 +108,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
         if radio.iqStreams[daxIqStreamId] == nil {
           
           // NO, is this stream for this client?
-          if !AudioStream.isStatusForThisClient(keyValues) { return }
+          if !isForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
           radio.iqStreams[daxIqStreamId] = IqStream(radio: radio, id: daxIqStreamId)

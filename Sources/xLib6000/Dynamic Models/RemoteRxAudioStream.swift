@@ -36,23 +36,22 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                             : RemoteRxStreamId
+  public      let id               : RemoteRxStreamId
+  public weak var delegate         : StreamHandler?
+  public      var isStreaming      = false
 
   @objc dynamic public var clientHandle: Handle {
-    get { return _clientHandle  }
+    get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue} } }
   
   @objc dynamic public var compression: String {
-    get { return _compression  }
+    get { _compression  }
     set { if _compression != newValue { _compression = newValue} } }
   
   @objc dynamic public var ip: String {
-    get { return _ip  }
+    get { _ip  }
     set { if _ip != newValue { _ip = newValue} } }
-  
-  public weak var delegate                 : StreamHandler?
-  public      var isStreaming              = false
-  
+    
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -69,17 +68,16 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _radio                        : Radio
+  private var _expectedFrame                : Int?
+  private var _initialized                  = false
   private let _log                          = Log.sharedInstance.msg
-  private var _initialized                  = false                         // True if initialized by Radio hardware
+  private let _radio                        : Radio
+  private var _vita                         : Vita?
+  private var _rxPacketCount                = 0
+  private var _rxLostPacketCount            = 0
+  private var _txSampleCount                = 0
+  private var _txSeq                        = 0
 
-  private var _vita                         : Vita?                         // a Vita class
-  private var _rxPacketCount                = 0                             // Rx total packet count
-  private var _rxLostPacketCount            = 0                             // Rx lost packet count
-  private var _expectedFrame                : Int?                          // Rx sequence number
-  private var _txSeq                        = 0                             // Tx sequence number
-  private var _txSampleCount                = 0                             // Tx sample count
-  
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
@@ -124,7 +122,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   ///
   init(radio: Radio, id: RemoteRxStreamId) {
     
-    self._radio = radio
+    _radio = radio
     self.id = id
     super.init()
     
@@ -154,14 +152,9 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       // known Keys, in alphabetical order
       switch token {
         
-      case .clientHandle:        
-        update(self, &_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
-
-      case .compression:
-        update(self, &_compression, to: property.value.lowercased(), signal: \.compression)
-
-      case .ip:
-       update(self, &_ip, to: property.value, signal: \.ip)
+      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0,   signal: \.clientHandle)
+      case .compression:  update(self, &_compression,   to: property.value.lowercased(),  signal: \.compression)
+      case .ip:           update(self, &_ip,            to: property.value,               signal: \.ip)
      }
     }
     // the Radio (hardware) has acknowledged this RxRemoteAudioStream

@@ -22,6 +22,12 @@ public typealias MeterName = String
 public final class Meter                    : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
+  static let kDbDbmDbfsSwrDenom             : Float = 128.0  // denominator for Db, Dbm, Dbfs, Swr
+  static let kDegDenom                      : Float = 64.0   // denominator for Degc, Degf
+  
+  // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public let id                             : MeterId
@@ -106,9 +112,6 @@ public final class Meter                    : NSObject, DynamicModel {
   private let _radio                        : Radio
   private var _voltsAmpsDenom               : Float = 256.0  // denominator for voltage/amperage depends on API version
 
-  static let kDbDbmDbfsSwrDenom             : Float = 128.0  // denominator for Db, Dbm, Dbfs, Swr
-  static let kDegDenom                      : Float = 64.0   // denominator for Degc, Degf
-  
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
@@ -316,49 +319,4 @@ public final class Meter                    : NSObject, DynamicModel {
       NC.post(.meterHasBeenAdded, object: self as Any?)
     }
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Stream methods
-
-  /// Process the UDP Stream Data for Meters
-  ///
-  ///   StreamHandler protocol method, executes on the streamQ
-  ///
-  /// - Parameter streamFrame:        a Meter frame (Int16)
-  ///
-//  public func streamHandler<T>(_ meterFrame: T) {
-//
-//    let newValue = Int16(bitPattern: meterFrame as! UInt16)
-//
-//    let previousValue = value
-//
-//    // check for unknown Units
-//    guard let token = Units(rawValue: units) else {
-//      // log it and ignore it
-//      _log("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", .warning, #function, #file, #line)
-//      return
-//    }
-//    var adjNewValue: Float = 0.0
-//    switch token {
-//
-//    case .db, .dbm, .dbfs, .swr:
-//      adjNewValue = Float(exactly: newValue)! / kDbDbmDbfsSwrDenom
-//
-//    case .volts, .amps:
-//      adjNewValue = Float(exactly: newValue)! / _voltsAmpsDenom
-//
-//    case .degc, .degf:
-//      adjNewValue = Float(exactly: newValue)! / kDegDenom
-//
-//    case .rpm, .watts, .percent, .none:
-//      adjNewValue = Float(exactly: newValue)!
-//    }
-//    // did it change?
-//    if adjNewValue != previousValue {
-//      value = adjNewValue
-//
-//      // notify all observers
-//      NC.post(.meterUpdated, object: self as Any?)
-//    }
-//  }
 }

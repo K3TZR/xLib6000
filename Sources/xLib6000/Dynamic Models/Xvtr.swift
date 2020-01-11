@@ -24,62 +24,57 @@ public final class Xvtr : NSObject, DynamicModel {
   
   public let id : XvtrId
   
-  @objc dynamic public var ifFrequency: Int {
-    get { return _ifFrequency }
+  @objc dynamic public var ifFrequency: Frequency {
+    get { _ifFrequency }
     set { if _ifFrequency != newValue { _ifFrequency = newValue ; xvtrCmd( .ifFrequency, newValue) } } }
   
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
-  @objc dynamic public var isValid: Bool {
-    return _isValid }
+  @objc dynamic public var inUse: Bool { _inUse }
+  @objc dynamic public var isValid: Bool { _isValid }
   
   @objc dynamic public var loError: Int {
-    get { return _loError }
+    get { _loError }
     set { if _loError != newValue { _loError = newValue ; xvtrCmd( .loError, newValue) } } }
   
   @objc dynamic public var name: String {
-    get { return _name }
-    set { if _name != newValue { _name = newValue ; xvtrCmd( .name, newValue) } } }
+    get { _name }
+    set { if _name != newValue { _name = newValue ; xvtrCmd( .name, _name) } } }
   
   @objc dynamic public var maxPower: Int {
-    get { return _maxPower }
+    get { _maxPower }
     set { if _maxPower != newValue { _maxPower = newValue ; xvtrCmd( .maxPower, newValue) } } }
   
   @objc dynamic public var order: Int {
-    get { return _order }
+    get { _order }
     set { if _order != newValue { _order = newValue ; xvtrCmd( .order, newValue) } } }
   
-  @objc dynamic public var preferred: Bool {
-    return _preferred }
+  @objc dynamic public var preferred: Bool { _preferred }
   
-  @objc dynamic public var rfFrequency: Int {
-    get { return _rfFrequency }
+  @objc dynamic public var rfFrequency: Frequency {
+    get { _rfFrequency }
     set { if _rfFrequency != newValue { _rfFrequency = newValue ; xvtrCmd( .rfFrequency, newValue) } } }
   
   @objc dynamic public var rxGain: Int {
-    get { return _rxGain }
+    get { _rxGain }
     set { if _rxGain != newValue { _rxGain = newValue ; xvtrCmd( .rxGain, newValue) } } }
   
   @objc dynamic public var rxOnly: Bool {
-    get { return _rxOnly }
+    get { _rxOnly }
     set { if _rxOnly != newValue { _rxOnly = newValue ; xvtrCmd( .rxOnly, newValue) } } }
 
-  @objc dynamic public var twoMeterInt: Int {
-    return _twoMeterInt }
+  @objc dynamic public var twoMeterInt: Int { _twoMeterInt }
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier("", Api.objectQ)     var _name
-  @Barrier(0, Api.objectQ)      var _ifFrequency
+  @Barrier(0, Api.objectQ)      var _ifFrequency    : Frequency
   @Barrier(false, Api.objectQ)  var _inUse
   @Barrier(false, Api.objectQ)  var _isValid
   @Barrier(0, Api.objectQ)      var _loError
+  @Barrier("", Api.objectQ)     var _name         { didSet { _name = String(_name.prefix(4)) }}
   @Barrier(0, Api.objectQ)      var _maxPower
   @Barrier(0, Api.objectQ)      var _order
   @Barrier(false, Api.objectQ)  var _preferred
-  @Barrier(0, Api.objectQ)      var _rfFrequency
+  @Barrier(0, Api.objectQ)      var _rfFrequency    : Frequency
   @Barrier(0, Api.objectQ)      var _rxGain
   @Barrier(false, Api.objectQ)  var _rxOnly
   @Barrier(0, Api.objectQ)      var _twoMeterInt
@@ -189,18 +184,18 @@ public final class Xvtr : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
-      case .name:         update(self, &_name,        to: property.value,         signal: \.name)
-      case .ifFrequency:  update(self, &_ifFrequency, to: property.value.iValue,  signal: \.ifFrequency)
-      case .inUse:        update(self, &_inUse,       to: property.value.bValue,  signal: \.inUse)
-      case .isValid:      update(self, &_isValid,     to: property.value.bValue,  signal: \.isValid)
-      case .loError:      update(self, &_loError,     to: property.value.iValue,  signal: \.loError)
-      case .maxPower:     update(self, &_maxPower,    to: property.value.iValue,  signal: \.maxPower)
-      case .order:        update(self, &_order,       to: property.value.iValue,  signal: \.order)
-      case .preferred:    update(self, &_preferred,   to: property.value.bValue,  signal: \.preferred)
-      case .rfFrequency:  update(self, &_rfFrequency, to: property.value.iValue,  signal: \.rfFrequency)
-      case .rxGain:       update(self, &_rxGain,      to: property.value.iValue,  signal: \.rxGain)
-      case .rxOnly:       update(self, &_rxOnly,      to: property.value.bValue,  signal: \.rxOnly)
-      case .twoMeterInt:  update(self, &_twoMeterInt, to: property.value.iValue,  signal: \.twoMeterInt)
+      case .name:         update(self, &_name,        to: String(property.value.prefix(4)), signal: \.name)
+      case .ifFrequency:  update(self, &_ifFrequency, to: property.value.mhzToHz,           signal: \.ifFrequency)
+      case .inUse:        update(self, &_inUse,       to: property.value.bValue,            signal: \.inUse)
+      case .isValid:      update(self, &_isValid,     to: property.value.bValue,            signal: \.isValid)
+      case .loError:      update(self, &_loError,     to: property.value.iValue,            signal: \.loError)
+      case .maxPower:     update(self, &_maxPower,    to: property.value.iValue,            signal: \.maxPower)
+      case .order:        update(self, &_order,       to: property.value.iValue,            signal: \.order)
+      case .preferred:    update(self, &_preferred,   to: property.value.bValue,            signal: \.preferred)
+      case .rfFrequency:  update(self, &_rfFrequency, to: property.value.mhzToHz,           signal: \.rfFrequency)
+      case .rxGain:       update(self, &_rxGain,      to: property.value.iValue,            signal: \.rxGain)
+      case .rxOnly:       update(self, &_rxOnly,      to: property.value.bValue,            signal: \.rxOnly)
+      case .twoMeterInt:  update(self, &_twoMeterInt, to: property.value.iValue,            signal: \.twoMeterInt)
       }
     }
     // is the waterfall initialized?

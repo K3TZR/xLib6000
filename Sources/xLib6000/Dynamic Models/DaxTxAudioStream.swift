@@ -23,14 +23,14 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id               : DaxTxStreamId
+  public let id                               : DaxTxStreamId
 
-  @objc dynamic public var isTransmitChannel: Bool {
-    get { return _isTransmitChannel  }
+  @objc dynamic public var isTransmitChannel  : Bool {
+    get { _isTransmitChannel  }
     set { if _isTransmitChannel != newValue { _isTransmitChannel = newValue ; txAudioCmd( newValue.as1or0) } } }
 
   @objc dynamic public var txGain: Int {
-    get { return _txGain  }
+    get { _txGain  }
     set {
       if _txGain != newValue {
         _txGain = newValue
@@ -46,8 +46,8 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
     }
   }
   
-  @objc dynamic public var clientHandle: Handle {
-    get { return _clientHandle  }
+  @objc dynamic public var clientHandle     : Handle {
+    get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue} } }
   
   // ------------------------------------------------------------------------------

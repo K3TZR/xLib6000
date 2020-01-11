@@ -23,33 +23,32 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let sampleRate              : Double = 24_000
-  public static let frameCount              = 240
+  public static let application             = 2049
   public static let channelCount            = 2
   public static let elementSize             = MemoryLayout<Float>.size
+  public static let frameCount              = 240
   public static let isInterleaved           = true
-  public static let application             = 2049
+  public static let sampleRate              : Double = 24_000
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                             : RemoteTxStreamId
+  public      let id                : RemoteTxStreamId
+  public weak var delegate          : StreamHandler?
+  public      var isStreaming       = false
 
   @objc dynamic public var clientHandle: Handle {
-    get { return _clientHandle  }
+    get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue} } }
   
   @objc dynamic public var compression: String {
-    get { return _compression  }
+    get { _compression  }
     set { if _compression != newValue { _compression = newValue} } }
   
   @objc dynamic public var ip: String {
-    get { return _ip  }
+    get { _ip  }
     set { if _ip != newValue { _ip = newValue} } }
     
-  public weak var delegate                 : StreamHandler?
-  public      var isStreaming              = false
-
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -123,8 +122,8 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   ///
   init(radio: Radio, id: RemoteTxStreamId) {
     
+    _radio = radio
     self.id = id
-    self._radio = radio
     super.init()
     
     isStreaming = false

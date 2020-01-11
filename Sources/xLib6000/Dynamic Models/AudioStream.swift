@@ -9,8 +9,6 @@
 import Foundation
 
 public typealias AudioStreamId = StreamId
-//public typealias DaxChannel = Int
-//public typealias DaxIqChannel = Int
 
 /// AudioStream Class implementation
 ///
@@ -20,58 +18,41 @@ public typealias AudioStreamId = StreamId
 ///      objects periodically receive Audio in a UDP stream.
 ///
 public final class AudioStream : NSObject, DynamicModelWithStream {
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kCmd             = "audio stream "
-  static let kStreamCreateCmd = "stream create "
-  static let kStreamRemoveCmd = "stream remove "
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public              let id                        : AudioStreamId
-  public              var delegate                  : StreamHandler?
-  public private(set) var rxLostPacketCount         = 0
+  public      let id         : AudioStreamId
+  public weak var delegate   : StreamHandler?
 
-  @objc dynamic public var rxGain: Int {
-    get { return _rxGain  }
-    set { if _rxGain != newValue { _rxGain = newValue ; if _slice != nil && !Api.sharedInstance.testerModeEnabled { audioStreamCmd( "gain", newValue) }}
-    }
-  }
-  
   @objc dynamic public var daxChannel: Int {
-    get { return _daxChannel }
-    set {
-      if _daxChannel != newValue {
-        _daxChannel = newValue
-        //        if _radio != nil {
-        _slice = _radio.findSlice(using: _daxChannel)
-        //        }
-      }
-    }
-  }
+    get { _daxChannel }
+    set { if _daxChannel != newValue { _daxChannel = newValue ; _slice = _radio.findSlice(using: _daxChannel) }}}
   
   @objc dynamic public var daxClients: Int {
-    get { return _daxClients  }
-    set { if _daxClients != newValue { _daxClients = newValue } } }
-  
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
+    get { _daxClients  }
+    set { if _daxClients != newValue { _daxClients = newValue }}}
+
+  @objc dynamic public var inUse: Bool { _inUse }
+
   @objc dynamic public var ip: String {
-    get { return _ip }
-    set { if _ip != newValue { _ip = newValue } } }
-  
+    get { _ip }
+    set { if _ip != newValue { _ip = newValue }}}
+
   @objc dynamic public var port: Int {
-    get { return _port  }
-    set { if _port != newValue { _port = newValue } } }
+    get { _port  }
+    set { if _port != newValue { _port = newValue }}}
   
+  @objc dynamic public var rxGain: Int {
+    get { _rxGain  }
+    set { if _rxGain != newValue { _rxGain = newValue ; if _slice != nil && !Api.sharedInstance.testerModeEnabled { audioStreamCmd( "gain", newValue) }}}}
+    
   @objc dynamic public var slice: xLib6000.Slice? {
-    get { return _slice }
-    set { if _slice != newValue { _slice = newValue } } }
-  
+    get { _slice }
+    set { if _slice != newValue { _slice = newValue }}}
+
+  public private(set) var rxLostPacketCount         = 0
+    
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -128,7 +109,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
         if radio.audioStreams[audioStreamId] == nil {
           
           // NO, is this stream for this client?
-          if !AudioStream.isStatusForThisClient(keyValues) { return }
+          if !isForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
           radio.audioStreams[audioStreamId] = AudioStream(radio: radio, id: audioStreamId)
@@ -150,75 +131,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       }
     }
   }
-  /// Check if an Audio Stream belongs to us
-  ///
-  /// - Parameters:
-  ///   - keyValues:          a KeyValuesArray of the status message
-  ///
-  /// - Returns:              result of the check
-  ///
-  public class func isStatusForThisClient(_ properties: KeyValuesArray) -> Bool {
-    
-    // allow a Tester app to see all Streams
-    guard Api.sharedInstance.testerModeEnabled == false else { return true }
-    
-    var statusIpStr = ""
-    var statusPortStr = ""
-    
-    // search thru each key/value pair, <key=value>
-    for property in properties {
-      
-      switch property.key.lowercased() {
-      case "ip":
-        statusIpStr = property.value
-      case "port":
-        statusPortStr = property.value
-      default:
-        break
-      }
-    }
-    
-    if statusIpStr == "" || statusPortStr == "" {
-      return false
-    }
-    if !statusIpStr.isValidIP4() {
-      return false
-    }
-    guard let statusPort = UInt16(statusPortStr) else {
-      return false
-    }
-    
-    // if local check ip and port
-    // if remote check only ip
-    
-    // TODO: this is a temporary fix and a flaw in Flex way to think.. :-)
-    
-    if Api.sharedInstance.isWan {
-      if Api.sharedInstance.localIP == statusIpStr {
-        return true
-      }
-    } else {
-      if Api.sharedInstance.localIP == statusIpStr && Api.sharedInstance.localUDPPort == statusPort {
-        return true
-      }
-    }
-    
-    return false
-  }
-  /// Find an AudioStream by DAX Channel
-  ///
-  /// - Parameter channel:    Dax channel number
-  /// - Returns:              an AudioStream (if any)
-  ///
-  public class func find(with channel: DaxChannel) -> AudioStream? {
-    
-    // find the AudioStream with the specified Channel (if any)
-    let streams = Api.sharedInstance.radio!.audioStreams.values.filter { $0.daxChannel == channel }
-    guard streams.count >= 1 else { return nil }
-    
-    // return the first one
-    return streams[0]
-  }
   
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
@@ -231,7 +143,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   ///
   init(radio: Radio, id: AudioStreamId) {
     
-    self._radio = radio
+    _radio = radio
     self.id = id
     super.init()
   }
@@ -268,7 +180,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
         if let sliceId = property.value.objectId {
           update(self, &_slice, to: _radio.slices[sliceId], signal: \.slice)
         }
-
         let gain = _rxGain
         _rxGain = 0
         rxGain = gain
@@ -308,11 +219,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   ///   - vita:       a Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    
-    if vita.classCode != .daxAudio {
-      // not for us
-      return
-    }
     
     // if there is a delegate, process the Panadapter stream
     if let delegate = delegate {

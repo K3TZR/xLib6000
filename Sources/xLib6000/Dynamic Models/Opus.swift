@@ -39,34 +39,65 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                             : OpusId
-  public var isStreaming                    = false
+  public        let id             : OpusId
+  private weak  var _delegate      : StreamHandler?
+  public        var isStreaming    = false
   
+  @objc dynamic public var clientHandle: UInt32 {
+    get { _clientHandle }
+    set { if _clientHandle != newValue { _clientHandle = newValue } } }
+  
+  @objc dynamic public var ip: String {
+    get { _ip }
+    set { if _ip != newValue { _ip = newValue } } }
+
+  @objc dynamic public var port: Int {
+    get { _port }
+    set { if _port != newValue { _port = newValue } } }
+
+  @objc dynamic public var rxStopped: Bool {
+    get { _rxStopped }
+    set { if _rxStopped != newValue { _rxStopped = newValue } } }
+  
+  @objc dynamic public var rxEnabled: Bool {
+    get { _rxEnabled }
+    set { if _rxEnabled != newValue { _rxEnabled = newValue ; opusCmd( .rxEnabled, newValue.as1or0) } } }
+  
+  @objc dynamic public var txEnabled: Bool {
+    get { _txEnabled }
+    set { if _txEnabled != newValue { _txEnabled = newValue ; opusCmd( .txEnabled, newValue.as1or0) } } }
+
+  // ----------------------------------------------------------------------------
+  // Public properties
+  
+  public var delegate: StreamHandler? {
+    get { Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
+
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(nil, Api.objectQ) var _expectedFrame               : Int?                    // Rx sequence number
-  @Barrier(false, Api.objectQ) var _rxEnabled                                            // Opus for receive
-  @Barrier(0, Api.objectQ) var _rxLostPacketCount                                        // Rx lost packet count
-  @Barrier(0, Api.objectQ) var _rxPacketCount                                            // Rx total packet count
-  @Barrier(false, Api.objectQ) var _rxStopped                                            // Rx stream stopped
-  @Barrier(false, Api.objectQ) var _txEnabled                                            // Opus for transmit
+  @Barrier(nil, Api.objectQ)    var _expectedFrame     : Int?
+  @Barrier(false, Api.objectQ)  var _rxEnabled
+  @Barrier(0, Api.objectQ)      var _rxLostPacketCount
+  @Barrier(0, Api.objectQ)      var _rxPacketCount
+  @Barrier(false, Api.objectQ)  var _rxStopped
+  @Barrier(false, Api.objectQ)  var _txEnabled
 
-  private weak var _delegate                : StreamHandler?                // Delegate for Opus Data Stream
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _radio                        : Radio
+  private var _initialized                  = false
   private let _log                          = Log.sharedInstance.msg
-  private var _initialized                  = false                         // True if initialized by Radio hardware
+  private var _radio                        : Radio
 
-  private var _clientHandle                 : UInt32 = 0                    //
-  private var _ip                           = ""                            // IP Address of ???
-  private var _port                         = 0                             // port number used by Opus
-  private var _vita                         : Vita?                         // a Vita class
-  private var _txSeq                        = 0                             // Tx sequence number
-  private var _txSampleCount                = 0                             // Tx sample count
+  private var _clientHandle                 : UInt32 = 0
+  private var _ip                           = ""
+  private var _port                         = 0
+  private var _vita                         : Vita?
+  private var _txSeq                        = 0
+  private var _txSampleCount                = 0
   
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
@@ -247,43 +278,6 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
 }
 
 extension Opus {
-  
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant) that send Commands
-  
-  @objc dynamic public var rxEnabled: Bool {
-    get { return _rxEnabled }
-    set { if _rxEnabled != newValue { _rxEnabled = newValue ; opusCmd( .rxEnabled, newValue.as1or0) } } }
-  
-  @objc dynamic public var txEnabled: Bool {
-    get { return _txEnabled }
-    set { if _txEnabled != newValue { _txEnabled = newValue ; opusCmd( .txEnabled, newValue.as1or0) } } }
-
-  // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
-  
-  @objc dynamic public var clientHandle: UInt32 {
-    get { return _clientHandle }
-    set { if _clientHandle != newValue { _clientHandle = newValue } } }
-  
-  @objc dynamic public var ip: String {
-    get { return _ip }
-    set { if _ip != newValue { _ip = newValue } } }
-
-  @objc dynamic public var port: Int {
-    get { return _port }
-    set { if _port != newValue { _port = newValue } } }
-
-  @objc dynamic public var rxStopped: Bool {
-    get { return _rxStopped }
-    set { if _rxStopped != newValue { _rxStopped = newValue } } }
-  
-  // ----------------------------------------------------------------------------
-  // Public properties
-  
-  public var delegate: StreamHandler? {
-    get { return Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
   
     // ----------------------------------------------------------------------------
     // Instance methods that send Commands

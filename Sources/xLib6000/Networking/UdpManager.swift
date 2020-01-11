@@ -13,7 +13,7 @@ import CocoaAsyncSocket
 ///
 ///      manages all Udp communication between the API and the Radio (hardware)
 ///
-final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegate {
+final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
 
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
@@ -28,20 +28,19 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private weak var _delegate                : UdpManagerDelegate?           // class to receive UDP data
+  private weak var _delegate                : UdpManagerDelegate?
   private let _log                          = Log.sharedInstance.msg
-  private var _udpReceiveQ                  : DispatchQueue!                // serial GCD Queue for inbound UDP traffic
-  private var _udpRegisterQ                 : DispatchQueue!                // serial GCD Queue for registration
-  private var _udpSocket                    : GCDAsyncUdpSocket!            // socket for Vita UDP data
+  private var _udpReceiveQ                  : DispatchQueue!
+  private var _udpRegisterQ                 : DispatchQueue!
+  private var _udpSocket                    : GCDAsyncUdpSocket!
   private var _udpBound                     = false
-  private var _udpRcvPort                   : UInt16 = 0                    // actual Vita port number
-  private var _udpSendIP                    = ""                            // radio IP address (destination for send)
+  private var _udpRcvPort                   : UInt16 = 0
+  private var _udpSendIP                    = ""
   private var _udpSendPort                  : UInt16 = kUdpSendPort
 
   private let kPingCmd                      = "client ping handle"
   private let kPingDelay                    : UInt32 = 50
   private let kMaxBindAttempts              = 20
-  private let kRegisterCmd                  = "client udp_register handle"
   private let kRegistrationDelay            : UInt32 = 50_000
 
   private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
@@ -81,8 +80,6 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   ///   - data:               a Data
   ///
   func sendData(_ data: Data) {
-    
-    // send the Data on the outbound port
     _udpSocket.send(data, toHost: _udpSendIP, port: _udpSendPort, withTimeout: -1, tag: 0)
   }
   /// Bind to the UDP Port
@@ -198,7 +195,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       while self._udpSocket != nil && !self.udpSuccessfulRegistration && self._udpBound {
         
         // send a Registration command
-        let cmd = self.kRegisterCmd + "=" + clientHandle!.hex
+        let cmd = "client udp_register handle=" + clientHandle!.hex
         self.sendData(cmd.data(using: String.Encoding.ascii, allowLossyConversion: false)!)
 
         // pause

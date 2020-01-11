@@ -15,8 +15,6 @@ import CocoaAsyncSocket
 ///
 public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegate {
   
-  typealias IpAddress                       = String                        // dotted decimal form
-  
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
 
@@ -28,23 +26,22 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   // MARK: - Public properties
   
   public var discoveredRadios: [DiscoveryStruct] {
-    get { return Api.objectQ.sync { _discoveredRadios } }
+    get { Api.objectQ.sync { _discoveredRadios } }
     set { Api.objectQ.sync(flags: .barrier) { _discoveredRadios = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
   private var _discoveredRadios             = [DiscoveryStruct]()
-
-  private var _udpSocket                    : GCDAsyncUdpSocket?            // socket to receive broadcasts
-  private var _timeoutTimer                 : DispatchSourceTimer!          // timer fired every "checkInterval"
+  private var _timeoutTimer                 : DispatchSourceTimer!
+  private var _udpSocket                    : GCDAsyncUdpSocket?
   
   // ----------------------------------------------------------------------------
   // MARK: - Singleton
   
   /// Provide access to the API singleton
   ///
-  @objc dynamic public static var sharedInstance = Discovery()
+  public static var sharedInstance = Discovery()
   
   /// Initialize Discovery
   ///

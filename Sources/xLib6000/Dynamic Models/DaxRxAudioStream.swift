@@ -8,8 +8,6 @@
 
 import Foundation
 
-public typealias DaxChannel = Int
-public typealias DaxIqChannel = Int
 public typealias DaxRxStreamId = StreamId
 
 /// DaxRxAudioStream Class implementation
@@ -25,12 +23,11 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public              let id                   : DaxRxStreamId
-  public weak         var delegate             : StreamHandler?
-  public private(set) var rxLostPacketCount    = 0
+  public      let id            : DaxRxStreamId
+  public weak var delegate      : StreamHandler?
 
-  @objc dynamic public var rxGain: Int {
-    get { return _rxGain  }
+  @objc dynamic public var rxGain       : Int {
+    get { _rxGain  }
     set { if _rxGain != newValue {
       _rxGain = newValue
       if _slice != nil && !Api.sharedInstance.testerModeEnabled { audioStreamCmd( "gain", _rxGain) }
@@ -38,31 +35,30 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
     }
   }
   
-  @objc dynamic public var clientHandle: Handle {
-    get { return _clientHandle  }
+  @objc dynamic public var clientHandle : Handle {
+    get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue } } }
   
-  @objc dynamic public var daxChannel: Int {
-    get { return _daxChannel }
+  @objc dynamic public var daxChannel   : Int {
+    get { _daxChannel }
     set {
       if _daxChannel != newValue {
         _daxChannel = newValue
-        //        if _radio != nil {
         slice = _radio.findSlice(using: _daxChannel)
-        //        }
       }
     }
   }
   
-  @objc dynamic public var daxClients: Int {
-    get { return _daxClients  }
+  @objc dynamic public var daxClients   : Int {
+    get { _daxClients  }
     set { if _daxClients != newValue { _daxClients = newValue } } }
   
-  @objc dynamic public var slice: xLib6000.Slice? {
-    get { return _slice }
+  @objc dynamic public var slice        : xLib6000.Slice? {
+    get { _slice }
     set { if _slice != newValue { _slice = newValue } } }
   
-  
+  public private(set) var rxLostPacketCount    = 0
+
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -119,42 +115,6 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       // pass the remaining key values for parsing (dropping the Id & Type)
       radio.daxRxAudioStreams[daxRxStreamId]!.parseProperties(radio, Array(properties.dropFirst(2)) )
     }
-  }
-  /// Check if an Stream belongs to us
-  ///
-  /// - Parameters:
-  ///   - keyValues:          a KeyValuesArray of the status message
-  ///
-  /// - Returns:              result of the check
-  ///
-  public class func isStatusForThisClient(_ handleString: String) -> Bool {
-
-    // allow a Tester app to see all Streams
-    guard Api.sharedInstance.testerModeEnabled == false else { return true }
-
-    // convert to the UInt32 form
-    if let handle = handleString.handle {
-      // true if they match
-      return handle == Api.sharedInstance.connectionHandle
-
-    } else {
-      // otherwise false
-      return false
-    }
-  }
-  /// Find a DaxRxAudioStream by DAX Channel
-  ///
-  /// - Parameter channel:    Dax channel number
-  /// - Returns:              a DaxRxAudioStream (if any)
-  ///
-  public class func find(with channel: DaxChannel) -> DaxRxAudioStream? {
-    
-    // find the DaxRxAudioStream with the specified Channel (if any)
-    let streams = Api.sharedInstance.radio!.daxRxAudioStreams.values.filter { $0.daxChannel == channel }
-    guard streams.count >= 1 else { return nil }
-    
-    // return the first one
-    return streams[0]
   }
 
   // ------------------------------------------------------------------------------
@@ -238,21 +198,16 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Stream methods
   
-  /// Process the AudioStream Vita struct
+  /// Process the DaxAudioStream Vita struct
   ///
   ///   VitaProcessor Protocol method, called by Radio, executes on the streamQ
   ///      The payload of the incoming Vita struct is converted to an AudioStreamFrame and
-  ///      passed to the Audio Stream Handler
+  ///      passed to the  Stream Handler
   ///
   /// - Parameters:
   ///   - vita:       a Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    
-    if vita.classCode != .daxAudio {
-      // not for us
-      return
-    }
     
     // if there is a delegate, process the Panadapter stream
     if let delegate = delegate {
@@ -295,7 +250,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      _log( "Missing AudioStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
+      _log( "Missing DaxRxAudioStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1

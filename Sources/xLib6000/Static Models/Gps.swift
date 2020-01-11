@@ -14,7 +14,7 @@ import Foundation
 ///      processing of the internal Gps (if installed). Gps objects are added,
 ///      removed and updated by the incoming TCP messages.
 ///
-public final class Gps                      : NSObject, StaticModel {
+public final class Gps : NSObject, StaticModel {
 
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
@@ -24,32 +24,32 @@ public final class Gps                      : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  @objc dynamic public var altitude       : String { _altitude }
-  @objc dynamic public var frequencyError : Double { _frequencyError }
-  @objc dynamic public var grid           : String { _grid }
-  @objc dynamic public var latitude       : String { _latitude }
-  @objc dynamic public var longitude      : String { _longitude }
-  @objc dynamic public var speed          : String { _speed }
-  @objc dynamic public var status         : Bool { _status }
-  @objc dynamic public var time           : String { _time }
-  @objc dynamic public var track          : Double { _track }
-  @objc dynamic public var tracked        : Bool { _tracked }
-  @objc dynamic public var visible        : Bool { _visible }
+  @objc dynamic public var altitude       : String  { _altitude }
+  @objc dynamic public var frequencyError : Double  { _frequencyError }
+  @objc dynamic public var grid           : String  { _grid }
+  @objc dynamic public var latitude       : String  { _latitude }
+  @objc dynamic public var longitude      : String  { _longitude }
+  @objc dynamic public var speed          : String  { _speed }
+  @objc dynamic public var status         : Bool    { _status }
+  @objc dynamic public var time           : String  { _time }
+  @objc dynamic public var track          : Double  { _track }
+  @objc dynamic public var tracked        : Bool    { _tracked }
+  @objc dynamic public var visible        : Bool    { _visible }
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier("", Api.objectQ) var _altitude
-  @Barrier(0.0, Api.objectQ) var _frequencyError   : Double
-  @Barrier("", Api.objectQ) var _grid
-  @Barrier("", Api.objectQ) var _latitude
-  @Barrier("", Api.objectQ) var _longitude
-  @Barrier("", Api.objectQ) var _speed
-  @Barrier(false, Api.objectQ) var _status
-  @Barrier("", Api.objectQ) var _time
-  @Barrier(0.0, Api.objectQ) var _track            : Double
-  @Barrier(false, Api.objectQ) var _tracked
-  @Barrier(false, Api.objectQ) var _visible
+  @Barrier("", Api.objectQ)     var _altitude
+  @Barrier(0.0, Api.objectQ)    var _frequencyError   : Double
+  @Barrier("", Api.objectQ)     var _grid
+  @Barrier("", Api.objectQ)     var _latitude
+  @Barrier("", Api.objectQ)     var _longitude
+  @Barrier("", Api.objectQ)     var _speed
+  @Barrier(false, Api.objectQ)  var _status
+  @Barrier("", Api.objectQ)     var _time
+  @Barrier(0.0, Api.objectQ)    var _track            : Double
+  @Barrier(false, Api.objectQ)  var _tracked
+  @Barrier(false, Api.objectQ)  var _visible
 
   enum Token: String {
     case altitude
@@ -68,8 +68,8 @@ public final class Gps                      : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _log                          = Log.sharedInstance.msg
-  private var _radio                        : Radio
+  private let _log        = Log.sharedInstance.msg
+  private var _radio      : Radio
 
   // ----------------------------------------------------------------------------
   // MARK: - Class methods
@@ -106,7 +106,6 @@ public final class Gps                      : NSObject, StaticModel {
   public init(radio: Radio) {
 
     _radio = radio
-    
     super.init()
   }
   
