@@ -8,8 +8,8 @@
 
 import Foundation
 
-public typealias SliceId    = ObjectId
-public typealias Frequency  = UInt
+public typealias SliceId  = ObjectId
+public typealias Hz       = UInt
 
 /// Slice Class implementation
 ///
@@ -124,7 +124,7 @@ public final class Slice  : NSObject, DynamicModel {
     get { _fmToneMode }
     set { if _fmToneMode != newValue { _fmToneMode = newValue ; sliceCmd( .fmToneMode, newValue) } } }
   
-  @objc dynamic public var frequency: Frequency {
+  @objc dynamic public var frequency: Hz {
     get { _frequency }
     set { if !_locked { if _frequency != newValue { _frequency = newValue ; sliceTuneCmd( newValue.hzToMhz) } } } }
 
@@ -391,7 +391,7 @@ public final class Slice  : NSObject, DynamicModel {
   @Barrier(false, Api.objectQ)                    var _fmToneBurstEnabled
   @Barrier(0.0, Api.objectQ)                      var _fmToneFreq : Float
   @Barrier("", Api.objectQ)                       var _fmToneMode
-  @Barrier(0, Api.objectQ)                        var _frequency        : Frequency
+  @Barrier(0, Api.objectQ)                        var _frequency        : Hz
   @Barrier(false, Api.objectQ)                    var _inUse
   @Barrier(false, Api.objectQ)                    var _locked
   @Barrier(false, Api.objectQ)                    var _loopAEnabled

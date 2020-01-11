@@ -322,7 +322,7 @@ extension Radio {
   ///   - dimensions:         Panafall dimensions
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestPanadapter(frequency: Frequency, antenna: String? = nil, dimensions: CGSize? = nil, callback: ReplyHandler? = nil) {
+  public func requestPanadapter(frequency: Hz, antenna: String? = nil, dimensions: CGSize? = nil, callback: ReplyHandler? = nil) {
     
     // tell the Radio to create a Panafall (if any available)
     if availablePanadapters > 0 {
@@ -551,7 +551,7 @@ extension Radio {
   ///   - mode:               selected mode
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestSlice(frequency: Frequency, antenna: String, mode: String, callback: ReplyHandler? = nil) {
+  public func requestSlice(frequency: Hz, antenna: String, mode: String, callback: ReplyHandler? = nil) {
     if availableSlices > 0 {
       // tell the Radio to create a Slice
       sendCommand("slice create " + "\(frequency.hzToMhz) \(antenna) \(mode)", replyTo: callback)
@@ -564,7 +564,7 @@ extension Radio {
   ///   - frequency:          frequency (Hz)
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestSlice(panadapter: Panadapter, frequency: Frequency = 0, callback: ReplyHandler? = nil) {
+  public func requestSlice(panadapter: Panadapter, frequency: Hz = 0, callback: ReplyHandler? = nil) {
     if availableSlices > 0 {
       // tell the Radio to create a Slice
       sendCommand("slice create " + "pan" + "=\(panadapter.id.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz)")", replyTo: callback)
@@ -602,14 +602,14 @@ extension Radio {
   ///   - width:      frequenct width
   /// - Returns:      a reference to a Slice (or nil)
   ///
-  public func findSlice(on id: PanadapterStreamId, at freq: Frequency, width: Int) -> xLib6000.Slice? {
+  public func findSlice(on id: PanadapterStreamId, at freq: Hz, width: Int) -> xLib6000.Slice? {
     
     // find the Slices on the Panadapter (if any)
     let filteredSlices = findAllSlices(on: id)
     guard filteredSlices != nil else {return nil}
     
     // find the ones in the frequency range
-    let selectedSlices = filteredSlices!.filter { freq >= $0.frequency + Frequency(min(-width/2, $0.filterLow)) && freq <= $0.frequency + Frequency(max(width/2, $0.filterHigh))}
+    let selectedSlices = filteredSlices!.filter { freq >= $0.frequency + Hz(min(-width/2, $0.filterLow)) && freq <= $0.frequency + Hz(max(width/2, $0.filterHigh))}
     guard selectedSlices.count >= 1 else { return nil }
     
     // return the first one
@@ -699,7 +699,7 @@ extension Radio {
   ///   - frequency:          frequency (Hz)
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestTnf(at frequency: Frequency, callback: ReplyHandler? = nil) {
+  public func requestTnf(at frequency: Hz, callback: ReplyHandler? = nil) {
     
     // tell the Radio to create a Tnf
     sendCommand("tnf create " + "freq" + "=\(frequency)", replyTo: callback)
@@ -711,10 +711,10 @@ extension Radio {
   ///   - minWidth:       bandwidth (hz)
   /// - Returns:          a Tnf reference (or nil)
   ///
-  public func findTnf(at freq: Frequency, minWidth: UInt) -> Tnf? {
+  public func findTnf(at freq: Hz, minWidth: UInt) -> Tnf? {
     
     // return the Tnfs within the specified Frequency / minimum width (if any)
-    let filteredTnfs = tnfs.values.filter { freq >= ($0.frequency - Frequency(max(minWidth, $0.width/2))) && freq <= ($0.frequency + Frequency(max(minWidth, $0.width/2))) }
+    let filteredTnfs = tnfs.values.filter { freq >= ($0.frequency - Hz(max(minWidth, $0.width/2))) && freq <= ($0.frequency + Hz(max(minWidth, $0.width/2))) }
     guard filteredTnfs.count >= 1 else { return nil }
     
     // return the first one

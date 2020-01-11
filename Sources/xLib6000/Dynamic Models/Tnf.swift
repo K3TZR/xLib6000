@@ -37,7 +37,7 @@ public final class Tnf : NSObject, DynamicModel {
     get { _depth }
     set { if _depth != newValue { _depth = newValue ; tnfCmd( .depth, newValue) } } }
 
-  @objc dynamic public var frequency: Frequency {
+  @objc dynamic public var frequency: Hz {
     get { _frequency }
     set { if _frequency != newValue { _frequency = newValue ; tnfCmd( .frequency, newValue.hzToMhz) } } }
   
@@ -59,7 +59,7 @@ public final class Tnf : NSObject, DynamicModel {
   // MARK: - Internal properties
 
   @BarrierClamped(kNormal, Api.objectQ, range: kNormal...kVeryDeep) var _depth      : UInt
-  @Barrier(0, Api.objectQ)                                          var _frequency  : Frequency
+  @Barrier(0, Api.objectQ)                                          var _frequency  : Hz
   @Barrier(false, Api.objectQ)                                      var _permanent
   @BarrierClamped(0, Api.objectQ, range: kWidthMin...kWidthMax)     var _width      : UInt
   

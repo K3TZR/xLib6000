@@ -40,7 +40,7 @@ public final class Memory                   : NSObject, DynamicModel {
     get { _filterLow }
     set { let value = filterLowLimits(newValue) ; if _filterLow != value { _filterLow = value ; memCmd( .rxFilterLow, newValue) } } }
   
-  @objc dynamic public var frequency: Frequency {
+  @objc dynamic public var frequency: Hz {
     get { _frequency }
     set { if _frequency != newValue { _frequency = newValue ; memCmd( .frequency, newValue) } } }
   
@@ -117,7 +117,7 @@ public final class Memory                   : NSObject, DynamicModel {
   @Barrier(0, Api.objectQ)      var _digitalUpperOffset
   @Barrier(0, Api.objectQ)      var _filterHigh
   @Barrier(0, Api.objectQ)      var _filterLow
-  @Barrier(0, Api.objectQ)      var _frequency    : Frequency
+  @Barrier(0, Api.objectQ)      var _frequency    : Hz
   @Barrier("", Api.objectQ)     var _group
   @Barrier("", Api.objectQ)     var _mode
   @Barrier("", Api.objectQ)     var _name

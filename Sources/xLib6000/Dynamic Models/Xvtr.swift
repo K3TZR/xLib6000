@@ -24,7 +24,7 @@ public final class Xvtr : NSObject, DynamicModel {
   
   public let id : XvtrId
   
-  @objc dynamic public var ifFrequency: Frequency {
+  @objc dynamic public var ifFrequency: Hz {
     get { _ifFrequency }
     set { if _ifFrequency != newValue { _ifFrequency = newValue ; xvtrCmd( .ifFrequency, newValue) } } }
   
@@ -49,7 +49,7 @@ public final class Xvtr : NSObject, DynamicModel {
   
   @objc dynamic public var preferred: Bool { _preferred }
   
-  @objc dynamic public var rfFrequency: Frequency {
+  @objc dynamic public var rfFrequency: Hz {
     get { _rfFrequency }
     set { if _rfFrequency != newValue { _rfFrequency = newValue ; xvtrCmd( .rfFrequency, newValue) } } }
   
@@ -66,7 +66,7 @@ public final class Xvtr : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(0, Api.objectQ)      var _ifFrequency    : Frequency
+  @Barrier(0, Api.objectQ)      var _ifFrequency    : Hz
   @Barrier(false, Api.objectQ)  var _inUse
   @Barrier(false, Api.objectQ)  var _isValid
   @Barrier(0, Api.objectQ)      var _loError
@@ -74,7 +74,7 @@ public final class Xvtr : NSObject, DynamicModel {
   @Barrier(0, Api.objectQ)      var _maxPower
   @Barrier(0, Api.objectQ)      var _order
   @Barrier(false, Api.objectQ)  var _preferred
-  @Barrier(0, Api.objectQ)      var _rfFrequency    : Frequency
+  @Barrier(0, Api.objectQ)      var _rfFrequency    : Hz
   @Barrier(0, Api.objectQ)      var _rxGain
   @Barrier(false, Api.objectQ)  var _rxOnly
   @Barrier(0, Api.objectQ)      var _twoMeterInt

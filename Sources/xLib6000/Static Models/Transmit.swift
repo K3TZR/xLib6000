@@ -183,7 +183,7 @@ public final class Transmit : NSObject, StaticModel {
     get {  return _tune }
     set { if _tune != newValue { _tune = newValue ; tuneCmd( .tune, newValue.as1or0) } } }
   
-  @objc dynamic public var frequency: Frequency {
+  @objc dynamic public var frequency: Hz {
     get {  return _frequency }
     set { if _frequency != newValue { _frequency = newValue } } }
   
@@ -220,7 +220,7 @@ public final class Transmit : NSObject, StaticModel {
   @Barrier(false, Api.objectQ)  var _cwSwapPaddles
   @Barrier(false, Api.objectQ)  var _cwSyncCwxEnabled
   @Barrier(false, Api.objectQ)  var _daxEnabled
-  @Barrier(0, Api.objectQ)      var _frequency              : Frequency
+  @Barrier(0, Api.objectQ)      var _frequency              : Hz
   @Barrier(false, Api.objectQ)  var _hwAlcEnabled
   @Barrier(false, Api.objectQ)  var _inhibit
   @Barrier(false, Api.objectQ)  var _metInRxEnabled

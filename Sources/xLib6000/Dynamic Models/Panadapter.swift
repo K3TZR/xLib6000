@@ -41,7 +41,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     get { _band }
     set { if _band != newValue { _band = newValue ; panadapterSet( .band, newValue) } } }
   
-  @objc dynamic public var bandwidth: Frequency {
+  @objc dynamic public var bandwidth: Hz {
     get { _bandwidth }
     set { if _bandwidth != newValue { _bandwidth = newValue ; panadapterSet( .bandwidth, newValue.hzToMhz + " autocenter=1") } } }
   
@@ -51,7 +51,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   
   // FIXME: Where does autoCenter come from?
   
-  @objc dynamic public var center: Frequency {
+  @objc dynamic public var center: Hz {
     get { _center }
     set { if _center != newValue { _center = newValue ; panadapterSet( .center, newValue.hzToMhz) } } }
   
@@ -133,8 +133,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @objc dynamic public var clientHandle: UInt32 {       // (V3 only)
     return _clientHandle }
   
-  @objc dynamic public var maxBw        : Frequency { _maxBw }
-  @objc dynamic public var minBw        : Frequency { _minBw }
+  @objc dynamic public var maxBw        : Hz { _maxBw }
+  @objc dynamic public var minBw        : Hz { _minBw }
   @objc dynamic public var preamp       : String    { _preamp }
   @objc dynamic public var rfGainHigh   : Int       { _rfGainHigh }
   @objc dynamic public var rfGainLow    : Int       { _rfGainLow }
@@ -158,9 +158,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @Barrier(false, Api.objectQ)      var _autoCenterEnabled
   @BarrierClamped(0, Api.objectQ, range: 1...100) var _average
   @Barrier("", Api.objectQ)         var _band
-  @Barrier(0, Api.objectQ)          var _bandwidth    : Frequency
+  @Barrier(0, Api.objectQ)          var _bandwidth    : Hz
   @Barrier(false, Api.objectQ)      var _bandZoomEnabled
-  @Barrier(0, Api.objectQ)          var _center       : Frequency
+  @Barrier(0, Api.objectQ)          var _center       : Hz
   @Barrier(0, Api.objectQ)          var _clientHandle : Handle
   @Barrier(0, Api.objectQ)          var _daxIqChannel
   @Barrier(0, Api.objectQ)          var _fps
@@ -452,7 +452,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - frequency:          Frequency (Hz)
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func clickTune(_ frequency: Frequency, callback: ReplyHandler? = nil) {
+  public func clickTune(_ frequency: Hz, callback: ReplyHandler? = nil) {
     
     // FIXME: ???
     _radio.sendCommand("slice " + "m " + "\(frequency.hzToMhz)" + " pan=\(id.hex)", replyTo: callback)

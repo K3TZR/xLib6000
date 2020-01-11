@@ -337,7 +337,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @Barrier(false, Api.objectQ) var _binauralRxEnabled         // Binaural enable
   @Barrier(nil, Api.objectQ)   var _boundClientId : UUID?     // The Client Id of this client's GUI (V3 only)
   // C
-  @Barrier(0, Api.objectQ)     var _calFreq  : Frequency                 // Calibration frequency
+  @Barrier(0, Api.objectQ)     var _calFreq  : Hz                 // Calibration frequency
   @Barrier("", Api.objectQ)    var _callsign                  // Callsign
   @Barrier("", Api.objectQ)    var _chassisSerial             // Radio serial number (read only)
   @Barrier("", Api.objectQ)    var _clientIp                  // Ip address returned by "client ip" command
