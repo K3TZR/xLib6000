@@ -114,8 +114,7 @@ public extension String {
   var handle          : Handle?         { self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16) }
   var iValue          : Int             { Int(self) ?? 0 }
   var list            : [String]        { self.components(separatedBy: ",") }
-  var mhzToHz         : UInt            { UInt( (Double(self) ?? 0) * 1_000_000 ) }
-  var mhzToHzUInt     : UInt            { UInt( (Double(self) ?? 0) * 1_000_000 ) }
+  var mhzToHz         : Hz              { Hz( (Double(self) ?? 0) * 1_000_000 ) }
   var objectId        : ObjectId?       { UInt16(self, radix: 10) }
   var sequenceNumber  : SequenceNumber  { UInt(self, radix: 10) ?? 0 }
   var streamId        : StreamId?       { self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16) }

@@ -9,7 +9,7 @@
 import Foundation
 
 public typealias SliceId  = ObjectId
-public typealias Hz       = UInt
+public typealias Hz       = Int
 
 /// Slice Class implementation
 ///

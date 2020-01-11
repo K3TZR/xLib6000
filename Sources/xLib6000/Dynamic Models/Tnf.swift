@@ -22,8 +22,8 @@ public final class Tnf : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kWidthMin  : UInt = 5
-  static let kWidthMax  : UInt = 6_000
+  static let kWidthMin  : Hz = 5
+  static let kWidthMax  : Hz = 6_000
   
   static let kNormal    = Depth.normal.rawValue
   static let kVeryDeep  = Depth.veryDeep.rawValue
@@ -45,7 +45,7 @@ public final class Tnf : NSObject, DynamicModel {
     get { _permanent }
     set { if _permanent != newValue { _permanent = newValue ; tnfCmd( .permanent, newValue.as1or0) } } }
   
-  @objc dynamic public var width: UInt {
+  @objc dynamic public var width: Hz {
     get { _width  }
     set { if _width != newValue { _width = newValue ; tnfCmd( .width, newValue.hzToMhz) } } }
   
@@ -61,7 +61,7 @@ public final class Tnf : NSObject, DynamicModel {
   @BarrierClamped(kNormal, Api.objectQ, range: kNormal...kVeryDeep) var _depth      : UInt
   @Barrier(0, Api.objectQ)                                          var _frequency  : Hz
   @Barrier(false, Api.objectQ)                                      var _permanent
-  @BarrierClamped(0, Api.objectQ, range: kWidthMin...kWidthMax)     var _width      : UInt
+  @BarrierClamped(0, Api.objectQ, range: kWidthMin...kWidthMax)     var _width      : Hz
   
   enum Token : String {
     case depth
@@ -159,10 +159,10 @@ public final class Tnf : NSObject, DynamicModel {
       // known keys, in alphabetical order
       switch token {
         
-      case .depth:      update(self, &_depth,     to: property.value.uValue,      signal: \.depth)
-      case .frequency:  update(self, &_frequency, to: property.value.mhzToHz,     signal: \.frequency)
-      case .permanent:  update(self, &_permanent, to: property.value.bValue,      signal: \.permanent)
-      case .width:      update(self, &_width,     to: property.value.mhzToHzUInt, signal: \.width)
+      case .depth:      update(self, &_depth,     to: property.value.uValue,  signal: \.depth)
+      case .frequency:  update(self, &_frequency, to: property.value.mhzToHz, signal: \.frequency)
+      case .permanent:  update(self, &_permanent, to: property.value.bValue,  signal: \.permanent)
+      case .width:      update(self, &_width,     to: property.value.mhzToHz, signal: \.width)
       }
       // is the Tnf initialized?
       if !_initialized && _frequency != 0 {

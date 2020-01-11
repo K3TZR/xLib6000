@@ -133,8 +133,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @objc dynamic public var clientHandle: UInt32 {       // (V3 only)
     return _clientHandle }
   
-  @objc dynamic public var maxBw        : Hz { _maxBw }
-  @objc dynamic public var minBw        : Hz { _minBw }
+  @objc dynamic public var maxBw        : Hz        { _maxBw }
+  @objc dynamic public var minBw        : Hz        { _minBw }
   @objc dynamic public var preamp       : String    { _preamp }
   @objc dynamic public var rfGainHigh   : Int       { _rfGainHigh }
   @objc dynamic public var rfGainLow    : Int       { _rfGainLow }
@@ -170,8 +170,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @Barrier("", Api.objectQ)         var _loggerDisplayIpAddress
   @Barrier(0, Api.objectQ)          var _loggerDisplayPort
   @Barrier(0, Api.objectQ)          var _loggerDisplayRadioNumber
-  @Barrier(0, Api.objectQ)          var _maxBw  : UInt
-  @Barrier(0, Api.objectQ)          var _minBw  : UInt
+  @Barrier(0, Api.objectQ)          var _maxBw  : Hz
+  @Barrier(0, Api.objectQ)          var _minBw  : Hz
   @Barrier(0.0, Api.objectQ)        var _maxDbm : CGFloat
   @Barrier(0.0, Api.objectQ)        var _minDbm : CGFloat
   @Barrier("", Api.objectQ)         var _preamp

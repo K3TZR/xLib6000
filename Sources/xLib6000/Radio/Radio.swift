@@ -159,7 +159,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     get {  return _binauralRxEnabled }
     set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) } } }
   
-  @objc dynamic public var calFreq: UInt {
+  @objc dynamic public var calFreq: Hz {
     get {  return _calFreq }
     set { if _calFreq != newValue { _calFreq = newValue ; radioSetCmd( .calFreq, newValue.hzToMhz) } } }
   
@@ -337,7 +337,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @Barrier(false, Api.objectQ) var _binauralRxEnabled         // Binaural enable
   @Barrier(nil, Api.objectQ)   var _boundClientId : UUID?     // The Client Id of this client's GUI (V3 only)
   // C
-  @Barrier(0, Api.objectQ)     var _calFreq  : Hz                 // Calibration frequency
+  @Barrier(0, Api.objectQ)     var _calFreq  : Hz             // Calibration frequency
   @Barrier("", Api.objectQ)    var _callsign                  // Callsign
   @Barrier("", Api.objectQ)    var _chassisSerial             // Radio serial number (read only)
   @Barrier("", Api.objectQ)    var _clientIp                  // Ip address returned by "client ip" command
