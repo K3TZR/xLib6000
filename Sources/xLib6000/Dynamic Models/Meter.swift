@@ -360,14 +360,14 @@ public final class Meter                    : NSObject, DynamicModel {
       // known Keys, in alphabetical order
       switch token {
         
-      case .desc:     desc = property.value
-      case .fps:      fps = property.value.iValue
-      case .high:     high = property.value.fValue
-      case .low:      low = property.value.fValue
-      case .name:     name = property.value.lowercased()
-      case .group:    group = property.value
-      case .source:   source = property.value.lowercased()
-      case .units:    units = property.value.lowercased()
+      case .desc:     desc    = property.value
+      case .fps:      fps     = property.value.iValue
+      case .high:     high    = property.value.fValue
+      case .low:      low     = property.value.fValue
+      case .name:     name    = property.value.lowercased()
+      case .group:    group   = property.value
+      case .source:   source  = property.value.lowercased()
+      case .units:    units   = property.value.lowercased()
       }
     }
     if !_initialized && group != "" && units != "" {
