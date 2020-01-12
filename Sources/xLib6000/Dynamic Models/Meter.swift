@@ -41,7 +41,7 @@ public final class Meter                    : NSObject, DynamicModel {
 //  @Barrier(0.0, Api.objectQ)  @objc dynamic public  var peak    : Float
 //  @Barrier("", Api.objectQ)   @objc dynamic public  var source
 //  @Barrier("", Api.objectQ)   @objc dynamic public  var units
-//  @Barrier(0.0, Api.objectQ)  @objc dynamic public  var value   : Float
+  @Barrier(0.0, Api.objectQ)  @objc dynamic public  var value   : Float
 
   @objc dynamic public var desc: String {
     get { Api.objectQ.sync { _desc }}
@@ -97,11 +97,11 @@ public final class Meter                    : NSObject, DynamicModel {
   }
   private var _units: String = ""
 
-  @objc dynamic public var value: Float {
-    get { Api.objectQ.sync { _value }}
-    set { Api.objectQ.sync(flags: .barrier) { _value = newValue }}
-  }
-  private var _value: Float = 0.0
+//  @objc dynamic public var value: Float {
+//    get { Api.objectQ.sync { _value }}
+//    set { Api.objectQ.sync(flags: .barrier) { _value = newValue }}
+//  }
+//  private var _value: Float = 0.0
 
   public enum Source: String {
     case codec      = "cod"
