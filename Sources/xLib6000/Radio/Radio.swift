@@ -72,10 +72,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 //    get { Api.objectQ.sync { _memories } }
 //    set { Api.objectQ.sync(flags: .barrier) { _memories = newValue } } }
   
-  public var meters = [MeterId: Meter]()
-//  {
-//    get { Api.objectQ.sync { _meters } }
-//    set { Api.objectQ.sync(flags: .barrier) { _meters = newValue } } }
+  public var meters: [MeterId: Meter] 
+  {
+    get { Api.objectQ.sync { _meters } }
+    set { Api.objectQ.sync(flags: .barrier) { _meters = newValue } } }
   
   public var micAudioStreams = [DaxMicStreamId: MicAudioStream]()
 //  {
@@ -587,7 +587,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 //  private var _equalizers                   = [Equalizer.EqType: Equalizer]()
 //  private var _iqStreams                    = [DaxIqStreamId: IqStream]()
 //  private var _memories                     = [MemoryId: Memory]()
-//  private var _meters                       = [MeterId: Meter]()
+  private var _meters                       = [MeterId: Meter]()
 //  private var _micAudioStreams              = [DaxMicStreamId: MicAudioStream]()
 //  private var _opusStreams                  = [OpusId: Opus]()
 //  private var _panadapters                  = [PanadapterStreamId: Panadapter]()
