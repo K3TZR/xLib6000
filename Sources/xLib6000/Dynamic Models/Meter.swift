@@ -187,7 +187,7 @@ public final class Meter                    : NSObject, DynamicModel {
           }
           // did it change?
           if adjNewValue != previousValue {
-            meter.value = adjNewValue
+            radio.meters[number]!.value = adjNewValue
             
             // notify all observers
             NC.post(.meterUpdated, object: meter as Any?)
