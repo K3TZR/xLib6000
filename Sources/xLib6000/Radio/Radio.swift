@@ -107,10 +107,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 //    get { Api.objectQ.sync { _remoteTxAudioStreams } }
 //    set { Api.objectQ.sync(flags: .barrier) { _remoteTxAudioStreams = newValue } } }
   
-  public var replyHandlers = [SequenceNumber: ReplyTuple]()
-//  {
-//    get { Api.objectQ.sync { _replyHandlers } }
-//    set { Api.objectQ.sync(flags: .barrier) { _replyHandlers = newValue } } }
+  public var replyHandlers: [SequenceNumber: ReplyTuple]
+  {
+    get { Api.objectQ.sync { _replyHandlers } }
+    set { Api.objectQ.sync(flags: .barrier) { _replyHandlers = newValue } } }
   
   public var slices = [SliceId: Slice]()
 //  {
@@ -594,7 +594,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 //  private var _profiles                     = [ProfileId: Profile]()
 //  private var _remoteRxAudioStreams         = [RemoteRxStreamId: RemoteRxAudioStream]()
 //  private var _remoteTxAudioStreams         = [RemoteTxStreamId: RemoteTxAudioStream]()
-//  private var _replyHandlers                = [SequenceNumber: ReplyTuple]()
+  private var _replyHandlers                = [SequenceNumber: ReplyTuple]()
 //  private var _slices                       = [SliceId: Slice]()
 //  private var _tnfs                         = [TnfId: Tnf]()
 //  private var _txAudioStreams               = [TxStreamId: TxAudioStream]()
