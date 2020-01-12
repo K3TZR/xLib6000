@@ -25,8 +25,9 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public      let id          : DaxIqStreamId
-  public weak var delegate    : StreamHandler?
   
+  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
+
   @objc dynamic public  var rate        : Int {
     get { _rate }
     set {

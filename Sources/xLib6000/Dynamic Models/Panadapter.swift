@@ -30,8 +30,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public      let id                : PanadapterStreamId
-  public weak var delegate          : StreamHandler?
   public      var isStreaming       = false
+
+  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
 
   @objc dynamic public var average: Int {
     get { _average }

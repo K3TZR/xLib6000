@@ -40,8 +40,9 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public        let id             : OpusId
-  private weak  var _delegate      : StreamHandler?
   public        var isStreaming    = false
+
+  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
   
   @objc dynamic public var clientHandle: UInt32 {
     get { _clientHandle }
@@ -70,9 +71,9 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // Public properties
   
-  public var delegate: StreamHandler? {
-    get { Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
+//  public var delegate: StreamHandler? {
+//    get { Api.objectQ.sync { _delegate } }
+//    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
 
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties

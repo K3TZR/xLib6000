@@ -23,7 +23,8 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public      let id         : AudioStreamId
-  public weak var delegate   : StreamHandler?
+  
+  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
 
   @objc dynamic public var daxChannel: Int {
     get { _daxChannel }
@@ -78,7 +79,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private      let _radio                   : Radio
-  private weak var _delegate                : StreamHandler? = nil
   private      var _initialized             = false
   private      var _rxSeq                   : Int?
   private      let _log                     = Log.sharedInstance.msg

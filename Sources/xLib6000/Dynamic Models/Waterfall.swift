@@ -24,8 +24,9 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
     
   public      let id              : WaterfallStreamId
-  public weak var delegate        : StreamHandler?
   public      var isStreaming     = false
+
+  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
 
   @objc dynamic public var autoBlackEnabled: Bool {
     get { _autoBlackEnabled }

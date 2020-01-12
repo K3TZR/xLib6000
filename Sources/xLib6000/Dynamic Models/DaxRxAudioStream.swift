@@ -24,7 +24,8 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public      let id            : DaxRxStreamId
-  public weak var delegate      : StreamHandler?
+  
+  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
 
   @objc dynamic public var rxGain       : Int {
     get { _rxGain  }

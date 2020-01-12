@@ -43,7 +43,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   public                var connectionHandle      : Handle?
   public                var connectionHandleWan   = ""
-  public                var delegate              : ApiDelegate?
+//  public                var delegate              : ApiDelegate?
   public                var isWan                 = false
   @objc dynamic public  var radio                 : Radio?
   public private(set)   var radioVersion          = Version()
@@ -51,8 +51,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public                var testerModeEnabled     = false
   public                var pingerEnabled         = true
 
+  
+  @Barrier(nil, Api.objectQ)                  public var delegate     : ApiDelegate?
   @Barrier("0.0.0.0", Api.objectQ)            public var localIP
-  @Barrier(0, Api.objectQ)                    public var localUDPPort: UInt16
+  @Barrier(0, Api.objectQ)                    public var localUDPPort : UInt16
   @Barrier([Handle:GuiClient](), Api.objectQ) public var guiClients
   
   public enum DisconnectReason: Equatable {

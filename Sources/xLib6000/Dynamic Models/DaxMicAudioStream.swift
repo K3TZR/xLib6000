@@ -24,7 +24,8 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public      let id          : DaxMicStreamId
-  public weak var delegate    : StreamHandler?
+  
+  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
 
   @objc dynamic public var clientHandle : Handle {
     get { _clientHandle  }

@@ -34,8 +34,9 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   // MARK: - Public properties
   
   public      let id                : RemoteTxStreamId
-  public weak var delegate          : StreamHandler?
   public      var isStreaming       = false
+
+  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
 
   @objc dynamic public var clientHandle: Handle {
     get { _clientHandle  }
@@ -56,8 +57,6 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   @Barrier(RemoteRxAudioStream.kUncompressed, Api.objectQ)  var _compression
   @Barrier("", Api.objectQ)                                 var _ip
 
-  private weak var _delegate                : StreamHandler?                // Delegate for Opus Data Stream
-  
   enum Token : String {
     case clientHandle         = "client_handle"
     case compression
