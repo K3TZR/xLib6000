@@ -131,7 +131,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @objc dynamic public var antList: [String] {
     return _antList }
   
-  @objc dynamic public var clientHandle: UInt32 {       // (V3 only)
+  @objc dynamic public var clientHandle: Handle {       // (V3 only)
     return _clientHandle }
   
   @objc dynamic public var maxBw        : Hz        { _maxBw }

@@ -26,7 +26,9 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   public      let id              : WaterfallStreamId
   public      var isStreaming     = false
 
-  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
+  public var delegate : StreamHandler? {
+    get { return Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue } } }
 
   @objc dynamic public var autoBlackEnabled: Bool {
     get { _autoBlackEnabled }
@@ -60,15 +62,39 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
+    
+  var _autoBlackEnabled: Bool {
+    get { return Api.objectQ.sync { __autoBlackEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__autoBlackEnabled = newValue } } }
   
-  @Barrier(false, Api.objectQ)  var _autoBlackEnabled
-  @Barrier(0, Api.objectQ)      var _autoBlackLevel : UInt32
-  @Barrier(0, Api.objectQ)      var _blackLevel
-  @Barrier(0, Api.objectQ)      var _clientHandle   : Handle
-  @Barrier(0, Api.objectQ)      var _colorGain
-  @Barrier(0, Api.objectQ)      var _gradientIndex
-  @Barrier(0, Api.objectQ)      var _lineDuration
-  @Barrier(0, Api.objectQ)      var _panadapterId   : PanadapterStreamId
+  var _autoBlackLevel: UInt32 {
+    get { return Api.objectQ.sync { __autoBlackLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __autoBlackLevel = newValue } } }
+  
+  var _blackLevel: Int {
+    get { return Api.objectQ.sync { __blackLevel } }
+    set { Api.objectQ.sync(flags: .barrier) {__blackLevel = newValue } } }
+  
+  var _clientHandle: Handle {          // (V3 only)
+    get { return Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } } }
+  
+  var _colorGain: Int {
+    get { return Api.objectQ.sync { __colorGain } }
+    set { Api.objectQ.sync(flags: .barrier) {__colorGain = newValue } } }
+  
+  var _gradientIndex: Int {
+    get { return Api.objectQ.sync { __gradientIndex } }
+    set { Api.objectQ.sync(flags: .barrier) {__gradientIndex = newValue } } }
+  
+  var _lineDuration: Int {
+    get { return Api.objectQ.sync { __lineDuration } }
+    set { Api.objectQ.sync(flags: .barrier) {__lineDuration = newValue } } }
+  
+  var _panadapterId: PanadapterStreamId {
+    get { return Api.objectQ.sync { __panadapterId } }
+    set { Api.objectQ.sync(flags: .barrier) { __panadapterId = newValue } } }
+
   
   enum Token : String {
     // on Waterfall
@@ -288,4 +314,18 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   private func waterfallCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("display panafall set " + "\(id.hex) " + token.rawValue + "=\(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _delegate           : StreamHandler?
+  
+  private var __autoBlackEnabled  = false
+  private var __autoBlackLevel    : UInt32 = 0
+  private var __blackLevel        = 0
+  private var __clientHandle      : Handle = 0
+  private var __colorGain         = 0
+  private var __gradientIndex     = 0
+  private var __lineDuration      = 0
+  private var __panadapterId      : PanadapterStreamId = 0
 }
