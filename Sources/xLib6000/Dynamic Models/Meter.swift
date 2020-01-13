@@ -177,15 +177,16 @@ public final class Meter                    : NSObject, DynamicModel {
   
   /// Process the Meter Vita struct
   ///
-  ///   VitaProcessor protocol methods, executes on the streamQ
+  ///   Executes on the streamQ
   ///      The payload of the incoming Vita struct is converted to Meter values
-  ///      which are passed to their respective Meter Stream Handlers, called by Radio
+  ///      Called by Radio
+  ///      Sends meterUpdated notifications
   ///
   /// - Parameters:
   ///   - vita:        a Vita struct
   ///
   class func vitaProcessor(_ vita: Vita, radio: Radio) {
-    var metersFound = [UInt16]()
+    var meterIds = [UInt16]()
     
     // NOTE:  there is a bug in the Radio (as of v2.2.8) that sends
     //        multiple copies of meters, this code ignores the duplicates
@@ -201,19 +202,19 @@ public final class Meter                    : NSObject, DynamicModel {
     // for each meter in the Meters packet
     for i in 0..<numberOfMeters {
       
-      // get the Meter number and the Meter value
-      let number: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
+      // get the Meter id and the Meter value
+      let id: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
       let value: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: (2 * i) + 1).pointee)
       
       // is this a duplicate?
-      if !metersFound.contains(number) {
+      if !meterIds.contains(id) {
         
         // NO, add it to the list
-        metersFound.append(number)
+        meterIds.append(id)
         
         // find the meter (if present) & update it
         //        if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", number)] {
-        if let meter = radio.meters[number] {
+        if let meter = radio.meters[id] {
           //          meter.streamHandler( value)
           
           let newValue = Int16(bitPattern: value)
@@ -247,7 +248,7 @@ public final class Meter                    : NSObject, DynamicModel {
           }
           // did it change?
           if adjNewValue != previousValue {
-            radio.meters[number]!.value = adjNewValue
+            meter.value = adjNewValue
             
             // notify all observers
             NC.post(.meterUpdated, object: meter as Any?)
@@ -261,7 +262,7 @@ public final class Meter                    : NSObject, DynamicModel {
   ///           OR
   ///   Format: <number "removed", "">
   ///
-  ///   StatusParser Protocol method, executes on the parseQ
+  ///   Executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
