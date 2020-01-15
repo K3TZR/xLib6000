@@ -27,7 +27,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // MARK: - Public properties
   
   // Object Collections
-  public var meters = [MeterId: Meter]() {
+  public var meters : [MeterId: Meter] {
     get { Api.objectQ.sync { _meters } }
     set { Api.objectQ.sync(flags: .barrier) { _meters = newValue }}}
   public var replyHandlers: [SequenceNumber: ReplyTuple] {
