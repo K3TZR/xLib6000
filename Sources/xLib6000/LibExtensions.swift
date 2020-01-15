@@ -284,7 +284,6 @@ public extension Bool {
 public extension Int {
   
   var hzToMhz     : String { String(format: "%02.6f", Float(self) / 1_000_000.0) }
-  var hzToMhzUInt : String { String(format: "%02.6f", Float(self) / 1_000_000.0) }
   /// Determine if a value is between two other values (inclusive)
   ///
   /// - Parameters:
