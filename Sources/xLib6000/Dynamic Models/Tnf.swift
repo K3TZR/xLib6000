@@ -39,16 +39,13 @@ public final class Tnf : NSObject, DynamicModel {
 
   @objc dynamic public var frequency: Hz {
     get { _frequency }
-    set { if _frequency != newValue { _frequency = newValue ; tnfCmd( .frequency, newValue.hzToMhz) } } }
-  
+    set { if _frequency != newValue { _frequency = newValue ; tnfCmd( .frequency, newValue.hzToMhz) }}}
   @objc dynamic public var permanent: Bool {
     get { _permanent }
-    set { if _permanent != newValue { _permanent = newValue ; tnfCmd( .permanent, newValue.as1or0) } } }
-  
+    set { if _permanent != newValue { _permanent = newValue ; tnfCmd( .permanent, newValue.as1or0) }}}
   @objc dynamic public var width: Hz {
     get { _width  }
-    set { if _width != newValue { _width = newValue ; tnfCmd( .width, newValue.hzToMhz) } } }
-  
+    set { if _width != newValue { _width = newValue ; tnfCmd( .width, newValue.hzToMhz) }}}
   public enum Depth : UInt {
     case normal         = 1
     case deep           = 2
@@ -58,11 +55,19 @@ public final class Tnf : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
 
-  @BarrierClamped(kNormal, Api.objectQ, range: kNormal...kVeryDeep) var _depth      : UInt
-  @Barrier(0, Api.objectQ)                                          var _frequency  : Hz
-  @Barrier(false, Api.objectQ)                                      var _permanent
-  @BarrierClamped(0, Api.objectQ, range: kWidthMin...kWidthMax)     var _width      : Hz
-  
+  var _depth : UInt {
+    get { Api.objectQ.sync { __depth } }
+    set { Api.objectQ.sync(flags: .barrier) {__depth = newValue }}}
+  var _frequency : Hz {
+    get { Api.objectQ.sync { __frequency } }
+    set { Api.objectQ.sync(flags: .barrier) {__frequency = newValue }}}
+  var _permanent : Bool {
+    get { Api.objectQ.sync { __permanent } }
+    set { Api.objectQ.sync(flags: .barrier) {__permanent = newValue }}}
+  var _width : Hz {
+    get { Api.objectQ.sync { __width } }
+    set { Api.objectQ.sync(flags: .barrier) {__width = newValue }}}
+
   enum Token : String {
     case depth
     case frequency      = "freq"
@@ -283,4 +288,12 @@ public final class Tnf : NSObject, DynamicModel {
   private func tnfCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("tnf set " + "\(id) " + token.rawValue + "=\(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __depth      : UInt = kNormal
+  private var __frequency  : Hz = 0
+  private var __permanent  = false
+  private var __width      : Hz = 0
 }

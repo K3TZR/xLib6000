@@ -29,36 +29,28 @@ public final class Equalizer : NSObject, DynamicModel {
 
   @objc dynamic public var eqEnabled: Bool {
     get {  _eqEnabled }
-    set { if _eqEnabled != newValue { _eqEnabled = newValue ; eqCmd( .enabled, newValue.as1or0) } } }
-  
+    set { if _eqEnabled != newValue { _eqEnabled = newValue ; eqCmd( .enabled, newValue.as1or0) }}}
   @objc dynamic public var level63Hz: Int {
     get { _level63Hz }
-    set { if _level63Hz != newValue { _level63Hz = newValue ; eqCmd( "63Hz", newValue) } } }
-  
+    set { if _level63Hz != newValue { _level63Hz = newValue ; eqCmd( "63Hz", newValue) }}}
   @objc dynamic public var level125Hz: Int {
     get { _level125Hz }
-    set { if _level125Hz != newValue { _level125Hz = newValue ; eqCmd( "125Hz", newValue) } } }
-  
+    set { if _level125Hz != newValue { _level125Hz = newValue ; eqCmd( "125Hz", newValue) }}}
   @objc dynamic public var level250Hz: Int {
     get { _level250Hz }
-    set { if _level250Hz != newValue { _level250Hz = newValue ; eqCmd( "250Hz", newValue) } } }
-  
+    set { if _level250Hz != newValue { _level250Hz = newValue ; eqCmd( "250Hz", newValue) }}}
   @objc dynamic public var level500Hz: Int {
     get { _level500Hz }
-    set { if _level500Hz != newValue { _level500Hz = newValue ; eqCmd( "500Hz", newValue) } } }
-  
+    set { if _level500Hz != newValue { _level500Hz = newValue ; eqCmd( "500Hz", newValue) }}}
   @objc dynamic public var level1000Hz: Int {
     get { _level1000Hz }
-    set { if _level1000Hz != newValue { _level1000Hz = newValue ; eqCmd( "1000Hz", newValue) } } }
-  
+    set { if _level1000Hz != newValue { _level1000Hz = newValue ; eqCmd( "1000Hz", newValue) }}}
   @objc dynamic public var level2000Hz: Int {
     get { _level2000Hz }
-    set { if _level2000Hz != newValue { _level2000Hz = newValue ; eqCmd( "2000Hz", newValue) } } }
-  
+    set { if _level2000Hz != newValue { _level2000Hz = newValue ; eqCmd( "2000Hz", newValue) }}}
   @objc dynamic public var level4000Hz: Int {
     get { _level4000Hz }
-    set { if _level4000Hz != newValue { _level4000Hz = newValue ; eqCmd( "4000Hz", newValue) } } }
-  
+    set { if _level4000Hz != newValue { _level4000Hz = newValue ; eqCmd( "4000Hz", newValue) }}}
   @objc dynamic public var level8000Hz: Int {
     get { _level8000Hz }
     set { if _level8000Hz != newValue { _level8000Hz = newValue ; eqCmd( "8000Hz", newValue) } } }
@@ -73,15 +65,33 @@ public final class Equalizer : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(false, Api.objectQ)  var _eqEnabled
-  @Barrier(0, Api.objectQ)      var _level63Hz
-  @Barrier(0, Api.objectQ)      var _level125Hz
-  @Barrier(0, Api.objectQ)      var _level250Hz
-  @Barrier(0, Api.objectQ)      var _level500Hz
-  @Barrier(0, Api.objectQ)      var _level1000Hz
-  @Barrier(0, Api.objectQ)      var _level2000Hz
-  @Barrier(0, Api.objectQ)      var _level4000Hz
-  @Barrier(0, Api.objectQ)      var _level8000Hz     
+  var _eqEnabled : Bool {
+    get { Api.objectQ.sync { __eqEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__eqEnabled = newValue }}}
+  var _level63Hz : Int {
+    get { Api.objectQ.sync { __level63Hz } }
+    set { Api.objectQ.sync(flags: .barrier) {__level63Hz = newValue }}}
+  var _level125Hz : Int {
+    get { Api.objectQ.sync { __level125Hz } }
+    set { Api.objectQ.sync(flags: .barrier) {__level125Hz = newValue }}}
+  var _level250Hz : Int {
+    get { Api.objectQ.sync { __level250Hz } }
+    set { Api.objectQ.sync(flags: .barrier) {__level250Hz = newValue }}}
+  var _level500Hz : Int {
+    get { Api.objectQ.sync { __level500Hz } }
+    set { Api.objectQ.sync(flags: .barrier) {__level500Hz = newValue }}}
+  var _level1000Hz : Int {
+    get { Api.objectQ.sync { __level1000Hz } }
+    set { Api.objectQ.sync(flags: .barrier) {__level1000Hz = newValue }}}
+  var _level2000Hz : Int {
+    get { Api.objectQ.sync { __level2000Hz } }
+    set { Api.objectQ.sync(flags: .barrier) {__level2000Hz = newValue }}}
+  var _level4000Hz : Int {
+    get { Api.objectQ.sync { __level4000Hz } }
+    set { Api.objectQ.sync(flags: .barrier) {__level4000Hz = newValue }}}
+  var _level8000Hz   : Int {
+    get { Api.objectQ.sync { __level8000Hz } }
+    set { Api.objectQ.sync(flags: .barrier) {__level8000Hz = newValue }}}
 
   enum Token : String {
     case level63Hz                          = "63hz"
@@ -234,4 +244,17 @@ public final class Equalizer : NSObject, DynamicModel {
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
     _radio.sendCommand("eq " + id + " " + token + "=\(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __eqEnabled     = false
+  private var __level63Hz     = 0
+  private var __level125Hz    = 0
+  private var __level250Hz    = 0
+  private var __level500Hz    = 0
+  private var __level1000Hz   = 0
+  private var __level2000Hz   = 0
+  private var __level4000Hz   = 0
+  private var __level8000Hz   = 0
 }

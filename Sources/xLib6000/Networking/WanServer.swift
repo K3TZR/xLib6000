@@ -63,8 +63,12 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(false, Api.objectQ)  var _isConnected
-  @Barrier("", Api.objectQ)     var _sslClientPublicIp
+  var _isConnected : Bool {
+    get { Api.objectQ.sync { __isConnected } }
+    set { Api.objectQ.sync(flags: .barrier) {__isConnected = newValue }}}
+  var _sslClientPublicIp : String {
+    get { Api.objectQ.sync { __sslClientPublicIp } }
+    set { Api.objectQ.sync(flags: .barrier) {__sslClientPublicIp = newValue }}}
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -85,6 +89,62 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
 
   private let kHostName                     = "smartlink.flexradio.com"
   private let kHostPort                     = 443
+
+  private enum Token: String {
+    case application
+    case radio
+  }
+  private enum ApplicationToken: String {
+    case info
+    case registrationInvalid        = "registration_invalid"
+    case userSettings               = "user_settings"
+  }
+  private enum ApplicationInfoToken: String {
+    case publicIp                   = "public_ip"
+  }
+  private enum ApplicationUserSettingsToken: String {
+    case callsign
+    case firstName                  = "first_name"
+    case lastName                   = "last_name"
+  }
+  private enum RadioToken: String {
+    case connectReady               = "connect_ready"
+    case list
+    case testConnection             = "test_connection"
+  }
+  private enum RadioConnectReadyToken: String {
+    case handle
+    case serial
+  }
+  private enum RadioListToken: String {
+    case lastSeen                   = "last_seen"
+
+    case callsign
+    case firmwareVersion            = "version"
+    case inUseHost                  = "inusehost"
+    case inUseIp                    = "inuseip"
+    case maxLicensedVersion         = "max_licensed_version"
+    case model
+    case nickName                   = "radio_name"
+    case publicIp                   = "public_ip"
+    case publicTlsPort              = "public_tls_port"
+    case publicUdpPort              = "public_udp_port"
+    case publicUpnpTlsPort          = "public_upnp_tls_port"
+    case publicUpnpUdpPort          = "public_upnp_udp_port"
+    case requiresAdditionalLicense  = "requires_additional_license"
+    case radioLicenseId             = "radio_license_id"
+    case serialNumber               = "serial"
+    case status
+    case upnpSupported              = "upnp_supported"
+  }
+  private enum RadioTestConnectionResultsToken: String {
+    case forwardTcpPortWorking      = "forward_tcp_port_working"
+    case forwardUdpPortWorking      = "forward_udp_port_working"
+    case natSupportsHolePunch       = "nat_supports_hole_punch"
+    case radioSerial                = "serial"
+    case upnpTcpPortWorking         = "upnp_tcp_port_working"
+    case upnpUdpPortWorking         = "upnp_udp_port_working"
+  }
 
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
@@ -641,86 +701,10 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // start reading
     readNext()
   }
-}
-
-extension WanServer {
   
   // ----------------------------------------------------------------------------
-  // Public properties (KVO compliant)
+  // *** Hidden properties (Do NOT use) ***
   
-  
-  // ----------------------------------------------------------------------------
-  // Tokens
-  
-  /// Types
-  ///
-  private enum Token: String {
-    case application
-    case radio
-  }
-  /// Application Types
-  ///
-  private enum ApplicationToken: String {
-    case info
-    case registrationInvalid        = "registration_invalid"
-    case userSettings               = "user_settings"
-  }
-  /// Info Types
-  ///
-  private enum ApplicationInfoToken: String {
-    case publicIp                   = "public_ip"
-  }
-  /// User Settings
-  ///
-  private enum ApplicationUserSettingsToken: String {
-    case callsign
-    case firstName                  = "first_name"
-    case lastName                   = "last_name"
-  }
-  /// Radio types
-  ///
-  private enum RadioToken: String {
-    case connectReady               = "connect_ready"
-    case list
-    case testConnection             = "test_connection"
-  }
-  /// Connection
-  ///
-  private enum RadioConnectReadyToken: String {
-    case handle
-    case serial
-  }
-  /// Radio list
-  ///
-  private enum RadioListToken: String {
-    case lastSeen                   = "last_seen"
-
-    case callsign
-    case firmwareVersion            = "version"
-    case inUseHost                  = "inusehost"
-    case inUseIp                    = "inuseip"
-    case maxLicensedVersion         = "max_licensed_version"
-    case model
-    case nickName                   = "radio_name"
-    case publicIp                   = "public_ip"
-    case publicTlsPort              = "public_tls_port"
-    case publicUdpPort              = "public_udp_port"
-    case publicUpnpTlsPort          = "public_upnp_tls_port"
-    case publicUpnpUdpPort          = "public_upnp_udp_port"
-    case requiresAdditionalLicense  = "requires_additional_license"
-    case radioLicenseId             = "radio_license_id"
-    case serialNumber               = "serial"
-    case status
-    case upnpSupported              = "upnp_supported"
-  }
-  /// Test types
-  ///
-  private enum RadioTestConnectionResultsToken: String {
-    case forwardTcpPortWorking      = "forward_tcp_port_working"
-    case forwardUdpPortWorking      = "forward_udp_port_working"
-    case natSupportsHolePunch       = "nat_supports_hole_punch"
-    case radioSerial                = "serial"
-    case upnpTcpPortWorking         = "upnp_tcp_port_working"
-    case upnpUdpPortWorking         = "upnp_udp_port_working"
-  }
+  private var __isConnected         = false
+  private var __sslClientPublicIp   = ""
 }

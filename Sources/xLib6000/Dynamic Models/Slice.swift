@@ -34,208 +34,159 @@ public final class Slice  : NSObject, DynamicModel {
 
   @objc dynamic public var active: Bool {
     get { _active }
-    set { if _active != newValue { _active = newValue ; sliceCmd( .active, newValue.as1or0) } } }
-  
+    set { if _active != newValue { _active = newValue ; sliceCmd( .active, newValue.as1or0) }}}
   @objc dynamic public var agcMode: String {
     get { _agcMode }
-    set { if _agcMode != newValue { _agcMode = newValue ; sliceCmd( .agcMode, newValue) } } }
-  
+    set { if _agcMode != newValue { _agcMode = newValue ; sliceCmd( .agcMode, newValue) }}}
   @objc dynamic public var agcOffLevel: Int {
     get { _agcOffLevel }
-    set { if _agcOffLevel != newValue {  _agcOffLevel = newValue ; sliceCmd( .agcOffLevel, newValue) } } }
-  
+    set { if _agcOffLevel != newValue {  _agcOffLevel = newValue ; sliceCmd( .agcOffLevel, newValue) }}}
   @objc dynamic public var agcThreshold: Int {
     get { _agcThreshold }
-    set { if _agcThreshold != newValue { _agcThreshold = newValue ; sliceCmd( .agcThreshold, newValue) } } }
-  
+    set { if _agcThreshold != newValue { _agcThreshold = newValue ; sliceCmd( .agcThreshold, newValue) }}}
   @objc dynamic public var anfEnabled: Bool {
     get { _anfEnabled }
-    set { if _anfEnabled != newValue { _anfEnabled = newValue ; sliceCmd( .anfEnabled, newValue.as1or0) } } }
-  
+    set { if _anfEnabled != newValue { _anfEnabled = newValue ; sliceCmd( .anfEnabled, newValue.as1or0) }}}
   @objc dynamic public var anfLevel: Int {
     get { _anfLevel }
-    set { if _anfLevel != newValue { _anfLevel = newValue ; sliceCmd( .anfLevel, newValue) } } }
-  
+    set { if _anfLevel != newValue { _anfLevel = newValue ; sliceCmd( .anfLevel, newValue) }}}
   @objc dynamic public var apfEnabled: Bool {
     get { _apfEnabled }
-    set { if _apfEnabled != newValue { _apfEnabled = newValue ; sliceCmd( .apfEnabled, newValue.as1or0) } } }
-  
+    set { if _apfEnabled != newValue { _apfEnabled = newValue ; sliceCmd( .apfEnabled, newValue.as1or0) }}}
   @objc dynamic public var apfLevel: Int {
     get { _apfLevel }
-    set { if _apfLevel != newValue { _apfLevel = newValue ; sliceCmd( .apfLevel, newValue) } } }
-  
+    set { if _apfLevel != newValue { _apfLevel = newValue ; sliceCmd( .apfLevel, newValue) }}}
   @objc dynamic public var audioGain: Int {
     get { _audioGain }
-    set { if _audioGain != newValue { _audioGain = newValue ; audioCmd("gain", value: newValue) } } }
-  
+    set { if _audioGain != newValue { _audioGain = newValue ; audioCmd("gain", value: newValue) }}}
   @objc dynamic public var audioMute: Bool {
     get { _audioMute }
-    set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue.as1or0) } } }
-  
+    set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue.as1or0) }}}
   @objc dynamic public var audioPan: Int {
     get { _audioPan }
-    set { if _audioPan != newValue { _audioPan = newValue ; audioCmd("pan", value: newValue) } } }
-  
+    set { if _audioPan != newValue { _audioPan = newValue ; audioCmd("pan", value: newValue) }}}
   @objc dynamic public var daxChannel: Int {
     get { _daxChannel }
-    set { if _daxChannel != newValue { _daxChannel = newValue ; sliceCmd(.daxChannel, newValue) } } }
-  
+    set { if _daxChannel != newValue { _daxChannel = newValue ; sliceCmd(.daxChannel, newValue) }}}
   @objc dynamic public var dfmPreDeEmphasisEnabled: Bool {
     get { _dfmPreDeEmphasisEnabled }
-    set { if _dfmPreDeEmphasisEnabled != newValue { _dfmPreDeEmphasisEnabled = newValue ; sliceCmd(.dfmPreDeEmphasisEnabled, newValue.as1or0) } } }
-  
+    set { if _dfmPreDeEmphasisEnabled != newValue { _dfmPreDeEmphasisEnabled = newValue ; sliceCmd(.dfmPreDeEmphasisEnabled, newValue.as1or0) }}}
   @objc dynamic public var digitalLowerOffset: Int {
     get { _digitalLowerOffset }
-    set { if _digitalLowerOffset != newValue { _digitalLowerOffset = newValue ; sliceCmd(.digitalLowerOffset, newValue) } } }
-  
+    set { if _digitalLowerOffset != newValue { _digitalLowerOffset = newValue ; sliceCmd(.digitalLowerOffset, newValue) }}}
   @objc dynamic public var digitalUpperOffset: Int {
     get { _digitalUpperOffset }
-    set { if _digitalUpperOffset != newValue { _digitalUpperOffset = newValue ; sliceCmd(.digitalUpperOffset, newValue) } } }
-  
+    set { if _digitalUpperOffset != newValue { _digitalUpperOffset = newValue ; sliceCmd(.digitalUpperOffset, newValue) }}}
   @objc dynamic public var diversityEnabled: Bool {
     get { _diversityEnabled }
-    set { if _diversityEnabled != newValue { _diversityEnabled = newValue ; sliceCmd(.diversityEnabled, newValue.as1or0) } } }
-  
+    set { if _diversityEnabled != newValue { _diversityEnabled = newValue ; sliceCmd(.diversityEnabled, newValue.as1or0) }}}
   @objc dynamic public var filterHigh: Int {
     get { _filterHigh }
-    set { if _filterHigh != newValue { let value = filterHighLimits(newValue) ; _filterHigh = value ; filterCmd( low: _filterLow, high: value) } } }
-  
+    set { if _filterHigh != newValue { let value = filterHighLimits(newValue) ; _filterHigh = value ; filterCmd( low: _filterLow, high: value) }}}
   @objc dynamic public var filterLow: Int {
     get { _filterLow }
-    set { if _filterLow != newValue { let value = filterLowLimits(newValue) ; _filterLow = value ; filterCmd( low: value, high: _filterHigh) } } }
-  
+    set { if _filterLow != newValue { let value = filterLowLimits(newValue) ; _filterLow = value ; filterCmd( low: value, high: _filterHigh) }}}
   @objc dynamic public var fmDeviation: Int {
     get { _fmDeviation }
-    set { if _fmDeviation != newValue { _fmDeviation = newValue ; sliceCmd(.fmDeviation, newValue) } } }
-  
+    set { if _fmDeviation != newValue { _fmDeviation = newValue ; sliceCmd(.fmDeviation, newValue) }}}
   @objc dynamic public var fmRepeaterOffset: Float {
     get { _fmRepeaterOffset }
-    set { if _fmRepeaterOffset != newValue { _fmRepeaterOffset = newValue ; sliceCmd( .fmRepeaterOffset, newValue) } } }
-  
+    set { if _fmRepeaterOffset != newValue { _fmRepeaterOffset = newValue ; sliceCmd( .fmRepeaterOffset, newValue) }}}
   @objc dynamic public var fmToneBurstEnabled: Bool {
     get { _fmToneBurstEnabled }
-    set { if _fmToneBurstEnabled != newValue { _fmToneBurstEnabled = newValue ; sliceCmd( .fmToneBurstEnabled, newValue.as1or0) } } }
-  
+    set { if _fmToneBurstEnabled != newValue { _fmToneBurstEnabled = newValue ; sliceCmd( .fmToneBurstEnabled, newValue.as1or0) }}}
   @objc dynamic public var fmToneFreq: Float {
     get { _fmToneFreq }
-    set { if _fmToneFreq != newValue { _fmToneFreq = newValue ; sliceCmd( .fmToneFreq, newValue) } } }
-  
+    set { if _fmToneFreq != newValue { _fmToneFreq = newValue ; sliceCmd( .fmToneFreq, newValue) }}}
   @objc dynamic public var fmToneMode: String {
     get { _fmToneMode }
-    set { if _fmToneMode != newValue { _fmToneMode = newValue ; sliceCmd( .fmToneMode, newValue) } } }
-  
+    set { if _fmToneMode != newValue { _fmToneMode = newValue ; sliceCmd( .fmToneMode, newValue) }}}
   @objc dynamic public var frequency: Hz {
     get { _frequency }
     set { if !_locked { if _frequency != newValue { _frequency = newValue ; sliceTuneCmd( newValue.hzToMhz) } } } }
 
   @objc dynamic public var locked: Bool {
     get { _locked }
-    set { if _locked != newValue { _locked = newValue ; sliceLock( newValue == true ? "lock" : "unlock") } } }
-  
+    set { if _locked != newValue { _locked = newValue ; sliceLock( newValue == true ? "lock" : "unlock") }}}
   @objc dynamic public var loopAEnabled: Bool {
     get { _loopAEnabled }
-    set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; sliceCmd( .loopAEnabled, newValue.as1or0) } } }
-  
+    set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; sliceCmd( .loopAEnabled, newValue.as1or0) }}}
   @objc dynamic public var loopBEnabled: Bool {
     get { _loopBEnabled }
-    set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; sliceCmd( .loopBEnabled, newValue.as1or0) } } }
-  
+    set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; sliceCmd( .loopBEnabled, newValue.as1or0) }}}
   @objc dynamic public var mode: String {
     get { _mode }
-    set { if _mode != newValue { _mode = newValue ; sliceCmd( .mode, newValue) } } }
-  
+    set { if _mode != newValue { _mode = newValue ; sliceCmd( .mode, newValue) }}}
   @objc dynamic public var nbEnabled: Bool {
     get { _nbEnabled }
-    set { if _nbEnabled != newValue { _nbEnabled = newValue ; sliceCmd( .nbEnabled, newValue.as1or0) } } }
-  
+    set { if _nbEnabled != newValue { _nbEnabled = newValue ; sliceCmd( .nbEnabled, newValue.as1or0) }}}
   @objc dynamic public var nbLevel: Int {
     get { _nbLevel }
-    set { if _nbLevel != newValue {  _nbLevel = newValue ; sliceCmd( .nbLevel, newValue) } } }
-  
+    set { if _nbLevel != newValue {  _nbLevel = newValue ; sliceCmd( .nbLevel, newValue) }}}
   @objc dynamic public var nrEnabled: Bool {
     get { _nrEnabled }
-    set { if _nrEnabled != newValue { _nrEnabled = newValue ; sliceCmd( .nrEnabled, newValue.as1or0) } } }
-  
+    set { if _nrEnabled != newValue { _nrEnabled = newValue ; sliceCmd( .nrEnabled, newValue.as1or0) }}}
   @objc dynamic public var nrLevel: Int {
     get { _nrLevel }
-    set { if _nrLevel != newValue {  _nrLevel = newValue ; sliceCmd( .nrLevel, newValue) } } }
-  
+    set { if _nrLevel != newValue {  _nrLevel = newValue ; sliceCmd( .nrLevel, newValue) }}}
   @objc dynamic public var playbackEnabled: Bool {
     get { _playbackEnabled }
-    set { if _playbackEnabled != newValue { _playbackEnabled = newValue ; sliceCmd( .playbackEnabled, newValue.as1or0) } } }
-  
+    set { if _playbackEnabled != newValue { _playbackEnabled = newValue ; sliceCmd( .playbackEnabled, newValue.as1or0) }}}
   @objc dynamic public var recordEnabled: Bool {
     get { _recordEnabled }
-    set { if recordEnabled != newValue { _recordEnabled = newValue ; sliceCmd( .recordEnabled, newValue.as1or0) } } }
-  
+    set { if recordEnabled != newValue { _recordEnabled = newValue ; sliceCmd( .recordEnabled, newValue.as1or0) }}}
   @objc dynamic public var repeaterOffsetDirection: String {
     get { _repeaterOffsetDirection }
-    set { if _repeaterOffsetDirection != newValue { _repeaterOffsetDirection = newValue ; sliceCmd( .repeaterOffsetDirection, newValue) } } }
-  
+    set { if _repeaterOffsetDirection != newValue { _repeaterOffsetDirection = newValue ; sliceCmd( .repeaterOffsetDirection, newValue) }}}
   @objc dynamic public var rfGain: Int {
     get { _rfGain }
-    set { if _rfGain != newValue { _rfGain = newValue ; sliceCmd( .rfGain, newValue) } } }
-  
+    set { if _rfGain != newValue { _rfGain = newValue ; sliceCmd( .rfGain, newValue) }}}
   @objc dynamic public var ritEnabled: Bool {
     get { _ritEnabled }
-    set { if _ritEnabled != newValue { _ritEnabled = newValue ; sliceCmd( .ritEnabled, newValue.as1or0) } } }
-  
+    set { if _ritEnabled != newValue { _ritEnabled = newValue ; sliceCmd( .ritEnabled, newValue.as1or0) }}}
   @objc dynamic public var ritOffset: Int {
     get { _ritOffset }
     set { if _ritOffset != newValue {  _ritOffset = newValue ; sliceCmd( .ritOffset, newValue) } } } 
   
   @objc dynamic public var rttyMark: Int {
     get { _rttyMark }
-    set { if _rttyMark != newValue { _rttyMark = newValue ; sliceCmd( .rttyMark, newValue) } } }
-  
+    set { if _rttyMark != newValue { _rttyMark = newValue ; sliceCmd( .rttyMark, newValue) }}}
   @objc dynamic public var rttyShift: Int {
     get { _rttyShift }
-    set { if _rttyShift != newValue { _rttyShift = newValue ; sliceCmd( .rttyShift, newValue) } } }
-  
+    set { if _rttyShift != newValue { _rttyShift = newValue ; sliceCmd( .rttyShift, newValue) }}}
   @objc dynamic public var rxAnt: Radio.AntennaPort {
     get { _rxAnt }
-    set { if _rxAnt != newValue { _rxAnt = newValue ; sliceCmd( .rxAnt, newValue) } } }
-  
+    set { if _rxAnt != newValue { _rxAnt = newValue ; sliceCmd( .rxAnt, newValue) }}}
   @objc dynamic public var step: Int {
     get { _step }
-    set { if _step != newValue { _step = newValue ; sliceCmd( .step, newValue) } } }
-  
+    set { if _step != newValue { _step = newValue ; sliceCmd( .step, newValue) }}}
   @objc dynamic public var stepList: String {
     get { _stepList }
-    set { if _stepList != newValue { _stepList = newValue ; sliceCmd( .stepList, newValue) } } }
-  
+    set { if _stepList != newValue { _stepList = newValue ; sliceCmd( .stepList, newValue) }}}
   @objc dynamic public var squelchEnabled: Bool {
     get { _squelchEnabled }
-    set { if _squelchEnabled != newValue { _squelchEnabled = newValue ; sliceCmd( .squelchEnabled, newValue.as1or0) } } }
-  
+    set { if _squelchEnabled != newValue { _squelchEnabled = newValue ; sliceCmd( .squelchEnabled, newValue.as1or0) }}}
   @objc dynamic public var squelchLevel: Int {
     get { _squelchLevel }
-    set { if _squelchLevel != newValue {  _squelchLevel = newValue ; sliceCmd( .squelchLevel, newValue) } } }
-  
+    set { if _squelchLevel != newValue {  _squelchLevel = newValue ; sliceCmd( .squelchLevel, newValue) }}}
   @objc dynamic public var txAnt: String {
     get { _txAnt }
-    set { if _txAnt != newValue { _txAnt = newValue ; sliceCmd( .txAnt, newValue) } } }
-  
+    set { if _txAnt != newValue { _txAnt = newValue ; sliceCmd( .txAnt, newValue) }}}
   @objc dynamic public var txEnabled: Bool {
     get { _txEnabled }
-    set { if _txEnabled != newValue { _txEnabled = newValue ; sliceCmd( .txEnabled, newValue.as1or0) } } }
-  
+    set { if _txEnabled != newValue { _txEnabled = newValue ; sliceCmd( .txEnabled, newValue.as1or0) }}}
   @objc dynamic public var txOffsetFreq: Float {
     get { _txOffsetFreq }
-    set { if _txOffsetFreq != newValue { _txOffsetFreq = newValue ;sliceCmd( .txOffsetFreq, newValue) } } }
-  
+    set { if _txOffsetFreq != newValue { _txOffsetFreq = newValue ;sliceCmd( .txOffsetFreq, newValue) }}}
   @objc dynamic public var wnbEnabled: Bool {
     get { _wnbEnabled }
-    set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; sliceCmd( .wnbEnabled, newValue.as1or0) } } }
-  
+    set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; sliceCmd( .wnbEnabled, newValue.as1or0) }}}
   @objc dynamic public var wnbLevel: Int {
     get { _wnbLevel }
-    set { if wnbLevel != newValue {  _wnbLevel = newValue ; sliceCmd( .wnbLevel, newValue) } } }
-  
+    set { if wnbLevel != newValue {  _wnbLevel = newValue ; sliceCmd( .wnbLevel, newValue) }}}
   @objc dynamic public var xitEnabled: Bool {
     get { _xitEnabled }
-    set { if _xitEnabled != newValue { _xitEnabled = newValue ; sliceCmd( .xitEnabled, newValue.as1or0) } } }
-  
+    set { if _xitEnabled != newValue { _xitEnabled = newValue ; sliceCmd( .xitEnabled, newValue.as1or0) }}}
   @objc dynamic public var xitOffset: Int {
     get { _xitOffset }
     set { if _xitOffset != newValue { _xitOffset = newValue ; sliceCmd( .xitOffset, newValue) } } }
@@ -243,71 +194,55 @@ public final class Slice  : NSObject, DynamicModel {
   
   @objc dynamic public var autoPan: Bool {
     get { _autoPan }
-    set { if _autoPan != newValue { _autoPan = newValue } } }
-  
+    set { if _autoPan != newValue { _autoPan = newValue }}}
   @objc dynamic public var daxClients: Int {
     get { _daxClients }
-    set { if _daxClients != newValue {  _daxClients = newValue } } }
-  
+    set { if _daxClients != newValue {  _daxClients = newValue }}}
   @objc dynamic public var daxTxEnabled: Bool {
     get { _daxTxEnabled }
-    set { if _daxTxEnabled != newValue { _daxTxEnabled = newValue } } }
-  
+    set { if _daxTxEnabled != newValue { _daxTxEnabled = newValue }}}
   @objc dynamic public var detached: Bool {
     get { _detached }
-    set { if _detached != newValue { _detached = newValue } } }
-  
+    set { if _detached != newValue { _detached = newValue }}}
   @objc dynamic public var diversityChild: Bool {
     get { _diversityChild }
-    set { if _diversityChild != newValue { if _diversityIsAllowed { _diversityChild = newValue } } } }
-  
+    set { if _diversityChild != newValue { if _diversityIsAllowed { _diversityChild = newValue } }}}
   @objc dynamic public var diversityIndex: Int {
     get { _diversityIndex }
-    set { if _diversityIndex != newValue { if _diversityIsAllowed { _diversityIndex = newValue } } } }
-  
+    set { if _diversityIndex != newValue { if _diversityIsAllowed { _diversityIndex = newValue } }}}
   @objc dynamic public var diversityParent: Bool {
     get { _diversityParent }
-    set { if _diversityParent != newValue { if _diversityIsAllowed { _diversityParent = newValue } } } }
-  
+    set { if _diversityParent != newValue { if _diversityIsAllowed { _diversityParent = newValue } }}}
   @objc dynamic public var inUse: Bool {
     return _inUse }
   
   @objc dynamic public var modeList: [String] {
     get { _modeList }
-    set { if _modeList != newValue { _modeList = newValue } } }
-  
+    set { if _modeList != newValue { _modeList = newValue }}}
   @objc dynamic public var nr2: Int {
     get { _nr2 }
-    set { if _nr2 != newValue { _nr2 = newValue } } }
-  
+    set { if _nr2 != newValue { _nr2 = newValue }}}
   @objc dynamic public var owner: Int {
     get { _owner }
-    set { if _owner != newValue { _owner = newValue } } }
-  
+    set { if _owner != newValue { _owner = newValue }}}
   @objc dynamic public var panadapterId: PanadapterStreamId {
     get { _panadapterId }
-    set {if _panadapterId != newValue {  _panadapterId = newValue } } }
-  
+    set {if _panadapterId != newValue {  _panadapterId = newValue }}}
   @objc dynamic public var postDemodBypassEnabled: Bool {
     get { _postDemodBypassEnabled }
-    set { if _postDemodBypassEnabled != newValue { _postDemodBypassEnabled = newValue } } }
-  
+    set { if _postDemodBypassEnabled != newValue { _postDemodBypassEnabled = newValue }}}
   @objc dynamic public var postDemodHigh: Int {
     get { _postDemodHigh }
-    set { if _postDemodHigh != newValue { _postDemodHigh = newValue } } }
-  
+    set { if _postDemodHigh != newValue { _postDemodHigh = newValue }}}
   @objc dynamic public var postDemodLow: Int {
     get { _postDemodLow }
-    set { if _postDemodLow != newValue { _postDemodLow = newValue } } }
-  
+    set { if _postDemodLow != newValue { _postDemodLow = newValue }}}
   @objc dynamic public var qskEnabled: Bool {
     get { _qskEnabled }
-    set { if _qskEnabled != newValue { _qskEnabled = newValue } } }
-  
+    set { if _qskEnabled != newValue { _qskEnabled = newValue }}}
   @objc dynamic public var recordLength: Float {
     get { _recordLength }
-    set { if _recordLength != newValue { _recordLength = newValue } } }
-  
+    set { if _recordLength != newValue { _recordLength = newValue }}}
   @objc dynamic public var rxAntList: [Radio.AntennaPort] {
     get { _rxAntList }
     set { _rxAntList = newValue } }
@@ -361,79 +296,225 @@ public final class Slice  : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(false, Api.objectQ)                    var _active
-  @Barrier(AgcMode.off.rawValue, Api.objectQ)     var _agcMode
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _agcOffLevel
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _agcThreshold
-  @Barrier(false, Api.objectQ)                    var _anfEnabled
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _anfLevel
-  @Barrier(false, Api.objectQ)                    var _apfEnabled
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _apfLevel
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _audioGain
-  @Barrier(false, Api.objectQ)                    var _audioMute
-  @BarrierClamped(50, Api.objectQ, range: 0...100)  var _audioPan
-  @Barrier(false, Api.objectQ)                    var _autoPan
-  @BarrierClamped(0, Api.objectQ, range: 1...8)   var _daxChannel
-  @Barrier(0, Api.objectQ)                        var _daxClients
-  @Barrier(false, Api.objectQ)                    var _daxTxEnabled
-  @Barrier(false, Api.objectQ)                    var _detached
-  @Barrier(false, Api.objectQ)                    var _dfmPreDeEmphasisEnabled
-  @Barrier(0, Api.objectQ)                        var _digitalLowerOffset
-  @Barrier(0, Api.objectQ)                        var _digitalUpperOffset
-  @Barrier(false, Api.objectQ)                    var _diversityChild
-  @Barrier(false, Api.objectQ)                    var _diversityEnabled
-  @Barrier(0, Api.objectQ)                        var _diversityIndex
-  @Barrier(false, Api.objectQ)                    var _diversityParent
-  @Barrier(0, Api.objectQ)                        var _filterHigh
-  @Barrier(0, Api.objectQ)                        var _filterLow
-  @Barrier(0, Api.objectQ)                        var _fmDeviation
-  @Barrier(0.0, Api.objectQ)                      var _fmRepeaterOffset : Float
-  @Barrier(false, Api.objectQ)                    var _fmToneBurstEnabled
-  @Barrier(0.0, Api.objectQ)                      var _fmToneFreq : Float
-  @Barrier("", Api.objectQ)                       var _fmToneMode
-  @Barrier(0, Api.objectQ)                        var _frequency        : Hz
-  @Barrier(false, Api.objectQ)                    var _inUse
-  @Barrier(false, Api.objectQ)                    var _locked
-  @Barrier(false, Api.objectQ)                    var _loopAEnabled
-  @Barrier(false, Api.objectQ)                    var _loopBEnabled
-  @Barrier(Mode.LSB.rawValue, Api.objectQ)        var _mode
-  @Barrier([String](), Api.objectQ)               var _modeList
-  @Barrier(false, Api.objectQ)                    var _nbEnabled
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _nbLevel
-  @Barrier(false, Api.objectQ)                    var _nrEnabled
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _nrLevel
-  @Barrier(0, Api.objectQ)                        var _nr2
-  @Barrier(0, Api.objectQ)                        var _owner
-  @Barrier(0, Api.objectQ)                        var _panadapterId     : PanadapterStreamId
-  @Barrier(false, Api.objectQ)                    var _playbackEnabled
-  @Barrier(false, Api.objectQ)                    var _postDemodBypassEnabled
-  @Barrier(0, Api.objectQ)                        var _postDemodHigh
-  @Barrier(0, Api.objectQ)                        var _postDemodLow
-  @Barrier(false, Api.objectQ)                    var _qskEnabled
-  @Barrier(false, Api.objectQ)                    var _recordEnabled
-  @Barrier(0.0, Api.objectQ)                      var _recordLength     : Float
-  @Barrier(Offset.simplex.rawValue, Api.objectQ)  var _repeaterOffsetDirection
-  @Barrier(0, Api.objectQ)                        var _rfGain
-  @Barrier(false, Api.objectQ)                    var _ritEnabled
-  @BarrierClamped(0, Api.objectQ, range: -99_999...99_999) var _ritOffset
-  @Barrier(0, Api.objectQ)                        var _rttyMark
-  @Barrier(0, Api.objectQ)                        var _rttyShift
-  @Barrier("", Api.objectQ)                       var _rxAnt
-  @Barrier([String](), Api.objectQ)               var _rxAntList
-  @Barrier(nil, Api.objectQ)                      var _sliceLetter : String?
-  @Barrier(0, Api.objectQ)                        var _step
-  @Barrier(false, Api.objectQ)                    var _squelchEnabled
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _squelchLevel
-  @Barrier("", Api.objectQ)                       var _stepList
-  @Barrier("", Api.objectQ)                       var _txAnt
-  @Barrier([String](), Api.objectQ)               var _txAntList
-  @Barrier(false, Api.objectQ)                    var _txEnabled
-  @Barrier(0.0, Api.objectQ)                      var _txOffsetFreq : Float
-  @Barrier(false, Api.objectQ)                    var _wide
-  @Barrier(false, Api.objectQ)                    var _wnbEnabled
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _wnbLevel
-  @Barrier(false, Api.objectQ)                    var _xitEnabled
-  @BarrierClamped(0, Api.objectQ, range: -99_999...99_999) var _xitOffset
+  var _active : Bool {
+    get { Api.objectQ.sync { __active } }
+    set { Api.objectQ.sync(flags: .barrier) {__active = newValue }}}
+  var _agcMode : String {
+    get { Api.objectQ.sync { __agcMode } }
+    set { Api.objectQ.sync(flags: .barrier) {__agcMode = newValue }}}
+  var _agcOffLevel : Int {
+    get { Api.objectQ.sync { __agcOffLevel } }
+    set { Api.objectQ.sync(flags: .barrier) {__agcOffLevel = newValue }}}
+  var _agcThreshold : Int {
+    get { Api.objectQ.sync { __agcThreshold } }
+    set { Api.objectQ.sync(flags: .barrier) {__agcThreshold = newValue }}}
+  var _anfEnabled : Bool {
+    get { Api.objectQ.sync { __anfEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__anfEnabled = newValue }}}
+  var _anfLevel : Int {
+    get { Api.objectQ.sync { __anfLevel } }
+    set { Api.objectQ.sync(flags: .barrier) {__anfLevel = newValue }}}
+  var _apfEnabled : Bool {
+    get { Api.objectQ.sync { __apfEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__apfEnabled = newValue }}}
+  var _apfLevel : Int {
+    get { Api.objectQ.sync { __apfLevel } }
+    set { Api.objectQ.sync(flags: .barrier) {__apfLevel = newValue }}}
+  var _audioGain : Int {
+    get { Api.objectQ.sync { __audioGain } }
+    set { Api.objectQ.sync(flags: .barrier) {__audioGain = newValue }}}
+  var _audioMute : Bool {
+    get { Api.objectQ.sync { __audioMute } }
+    set { Api.objectQ.sync(flags: .barrier) {__audioMute = newValue }}}
+  var _audioPan : Int {
+    get { Api.objectQ.sync { __audioPan } }
+    set { Api.objectQ.sync(flags: .barrier) {__audioPan = newValue }}}
+  var _autoPan : Bool {
+    get { Api.objectQ.sync { __autoPan } }
+    set { Api.objectQ.sync(flags: .barrier) {__autoPan = newValue }}}
+  var _daxChannel : Int {
+    get { Api.objectQ.sync { __daxChannel } }
+    set { Api.objectQ.sync(flags: .barrier) {__daxChannel = newValue }}}
+  var _daxClients : Int {
+    get { Api.objectQ.sync { __daxClients } }
+    set { Api.objectQ.sync(flags: .barrier) {__daxClients = newValue }}}
+  var _daxTxEnabled : Bool {
+    get { Api.objectQ.sync { __daxTxEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__daxTxEnabled = newValue }}}
+  var _detached : Bool {
+    get { Api.objectQ.sync { __detached } }
+    set { Api.objectQ.sync(flags: .barrier) {__detached = newValue }}}
+  var _dfmPreDeEmphasisEnabled : Bool {
+    get { Api.objectQ.sync { __dfmPreDeEmphasisEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__dfmPreDeEmphasisEnabled = newValue }}}
+  var _digitalLowerOffset : Int {
+    get { Api.objectQ.sync { __digitalLowerOffset } }
+    set { Api.objectQ.sync(flags: .barrier) {__digitalLowerOffset = newValue }}}
+  var _digitalUpperOffset : Int {
+    get { Api.objectQ.sync { __digitalUpperOffset } }
+    set { Api.objectQ.sync(flags: .barrier) {__digitalUpperOffset = newValue }}}
+  var _diversityChild : Bool {
+    get { Api.objectQ.sync { __diversityChild } }
+    set { Api.objectQ.sync(flags: .barrier) {__diversityChild = newValue }}}
+  var _diversityEnabled : Bool {
+    get { Api.objectQ.sync { __diversityEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__diversityEnabled = newValue }}}
+  var _diversityIndex : Int {
+    get { Api.objectQ.sync { __diversityIndex } }
+    set { Api.objectQ.sync(flags: .barrier) {__diversityIndex = newValue }}}
+  var _diversityParent : Bool {
+    get { Api.objectQ.sync { __diversityParent } }
+    set { Api.objectQ.sync(flags: .barrier) {__diversityParent = newValue }}}
+  var _filterHigh : Int {
+    get { Api.objectQ.sync { __filterHigh } }
+    set { Api.objectQ.sync(flags: .barrier) {__filterHigh = newValue }}}
+  var _filterLow : Int {
+    get { Api.objectQ.sync { __filterLow } }
+    set { Api.objectQ.sync(flags: .barrier) {__filterLow = newValue }}}
+  var _fmDeviation : Int {
+    get { Api.objectQ.sync { __fmDeviation } }
+    set { Api.objectQ.sync(flags: .barrier) {__fmDeviation = newValue }}}
+  var _fmRepeaterOffset : Float {
+    get { Api.objectQ.sync { __fmRepeaterOffset } }
+    set { Api.objectQ.sync(flags: .barrier) {__fmRepeaterOffset = newValue }}}
+  var _fmToneBurstEnabled : Bool {
+    get { Api.objectQ.sync { __fmToneBurstEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__fmToneBurstEnabled = newValue }}}
+  var _fmToneFreq : Float {
+    get { Api.objectQ.sync { __fmToneFreq } }
+    set { Api.objectQ.sync(flags: .barrier) {__fmToneFreq = newValue }}}
+  var _fmToneMode : String {
+    get { Api.objectQ.sync { __fmToneMode } }
+    set { Api.objectQ.sync(flags: .barrier) {__fmToneMode = newValue }}}
+  var _frequency : Hz {
+    get { Api.objectQ.sync { __frequency } }
+    set { Api.objectQ.sync(flags: .barrier) {__frequency = newValue }}}
+  var _inUse : Bool {
+    get { Api.objectQ.sync { __inUse } }
+    set { Api.objectQ.sync(flags: .barrier) {__inUse = newValue }}}
+  var _locked : Bool {
+    get { Api.objectQ.sync { __locked } }
+    set { Api.objectQ.sync(flags: .barrier) {__locked = newValue }}}
+  var _loopAEnabled : Bool {
+    get { Api.objectQ.sync { __loopAEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__loopAEnabled = newValue }}}
+  var _loopBEnabled : Bool {
+    get { Api.objectQ.sync { __loopBEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__loopBEnabled = newValue }}}
+  var _mode : String {
+    get { Api.objectQ.sync { __mode } }
+    set { Api.objectQ.sync(flags: .barrier) {__mode = newValue }}}
+  var _modeList : [String] {
+    get { Api.objectQ.sync { __modeList } }
+    set { Api.objectQ.sync(flags: .barrier) {__modeList = newValue }}}
+  var _nbEnabled : Bool {
+    get { Api.objectQ.sync { __nbEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__nbEnabled = newValue }}}
+  var _nbLevel : Int {
+    get { Api.objectQ.sync { __nbLevel } }
+    set { Api.objectQ.sync(flags: .barrier) {__nbLevel = newValue }}}
+  var _nrEnabled : Bool {
+    get { Api.objectQ.sync { __nrEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__nrEnabled = newValue }}}
+  var _nrLevel : Int {
+    get { Api.objectQ.sync { __nrLevel } }
+    set { Api.objectQ.sync(flags: .barrier) {__nrLevel = newValue }}}
+  var _nr2 : Int {
+    get { Api.objectQ.sync { __nr2 } }
+    set { Api.objectQ.sync(flags: .barrier) {__nr2 = newValue }}}
+  var _owner : Int {
+    get { Api.objectQ.sync { __owner } }
+    set { Api.objectQ.sync(flags: .barrier) {__owner = newValue }}}
+  var _panadapterId     : PanadapterStreamId  {
+    get { Api.objectQ.sync { __panadapterId } }
+    set { Api.objectQ.sync(flags: .barrier) {__panadapterId = newValue }}}
+  var _playbackEnabled : Bool {
+    get { Api.objectQ.sync { __playbackEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__playbackEnabled = newValue }}}
+  var _postDemodBypassEnabled : Bool {
+    get { Api.objectQ.sync { __postDemodBypassEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__postDemodBypassEnabled = newValue }}}
+  var _postDemodHigh : Int {
+    get { Api.objectQ.sync { __postDemodHigh } }
+    set { Api.objectQ.sync(flags: .barrier) {__postDemodHigh = newValue }}}
+  var _postDemodLow : Int {
+    get { Api.objectQ.sync { __postDemodLow } }
+    set { Api.objectQ.sync(flags: .barrier) {__postDemodLow = newValue }}}
+  var _qskEnabled : Bool {
+    get { Api.objectQ.sync { __qskEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__qskEnabled = newValue }}}
+  var _recordEnabled : Bool {
+    get { Api.objectQ.sync { __recordEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__recordEnabled = newValue }}}
+  var _recordLength : Float {
+    get { Api.objectQ.sync { __recordLength } }
+    set { Api.objectQ.sync(flags: .barrier) {__recordLength = newValue }}}
+  var _repeaterOffsetDirection : String {
+    get { Api.objectQ.sync { __repeaterOffsetDirection } }
+    set { Api.objectQ.sync(flags: .barrier) {__repeaterOffsetDirection = newValue }}}
+  var _rfGain : Int {
+    get { Api.objectQ.sync { __rfGain } }
+    set { Api.objectQ.sync(flags: .barrier) {__rfGain = newValue }}}
+  var _ritEnabled : Bool {
+    get { Api.objectQ.sync { __ritEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__ritEnabled = newValue }}}
+  var _ritOffset : Int {
+    get { Api.objectQ.sync { __ritOffset } }
+    set { Api.objectQ.sync(flags: .barrier) {__ritOffset = newValue }}}
+  var _rttyMark : Int {
+    get { Api.objectQ.sync { __rttyMark } }
+    set { Api.objectQ.sync(flags: .barrier) {__rttyMark = newValue }}}
+  var _rttyShift : Int {
+    get { Api.objectQ.sync { __rttyShift } }
+    set { Api.objectQ.sync(flags: .barrier) {__rttyShift = newValue }}}
+  var _rxAnt : String {
+    get { Api.objectQ.sync { __rxAnt } }
+    set { Api.objectQ.sync(flags: .barrier) {__rxAnt = newValue }}}
+  var _rxAntList : [String] {
+    get { Api.objectQ.sync { __rxAntList } }
+    set { Api.objectQ.sync(flags: .barrier) {__rxAntList = newValue }}}
+  var _sliceLetter : String? {
+    get { Api.objectQ.sync { __sliceLetter } }
+    set { Api.objectQ.sync(flags: .barrier) {__sliceLetter = newValue }}}
+  var _step : Int {
+    get { Api.objectQ.sync { __step } }
+    set { Api.objectQ.sync(flags: .barrier) {__step = newValue }}}
+  var _squelchEnabled : Bool {
+    get { Api.objectQ.sync { __squelchEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__squelchEnabled = newValue }}}
+  var _squelchLevel : Int {
+    get { Api.objectQ.sync { __squelchLevel } }
+    set { Api.objectQ.sync(flags: .barrier) {__squelchLevel = newValue }}}
+  var _stepList : String {
+    get { Api.objectQ.sync { __stepList } }
+    set { Api.objectQ.sync(flags: .barrier) {__stepList = newValue }}}
+  var _txAnt : String {
+    get { Api.objectQ.sync { __txAnt } }
+    set { Api.objectQ.sync(flags: .barrier) {__txAnt = newValue }}}
+  var _txAntList : [String] {
+    get { Api.objectQ.sync { __txAntList } }
+    set { Api.objectQ.sync(flags: .barrier) {__txAntList = newValue }}}
+  var _txEnabled : Bool {
+    get { Api.objectQ.sync { __txEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__txEnabled = newValue }}}
+  var _txOffsetFreq : Float {
+    get { Api.objectQ.sync { __txOffsetFreq } }
+    set { Api.objectQ.sync(flags: .barrier) {__txOffsetFreq = newValue }}}
+  var _wide : Bool {
+    get { Api.objectQ.sync { __wide } }
+    set { Api.objectQ.sync(flags: .barrier) {__wide = newValue }}}
+  var _wnbEnabled : Bool {
+    get { Api.objectQ.sync { __wnbEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__wnbEnabled = newValue }}}
+  var _wnbLevel : Int {
+    get { Api.objectQ.sync { __wnbLevel } }
+    set { Api.objectQ.sync(flags: .barrier) {__wnbLevel = newValue }}}
+  var _xitEnabled : Bool {
+    get { Api.objectQ.sync { __xitEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__xitEnabled = newValue }}}
+  var _xitOffset : Int {
+    get { Api.objectQ.sync { __xitOffset } }
+    set { Api.objectQ.sync(flags: .barrier) {__xitOffset = newValue }}}
 
   enum Token : String {
     case active
@@ -912,4 +993,81 @@ public final class Slice  : NSObject, DynamicModel {
     
     _radio.sendCommand("filt " + "0x\(id)" + " \(low)" + " \(high)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __active                  = false
+  private var __agcMode                 = AgcMode.off.rawValue
+  private var __agcOffLevel             = 0
+  private var __agcThreshold            = 0
+  private var __anfEnabled              = false
+  private var __anfLevel                = 0
+  private var __apfEnabled              = false
+  private var __apfLevel                = 0
+  private var __audioGain               = 0
+  private var __audioMute               = false
+  private var __audioPan                = 0
+  private var __autoPan                 = false
+  private var __daxChannel              = 0
+  private var __daxClients              = 0
+  private var __daxTxEnabled            = false
+  private var __detached                = false
+  private var __dfmPreDeEmphasisEnabled = false
+  private var __digitalLowerOffset      = 0
+  private var __digitalUpperOffset      = 0
+  private var __diversityChild          = false
+  private var __diversityEnabled        = false
+  private var __diversityIndex          = 0
+  private var __diversityParent         = false
+  private var __filterHigh              = 0
+  private var __filterLow               = 0
+  private var __fmDeviation             = 0
+  private var __fmRepeaterOffset        : Float = 0.0
+  private var __fmToneBurstEnabled      = false
+  private var __fmToneFreq              : Float = 0.0
+  private var __fmToneMode              = ""
+  private var __frequency               : Hz = 0
+  private var __inUse                   = false
+  private var __locked                  = false
+  private var __loopAEnabled            = false
+  private var __loopBEnabled            = false
+  private var __mode                    = Mode.LSB.rawValue
+  private var __modeList                = [String]()
+  private var __nbEnabled               = false
+  private var __nbLevel                 = 0
+  private var __nrEnabled               = false
+  private var __nrLevel                 = 0
+  private var __nr2                     = 0
+  private var __owner                   = 0
+  private var __panadapterId            : PanadapterStreamId = 0
+  private var __playbackEnabled         = false
+  private var __postDemodBypassEnabled  = false
+  private var __postDemodHigh           = 0
+  private var __postDemodLow            = 0
+  private var __qskEnabled              = false
+  private var __recordEnabled           = false
+  private var __recordLength            : Float = 0.0
+  private var __repeaterOffsetDirection = Offset.simplex.rawValue
+  private var __rfGain                  = 0
+  private var __ritEnabled              = false
+  private var __ritOffset               = 0
+  private var __rttyMark                = 0
+  private var __rttyShift               = 0
+  private var __rxAnt                   = ""
+  private var __rxAntList               = [String]()
+  private var __sliceLetter             : String?
+  private var __step                    = 0
+  private var __squelchEnabled          = false
+  private var __squelchLevel            = 0
+  private var __stepList                = ""
+  private var __txAnt                   = ""
+  private var __txAntList               = [String]()
+  private var __txEnabled               = false
+  private var __txOffsetFreq            : Float = 0.0
+  private var __wide                    = false
+  private var __wnbEnabled              = false
+  private var __wnbLevel                = 0
+  private var __xitEnabled              = false
+  private var __xitOffset               = 0
 }

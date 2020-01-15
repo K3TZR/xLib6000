@@ -19,89 +19,58 @@ public typealias MeterName = String
 ///      stream containing multiple Meters. They are collected in the
 ///      meters collection on the Radio object.
 ///
-public final class Meter                    : NSObject, DynamicModel {
+public final class Meter : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kDbDbmDbfsSwrDenom             : Float = 128.0  // denominator for Db, Dbm, Dbfs, Swr
-  static let kDegDenom                      : Float = 64.0   // denominator for Degc, Degf
+  static let kDbDbmDbfsSwrDenom  : Float = 128.0  // denominator for Db, Dbm, Dbfs, Swr
+  static let kDegDenom           : Float = 64.0   // denominator for Degc, Degf
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                             : MeterId
+  public let id : MeterId
 
-  @Barrier("", Api.objectQ)   @objc dynamic public  var desc
-  @Barrier(0, Api.objectQ)    @objc dynamic public  var fps
-  @Barrier(0.0, Api.objectQ)  @objc dynamic public  var high    : Float
-  @Barrier(0.0, Api.objectQ)  @objc dynamic public  var low     : Float
-  @Barrier("", Api.objectQ)   @objc dynamic public  var group
-  @Barrier("", Api.objectQ)   @objc dynamic public  var name
-  @Barrier(0.0, Api.objectQ)  @objc dynamic public  var peak    : Float
-  @Barrier("", Api.objectQ)   @objc dynamic public  var source
-  @Barrier("", Api.objectQ)   @objc dynamic public  var units
-  @Barrier(0.0, Api.objectQ)  @objc dynamic public  var value   : Float
+  @objc dynamic public var desc : String {
+    get { Api.objectQ.sync { _desc }}
+    set { Api.objectQ.sync(flags: .barrier) { _desc = newValue }}}
 
-//  @objc dynamic public var desc: String {
-//    get { Api.objectQ.sync { _desc }}
-//    set { Api.objectQ.sync(flags: .barrier) { _desc = newValue }}
-//  }
-//  private var _desc: String = ""
-//
-//  @objc dynamic public var fps: Int {
-//    get { Api.objectQ.sync { _fps }}
-//    set { Api.objectQ.sync(flags: .barrier) { _fps = newValue }}
-//  }
-//  private var _fps: Int = 0
-//
-//  @objc dynamic public var high: Float {
-//    get { Api.objectQ.sync { _high }}
-//    set { Api.objectQ.sync(flags: .barrier) { _high = newValue }}
-//  }
-//  private var _high: Float = 0.0
-//
-//  @objc dynamic public var low: Float {
-//    get { Api.objectQ.sync { _low }}
-//    set { Api.objectQ.sync(flags: .barrier) { _low = newValue }}
-//  }
-//  private var _low: Float = 0.0
-//
-//  @objc dynamic public var group: String {
-//    get { Api.objectQ.sync { _group }}
-//    set { Api.objectQ.sync(flags: .barrier) { _group = newValue }}
-//  }
-//  private var _group: String = ""
-//
-//  @objc dynamic public var name: String {
-//    get { Api.objectQ.sync { _name }}
-//    set { Api.objectQ.sync(flags: .barrier) { _name = newValue }}
-//  }
-//  private var _name: String = ""
-//
-//  @objc dynamic public var peak: Float {
-//    get { Api.objectQ.sync { _peak }}
-//    set { Api.objectQ.sync(flags: .barrier) { _peak = newValue }}
-//  }
-//  private var _peak: Float = 0.0
-//
-//  @objc dynamic public var source: String {
-//    get { Api.objectQ.sync { _source }}
-//    set { Api.objectQ.sync(flags: .barrier) { _source = newValue }}
-//  }
-//  private var _source: String = ""
-//
-//  @objc dynamic public var units: String {
-//    get { Api.objectQ.sync { _units }}
-//    set { Api.objectQ.sync(flags: .barrier) { _units = newValue }}
-//  }
-//  private var _units: String = ""
-//
-//  @objc dynamic public var value: Float {
-//    get { Api.objectQ.sync { _value }}
-//    set { Api.objectQ.sync(flags: .barrier) { _value = newValue }}
-//  }
-//  private var _value: Float = 0.0
+  @objc dynamic public var fps : Int {
+    get { Api.objectQ.sync { _fps }}
+    set { Api.objectQ.sync(flags: .barrier) { _fps = newValue }}}
+
+  @objc dynamic public var high : Float {
+    get { Api.objectQ.sync { _high }}
+    set { Api.objectQ.sync(flags: .barrier) { _high = newValue }}}
+
+  @objc dynamic public var low : Float {
+    get { Api.objectQ.sync { _low }}
+    set { Api.objectQ.sync(flags: .barrier) { _low = newValue }}}
+
+  @objc dynamic public var group : String {
+    get { Api.objectQ.sync { _group }}
+    set { Api.objectQ.sync(flags: .barrier) { _group = newValue }}}
+
+  @objc dynamic public var name : String {
+    get { Api.objectQ.sync { _name }}
+    set { Api.objectQ.sync(flags: .barrier) { _name = newValue }}}
+
+  @objc dynamic public var peak : Float {
+    get { Api.objectQ.sync { _peak }}
+    set { Api.objectQ.sync(flags: .barrier) { _peak = newValue }}}
+
+  @objc dynamic public var source : String {
+    get { Api.objectQ.sync { _source }}
+    set { Api.objectQ.sync(flags: .barrier) { _source = newValue }}}
+
+  @objc dynamic public var units : String {
+    get { Api.objectQ.sync { _units }}
+    set { Api.objectQ.sync(flags: .barrier) { _units = newValue }}}
+
+  @objc dynamic public var value : Float {
+    get { Api.objectQ.sync { _value }}
+    set { Api.objectQ.sync(flags: .barrier) { _value = newValue }}}
 
   public enum Source: String {
     case codec      = "cod"
@@ -380,4 +349,18 @@ public final class Meter                    : NSObject, DynamicModel {
       NC.post(.meterHasBeenAdded, object: self as Any?)
     }
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _desc     = ""
+  private var _fps      = 0
+  private var _high     : Float = 0.0
+  private var _low      : Float = 0.0
+  private var _group    = ""
+  private var _name     = ""
+  private var _peak     : Float = 0.0
+  private var _source   = ""
+  private var _units    = ""
+  private var _value    : Float = 0.0
 }

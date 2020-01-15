@@ -24,7 +24,9 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   
   public      let id         : AudioStreamId
   
-  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
+  public var delegate : StreamHandler? {
+    get { Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
   @objc dynamic public var daxChannel: Int {
     get { _daxChannel }
@@ -56,15 +58,28 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
-  
-  @BarrierClamped(50, Api.objectQ, range: 0...100)  var _rxGain
-
-  @Barrier(0, Api.objectQ)      var _daxChannel
-  @Barrier(0, Api.objectQ)      var _daxClients
-  @Barrier(false, Api.objectQ)  var _inUse
-  @Barrier("", Api.objectQ)     var _ip
-  @Barrier(0, Api.objectQ)      var _port
-  @Barrier(nil, Api.objectQ)    var _slice : xLib6000.Slice?
+    
+  var _daxChannel : Int {
+    get { Api.objectQ.sync { __daxChannel } }
+    set { Api.objectQ.sync(flags: .barrier) {__daxChannel = newValue }}}
+  var _daxClients : Int {
+    get { Api.objectQ.sync { __daxClients } }
+    set { Api.objectQ.sync(flags: .barrier) {__daxClients = newValue }}}
+  var _inUse : Bool {
+    get { Api.objectQ.sync { __inUse } }
+    set { Api.objectQ.sync(flags: .barrier) {__inUse = newValue }}}
+  var _ip : String {
+    get { Api.objectQ.sync { __ip } }
+    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+  var _port : Int {
+    get { Api.objectQ.sync { __port } }
+    set { Api.objectQ.sync(flags: .barrier) {__port = newValue }}}
+  var _rxGain : Int {
+    get { Api.objectQ.sync { __rxGain } }
+    set { Api.objectQ.sync(flags: .barrier) {__rxGain = newValue }}}
+  var _slice : xLib6000.Slice? {
+    get { Api.objectQ.sync { __slice } }
+    set { Api.objectQ.sync(flags: .barrier) {__slice = newValue }}}
 
   internal enum Token: String {
     case daxChannel                         = "dax"
@@ -282,6 +297,19 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   private func audioStreamCmd(_ token: String, _ value: Any) {
     _radio.sendCommand("audio stream " + "\(id.hex) slice \(_slice!.id) " + token + " \(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _delegate     : StreamHandler? = nil
+
+  private var __daxChannel  = 0
+  private var __daxClients  = 0
+  private var __inUse       = false
+  private var __ip          = ""
+  private var __port        = 0
+  private var __rxGain      = 50
+  private var __slice       : xLib6000.Slice? = nil
 }
 
 

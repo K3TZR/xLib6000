@@ -23,7 +23,9 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   
   public      let id           : DaxIqStreamId
   
-  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
+  public var delegate : StreamHandler? {
+    get { Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
   @objc dynamic public var rate: Int {
     get { _rate }
@@ -51,16 +53,34 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(0, Api.objectQ)      var _available
-  @Barrier(0, Api.objectQ)      var _capacity
-  @Barrier(0, Api.objectQ)      var _daxIqChannel : Int
-  @Barrier(false, Api.objectQ)  var _inUse
-  @Barrier("", Api.objectQ)     var _ip
-  @Barrier(0, Api.objectQ)      var _pan          : PanadapterStreamId
-  @Barrier(0, Api.objectQ)      var _port
-  @Barrier(0, Api.objectQ)      var _rate
-  @Barrier(false, Api.objectQ)  var _streaming
-  
+  var _available : Int {
+    get { Api.objectQ.sync { __available } }
+    set { Api.objectQ.sync(flags: .barrier) {__available = newValue }}}
+  var _capacity : Int {
+    get { Api.objectQ.sync { __capacity } }
+    set { Api.objectQ.sync(flags: .barrier) {__capacity = newValue }}}
+  var _daxIqChannel : Int {
+    get { Api.objectQ.sync { __daxIqChannel } }
+    set { Api.objectQ.sync(flags: .barrier) {__daxIqChannel = newValue }}}
+  var _inUse : Bool {
+    get { Api.objectQ.sync { __inUse } }
+    set { Api.objectQ.sync(flags: .barrier) {__inUse = newValue }}}
+  var _ip : String {
+    get { Api.objectQ.sync { __ip } }
+    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+  var _pan : PanadapterStreamId {
+    get { Api.objectQ.sync { __pan } }
+    set { Api.objectQ.sync(flags: .barrier) {__pan = newValue }}}
+  var _port : Int {
+    get { Api.objectQ.sync { __port } }
+    set { Api.objectQ.sync(flags: .barrier) {__port = newValue }}}
+  var _rate : Int {
+    get { Api.objectQ.sync { __rate } }
+    set { Api.objectQ.sync(flags: .barrier) {__rate = newValue }}}
+  var _streaming : Bool {
+    get { Api.objectQ.sync { __streaming } }
+    set { Api.objectQ.sync(flags: .barrier) {__streaming = newValue }}}
+
   enum Token: String {
     case available
     case capacity
@@ -279,5 +299,20 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   private func iqCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("dax iq " + "\(_daxIqChannel) " + token.rawValue + "=\(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _delegate        : StreamHandler? = nil
+
+  private var __available     = 0
+  private var __capacity      = 0
+  private var __daxIqChannel  = 0
+  private var __inUse         = false
+  private var __ip            = ""
+  private var __pan           : PanadapterStreamId = 0
+  private var __port          = 0
+  private var __rate          = 0
+  private var __streaming     = false
 }
 

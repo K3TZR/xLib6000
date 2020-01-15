@@ -26,58 +26,83 @@ public final class Xvtr : NSObject, DynamicModel {
   
   @objc dynamic public var ifFrequency: Hz {
     get { _ifFrequency }
-    set { if _ifFrequency != newValue { _ifFrequency = newValue ; xvtrCmd( .ifFrequency, newValue) } } }
-  
+    set { if _ifFrequency != newValue { _ifFrequency = newValue ; xvtrCmd( .ifFrequency, newValue) }}}
+
   @objc dynamic public var inUse: Bool { _inUse }
+
   @objc dynamic public var isValid: Bool { _isValid }
-  
+
   @objc dynamic public var loError: Int {
     get { _loError }
-    set { if _loError != newValue { _loError = newValue ; xvtrCmd( .loError, newValue) } } }
-  
+    set { if _loError != newValue { _loError = newValue ; xvtrCmd( .loError, newValue) }}}
+
   @objc dynamic public var name: String {
     get { _name }
-    set { if _name != newValue { _name = newValue ; xvtrCmd( .name, _name) } } }
-  
+    set { if _name != newValue { _name = newValue ; xvtrCmd( .name, _name) }}}
+
   @objc dynamic public var maxPower: Int {
     get { _maxPower }
-    set { if _maxPower != newValue { _maxPower = newValue ; xvtrCmd( .maxPower, newValue) } } }
-  
+    set { if _maxPower != newValue { _maxPower = newValue ; xvtrCmd( .maxPower, newValue) }}}
+
   @objc dynamic public var order: Int {
     get { _order }
-    set { if _order != newValue { _order = newValue ; xvtrCmd( .order, newValue) } } }
-  
+    set { if _order != newValue { _order = newValue ; xvtrCmd( .order, newValue) }}}
+
   @objc dynamic public var preferred: Bool { _preferred }
-  
+
   @objc dynamic public var rfFrequency: Hz {
     get { _rfFrequency }
-    set { if _rfFrequency != newValue { _rfFrequency = newValue ; xvtrCmd( .rfFrequency, newValue) } } }
-  
+    set { if _rfFrequency != newValue { _rfFrequency = newValue ; xvtrCmd( .rfFrequency, newValue) }}}
+
   @objc dynamic public var rxGain: Int {
     get { _rxGain }
-    set { if _rxGain != newValue { _rxGain = newValue ; xvtrCmd( .rxGain, newValue) } } }
-  
+    set { if _rxGain != newValue { _rxGain = newValue ; xvtrCmd( .rxGain, newValue) }}}
+
   @objc dynamic public var rxOnly: Bool {
     get { _rxOnly }
-    set { if _rxOnly != newValue { _rxOnly = newValue ; xvtrCmd( .rxOnly, newValue) } } }
+    set { if _rxOnly != newValue { _rxOnly = newValue ; xvtrCmd( .rxOnly, newValue) }}}
 
   @objc dynamic public var twoMeterInt: Int { _twoMeterInt }
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(0, Api.objectQ)      var _ifFrequency    : Hz
-  @Barrier(false, Api.objectQ)  var _inUse
-  @Barrier(false, Api.objectQ)  var _isValid
-  @Barrier(0, Api.objectQ)      var _loError
-  @Barrier("", Api.objectQ)     var _name         { didSet { _name = String(_name.prefix(4)) }}
-  @Barrier(0, Api.objectQ)      var _maxPower
-  @Barrier(0, Api.objectQ)      var _order
-  @Barrier(false, Api.objectQ)  var _preferred
-  @Barrier(0, Api.objectQ)      var _rfFrequency    : Hz
-  @Barrier(0, Api.objectQ)      var _rxGain
-  @Barrier(false, Api.objectQ)  var _rxOnly
-  @Barrier(0, Api.objectQ)      var _twoMeterInt
+  var _ifFrequency : Hz {
+    get { Api.objectQ.sync { __ifFrequency } }
+    set { Api.objectQ.sync(flags: .barrier) {__ifFrequency = newValue }}}
+  var _inUse : Bool {
+    get { Api.objectQ.sync { __inUse } }
+    set { Api.objectQ.sync(flags: .barrier) {__inUse = newValue }}}
+  var _isValid : Bool {
+    get { Api.objectQ.sync { __isValid } }
+    set { Api.objectQ.sync(flags: .barrier) {__isValid = newValue }}}
+  var _loError : Int {
+    get { Api.objectQ.sync { __loError } }
+    set { Api.objectQ.sync(flags: .barrier) {__loError = newValue }}}
+  var _name : String {
+    get { Api.objectQ.sync { __name } }
+    set { Api.objectQ.sync(flags: .barrier) {__name = newValue }}}
+  var _maxPower : Int {
+    get { Api.objectQ.sync { __maxPower } }
+    set { Api.objectQ.sync(flags: .barrier) {__maxPower = newValue }}}
+  var _order : Int {
+    get { Api.objectQ.sync { __order } }
+    set { Api.objectQ.sync(flags: .barrier) {__order = newValue }}}
+  var _preferred : Bool {
+    get { Api.objectQ.sync { __preferred } }
+    set { Api.objectQ.sync(flags: .barrier) {__preferred = newValue }}}
+  var _rfFrequency : Hz {
+    get { Api.objectQ.sync { __rfFrequency } }
+    set { Api.objectQ.sync(flags: .barrier) {__rfFrequency = newValue }}}
+  var _rxGain : Int {
+    get { Api.objectQ.sync { __rxGain } }
+    set { Api.objectQ.sync(flags: .barrier) {__rxGain = newValue }}}
+  var _rxOnly : Bool {
+    get { Api.objectQ.sync { __rxOnly } }
+    set { Api.objectQ.sync(flags: .barrier) {__rxOnly = newValue }}}
+  var _twoMeterInt : Int {
+    get { Api.objectQ.sync { __twoMeterInt } }
+    set { Api.objectQ.sync(flags: .barrier) {__twoMeterInt = newValue }}}
 
   enum Token : String {
     case name
@@ -220,7 +245,7 @@ public final class Xvtr : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
-    /// Set an Xvtr property on the Radio
+  /// Set an Xvtr property on the Radio
   ///
   /// - Parameters:
   ///   - token:      the parse token
@@ -229,4 +254,20 @@ public final class Xvtr : NSObject, DynamicModel {
   private func xvtrCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("xvtr set " + "\(id) " + token.rawValue + "=\(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __ifFrequency : Hz = 0
+  private var __inUse       = false
+  private var __isValid     = false
+  private var __loError     = 0
+  private var __name        = "" { didSet { _name = String(_name.prefix(4)) }}
+  private var __maxPower    = 0
+  private var __order       = 0
+  private var __preferred   = false
+  private var __rfFrequency : Hz = 0
+  private var __rxGain      = 0
+  private var __rxOnly      = false
+  private var __twoMeterInt = 0
 }

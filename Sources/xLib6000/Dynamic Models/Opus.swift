@@ -42,12 +42,13 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   public        let id             : OpusId
   public        var isStreaming    = false
 
-  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
-  
+  public var delegate : StreamHandler? {
+    get { Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
+
   @objc dynamic public var clientHandle: UInt32 {
     get { _clientHandle }
-    set { if _clientHandle != newValue { _clientHandle = newValue } } }
-  
+    set { if _clientHandle != newValue { _clientHandle = newValue }}}
   @objc dynamic public var ip: String {
     get { _ip }
     set { if _ip != newValue { _ip = newValue } } }
@@ -58,33 +59,44 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
 
   @objc dynamic public var rxStopped: Bool {
     get { _rxStopped }
-    set { if _rxStopped != newValue { _rxStopped = newValue } } }
-  
+    set { if _rxStopped != newValue { _rxStopped = newValue }}}
   @objc dynamic public var rxEnabled: Bool {
     get { _rxEnabled }
-    set { if _rxEnabled != newValue { _rxEnabled = newValue ; opusCmd( .rxEnabled, newValue.as1or0) } } }
-  
+    set { if _rxEnabled != newValue { _rxEnabled = newValue ; opusCmd( .rxEnabled, newValue.as1or0) }}}
   @objc dynamic public var txEnabled: Bool {
     get { _txEnabled }
     set { if _txEnabled != newValue { _txEnabled = newValue ; opusCmd( .txEnabled, newValue.as1or0) } } }
 
-  // ----------------------------------------------------------------------------
-  // Public properties
-  
-//  public var delegate: StreamHandler? {
-//    get { Api.objectQ.sync { _delegate } }
-//    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue } } }
-
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(nil, Api.objectQ)    var _expectedFrame     : Int?
-  @Barrier(false, Api.objectQ)  var _rxEnabled
-  @Barrier(0, Api.objectQ)      var _rxLostPacketCount
-  @Barrier(0, Api.objectQ)      var _rxPacketCount
-  @Barrier(false, Api.objectQ)  var _rxStopped
-  @Barrier(false, Api.objectQ)  var _txEnabled
+  var _expectedFrame     : Int? {
+    get { Api.objectQ.sync { __expectedFrame } }
+    set { Api.objectQ.sync(flags: .barrier) {__expectedFrame = newValue }}}
+  var _rxEnabled : Bool {
+    get { Api.objectQ.sync { __rxEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__rxEnabled = newValue }}}
+  var _rxLostPacketCount : Int {
+    get { Api.objectQ.sync { __rxLostPacketCount } }
+    set { Api.objectQ.sync(flags: .barrier) {__rxLostPacketCount = newValue }}}
+  var _rxPacketCount : Int {
+    get { Api.objectQ.sync { __rxPacketCount } }
+    set { Api.objectQ.sync(flags: .barrier) {__rxPacketCount = newValue }}}
+  var _rxStopped : Bool {
+    get { Api.objectQ.sync { __rxStopped } }
+    set { Api.objectQ.sync(flags: .barrier) {__rxStopped = newValue }}}
+  var _txEnabled : Bool {
+    get { Api.objectQ.sync { __txEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__txEnabled = newValue }}}
 
+  enum Token : String {
+    case clientHandle         = "client_handle"
+    case ipAddress            = "ip"
+    case port
+    case rxEnabled            = "rx_on"
+    case txEnabled            = "tx_on"
+    case rxStopped            = "opus_rx_stream_stopped"
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -101,7 +113,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   private var _txSampleCount                = 0
   
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol class methods
+  // MARK: - Class methods
   
   /// Parse an Opus status message
   ///   Format:  <streamId, > <"ip", ip> <"port", port> <"opus_rx_stream_stopped", 1|0>  <"rx_on", 1|0> <"tx_on", 1|0>
@@ -150,7 +162,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Public instance methods
+  // MARK: - Public methods
   
   /// Send Opus encoded TX audio to the Radio (hardware)
   ///
@@ -187,7 +199,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Protocol instance methods
+  // MARK: - Instance methods
   
   ///  Parse Opus key/value pairs
   ///
@@ -276,13 +288,10 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: vita.payloadSize) )
     }
   }
-}
-
-extension Opus {
   
-    // ----------------------------------------------------------------------------
-    // Instance methods that send Commands
-
+  // ----------------------------------------------------------------------------
+  // MARK: - Private methods
+  
     /// Remove this Opus Stream
     ///
     /// - Parameters:
@@ -293,8 +302,6 @@ extension Opus {
   //    // tell the Radio to remove the Stream
   //    Api.sharedInstance.send(Opus.kStreamRemoveCmd + "0x\(id)", replyTo: callback)
   //  }
-  // ----------------------------------------------------------------------------
-  // Private command helper methods
 
   /// Set an Opus property on the Radio
   ///
@@ -306,19 +313,18 @@ extension Opus {
     
     Api.sharedInstance.send(Opus.kCmd + token.rawValue + " \(value)")
   }
-  // ----------------------------------------------------------------------------
-  // Tokens
   
-  /// Properties
-  ///
-  internal enum Token : String {
-    case clientHandle         = "client_handle"
-    case ipAddress            = "ip"
-    case port
-    case rxEnabled            = "rx_on"
-    case txEnabled            = "tx_on"
-    case rxStopped            = "opus_rx_stream_stopped"
-  }
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _delegate           : StreamHandler? = nil
+
+  private var __expectedFrame     : Int? = nil
+  private var __rxEnabled         = false
+  private var __rxLostPacketCount = 0
+  private var __rxPacketCount     = 0
+  private var __rxStopped         = false
+  private var __txEnabled         = false
 }
 
 

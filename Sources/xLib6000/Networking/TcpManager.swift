@@ -36,8 +36,12 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   private var _tcpSocket                    : GCDAsyncSocket!
   private var _timeout                      = 0.0   // seconds
 
-  @Barrier(false, Api.objectQ)  private var _isWan
-  @Barrier(0, Api.objectQ)      private var _seqNum : UInt
+  private var _isWan : Bool {
+    get { Api.objectQ.sync { __isWan } }
+    set { Api.objectQ.sync(flags: .barrier) {__isWan = newValue }}}
+  private var _seqNum : UInt {
+    get { Api.objectQ.sync { __seqNum } }
+    set { Api.objectQ.sync(flags: .barrier) {__seqNum = newValue }}}
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -256,4 +260,10 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
     // there are no validations for the radio connection
     completionHandler(true)
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __isWan   = false
+  private var __seqNum  : UInt = 0
 }

@@ -23,12 +23,15 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(false, Api.objectQ) var udpSuccessfulRegistration
-  
+  var udpSuccessfulRegistration : Bool {
+    get { Api.objectQ.sync { _udpSuccessfulRegistration } }
+    set { Api.objectQ.sync(flags: .barrier) {_udpSuccessfulRegistration = newValue }}}
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
   private weak var _delegate                : UdpManagerDelegate?
+
   private let _log                          = Log.sharedInstance.msg
   private var _udpReceiveQ                  : DispatchQueue!
   private var _udpRegisterQ                 : DispatchQueue!
@@ -276,4 +279,9 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       }
     }
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _udpSuccessfulRegistration = false
 }

@@ -24,7 +24,9 @@ public final class Waveform : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier("", Api.objectQ) var _waveformList                                         
+  var _waveformList : String {
+    get { Api.objectQ.sync { __waveformList } }
+    set { Api.objectQ.sync(flags: .barrier) {__waveformList = newValue }}}
 
   enum Token: String {
     case waveformList = "installed_list"
@@ -77,4 +79,9 @@ public final class Waveform : NSObject, StaticModel {
       case .waveformList: update(self, &_waveformList, to: property.value, signal: \.waveformList)      }
     }
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __waveformList = ""
 }

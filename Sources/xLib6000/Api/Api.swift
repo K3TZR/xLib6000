@@ -51,12 +51,19 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public                var testerModeEnabled     = false
   public                var pingerEnabled         = true
 
-  
-  @Barrier(nil, Api.objectQ)                  public var delegate     : ApiDelegate?
-  @Barrier("0.0.0.0", Api.objectQ)            public var localIP
-  @Barrier(0, Api.objectQ)                    public var localUDPPort : UInt16
-  @Barrier([Handle:GuiClient](), Api.objectQ) public var guiClients
-  
+  public var delegate     : ApiDelegate? {
+    get { Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
+  public var localIP : String {
+    get { Api.objectQ.sync { _localIP } }
+    set { Api.objectQ.sync(flags: .barrier) { _localIP  = newValue }}}
+  public var localUDPPort : UInt16 {
+    get { Api.objectQ.sync { _localUDPPort } }
+    set { Api.objectQ.sync(flags: .barrier) { _localUDPPort  = newValue }}}
+  public var guiClients : [Handle:GuiClient] {
+    get { Api.objectQ.sync { _guiClients } }
+    set { Api.objectQ.sync(flags: .barrier) {_guiClients = newValue }}}
+
   public enum DisconnectReason: Equatable {
     public static func ==(lhs: Api.DisconnectReason, rhs: Api.DisconnectReason) -> Bool {
       
@@ -518,4 +525,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // pass it to xAPITester (if present)
     testerDelegate?.vitaParser(vitaPacket)
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _delegate      : ApiDelegate? = nil
+  private var _localIP       = "0.0.0.0"
+  private var _localUDPPort  : UInt16 = 0
+  private var _guiClients    = [Handle:GuiClient]()
 }

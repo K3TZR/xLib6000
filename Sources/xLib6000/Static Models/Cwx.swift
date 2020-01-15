@@ -25,12 +25,10 @@ public final class Cwx : NSObject, StaticModel {
 
   @objc dynamic public var breakInDelay: Int {
     get { _breakInDelay }
-    set { if _breakInDelay != newValue { let value = newValue ;  _breakInDelay = value ; cwxCmd( "delay", value) } } }
-  
+    set { if _breakInDelay != newValue { let value = newValue ;  _breakInDelay = value ; cwxCmd( "delay", value) }}}
   @objc dynamic public var qskEnabled: Bool {
     get { _qskEnabled }
-    set { if _qskEnabled != newValue { _qskEnabled = newValue ; cwxCmd( .qskEnabled, newValue.as1or0) } } }
-  
+    set { if _qskEnabled != newValue { _qskEnabled = newValue ; cwxCmd( .qskEnabled, newValue.as1or0) }}}
   @objc dynamic public var wpm: Int {
     get { _wpm }
     set { if _wpm != newValue { let value = newValue ; if _wpm != value  { _wpm = value ; cwxCmd( .wpm, value) } } } }
@@ -38,9 +36,15 @@ public final class Cwx : NSObject, StaticModel {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @BarrierClamped(0, Api.objectQ, range: 0...2_000) var _breakInDelay
-  @Barrier(false, Api.objectQ) var _qskEnabled
-  @BarrierClamped(0, Api.objectQ, range: 5...100)   var _wpm
+  var _breakInDelay : Int {
+    get { Api.objectQ.sync { __breakInDelay } }
+    set { Api.objectQ.sync(flags: .barrier) {__breakInDelay = newValue }}}
+  var _qskEnabled : Bool {
+    get { Api.objectQ.sync { __qskEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__qskEnabled = newValue }}}
+  var _wpm : Int {
+    get { Api.objectQ.sync { __wpm } }
+    set { Api.objectQ.sync(flags: .barrier) {__wpm = newValue }}}
 
   internal var macros                       : [String]
   internal let kMaxNumberOfMacros           = 12
@@ -334,4 +338,11 @@ public final class Cwx : NSObject, StaticModel {
   private func cwxCmd(_ token: String, _ value: Any) {
     _radio.sendCommand("cwx " + token + " \(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __breakInDelay = 0
+  private var __qskEnabled = false
+  private var __wpm = 0
 }

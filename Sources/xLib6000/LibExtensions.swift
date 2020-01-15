@@ -16,6 +16,18 @@ public typealias StreamId       = UInt32
 public typealias Handle         = UInt32
 public typealias ObjectId       = UInt16
 
+public let kControlMin = 0
+public let kControlMax = 100
+public let kMinPitch = 100
+public let kMaxPitch = 6000
+public let kMinWpm = 5
+public let kMaxWpm = 60
+public let kMinBreakInDelay = 0
+public let kMaxBreakInDelay = 2_000
+
+public let kMinApfQ = 0
+public let kMaxApfQ = 33
+
 
 public extension Date {
   
@@ -281,6 +293,25 @@ public extension Int {
   /// - Returns:      true - self within two values
   ///
   func within(_ value1: Int, _ value2: Int) -> Bool { (self >= value1) && (self <= value2) }
+
+  /// Force a value to be between two other values (inclusive)
+  ///
+  /// - Parameters:
+  ///   - value1:     the Minimum
+  ///   - value2:     the Maximum
+  /// - Returns:      the coerced value
+  ///
+  func bound(_ value1: Int, _ value2: Int) -> Int {
+    let newValue = self < value1 ? value1 : self
+    return newValue > value2 ? value2 : newValue
+  }
+
+  func rangeCheck(_ range: ClosedRange<Int>) -> Int {
+    
+    if self < range.lowerBound { return range.lowerBound }
+    if self > range.upperBound { return range.upperBound }
+    return self
+  }
 }
 
 public extension UInt {
@@ -436,7 +467,7 @@ public struct Barrier<Element> {
 
   public var wrappedValue: Element {
     get { _q.sync { _value }}
-    set { _q.sync(flags: .barrier) { _value = newValue }}
+    set { Api.objectQ.sync(flags: .barrier) { _value = newValue }}
   }
   
   init(_ value: Element, _ queue: DispatchQueue) {
@@ -456,7 +487,7 @@ struct BarrierClamped<Element: Comparable> {
   
   var wrappedValue: Element {
     get { _q.sync { _value }}
-    set { _q.sync(flags: .barrier) { _value = min( max(_range.lowerBound, newValue), _range.upperBound) }}
+    set { Api.objectQ.sync(flags: .barrier) { _value = min( max(_range.lowerBound, newValue), _range.upperBound) }}
   }
   
   init(_ value: Element, _ queue: DispatchQueue, range: ClosedRange<Element>) {

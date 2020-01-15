@@ -21,60 +21,47 @@ public final class Interlock : NSObject, StaticModel {
   
   @objc dynamic public var accTxEnabled: Bool {
     get { _accTxEnabled }
-    set { if _accTxEnabled != newValue { _accTxEnabled = newValue ; interlockCmd( .accTxEnabled, newValue.asTF) } } }
-  
+    set { if _accTxEnabled != newValue { _accTxEnabled = newValue ; interlockCmd( .accTxEnabled, newValue.asTF) }}}
   @objc dynamic public var accTxDelay: Int {
     get { _accTxDelay }
-    set { if _accTxDelay != newValue { _accTxDelay = newValue ; interlockCmd( .accTxDelay, newValue) } } }
-  
+    set { if _accTxDelay != newValue { _accTxDelay = newValue ; interlockCmd( .accTxDelay, newValue) }}}
   @objc dynamic public var accTxReqEnabled: Bool {
     get { _accTxReqEnabled }
-    set { if _accTxReqEnabled != newValue { _accTxReqEnabled = newValue ; interlockCmd( .accTxReqEnabled, newValue.as1or0) } } }
-  
+    set { if _accTxReqEnabled != newValue { _accTxReqEnabled = newValue ; interlockCmd( .accTxReqEnabled, newValue.as1or0) }}}
   @objc dynamic public var accTxReqPolarity: Bool {
     get { _accTxReqPolarity }
-    set { if _accTxReqPolarity != newValue { _accTxReqPolarity = newValue ; interlockCmd( .accTxReqPolarity, newValue.as1or0) } } }
-  
+    set { if _accTxReqPolarity != newValue { _accTxReqPolarity = newValue ; interlockCmd( .accTxReqPolarity, newValue.as1or0) }}}
   @objc dynamic public var rcaTxReqEnabled: Bool {
     get { _rcaTxReqEnabled}
-    set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue ; interlockCmd( .rcaTxReqEnabled, newValue.asTF) } } }
-  
+    set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue ; interlockCmd( .rcaTxReqEnabled, newValue.asTF) }}}
   @objc dynamic public var rcaTxReqPolarity: Bool {
     get { _rcaTxReqPolarity }
-    set { if _rcaTxReqPolarity != newValue { _rcaTxReqPolarity = newValue ; interlockCmd( .rcaTxReqPolarity, newValue.asTF) } } }
-  
+    set { if _rcaTxReqPolarity != newValue { _rcaTxReqPolarity = newValue ; interlockCmd( .rcaTxReqPolarity, newValue.asTF) }}}
   @objc dynamic public var timeout: Int {
     get { _timeout }
-    set { if _timeout != newValue { _timeout = newValue ; interlockCmd( .timeout, newValue) } } }
-  
+    set { if _timeout != newValue { _timeout = newValue ; interlockCmd( .timeout, newValue) }}}
   @objc dynamic public var txDelay: Int {
     get { _txDelay }
     set { if _txDelay != newValue { _txDelay = newValue  ; interlockCmd( .txDelay, newValue) } } }
 
   @objc dynamic public var tx1Enabled: Bool {
     get { _tx1Enabled }
-    set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; interlockCmd( .tx1Enabled, newValue.asTF) } } }
-  
+    set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; interlockCmd( .tx1Enabled, newValue.asTF) }}}
   @objc dynamic public var tx1Delay: Int {
     get { _tx1Delay }
-    set { if _tx1Delay != newValue { _tx1Delay = newValue  ; interlockCmd( .tx1Delay, newValue) } } }
-  
+    set { if _tx1Delay != newValue { _tx1Delay = newValue  ; interlockCmd( .tx1Delay, newValue) }}}
   @objc dynamic public var tx2Enabled: Bool {
     get { _tx2Enabled }
-    set { if _tx2Enabled != newValue { _tx2Enabled = newValue ; interlockCmd( .tx2Enabled, newValue.asTF) } } }
-  
+    set { if _tx2Enabled != newValue { _tx2Enabled = newValue ; interlockCmd( .tx2Enabled, newValue.asTF) }}}
   @objc dynamic public var tx2Delay: Int {
     get { _tx2Delay }
-    set { if _tx2Delay != newValue { _tx2Delay = newValue ; interlockCmd( .tx2Delay, newValue) } } }
-  
+    set { if _tx2Delay != newValue { _tx2Delay = newValue ; interlockCmd( .tx2Delay, newValue) }}}
   @objc dynamic public var tx3Enabled: Bool {
     get { _tx3Enabled }
-    set { if _tx3Enabled != newValue { _tx3Enabled = newValue ; interlockCmd( .tx3Enabled, newValue.asTF) } } }
-  
+    set { if _tx3Enabled != newValue { _tx3Enabled = newValue ; interlockCmd( .tx3Enabled, newValue.asTF) }}}
   @objc dynamic public var tx3Delay: Int {
     get { _tx3Delay }
-    set { if _tx3Delay != newValue { _tx3Delay = newValue ; interlockCmd( .tx3Delay, newValue) } } }
-  
+    set { if _tx3Delay != newValue { _tx3Delay = newValue ; interlockCmd( .tx3Delay, newValue) }}}
   @objc dynamic public var amplifier  : String  { _amplifier }
   @objc dynamic public var reason     : String  { _reason }
   @objc dynamic public var source     : String  { _source }
@@ -84,26 +71,64 @@ public final class Interlock : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(false, Api.objectQ)  var _accTxEnabled
-  @Barrier(0, Api.objectQ)      var _accTxDelay
-  @Barrier(false, Api.objectQ)  var _accTxReqEnabled
-  @Barrier(false, Api.objectQ)  var _accTxReqPolarity
-  @Barrier("", Api.objectQ)     var _amplifier
-  @Barrier(false, Api.objectQ)  var _rcaTxReqEnabled
-  @Barrier(false, Api.objectQ)  var _rcaTxReqPolarity
-  @Barrier("", Api.objectQ)     var _reason
-  @Barrier("", Api.objectQ)     var _source
-  @Barrier("", Api.objectQ)     var _state
-  @Barrier(0, Api.objectQ)      var _timeout
-  @Barrier(false, Api.objectQ)  var _txAllowed
-  @Barrier(0, Api.objectQ)      var _txDelay
-  @Barrier(0, Api.objectQ)      var _tx1Delay
-  @Barrier(false, Api.objectQ)  var _tx1Enabled
-  @Barrier(0, Api.objectQ)      var _tx2Delay
-  @Barrier(false, Api.objectQ)  var _tx2Enabled
-  @Barrier(0, Api.objectQ)      var _tx3Delay
-  @Barrier(false, Api.objectQ)  var _tx3Enabled
-
+  var _accTxEnabled: Bool {
+    get { Api.objectQ.sync { __accTxEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __accTxEnabled = newValue }}}
+  var _accTxDelay: Int {
+    get { Api.objectQ.sync { __accTxDelay } }
+    set { Api.objectQ.sync(flags: .barrier) { __accTxDelay = newValue }}}
+  var _accTxReqEnabled: Bool {
+    get { Api.objectQ.sync { __accTxReqEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __accTxReqEnabled = newValue }}}
+  var _accTxReqPolarity: Bool {
+    get { Api.objectQ.sync { __accTxReqPolarity } }
+    set { Api.objectQ.sync(flags: .barrier) { __accTxReqPolarity = newValue }}}
+  var _amplifier: String {
+    get { Api.objectQ.sync { __amplifier } }
+    set { Api.objectQ.sync(flags: .barrier) { __amplifier = newValue }}}
+  var _rcaTxReqEnabled: Bool {
+    get { Api.objectQ.sync { __rcaTxReqEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __rcaTxReqEnabled = newValue }}}
+  var _rcaTxReqPolarity: Bool {
+    get { Api.objectQ.sync { __rcaTxReqPolarity } }
+    set { Api.objectQ.sync(flags: .barrier) { __rcaTxReqPolarity = newValue }}}
+  var _reason: String {
+    get { Api.objectQ.sync { __reason } }
+    set { Api.objectQ.sync(flags: .barrier) { __reason = newValue }}}
+  var _source: String {
+    get { Api.objectQ.sync { __source } }
+    set { Api.objectQ.sync(flags: .barrier) { __source = newValue }}}
+  var _state: String {
+    get { Api.objectQ.sync { __state } }
+    set { Api.objectQ.sync(flags: .barrier) { __state = newValue }}}
+  var _timeout: Int {
+    get { Api.objectQ.sync { __timeout } }
+    set { Api.objectQ.sync(flags: .barrier) { __timeout = newValue }}}
+  var _txAllowed: Bool {
+    get { Api.objectQ.sync { __txAllowed } }
+    set { Api.objectQ.sync(flags: .barrier) { __txAllowed = newValue }}}
+  var _txDelay: Int {
+    get { Api.objectQ.sync { __txDelay } }
+    set { Api.objectQ.sync(flags: .barrier) { __txDelay = newValue }}}
+  var _tx1Delay: Int {
+    get { Api.objectQ.sync { __tx1Delay } }
+    set { Api.objectQ.sync(flags: .barrier) { __tx1Delay = newValue }}}
+  var _tx1Enabled: Bool {
+    get { Api.objectQ.sync { __tx1Enabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __tx1Enabled = newValue }}}
+  var _tx2Delay: Int {
+    get { Api.objectQ.sync { __tx2Delay } }
+    set { Api.objectQ.sync(flags: .barrier) { __tx2Delay = newValue }}}
+  var _tx2Enabled: Bool {
+    get { Api.objectQ.sync { __tx2Enabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __tx2Enabled = newValue }}}
+  var _tx3Delay: Int {
+    get { Api.objectQ.sync { __tx3Delay } }
+    set { Api.objectQ.sync(flags: .barrier) { __tx3Delay = newValue }}}
+  var _tx3Enabled: Bool {
+    get { Api.objectQ.sync { __tx3Enabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __tx3Enabled = newValue }}}
+  
   enum Token: String {
     case accTxEnabled       = "acc_tx_enabled"
     case accTxDelay         = "acc_tx_delay"
@@ -239,4 +264,27 @@ public final class Interlock : NSObject, StaticModel {
   private func interlockCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("interlock " + token.rawValue + "=\(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __accTxEnabled      = false
+  private var __accTxDelay        = 0
+  private var __accTxReqEnabled   = false
+  private var __accTxReqPolarity  = false
+  private var __amplifier         = ""
+  private var __rcaTxReqEnabled   = false
+  private var __rcaTxReqPolarity  = false
+  private var __reason            = ""
+  private var __source            = ""
+  private var __state             = ""
+  private var __timeout           = 0
+  private var __txAllowed         = false
+  private var __txDelay           = 0
+  private var __tx1Delay          = 0
+  private var __tx1Enabled        = false
+  private var __tx2Delay          = 0
+  private var __tx2Enabled        = false
+  private var __tx3Delay          = 0
+  private var __tx3Enabled        = false
 }

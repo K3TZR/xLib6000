@@ -23,170 +23,130 @@ public final class Transmit : NSObject, StaticModel {
   
   @objc dynamic public var cwBreakInDelay: Int {
     get { _cwBreakInDelay }
-    set { if _cwBreakInDelay != newValue { _cwBreakInDelay = newValue ; cwCmd( .cwBreakInDelay, newValue) } } }
-  
+    set { if _cwBreakInDelay != newValue { _cwBreakInDelay = newValue ; cwCmd( .cwBreakInDelay, newValue) }}}
   @objc dynamic public var cwBreakInEnabled: Bool {
     get { _cwBreakInEnabled }
-    set { if _cwBreakInEnabled != newValue { _cwBreakInEnabled = newValue ; cwCmd( .cwBreakInEnabled, newValue.as1or0) } } }
-  
+    set { if _cwBreakInEnabled != newValue { _cwBreakInEnabled = newValue ; cwCmd( .cwBreakInEnabled, newValue.as1or0) }}}
   @objc dynamic public var cwIambicEnabled: Bool {
     get { _cwIambicEnabled }
-    set { if _cwIambicEnabled != newValue { _cwIambicEnabled = newValue ; cwCmd( .cwIambicEnabled, newValue.as1or0) } } }
-  
+    set { if _cwIambicEnabled != newValue { _cwIambicEnabled = newValue ; cwCmd( .cwIambicEnabled, newValue.as1or0) }}}
   @objc dynamic public var cwIambicMode: Int {
     get { _cwIambicMode }
-    set { if _cwIambicMode != newValue { _cwIambicMode = newValue ; cwCmd( "mode", newValue) } } }
-  
+    set { if _cwIambicMode != newValue { _cwIambicMode = newValue ; cwCmd( "mode", newValue) }}}
   @objc dynamic public var cwlEnabled: Bool {
     get { _cwlEnabled }
-    set { if _cwlEnabled != newValue { _cwlEnabled = newValue ; cwCmd( .cwlEnabled, newValue.as1or0) } } }
-  
+    set { if _cwlEnabled != newValue { _cwlEnabled = newValue ; cwCmd( .cwlEnabled, newValue.as1or0) }}}
   @objc dynamic public var cwPitch: Int {
     get { _cwPitch }
-    set { if _cwPitch != newValue { _cwPitch = newValue ; cwCmd( .cwPitch, newValue) } } }
-  
+    set { if _cwPitch != newValue { _cwPitch = newValue ; cwCmd( .cwPitch, newValue) }}}
   @objc dynamic public var cwSidetoneEnabled: Bool {
     get { _cwSidetoneEnabled }
-    set { if _cwSidetoneEnabled != newValue { _cwSidetoneEnabled = newValue ; cwCmd( .cwSidetoneEnabled, newValue.as1or0) } } }
-  
+    set { if _cwSidetoneEnabled != newValue { _cwSidetoneEnabled = newValue ; cwCmd( .cwSidetoneEnabled, newValue.as1or0) }}}
   @objc dynamic public var cwSpeed: Int {
     get { _cwSpeed }
-    set { if _cwSpeed != newValue { _cwSpeed = newValue ; cwCmd( "wpm", newValue) } } }
-  
+    set { if _cwSpeed != newValue { _cwSpeed = newValue ; cwCmd( "wpm", newValue) }}}
   @objc dynamic public var cwSwapPaddles: Bool {
     get { _cwSwapPaddles }
-    set { if _cwSwapPaddles != newValue { _cwSwapPaddles = newValue ; cwCmd( "swap", newValue.as1or0) } } }
-  
+    set { if _cwSwapPaddles != newValue { _cwSwapPaddles = newValue ; cwCmd( "swap", newValue.as1or0) }}}
   @objc dynamic public var cwSyncCwxEnabled: Bool {
     get { _cwSyncCwxEnabled }
-    set { if _cwSyncCwxEnabled != newValue { _cwSyncCwxEnabled = newValue ; cwCmd( .cwSyncCwxEnabled, newValue.as1or0) } } }
-  
+    set { if _cwSyncCwxEnabled != newValue { _cwSyncCwxEnabled = newValue ; cwCmd( .cwSyncCwxEnabled, newValue.as1or0) }}}
   // ***** MIC COMMANDS *****
   
   @objc dynamic public var micAccEnabled: Bool {
     get { _micAccEnabled }
-    set { if _micAccEnabled != newValue { _micAccEnabled = newValue ; micCmd( "acc", newValue.asOnOff) } } }
-  
+    set { if _micAccEnabled != newValue { _micAccEnabled = newValue ; micCmd( "acc", newValue.asOnOff) }}}
   @objc dynamic public var micBiasEnabled: Bool {
     get { _micBiasEnabled }
-    set { if _micBiasEnabled != newValue { _micBiasEnabled = newValue ; micCmd( "bias", newValue.asOnOff) } } }
-  
+    set { if _micBiasEnabled != newValue { _micBiasEnabled = newValue ; micCmd( "bias", newValue.asOnOff) }}}
   @objc dynamic public var micBoostEnabled: Bool {
     get { _micBoostEnabled }
-    set { if _micBoostEnabled != newValue { _micBoostEnabled = newValue ; micCmd( "boost", newValue.asOnOff) } } }
-  
+    set { if _micBoostEnabled != newValue { _micBoostEnabled = newValue ; micCmd( "boost", newValue.asOnOff) }}}
   @objc dynamic public var micSelection: String {
     get { _micSelection }
-    set { if _micSelection != newValue { _micSelection = newValue ; micCmd( "input", newValue) } } }
-  
+    set { if _micSelection != newValue { _micSelection = newValue ; micCmd( "input", newValue) }}}
   // ***** TRANSMIT COMMANDS *****
   
   @objc dynamic public var carrierLevel: Int {
     get { _carrierLevel }
-    set { if _carrierLevel != newValue { _carrierLevel = newValue ; transmitCmd( "am_carrier", newValue) } } }
-  
+    set { if _carrierLevel != newValue { _carrierLevel = newValue ; transmitCmd( "am_carrier", newValue) }}}
   @objc dynamic public var companderEnabled: Bool {
     get { _companderEnabled }
-    set { if _companderEnabled != newValue { _companderEnabled = newValue ; transmitCmd( .companderEnabled, newValue.as1or0) } } }
-  
+    set { if _companderEnabled != newValue { _companderEnabled = newValue ; transmitCmd( .companderEnabled, newValue.as1or0) }}}
   @objc dynamic public var companderLevel: Int {
     get { _companderLevel }
-    set { if _companderLevel != newValue { _companderLevel = newValue ; transmitCmd( .companderLevel, newValue) } } }
-  
+    set { if _companderLevel != newValue { _companderLevel = newValue ; transmitCmd( .companderLevel, newValue) }}}
   @objc dynamic public var daxEnabled: Bool {
     get { _daxEnabled }
-    set { if _daxEnabled != newValue { _daxEnabled = newValue ; transmitCmd( .daxEnabled, newValue.as1or0) } } }
-  
+    set { if _daxEnabled != newValue { _daxEnabled = newValue ; transmitCmd( .daxEnabled, newValue.as1or0) }}}
   @objc dynamic public var hwAlcEnabled: Bool {
     get { _hwAlcEnabled }
-    set { if _hwAlcEnabled != newValue { _hwAlcEnabled = newValue ; transmitCmd( .hwAlcEnabled, newValue.as1or0) } } }
-  
+    set { if _hwAlcEnabled != newValue { _hwAlcEnabled = newValue ; transmitCmd( .hwAlcEnabled, newValue.as1or0) }}}
   @objc dynamic public var inhibit: Bool {
     get { _inhibit }
-    set { if _inhibit != newValue { _inhibit = newValue ; transmitCmd( .inhibit, newValue.as1or0) } } }
-  
+    set { if _inhibit != newValue { _inhibit = newValue ; transmitCmd( .inhibit, newValue.as1or0) }}}
   @objc dynamic public var maxPowerLevel: Int {
     get { _maxPowerLevel }
-    set { if _maxPowerLevel != newValue { _maxPowerLevel = newValue ; transmitCmd( .maxPowerLevel, newValue) } } }
-  
+    set { if _maxPowerLevel != newValue { _maxPowerLevel = newValue ; transmitCmd( .maxPowerLevel, newValue) }}}
   @objc dynamic public var metInRxEnabled: Bool {
     get { _metInRxEnabled }
-    set { if _metInRxEnabled != newValue { _metInRxEnabled = newValue ; transmitCmd( .metInRxEnabled, newValue.as1or0) } } }
-  
+    set { if _metInRxEnabled != newValue { _metInRxEnabled = newValue ; transmitCmd( .metInRxEnabled, newValue.as1or0) }}}
   @objc dynamic public var micLevel: Int {
     get { _micLevel }
-    set { if _micLevel != newValue { _micLevel = newValue ; transmitCmd( "miclevel", newValue) } } }
-  
+    set { if _micLevel != newValue { _micLevel = newValue ; transmitCmd( "miclevel", newValue) }}}
   @objc dynamic public var rfPower: Int {
     get { _rfPower }
-    set { if _rfPower != newValue { _rfPower = newValue ; transmitCmd( .rfPower, newValue) } } }
-  
+    set { if _rfPower != newValue { _rfPower = newValue ; transmitCmd( .rfPower, newValue) }}}
   @objc dynamic public var speechProcessorEnabled: Bool {
     get { _speechProcessorEnabled }
-    set { if _speechProcessorEnabled != newValue { _speechProcessorEnabled = newValue ; transmitCmd( .speechProcessorEnabled, newValue.as1or0) } } }
-  
+    set { if _speechProcessorEnabled != newValue { _speechProcessorEnabled = newValue ; transmitCmd( .speechProcessorEnabled, newValue.as1or0) }}}
   @objc dynamic public var speechProcessorLevel: Int {
     get { _speechProcessorLevel }
-    set { if _speechProcessorLevel != newValue { _speechProcessorLevel = newValue ; transmitCmd( .speechProcessorLevel, newValue) } } }
-  
+    set { if _speechProcessorLevel != newValue { _speechProcessorLevel = newValue ; transmitCmd( .speechProcessorLevel, newValue) }}}
   @objc dynamic public var tunePower: Int {
     get {  _tunePower }
-    set { if _tunePower != newValue { _tunePower = newValue ; transmitCmd( .tunePower, newValue) } } }
-  
+    set { if _tunePower != newValue { _tunePower = newValue ; transmitCmd( .tunePower, newValue) }}}
   @objc dynamic public var txFilterHigh: Int {
     get { _txFilterHigh }
-    set { if _txFilterHigh != newValue { let value = txFilterHighLimits(txFilterLow, newValue) ; _txFilterHigh = value ; transmitCmd( "filter_high", value) } } }
-  
+    set { if _txFilterHigh != newValue { let value = txFilterHighLimits(txFilterLow, newValue) ; _txFilterHigh = value ; transmitCmd( "filter_high", value) }}}
   @objc dynamic public var txFilterLow: Int {
     get { _txFilterLow }
-    set { if _txFilterLow != newValue { let value = txFilterLowLimits(newValue, txFilterHigh) ; _txFilterLow = value ; transmitCmd( "filter_low", value) } } }
-  
+    set { if _txFilterLow != newValue { let value = txFilterLowLimits(newValue, txFilterHigh) ; _txFilterLow = value ; transmitCmd( "filter_low", value) }}}
   @objc dynamic public var txInWaterfallEnabled: Bool {
     get { _txInWaterfallEnabled }
-    set { if _txInWaterfallEnabled != newValue { _txInWaterfallEnabled = newValue ; transmitCmd( .txInWaterfallEnabled, newValue.as1or0) } } }
-  
+    set { if _txInWaterfallEnabled != newValue { _txInWaterfallEnabled = newValue ; transmitCmd( .txInWaterfallEnabled, newValue.as1or0) }}}
   @objc dynamic public var txMonitorEnabled: Bool {
     get { _txMonitorEnabled }
-    set { if _txMonitorEnabled != newValue { _txMonitorEnabled = newValue ; transmitCmd( "mon", newValue.as1or0) } } }
-  
+    set { if _txMonitorEnabled != newValue { _txMonitorEnabled = newValue ; transmitCmd( "mon", newValue.as1or0) }}}
   @objc dynamic public var txMonitorGainCw: Int {
     get { _txMonitorGainCw }
-    set { if _txMonitorGainCw != newValue { _txMonitorGainCw = newValue ; transmitCmd( .txMonitorGainCw, newValue) } } }
-  
+    set { if _txMonitorGainCw != newValue { _txMonitorGainCw = newValue ; transmitCmd( .txMonitorGainCw, newValue) }}}
   @objc dynamic public var txMonitorGainSb: Int {
     get { _txMonitorGainSb }
-    set { if _txMonitorGainSb != newValue { _txMonitorGainSb = newValue ; transmitCmd( .txMonitorGainSb, newValue) } } }
-  
+    set { if _txMonitorGainSb != newValue { _txMonitorGainSb = newValue ; transmitCmd( .txMonitorGainSb, newValue) }}}
   @objc dynamic public var txMonitorPanCw: Int {
     get { _txMonitorPanCw }
-    set { if _txMonitorPanCw != newValue { _txMonitorPanCw = newValue ; transmitCmd( .txMonitorPanCw, newValue) } } }
-  
+    set { if _txMonitorPanCw != newValue { _txMonitorPanCw = newValue ; transmitCmd( .txMonitorPanCw, newValue) }}}
   @objc dynamic public var txMonitorPanSb: Int {
     get { _txMonitorPanSb }
-    set { if _txMonitorPanSb != newValue { _txMonitorPanSb = newValue ; transmitCmd( .txMonitorPanSb, newValue) } } }
-  
+    set { if _txMonitorPanSb != newValue { _txMonitorPanSb = newValue ; transmitCmd( .txMonitorPanSb, newValue) }}}
   @objc dynamic public var voxEnabled: Bool {
     get { _voxEnabled }
-    set { if _voxEnabled != newValue { _voxEnabled = newValue ; transmitCmd( .voxEnabled, newValue.as1or0) } } }
-  
+    set { if _voxEnabled != newValue { _voxEnabled = newValue ; transmitCmd( .voxEnabled, newValue.as1or0) }}}
   @objc dynamic public var voxDelay: Int {
     get { _voxDelay }
-    set { if _voxDelay != newValue { _voxDelay = newValue ; transmitCmd( .voxDelay, newValue) } } }
-  
+    set { if _voxDelay != newValue { _voxDelay = newValue ; transmitCmd( .voxDelay, newValue) }}}
   @objc dynamic public var voxLevel: Int {
     get { _voxLevel }
-    set { if _voxLevel != newValue { _voxLevel = newValue ; transmitCmd( .voxLevel, newValue) } } }
-  
+    set { if _voxLevel != newValue { _voxLevel = newValue ; transmitCmd( .voxLevel, newValue) }}}
   // ***** TUNE COMMANDS *****
   
   @objc dynamic public var tune: Bool {
     get {  return _tune }
-    set { if _tune != newValue { _tune = newValue ; tuneCmd( .tune, newValue.as1or0) } } }
-  
+    set { if _tune != newValue { _tune = newValue ; tuneCmd( .tune, newValue.as1or0) }}}
   @objc dynamic public var frequency: Hz {
     get {  return _frequency }
-    set { if _frequency != newValue { _frequency = newValue } } }
-  
+    set { if _frequency != newValue { _frequency = newValue }}}
   @objc dynamic public var rawIqEnabled: Bool       { _rawIqEnabled }
   @objc dynamic public var txFilterChanges: Bool    { _txFilterChanges }
   @objc dynamic public var txMonitorAvailable: Bool { _txMonitorAvailable }
@@ -195,51 +155,138 @@ public final class Transmit : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
 
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _carrierLevel                   
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _companderLevel
-  @BarrierClamped(0, Api.objectQ, range: 0...2_000)   var _cwBreakInDelay
-  @BarrierClamped(0, Api.objectQ, range: 100...6_000) var _cwPitch
-  @BarrierClamped(5, Api.objectQ, range: 5...100)     var _cwSpeed
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _maxPowerLevel
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _micLevel
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _rfPower
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _txMonitorPanSb
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _txMonitorGainCw
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _txMonitorGainSb
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _txMonitorPanCw
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _tunePower
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _voxDelay
-  @BarrierClamped(0, Api.objectQ, range: 0...100)     var _voxLevel
-
-  @Barrier(false, Api.objectQ)  var _companderEnabled
-  @Barrier(false, Api.objectQ)  var _cwBreakInEnabled
-  @Barrier(false, Api.objectQ)  var _cwIambicEnabled
-  @Barrier(0, Api.objectQ)      var _cwIambicMode
-  @Barrier(false, Api.objectQ)  var _cwlEnabled
-  @Barrier(false, Api.objectQ)  var _cwSidetoneEnabled
-  @Barrier(false, Api.objectQ)  var _cwSwapPaddles
-  @Barrier(false, Api.objectQ)  var _cwSyncCwxEnabled
-  @Barrier(false, Api.objectQ)  var _daxEnabled
-  @Barrier(0, Api.objectQ)      var _frequency              : Hz
-  @Barrier(false, Api.objectQ)  var _hwAlcEnabled
-  @Barrier(false, Api.objectQ)  var _inhibit
-  @Barrier(false, Api.objectQ)  var _metInRxEnabled
-  @Barrier(false, Api.objectQ)  var _micAccEnabled
-  @Barrier(false, Api.objectQ)  var _micBiasEnabled
-  @Barrier(false, Api.objectQ)  var _micBoostEnabled
-  @Barrier("", Api.objectQ)     var _micSelection
-  @Barrier(false, Api.objectQ)  var _rawIqEnabled
-  @Barrier(false, Api.objectQ)  var _speechProcessorEnabled
-  @Barrier(0, Api.objectQ)      var _speechProcessorLevel
-  @Barrier(false, Api.objectQ)  var _txFilterChanges
-  @Barrier(0, Api.objectQ)      var _txFilterHigh
-  @Barrier(0, Api.objectQ)      var _txFilterLow
-  @Barrier(false, Api.objectQ)  var _txInWaterfallEnabled
-  @Barrier(false, Api.objectQ)  var _txMonitorAvailable
-  @Barrier(false, Api.objectQ)  var _txMonitorEnabled
-  @Barrier(false, Api.objectQ)  var _txRfPowerChanges
-  @Barrier(false, Api.objectQ)  var _tune
-  @Barrier(false, Api.objectQ)  var _voxEnabled
+  var _carrierLevel: Int {
+    get { Api.objectQ.sync { __carrierLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __carrierLevel = newValue.bound(kControlMin, kControlMax) }}}
+  var _companderEnabled: Bool {
+    get { Api.objectQ.sync { __companderEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __companderEnabled = newValue }}}
+  var _companderLevel: Int {
+    get { Api.objectQ.sync { __companderLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __companderLevel = newValue.bound(0, 100) }}}
+  var _cwBreakInEnabled: Bool {
+    get { Api.objectQ.sync { __cwBreakInEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __cwBreakInEnabled = newValue }}}
+  var _cwBreakInDelay: Int {
+    get { Api.objectQ.sync { __cwBreakInDelay } }
+    set { Api.objectQ.sync(flags: .barrier) { __cwBreakInDelay = newValue.bound(kMinBreakInDelay, kMaxBreakInDelay) }}}
+  var _cwIambicEnabled: Bool {
+    get { Api.objectQ.sync { __cwIambicEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __cwIambicEnabled = newValue }}}
+  var _cwIambicMode: Int {
+    get { Api.objectQ.sync { __cwIambicMode } }
+    set { Api.objectQ.sync(flags: .barrier) { __cwIambicMode = newValue }}}
+  var _cwlEnabled: Bool {
+    get { Api.objectQ.sync { __cwlEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __cwlEnabled = newValue }}}
+  var _cwPitch: Int {
+    get { Api.objectQ.sync { __cwPitch } }
+    set { Api.objectQ.sync(flags: .barrier) { __cwPitch = newValue.bound(kMinPitch, kMaxPitch) }}}
+  var _cwSidetoneEnabled: Bool {
+    get { Api.objectQ.sync { __cwSidetoneEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __cwSidetoneEnabled = newValue }}}
+  var _cwSwapPaddles: Bool {
+    get { Api.objectQ.sync { __cwSwapPaddles } }
+    set { Api.objectQ.sync(flags: .barrier) { __cwSwapPaddles = newValue }}}
+  var _cwSyncCwxEnabled: Bool {
+    get { Api.objectQ.sync { __cwSyncCwxEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __cwSyncCwxEnabled = newValue }}}
+  var _cwSpeed: Int {
+    get { Api.objectQ.sync { __cwSpeed } }
+    set { Api.objectQ.sync(flags: .barrier) { __cwSpeed = newValue.bound(kMinWpm, kMaxWpm) }}}
+  var _daxEnabled: Bool {
+    get { Api.objectQ.sync { __daxEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __daxEnabled = newValue }}}
+  var _frequency: Int {
+    get { Api.objectQ.sync { __frequency } }
+    set { Api.objectQ.sync(flags: .barrier) { __frequency = newValue }}}
+  var _hwAlcEnabled: Bool {
+    get { Api.objectQ.sync { __hwAlcEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __hwAlcEnabled = newValue }}}
+  var _inhibit: Bool {
+    get { Api.objectQ.sync { __inhibit } }
+    set { Api.objectQ.sync(flags: .barrier) { __inhibit = newValue }}}
+  var _maxPowerLevel: Int {
+    get { Api.objectQ.sync { __maxPowerLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __maxPowerLevel = newValue.bound(kControlMin, kControlMax) }}}
+  var _metInRxEnabled: Bool {
+    get { Api.objectQ.sync { __metInRxEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __metInRxEnabled = newValue }}}
+  var _micAccEnabled: Bool {
+    get { Api.objectQ.sync { __micAccEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __micAccEnabled = newValue }}}
+  var _micBoostEnabled: Bool {
+    get { Api.objectQ.sync { __micBoostEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __micBoostEnabled = newValue }}}
+  var _micBiasEnabled: Bool {
+    get { Api.objectQ.sync { __micBiasEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __micBiasEnabled = newValue }}}
+  var _micLevel: Int {
+    get { Api.objectQ.sync { __micLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __micLevel = newValue.bound(kControlMin, kControlMax) }}}
+  var _micSelection: String {
+    get { Api.objectQ.sync { __micSelection } }
+    set { Api.objectQ.sync(flags: .barrier) { __micSelection = newValue }}}
+  var _rawIqEnabled: Bool {
+    get { Api.objectQ.sync { __rawIqEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __rawIqEnabled = newValue }}}
+  var _rfPower: Int {
+    get { Api.objectQ.sync { __rfPower } }
+    set { Api.objectQ.sync(flags: .barrier) { __rfPower = newValue.bound(kControlMin, kControlMax) }}}
+  var _speechProcessorEnabled: Bool {
+    get { Api.objectQ.sync { __speechProcessorEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __speechProcessorEnabled = newValue }}}
+  var _speechProcessorLevel: Int {
+    get { Api.objectQ.sync { __speechProcessorLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __speechProcessorLevel = newValue }}}
+  var _txFilterChanges: Bool {
+    get { Api.objectQ.sync { __txFilterChanges } }
+    set { Api.objectQ.sync(flags: .barrier) { __txFilterChanges = newValue }}}
+  var _txFilterHigh: Int {
+    get { Api.objectQ.sync { __txFilterHigh } }
+    set { Api.objectQ.sync(flags: .barrier) { __txFilterHigh = newValue }}}
+  var _txFilterLow: Int {
+    get { Api.objectQ.sync { __txFilterLow } }
+    set { Api.objectQ.sync(flags: .barrier) { __txFilterLow = newValue }}}
+  var _txInWaterfallEnabled: Bool {
+    get { Api.objectQ.sync { __txInWaterfallEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __txInWaterfallEnabled = newValue }}}
+  var _txMonitorAvailable: Bool {
+    get { Api.objectQ.sync { __txMonitorAvailable } }
+    set { Api.objectQ.sync(flags: .barrier) { __txMonitorAvailable = newValue }}}
+  var _txMonitorEnabled: Bool {
+    get { Api.objectQ.sync { __txMonitorEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __txMonitorEnabled = newValue }}}
+  var _txMonitorGainCw: Int {
+    get { Api.objectQ.sync { __txMonitorGainCw } }
+    set { Api.objectQ.sync(flags: .barrier) { __txMonitorGainCw = newValue.bound(kControlMin, kControlMax) }}}
+  var _txMonitorGainSb: Int {
+    get { Api.objectQ.sync { __txMonitorGainSb } }
+    set { Api.objectQ.sync(flags: .barrier) { __txMonitorGainSb = newValue.bound(kControlMin, kControlMax) }}}
+  var _txMonitorPanCw: Int {
+    get { Api.objectQ.sync { __txMonitorPanCw } }
+    set { Api.objectQ.sync(flags: .barrier) { __txMonitorPanCw = newValue.bound(0, 100) }}}
+  var _txMonitorPanSb: Int {
+    get { Api.objectQ.sync { __txMonitorPanSb } }
+    set { Api.objectQ.sync(flags: .barrier) { __txMonitorPanSb = newValue.bound(0, 100) }}}
+  var _txRfPowerChanges: Bool {
+    get { Api.objectQ.sync { __txRfPowerChanges } }
+    set { Api.objectQ.sync(flags: .barrier) { __txRfPowerChanges = newValue }}}
+  var _tune: Bool {
+    get { Api.objectQ.sync { __tune } }
+    set { Api.objectQ.sync(flags: .barrier) { __tune = newValue }}}
+  var _tunePower: Int {
+    get { Api.objectQ.sync { __tunePower } }
+    set { Api.objectQ.sync(flags: .barrier) { __tunePower = newValue.bound(kControlMin, kControlMax) }}}
+  var _voxEnabled: Bool {
+    get { Api.objectQ.sync { __voxEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __voxEnabled = newValue }}}
+  var _voxDelay: Int {
+    get { Api.objectQ.sync { __voxDelay } }
+    set { Api.objectQ.sync(flags: .barrier) { __voxDelay = newValue.bound(kControlMin, kControlMax) }}}
+  var _voxLevel: Int {
+    get { Api.objectQ.sync { __voxLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __voxLevel = newValue.bound(kControlMin, kControlMax) }}}
 
   enum Token: String {
     case amCarrierLevel           = "am_carrier_level"              // "am_carrier"
@@ -464,4 +511,52 @@ public final class Transmit : NSObject, StaticModel {
     
     Api.sharedInstance.send("mic " + token + " \(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __carrierLevel                = 0
+  private var __companderEnabled            = false
+  private var __companderLevel              = 0
+  private var __cwBreakInDelay              = 0
+  private var __cwBreakInEnabled            = false
+  private var __cwIambicEnabled             = false
+  private var __cwIambicMode                = 0
+  private var __cwlEnabled                  = false
+  private var __cwPitch                     = 0
+  private var __cwSidetoneEnabled           = false
+  private var __cwSwapPaddles               = false
+  private var __cwSyncCwxEnabled            = false
+  private var __cwSpeed                     = 5
+  private var __daxEnabled                  = false
+  private var __frequency                   = 0
+  private var __hwAlcEnabled                = false
+  private var __inhibit                     = false
+  private var __maxPowerLevel               = 0
+  private var __metInRxEnabled              = false
+  private var __micAccEnabled               = false
+  private var __micBiasEnabled              = false
+  private var __micBoostEnabled             = false
+  private var __micLevel                    = 0
+  private var __micSelection                = ""
+  private var __rawIqEnabled                = false
+  private var __rfPower                     = 0
+  private var __speechProcessorEnabled      = false
+  private var __speechProcessorLevel        = 0
+  private var __txFilterChanges             = false
+  private var __txFilterHigh                = 0
+  private var __txFilterLow                 = 0
+  private var __txInWaterfallEnabled        = false
+  private var __txMonitorAvailable          = false
+  private var __txMonitorEnabled            = false
+  private var __txMonitorGainCw             = 0
+  private var __txMonitorGainSb             = 0
+  private var __txMonitorPanCw              = 0
+  private var __txMonitorPanSb              = 0
+  private var __txRfPowerChanges            = false
+  private var __tune                        = false
+  private var __tunePower                   = 0
+  private var __voxDelay                    = 0
+  private var __voxEnabled                  = false
+  private var __voxLevel                    = 0                            
 }

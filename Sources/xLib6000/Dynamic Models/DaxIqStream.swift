@@ -26,7 +26,9 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   
   public      let id          : DaxIqStreamId
   
-  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
+  public var delegate : StreamHandler? {
+    get { Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
   @objc dynamic public  var rate        : Int {
     get { _rate }
@@ -50,11 +52,21 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(0, Api.objectQ)      var _channel      : Int
-  @Barrier(0, Api.objectQ)      var _clientHandle : Handle
-  @Barrier(0, Api.objectQ)      var _pan          : PanadapterStreamId
-  @Barrier(0, Api.objectQ)      var _rate
-  @Barrier(false, Api.objectQ)  var _isActive
+  var _channel      : Int {
+    get { Api.objectQ.sync { __channel } }
+    set { Api.objectQ.sync(flags: .barrier) {__channel = newValue }}}
+  var _clientHandle : Handle {
+    get { Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+  var _pan : PanadapterStreamId {
+    get { Api.objectQ.sync { __pan } }
+    set { Api.objectQ.sync(flags: .barrier) {__pan = newValue }}}
+  var _rate : Int {
+    get { Api.objectQ.sync { __rate } }
+    set { Api.objectQ.sync(flags: .barrier) {__rate = newValue }}}
+  var _isActive : Bool {
+    get { Api.objectQ.sync { __isActive } }
+    set { Api.objectQ.sync(flags: .barrier) {__isActive = newValue }}}
 
   enum Token: String {
     case clientHandle                       = "client_handle"
@@ -251,5 +263,16 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       _rxSeq = expectedSequenceNumber
     }
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _delegate       : StreamHandler? = nil
+
+  private var __channel       = 0
+  private var __clientHandle  : Handle = 0
+  private var __pan           : PanadapterStreamId = 0
+  private var __rate          = 0
+  private var __isActive      = false
 }
 

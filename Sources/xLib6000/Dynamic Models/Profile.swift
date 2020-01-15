@@ -34,8 +34,7 @@ public final class Profile                  : NSObject, StaticModel {
 
   @objc dynamic public var selection: ProfileName {
     get { _selection }
-    set { if _selection != newValue { _selection = newValue ; profileCmd(newValue) } } }
-  
+    set { if _selection != newValue { _selection = newValue ; profileCmd(newValue) }}}
   @objc dynamic public var list: [ProfileName] { _list }
 
   public enum Group : String {
@@ -51,8 +50,12 @@ public final class Profile                  : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier([ProfileName](), Api.objectQ)  var _list           : [ProfileName]
-  @Barrier("", Api.objectQ)               var _selection      : ProfileId
+  var _list : [ProfileName] {
+    get { Api.objectQ.sync { __list } }
+    set { Api.objectQ.sync(flags: .barrier) {__list = newValue }}}
+  var _selection : ProfileId {
+    get { Api.objectQ.sync { __selection } }
+    set { Api.objectQ.sync(flags: .barrier) {__selection = newValue }}}
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -207,4 +210,10 @@ public final class Profile                  : NSObject, StaticModel {
   private func profileCmd(_ value: Any) {
     _radio.sendCommand("profile "  + id + " load \"\(value)\"")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __list           = [ProfileName]()
+  private var __selection      : ProfileId = ""
 }

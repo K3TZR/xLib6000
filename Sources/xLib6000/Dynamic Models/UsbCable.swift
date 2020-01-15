@@ -26,68 +26,52 @@ public final class UsbCable : NSObject, DynamicModel {
 
   @objc dynamic public var autoReport: Bool {
     get { _autoReport }
-    set { if _autoReport != newValue { _autoReport = newValue ; usbCableCmd( .autoReport, newValue.as1or0) } } }
-  
+    set { if _autoReport != newValue { _autoReport = newValue ; usbCableCmd( .autoReport, newValue.as1or0) }}}
   @objc dynamic public var band: String {
     get { _band }
-    set { if _band != newValue { _band = newValue ; usbCableCmd( .band, newValue) } } }
-  
+    set { if _band != newValue { _band = newValue ; usbCableCmd( .band, newValue) }}}
   @objc dynamic public var dataBits: Int {
     get { _dataBits }
-    set { if _dataBits != newValue { _dataBits = newValue ; usbCableCmd( .dataBits, newValue) } } }
-  
+    set { if _dataBits != newValue { _dataBits = newValue ; usbCableCmd( .dataBits, newValue) }}}
   @objc dynamic public var enable: Bool {
     get { _enable }
-    set { if _enable != newValue { _enable = newValue ; usbCableCmd( .enable, newValue.as1or0) } } }
-  
+    set { if _enable != newValue { _enable = newValue ; usbCableCmd( .enable, newValue.as1or0) }}}
   @objc dynamic public var flowControl: String {
     get { _flowControl }
-    set { if _flowControl != newValue { _flowControl = newValue ; usbCableCmd( .flowControl, newValue) } } }
-  
+    set { if _flowControl != newValue { _flowControl = newValue ; usbCableCmd( .flowControl, newValue) }}}
   @objc dynamic public var name: String {
     get { _name }
-    set { if _name != newValue { _name = newValue ; usbCableCmd( .name, newValue) } } }
-  
+    set { if _name != newValue { _name = newValue ; usbCableCmd( .name, newValue) }}}
   @objc dynamic public var parity: String {
     get { _parity }
-    set { if _parity != newValue { _parity = newValue ; usbCableCmd( .parity, newValue) } } }
-  
+    set { if _parity != newValue { _parity = newValue ; usbCableCmd( .parity, newValue) }}}
   @objc dynamic public var pluggedIn: Bool {
     get { _pluggedIn }
-    set { if _pluggedIn != newValue { _pluggedIn = newValue ; usbCableCmd( .pluggedIn, newValue.as1or0) } } }
-  
+    set { if _pluggedIn != newValue { _pluggedIn = newValue ; usbCableCmd( .pluggedIn, newValue.as1or0) }}}
   @objc dynamic public var polarity: String {
     get { _polarity }
-    set { if _polarity != newValue { _polarity = newValue ; usbCableCmd( .polarity, newValue) } } }
-  
+    set { if _polarity != newValue { _polarity = newValue ; usbCableCmd( .polarity, newValue) }}}
   @objc dynamic public var preamp: String {
     get { _preamp }
-    set { if _preamp != newValue { _preamp = newValue ; usbCableCmd( .preamp, newValue) } } }
-  
+    set { if _preamp != newValue { _preamp = newValue ; usbCableCmd( .preamp, newValue) }}}
   @objc dynamic public var source: String {
     get { _source }
-    set { if _source != newValue { _source = newValue ; usbCableCmd( .source, newValue) } } }
-  
+    set { if _source != newValue { _source = newValue ; usbCableCmd( .source, newValue) }}}
   @objc dynamic public var sourceRxAnt: String {
     get { _sourceRxAnt }
-    set { if _sourceRxAnt != newValue { _sourceRxAnt = newValue ; usbCableCmd( .sourceRxAnt, newValue) } } }
-  
+    set { if _sourceRxAnt != newValue { _sourceRxAnt = newValue ; usbCableCmd( .sourceRxAnt, newValue) }}}
   @objc dynamic public var sourceSlice: Int {
     get { _sourceSlice }
-    set { if _sourceSlice != newValue { _sourceSlice = newValue ; usbCableCmd( .sourceSlice, newValue) } } }
-  
+    set { if _sourceSlice != newValue { _sourceSlice = newValue ; usbCableCmd( .sourceSlice, newValue) }}}
   @objc dynamic public var sourceTxAnt: String {
     get { _sourceTxAnt }
-    set { if _sourceTxAnt != newValue { _sourceTxAnt = newValue ; usbCableCmd( .sourceTxAnt, newValue) } } }
-  
+    set { if _sourceTxAnt != newValue { _sourceTxAnt = newValue ; usbCableCmd( .sourceTxAnt, newValue) }}}
   @objc dynamic public var speed: Int {
     get { _speed }
-    set { if _speed != newValue { _speed = newValue ; usbCableCmd( .speed, newValue) } } }
-  
+    set { if _speed != newValue { _speed = newValue ; usbCableCmd( .speed, newValue) }}}
   @objc dynamic public var stopBits: Int {
     get { _stopBits }
-    set { if _stopBits != newValue { _stopBits = newValue ; usbCableCmd( .stopBits, newValue) } } }
-  
+    set { if _stopBits != newValue { _stopBits = newValue ; usbCableCmd( .stopBits, newValue) }}}
   @objc dynamic public var usbLog: Bool {
     get { _usbLog }
     set { if _usbLog != newValue { _usbLog = newValue ; usbCableCmd( .usbLog, newValue.as1or0) } } }
@@ -106,24 +90,60 @@ public final class UsbCable : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(false, Api.objectQ) var _autoReport
-  @Barrier("", Api.objectQ)    var _band
-  @Barrier(0, Api.objectQ)     var _dataBits
-  @Barrier(false, Api.objectQ) var _enable
-  @Barrier("", Api.objectQ)    var _flowControl
-  @Barrier("", Api.objectQ)    var _name
-  @Barrier("", Api.objectQ)    var _parity
-  @Barrier(false, Api.objectQ) var _pluggedIn
-  @Barrier("", Api.objectQ)    var _polarity
-  @Barrier("", Api.objectQ)    var _preamp
-  @Barrier("", Api.objectQ)    var _source
-  @Barrier("", Api.objectQ)    var _sourceRxAnt
-  @Barrier(0, Api.objectQ)     var _sourceSlice
-  @Barrier("", Api.objectQ)    var _sourceTxAnt
-  @Barrier(0, Api.objectQ)     var _speed
-  @Barrier(0, Api.objectQ)     var _stopBits
-  @Barrier(false, Api.objectQ) var _usbLog
-  @Barrier("", Api.objectQ)    var _usbLogLine                           
+  var _autoReport : Bool {
+    get { Api.objectQ.sync { __autoReport } }
+    set { Api.objectQ.sync(flags: .barrier) {__autoReport = newValue }}}
+  var _band : String {
+    get { Api.objectQ.sync { __band } }
+    set { Api.objectQ.sync(flags: .barrier) {__band = newValue }}}
+  var _dataBits : Int {
+    get { Api.objectQ.sync { __dataBits } }
+    set { Api.objectQ.sync(flags: .barrier) {__dataBits = newValue }}}
+  var _enable : Bool {
+    get { Api.objectQ.sync { __enable } }
+    set { Api.objectQ.sync(flags: .barrier) {__enable = newValue }}}
+  var _flowControl : String {
+    get { Api.objectQ.sync { __flowControl } }
+    set { Api.objectQ.sync(flags: .barrier) {__flowControl = newValue }}}
+  var _name : String {
+    get { Api.objectQ.sync { __name } }
+    set { Api.objectQ.sync(flags: .barrier) {__name = newValue }}}
+  var _parity : String {
+    get { Api.objectQ.sync { __parity } }
+    set { Api.objectQ.sync(flags: .barrier) {__parity = newValue }}}
+  var _pluggedIn : Bool {
+    get { Api.objectQ.sync { __pluggedIn } }
+    set { Api.objectQ.sync(flags: .barrier) {__pluggedIn = newValue }}}
+  var _polarity : String {
+    get { Api.objectQ.sync { __polarity } }
+    set { Api.objectQ.sync(flags: .barrier) {__polarity = newValue }}}
+  var _preamp : String {
+    get { Api.objectQ.sync { __preamp } }
+    set { Api.objectQ.sync(flags: .barrier) {__preamp = newValue }}}
+  var _source : String {
+    get { Api.objectQ.sync { __source } }
+    set { Api.objectQ.sync(flags: .barrier) {__source = newValue }}}
+  var _sourceRxAnt : String {
+    get { Api.objectQ.sync { __sourceRxAnt } }
+    set { Api.objectQ.sync(flags: .barrier) {__sourceRxAnt = newValue }}}
+  var _sourceSlice : Int {
+    get { Api.objectQ.sync { __sourceSlice } }
+    set { Api.objectQ.sync(flags: .barrier) {__sourceSlice = newValue }}}
+  var _sourceTxAnt : String {
+    get { Api.objectQ.sync { __sourceTxAnt } }
+    set { Api.objectQ.sync(flags: .barrier) {__sourceTxAnt = newValue }}}
+  var _speed : Int {
+    get { Api.objectQ.sync { __speed } }
+    set { Api.objectQ.sync(flags: .barrier) {__speed = newValue }}}
+  var _stopBits : Int {
+    get { Api.objectQ.sync { __stopBits } }
+    set { Api.objectQ.sync(flags: .barrier) {__stopBits = newValue }}}
+  var _usbLog : Bool {
+    get { Api.objectQ.sync { __usbLog } }
+    set { Api.objectQ.sync(flags: .barrier) {__usbLog = newValue }}}
+  var _usbLogLine : String {
+    get { Api.objectQ.sync { __usbLogLine } }
+    set { Api.objectQ.sync(flags: .barrier) {__usbLogLine = newValue }}}
 
   enum Token : String {
     case autoReport       = "auto_report"
@@ -317,5 +337,27 @@ public final class UsbCable : NSObject, DynamicModel {
   private func usbCableCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("usb_cable set " + "\(id) " + token.rawValue + "=\(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __autoReport  = false
+  private var __band        = ""
+  private var __dataBits    = 0
+  private var __enable      = false
+  private var __flowControl = ""
+  private var __name        = ""
+  private var __parity      = ""
+  private var __pluggedIn   = false
+  private var __polarity    = ""
+  private var __preamp      = ""
+  private var __source      = ""
+  private var __sourceRxAnt = ""
+  private var __sourceSlice = 0
+  private var __sourceTxAnt = ""
+  private var __speed       = 0
+  private var __stopBits    = 0
+  private var __usbLog      = false
+  private var __usbLogLine  = ""
 }
 

@@ -39,17 +39,39 @@ public final class Gps : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier("", Api.objectQ)     var _altitude
-  @Barrier(0.0, Api.objectQ)    var _frequencyError   : Double
-  @Barrier("", Api.objectQ)     var _grid
-  @Barrier("", Api.objectQ)     var _latitude
-  @Barrier("", Api.objectQ)     var _longitude
-  @Barrier("", Api.objectQ)     var _speed
-  @Barrier(false, Api.objectQ)  var _status
-  @Barrier("", Api.objectQ)     var _time
-  @Barrier(0.0, Api.objectQ)    var _track            : Double
-  @Barrier(false, Api.objectQ)  var _tracked
-  @Barrier(false, Api.objectQ)  var _visible
+  var _altitude : String {
+    get { Api.objectQ.sync { __altitude } }
+    set { Api.objectQ.sync(flags: .barrier) {__altitude = newValue }}}
+  var _frequencyError : Double {
+    get { Api.objectQ.sync { __frequencyError } }
+    set { Api.objectQ.sync(flags: .barrier) {__frequencyError = newValue }}}
+  var _grid : String {
+    get { Api.objectQ.sync { __grid } }
+    set { Api.objectQ.sync(flags: .barrier) {__grid = newValue }}}
+  var _latitude : String {
+    get { Api.objectQ.sync { __latitude } }
+    set { Api.objectQ.sync(flags: .barrier) {__latitude = newValue }}}
+  var _longitude : String {
+    get { Api.objectQ.sync { __longitude } }
+    set { Api.objectQ.sync(flags: .barrier) {__longitude = newValue }}}
+  var _speed : String {
+    get { Api.objectQ.sync { __speed } }
+    set { Api.objectQ.sync(flags: .barrier) {__speed = newValue }}}
+  var _status : Bool {
+    get { Api.objectQ.sync { __status } }
+    set { Api.objectQ.sync(flags: .barrier) {__status = newValue }}}
+  var _time : String {
+    get { Api.objectQ.sync { __time } }
+    set { Api.objectQ.sync(flags: .barrier) {__time = newValue }}}
+  var _track : Double {
+    get { Api.objectQ.sync { __track } }
+    set { Api.objectQ.sync(flags: .barrier) {__track = newValue }}}
+  var _tracked : Bool {
+    get { Api.objectQ.sync { __tracked } }
+    set { Api.objectQ.sync(flags: .barrier) {__tracked = newValue }}}
+  var _visible : Bool {
+    get { Api.objectQ.sync { __visible } }
+    set { Api.objectQ.sync(flags: .barrier) {__visible = newValue }}}
 
   enum Token: String {
     case altitude
@@ -148,4 +170,19 @@ public final class Gps : NSObject, StaticModel {
       }
     }
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __altitude        = ""
+  private var __frequencyError  : Double = 0.0
+  private var __grid            = ""
+  private var __latitude        = ""
+  private var __longitude       = ""
+  private var __speed           = ""
+  private var __status          = false
+  private var __time            = ""
+  private var __track           : Double = 0.0
+  private var __tracked         = false
+  private var __visible         = false
 }

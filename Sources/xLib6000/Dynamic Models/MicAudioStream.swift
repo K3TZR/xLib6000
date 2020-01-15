@@ -22,19 +22,19 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   
   public      let id          : DaxMicStreamId
   
-  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
+  public var delegate : StreamHandler? {
+    get { Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
   @objc dynamic public var inUse: Bool {
     return _inUse }
   
   @objc dynamic public var ip: String {
     get { _ip }
-    set { if _ip != newValue { _ip = newValue } } }
-  
+    set { if _ip != newValue { _ip = newValue }}}
   @objc dynamic public var port: Int {
     get { _port  }
-    set { if _port != newValue { _port = newValue } } }
-  
+    set { if _port != newValue { _port = newValue }}}
   @objc dynamic public var micGain: Int {
     get { _micGain  }
     set {
@@ -57,13 +57,22 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @BarrierClamped(50, Api.objectQ,range:  0...100)  var _micGain
+  var _inUse : Bool {
+    get { Api.objectQ.sync { __inUse } }
+    set { Api.objectQ.sync(flags: .barrier) {__inUse = newValue }}}
+  var _ip : String {
+    get { Api.objectQ.sync { __ip } }
+    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+  var _port : Int {
+    get { Api.objectQ.sync { __port } }
+    set { Api.objectQ.sync(flags: .barrier) {__port = newValue }}}
+  var _micGain : Int {
+    get { Api.objectQ.sync { __micGain } }
+    set { Api.objectQ.sync(flags: .barrier) {__micGain = newValue }}}
+  var _micGainScalar : Float {
+    get { Api.objectQ.sync { __micGainScalar } }
+    set { Api.objectQ.sync(flags: .barrier) {__micGainScalar = newValue }}}
 
-  @Barrier(false, Api.objectQ)  var _inUse
-  @Barrier("", Api.objectQ)     var _ip
-  @Barrier(0, Api.objectQ)      var _port
-  @Barrier(1.0, Api.objectQ)    var _micGainScalar : Float
-  
   enum Token: String {
     case inUse      = "in_use"
     case ip
@@ -267,4 +276,15 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       _rxSeq = expectedSequenceNumber
     }
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _delegate       : StreamHandler? = nil
+    
+  private var __inUse         = false
+  private var __ip            = ""
+  private var __port          = 0
+  private var __micGain       = 50
+  private var __micGainScalar : Float = 1.0
 }

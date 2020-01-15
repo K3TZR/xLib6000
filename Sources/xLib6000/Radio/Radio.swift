@@ -30,113 +30,91 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   public var amplifiers = [AmplifierId: Amplifier]()
 //  {
 //    get { Api.objectQ.sync { _amplifiers } }
-//    set { Api.objectQ.sync(flags: .barrier) { _amplifiers = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _amplifiers = newValue }}}
   public var audioStreams = [AudioStreamId: AudioStream]()
 //  {
 //    get { Api.objectQ.sync { _audioStreams } }
-//    set { Api.objectQ.sync(flags: .barrier) { _audioStreams = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _audioStreams = newValue }}}
   public var daxIqStreams = [DaxIqStreamId: DaxIqStream]()
 //  {
 //    get { Api.objectQ.sync { _daxIqStreams } }
-//    set { Api.objectQ.sync(flags: .barrier) { _daxIqStreams = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _daxIqStreams = newValue }}}
   public var daxMicAudioStreams = [DaxMicStreamId: DaxMicAudioStream]()
 //  {
 //    get { Api.objectQ.sync { _daxMicAudioStreams } }
-//    set { Api.objectQ.sync(flags: .barrier) { _daxMicAudioStreams = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _daxMicAudioStreams = newValue }}}
   public var daxRxAudioStreams = [DaxRxStreamId: DaxRxAudioStream]()
 //  {
 //    get { Api.objectQ.sync { _daxRxAudioStreams } }
-//    set { Api.objectQ.sync(flags: .barrier) { _daxRxAudioStreams = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _daxRxAudioStreams = newValue }}}
   public var daxTxAudioStreams = [DaxTxStreamId: DaxTxAudioStream]()
 //  {
 //    get { Api.objectQ.sync { _daxTxAudioStreams } }
-//    set { Api.objectQ.sync(flags: .barrier) { _daxTxAudioStreams = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _daxTxAudioStreams = newValue }}}
   public var equalizers = [Equalizer.EqType: Equalizer]()
 //  {
 //    get { Api.objectQ.sync { _equalizers } }
-//    set { Api.objectQ.sync(flags: .barrier) { _equalizers = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _equalizers = newValue }}}
   public var iqStreams = [DaxIqStreamId: IqStream]()
 //  {
 //    get { Api.objectQ.sync { _iqStreams } }
-//    set { Api.objectQ.sync(flags: .barrier) { _iqStreams = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _iqStreams = newValue }}}
   public var memories = [MemoryId: Memory]()
 //  {
 //    get { Api.objectQ.sync { _memories } }
-//    set { Api.objectQ.sync(flags: .barrier) { _memories = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _memories = newValue }}}
   public var meters = [MeterId: Meter]()
 //  {
 //    get { Api.objectQ.sync { _meters } }
-//    set { Api.objectQ.sync(flags: .barrier) { _meters = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _meters = newValue }}}
   public var micAudioStreams = [DaxMicStreamId: MicAudioStream]()
 //  {
 //    get { Api.objectQ.sync { _micAudioStreams } }
-//    set { Api.objectQ.sync(flags: .barrier) { _micAudioStreams = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _micAudioStreams = newValue }}}
   public var opusStreams = [OpusId: Opus]()
 //  {
 //    get { Api.objectQ.sync { _opusStreams } }
-//    set { Api.objectQ.sync(flags: .barrier) { _opusStreams = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _opusStreams = newValue }}}
   public var panadapters = [PanadapterStreamId: Panadapter]()
 //  {
 //    get { Api.objectQ.sync { _panadapters } }
-//    set { Api.objectQ.sync(flags: .barrier) { _panadapters = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _panadapters = newValue }}}
   public var profiles = [ProfileId: Profile]()
 //  {
 //    get { Api.objectQ.sync { _profiles } }
-//    set { Api.objectQ.sync(flags: .barrier) { _profiles = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _profiles = newValue }}}
   public var remoteRxAudioStreams = [RemoteRxStreamId: RemoteRxAudioStream]()
 //  {
 //    get { Api.objectQ.sync { _remoteRxAudioStreams } }
-//    set { Api.objectQ.sync(flags: .barrier) { _remoteRxAudioStreams = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _remoteRxAudioStreams = newValue }}}
   public var remoteTxAudioStreams = [RemoteTxStreamId: RemoteTxAudioStream]()
 //  {
 //    get { Api.objectQ.sync { _remoteTxAudioStreams } }
-//    set { Api.objectQ.sync(flags: .barrier) { _remoteTxAudioStreams = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _remoteTxAudioStreams = newValue }}}
   public var replyHandlers: [SequenceNumber: ReplyTuple]
   {
     get { Api.objectQ.sync { _replyHandlers } }
-    set { Api.objectQ.sync(flags: .barrier) { _replyHandlers = newValue } } }
-  
+    set { Api.objectQ.sync(flags: .barrier) { _replyHandlers = newValue }}}
   public var slices = [SliceId: Slice]()
 //  {
 //    get { Api.objectQ.sync { _slices } }
-//    set { Api.objectQ.sync(flags: .barrier) { _slices = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _slices = newValue }}}
   public var tnfs = [TnfId: Tnf]()
 //  {
 //    get { Api.objectQ.sync { _tnfs } }
-//    set { Api.objectQ.sync(flags: .barrier) { _tnfs = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _tnfs = newValue }}}
   public var txAudioStreams = [TxStreamId: TxAudioStream]()
 //  {
 //    get { Api.objectQ.sync { _txAudioStreams } }
-//    set { Api.objectQ.sync(flags: .barrier) { _txAudioStreams = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _txAudioStreams = newValue }}}
   public var usbCables = [UsbCableId: UsbCable]()
 //  {
 //    get { Api.objectQ.sync { _usbCables } }
-//    set { Api.objectQ.sync(flags: .barrier) { _usbCables = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _usbCables = newValue }}}
   public var waterfalls = [WaterfallStreamId: Waterfall]()
 //  {
 //    get { Api.objectQ.sync { _waterfalls } }
-//    set { Api.objectQ.sync(flags: .barrier) { _waterfalls = newValue } } }
-  
+//    set { Api.objectQ.sync(flags: .barrier) { _waterfalls = newValue }}}
   public var xvtrs = [XvtrId: Xvtr]()
 //  {
 //    get { Api.objectQ.sync { _xvtrs } }
@@ -159,140 +137,107 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // Shadowed properties that send commands
   @objc dynamic public var apfEnabled: Bool {
     get {  return _apfEnabled }
-    set { if _apfEnabled != newValue { _apfEnabled = newValue ; apfCmd( .mode, newValue.as1or0) } } }
-  
+    set { if _apfEnabled != newValue { _apfEnabled = newValue ; apfCmd( .mode, newValue.as1or0) }}}
   @objc dynamic public var apfQFactor: Int {
     get {  return _apfQFactor }
-    set { if _apfQFactor != newValue { _apfQFactor = newValue ; apfCmd( .qFactor, newValue) } } }
-  
+    set { if _apfQFactor != newValue { _apfQFactor = newValue ; apfCmd( .qFactor, newValue) }}}
   @objc dynamic public var apfGain: Int {
     get {  return _apfGain }
-    set { if _apfGain != newValue { _apfGain = newValue ; apfCmd( .gain, newValue) } } }
-  
+    set { if _apfGain != newValue { _apfGain = newValue ; apfCmd( .gain, newValue) }}}
   // FIXME: command for backlight
   @objc dynamic public var backlight: Int {
     get {  return _backlight }
-    set { if _backlight != newValue { _backlight = newValue  } } }
-  
+    set { if _backlight != newValue { _backlight = newValue  }}}
   @objc dynamic public var bandPersistenceEnabled: Bool {
     get {  return _bandPersistenceEnabled }
-    set { if _bandPersistenceEnabled != newValue { _bandPersistenceEnabled = newValue ; radioSetCmd( .bandPersistenceEnabled, newValue.as1or0) } } }
-  
+    set { if _bandPersistenceEnabled != newValue { _bandPersistenceEnabled = newValue ; radioSetCmd( .bandPersistenceEnabled, newValue.as1or0) }}}
   @objc dynamic public var binauralRxEnabled: Bool {
     get {  return _binauralRxEnabled }
-    set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) } } }
-  
+    set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) }}}
   @objc dynamic public var calFreq: Hz {
     get {  return _calFreq }
-    set { if _calFreq != newValue { _calFreq = newValue ; radioSetCmd( .calFreq, newValue.hzToMhz) } } }
-  
+    set { if _calFreq != newValue { _calFreq = newValue ; radioSetCmd( .calFreq, newValue.hzToMhz) }}}
   @objc dynamic public var callsign: String {
     get {  return _callsign }
-    set { if _callsign != newValue { _callsign = newValue ; radioCmd( .callsign, newValue) } } }
-  
+    set { if _callsign != newValue { _callsign = newValue ; radioCmd( .callsign, newValue) }}}
   @objc dynamic public var enforcePrivateIpEnabled: Bool {
     get {  return _enforcePrivateIpEnabled }
-    set { if _enforcePrivateIpEnabled != newValue { _enforcePrivateIpEnabled = newValue ; radioSetCmd( .enforcePrivateIpEnabled, newValue.as1or0) } } }
-  
+    set { if _enforcePrivateIpEnabled != newValue { _enforcePrivateIpEnabled = newValue ; radioSetCmd( .enforcePrivateIpEnabled, newValue.as1or0) }}}
   @objc dynamic public var filterCwAutoEnabled: Bool {
     get {  return _filterCwAutoEnabled }
-    set { if _filterCwAutoEnabled != newValue { _filterCwAutoEnabled = newValue ; radioFilterCmd( .cw, .autoLevel, newValue.as1or0) } } }
-  
+    set { if _filterCwAutoEnabled != newValue { _filterCwAutoEnabled = newValue ; radioFilterCmd( .cw, .autoLevel, newValue.as1or0) }}}
   @objc dynamic public var filterDigitalAutoEnabled: Bool {
     get {  return _filterDigitalAutoEnabled }
-    set { if _filterDigitalAutoEnabled != newValue { _filterDigitalAutoEnabled = newValue ; radioFilterCmd( .digital, .autoLevel, newValue.as1or0) } } }
-  
+    set { if _filterDigitalAutoEnabled != newValue { _filterDigitalAutoEnabled = newValue ; radioFilterCmd( .digital, .autoLevel, newValue.as1or0) }}}
   @objc dynamic public var filterVoiceAutoEnabled: Bool {
     get {  return _filterVoiceAutoEnabled }
-    set { if _filterVoiceAutoEnabled != newValue { _filterVoiceAutoEnabled = newValue ; radioFilterCmd( .voice, .autoLevel, newValue.as1or0) } } }
-  
+    set { if _filterVoiceAutoEnabled != newValue { _filterVoiceAutoEnabled = newValue ; radioFilterCmd( .voice, .autoLevel, newValue.as1or0) }}}
   @objc dynamic public var filterCwLevel: Int {
     get {  return _filterCwLevel }
-    set { if _filterCwLevel != newValue { _filterCwLevel = newValue ; radioFilterCmd( .cw, .level, newValue) } } }
-  
+    set { if _filterCwLevel != newValue { _filterCwLevel = newValue ; radioFilterCmd( .cw, .level, newValue) }}}
   @objc dynamic public var filterDigitalLevel: Int {
     get {  return _filterDigitalLevel }
-    set { if _filterDigitalLevel != newValue { _filterDigitalLevel = newValue ; radioFilterCmd( .digital, .level, newValue) } } }
-  
+    set { if _filterDigitalLevel != newValue { _filterDigitalLevel = newValue ; radioFilterCmd( .digital, .level, newValue) }}}
   @objc dynamic public var filterVoiceLevel: Int {
     get {  return _filterVoiceLevel }
-    set { if _filterVoiceLevel != newValue { _filterVoiceLevel = newValue ; radioFilterCmd( .voice, .level, newValue) } } }
-  
+    set { if _filterVoiceLevel != newValue { _filterVoiceLevel = newValue ; radioFilterCmd( .voice, .level, newValue) }}}
   @objc dynamic public var freqErrorPpb: Int {
     get {  return _freqErrorPpb }
-    set { if _freqErrorPpb != newValue { _freqErrorPpb = newValue ; radioSetCmd( .freqErrorPpb, newValue) } } }
-  
+    set { if _freqErrorPpb != newValue { _freqErrorPpb = newValue ; radioSetCmd( .freqErrorPpb, newValue) }}}
   @objc dynamic public var frontSpeakerMute: Bool {
     get {  return _frontSpeakerMute }
-    set { if _frontSpeakerMute != newValue { _frontSpeakerMute = newValue ; radioSetCmd( .frontSpeakerMute, newValue.as1or0) } } }
-  
+    set { if _frontSpeakerMute != newValue { _frontSpeakerMute = newValue ; radioSetCmd( .frontSpeakerMute, newValue.as1or0) }}}
   @objc dynamic public var fullDuplexEnabled: Bool {
     get {  return _fullDuplexEnabled }
-    set { if _fullDuplexEnabled != newValue { _fullDuplexEnabled = newValue ; radioSetCmd( .fullDuplexEnabled, newValue.as1or0) } } }
-  
+    set { if _fullDuplexEnabled != newValue { _fullDuplexEnabled = newValue ; radioSetCmd( .fullDuplexEnabled, newValue.as1or0) }}}
   @objc dynamic public var headphoneGain: Int {
     get {  return _headphoneGain }
-    set { if _headphoneGain != newValue { _headphoneGain = newValue ; mixerCmd( "headphone gain", newValue) } } }
-  
+    set { if _headphoneGain != newValue { _headphoneGain = newValue ; mixerCmd( "headphone gain", newValue) }}}
   @objc dynamic public var headphoneMute: Bool {
     get {  return _headphoneMute }
-    set { if _headphoneMute != newValue { _headphoneMute = newValue; mixerCmd( "headphone mute", newValue.as1or0) } } }
-  
+    set { if _headphoneMute != newValue { _headphoneMute = newValue; mixerCmd( "headphone mute", newValue.as1or0) }}}
   @objc dynamic public var lineoutGain: Int {
     get {  return _lineoutGain }
-    set { if _lineoutGain != newValue { _lineoutGain = newValue ; mixerCmd( "lineout gain", newValue) } } }
-  
+    set { if _lineoutGain != newValue { _lineoutGain = newValue ; mixerCmd( "lineout gain", newValue) }}}
   @objc dynamic public var lineoutMute: Bool {
     get {  return _lineoutMute }
-    set { if _lineoutMute != newValue { _lineoutMute = newValue ; mixerCmd( "lineout mute", newValue.as1or0) } } }
-  
+    set { if _lineoutMute != newValue { _lineoutMute = newValue ; mixerCmd( "lineout mute", newValue.as1or0) }}}
   @objc dynamic public var mox: Bool {
     get { _mox }
-    set { if _mox != newValue { _mox = newValue ; xmitCmd( newValue.as1or0) } } }
-  
+    set { if _mox != newValue { _mox = newValue ; xmitCmd( newValue.as1or0) }}}
   @objc dynamic public var muteLocalAudio: Bool {
     get { _muteLocalAudio }
-    set { if _muteLocalAudio != newValue { _muteLocalAudio = newValue ; radioSetCmd( "mute_local_audio", newValue.as1or0) } } }
-  
+    set { if _muteLocalAudio != newValue { _muteLocalAudio = newValue ; radioSetCmd( "mute_local_audio", newValue.as1or0) }}}
   @objc dynamic public var nickname: String {
     get {  return _nickname }
-    set { if _nickname != newValue { _nickname = newValue ; radioCmd("name", newValue) } } }
-  
+    set { if _nickname != newValue { _nickname = newValue ; radioCmd("name", newValue) }}}
   @objc dynamic public var radioScreenSaver: String {
     get {  return _radioScreenSaver }
-    set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ; radioCmd("screensaver", newValue) } } }
-  
+    set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ; radioCmd("screensaver", newValue) }}}
   @objc dynamic public var remoteOnEnabled: Bool {
     get {  return _remoteOnEnabled }
-    set { if _remoteOnEnabled != newValue { _remoteOnEnabled = newValue ; radioSetCmd( .remoteOnEnabled, newValue.as1or0) } } }
-  
+    set { if _remoteOnEnabled != newValue { _remoteOnEnabled = newValue ; radioSetCmd( .remoteOnEnabled, newValue.as1or0) }}}
   @objc dynamic public var rttyMark: Int {
     get {  return _rttyMark }
-    set { if _rttyMark != newValue { _rttyMark = newValue ; radioSetCmd( .rttyMark, newValue) } } }
-  
+    set { if _rttyMark != newValue { _rttyMark = newValue ; radioSetCmd( .rttyMark, newValue) }}}
   @objc dynamic public var snapTuneEnabled: Bool {
     get {  return _snapTuneEnabled }
-    set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; radioSetCmd( .snapTuneEnabled, newValue.as1or0) } } }
-  
+    set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; radioSetCmd( .snapTuneEnabled, newValue.as1or0) }}}
   @objc dynamic public var startCalibration: Bool {
     get { _startCalibration }
-    set { if _startCalibration != newValue { _startCalibration = newValue ; if newValue { radioCmd("pll_start", "") } } } }
-  
+    set { if _startCalibration != newValue { _startCalibration = newValue ; if newValue { radioCmd("pll_start", "") } }}}
   @objc dynamic public var staticGateway: String {
     get {  return _staticGateway }
-    set { if _staticGateway != newValue { _staticGateway = newValue } } }
-  
+    set { if _staticGateway != newValue { _staticGateway = newValue }}}
   @objc dynamic public var staticIp: String {
     get {  return _staticIp }
-    set { if _staticIp != newValue { _staticIp = newValue } } }
-  
+    set { if _staticIp != newValue { _staticIp = newValue }}}
   @objc dynamic public var staticNetmask: String {
     get {  return _staticNetmask }
-    set { if _staticNetmask != newValue { _staticNetmask = newValue } } }
-  
+    set { if _staticNetmask != newValue { _staticNetmask = newValue }}}
   @objc dynamic public var tnfsEnabled: Bool {
     get {  return _tnfsEnabled }
-    set { if _tnfsEnabled != newValue { _tnfsEnabled = newValue ; radioSetCmd( .tnfsEnabled, newValue.asTrueFalse) } } }
+    set { if _tnfsEnabled != newValue { _tnfsEnabled = newValue ; radioSetCmd( .tnfsEnabled, newValue.asTrueFalse) }}}
   
   @objc dynamic public var atuPresent           : Bool    { _atuPresent }
   @objc dynamic public var availablePanadapters : Int     { _availablePanadapters }
@@ -348,92 +293,212 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  // A
-  @Barrier(false, Api.objectQ) var _apfEnabled
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _apfGain
-  @BarrierClamped(0, Api.objectQ, range: 0...33)  var _apfQFactor
-  @Barrier(0, Api.objectQ)     var _availablePanadapters      // (read only)
-  @Barrier(0, Api.objectQ)     var _availableSlices           // (read only)
-  // B
-  @Barrier(0, Api.objectQ)     var _backlight                 //
-  @Barrier(false, Api.objectQ) var _bandPersistenceEnabled    //
-  @Barrier(false, Api.objectQ) var _binauralRxEnabled         // Binaural enable
-  @Barrier(nil, Api.objectQ)   var _boundClientId : UUID?     // The Client Id of this client's GUI (V3 only)
-  // C
-  @Barrier(0, Api.objectQ)     var _calFreq  : Hz             // Calibration frequency
-  @Barrier("", Api.objectQ)    var _callsign                  // Callsign
-  @Barrier("", Api.objectQ)    var _chassisSerial             // Radio serial number (read only)
-  @Barrier("", Api.objectQ)    var _clientIp                  // Ip address returned by "client ip" command
-  // D
-  @Barrier(0, Api.objectQ)     var _daxIqAvailable            //
-  @Barrier(0, Api.objectQ)     var _daxIqCapacity             //
-  // E
-  @Barrier(false, Api.objectQ) var _enforcePrivateIpEnabled   //
-  @Barrier(false, Api.objectQ) var _extPresent                //
-  // F
-  @Barrier(false, Api.objectQ) var _filterCwAutoEnabled       //
-  @Barrier(0, Api.objectQ)     var _filterCwLevel             //
-  @Barrier(false, Api.objectQ) var _filterDigitalAutoEnabled  //
-  @Barrier(0, Api.objectQ)     var _filterDigitalLevel        //
-  @Barrier(false, Api.objectQ) var _filterVoiceAutoEnabled    //
-  @Barrier(0, Api.objectQ)     var _filterVoiceLevel          //
-  @Barrier("", Api.objectQ)    var _fpgaMbVersion             // FPGA version (read only)
-  @Barrier(0, Api.objectQ)     var _freqErrorPpb              // Calibration error (Hz)
-  @Barrier(false, Api.objectQ) var _frontSpeakerMute          //
-  @Barrier(false, Api.objectQ) var _fullDuplexEnabled         // Full duplex enable
-  // G
-  @Barrier("", Api.objectQ)    var _gateway                   // (read only)
-  @Barrier(false, Api.objectQ) var _gpsdoPresent              //
-  // H
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _headphoneGain
-  @Barrier(false, Api.objectQ) var _headphoneMute             // Headset muted
-  // I
-  @Barrier("", Api.objectQ)    var _ipAddress                 // IP Address (dotted decimal) (read only)
-  // L
-  @BarrierClamped(0, Api.objectQ, range: 0...100) var _lineoutGain
-  @Barrier(false, Api.objectQ) var _lineoutMute               // Speaker muted
-  @Barrier(false, Api.objectQ) var _localPtt                  // PTT usage (V3 only)
-  @Barrier("", Api.objectQ)    var _location                  // (read only)
-  @Barrier(false, Api.objectQ) var _locked                    //
-  // M
-  @Barrier("", Api.objectQ)    var _macAddress                // Radio Mac Address (read only)
-  @Barrier(false, Api.objectQ) var _mox                       // manual Transmit
-  @Barrier(false, Api.objectQ) var _muteLocalAudio            // mute local audio when remote
-  // N
-  @Barrier("", Api.objectQ)    var _netmask                   //
-  @Barrier("", Api.objectQ)    var _nickname                  // User assigned name
-  @Barrier(0, Api.objectQ)     var _numberOfScus              // NUmber of SCU's (read only)
-  @Barrier(0, Api.objectQ)     var _numberOfSlices            // Number of Slices (read only)
-  @Barrier(0, Api.objectQ)     var _numberOfTx                // Number of TX (read only)
-  // O
-  @Barrier("", Api.objectQ)    var _oscillator                //
-  // P
-  @Barrier("", Api.objectQ)    var _picDecpuVersion           //
-  @Barrier("", Api.objectQ)    var _program                   // Client program
-  @Barrier("", Api.objectQ)    var _psocMbPa100Version        // Power amplifier software version
-  @Barrier("", Api.objectQ)    var _psocMbtrxVersion          // System supervisor software version
-  // R
-  @Barrier("", Api.objectQ)    var _radioModel                // Radio Model (e.g. FLEX-6500) (read only)
-  @Barrier("", Api.objectQ)    var _radioOptions              // (read only
-  @Barrier("", Api.objectQ)    var _radioScreenSaver          // (read only)
-  @Barrier("", Api.objectQ)    var _region                    // (read only)
-  @Barrier(false, Api.objectQ) var _remoteOnEnabled           // Remote Power On enable
-  @Barrier(0, Api.objectQ)     var _rttyMark                  // RTTY mark default
-  // S
-  @Barrier("", Api.objectQ)    var _setting                   //
-  @Barrier("", Api.objectQ)    var _smartSdrMB                // Microburst main CPU software version
-  @Barrier(false, Api.objectQ) var _snapTuneEnabled           // Snap tune enable
-  @Barrier("", Api.objectQ)    var _softwareVersion           // (read only)
-  @Barrier(false, Api.objectQ) var _startCalibration          // true if a Calibration is in progress
-  @Barrier("", Api.objectQ)    var _state                     //
-  @Barrier("", Api.objectQ)    var _staticGateway             // Static Gateway address
-  @Barrier("", Api.objectQ)    var _staticIp                  // Static IpAddress
-  @Barrier("", Api.objectQ)    var _staticNetmask             // Static Netmask
-  @Barrier("", Api.objectQ)    var _station                   // Station name (V3 only)
-  // T
-  @Barrier(false, Api.objectQ) var _tcxoPresent               //
-  @Barrier(false, Api.objectQ) var _tnfsEnabled               // TNF's enable
-  
+  var _apfEnabled: Bool {
+    get { Api.objectQ.sync { __apfEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __apfEnabled = newValue }}}
+  var _apfQFactor: Int {
+    get { Api.objectQ.sync { __apfQFactor } }
+    set { Api.objectQ.sync(flags: .barrier) { __apfQFactor = newValue.bound(kMinApfQ, kMaxApfQ) }}}
+  var _apfGain: Int {
+    get { Api.objectQ.sync { __apfGain } }
+    set { Api.objectQ.sync(flags: .barrier) { __apfGain = newValue.bound(kControlMin, kControlMax) }}}
+  var _availablePanadapters: Int {
+    get { Api.objectQ.sync { __availablePanadapters } }
+    set { Api.objectQ.sync(flags: .barrier) { __availablePanadapters = newValue }}}
+  var _availableSlices: Int {
+    get { Api.objectQ.sync { __availableSlices } }
+    set { Api.objectQ.sync(flags: .barrier) { __availableSlices = newValue }}}
+  var _backlight: Int {
+    get { Api.objectQ.sync { __backlight } }
+    set { Api.objectQ.sync(flags: .barrier) { __backlight = newValue }}}
+  var _bandPersistenceEnabled: Bool {
+    get { Api.objectQ.sync { __bandPersistenceEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __bandPersistenceEnabled = newValue }}}
+  var _binauralRxEnabled: Bool {
+    get { Api.objectQ.sync { __binauralRxEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __binauralRxEnabled = newValue }}}
+  var _boundClientId: UUID? {                          // (V3 only)
+    get { Api.objectQ.sync { __boundClientId } }
+    set { Api.objectQ.sync(flags: .barrier) { __boundClientId = newValue }}}
+  var _calFreq: Int {
+    get { Api.objectQ.sync { __calFreq } }
+    set { Api.objectQ.sync(flags: .barrier) { __calFreq = newValue }}}
+  var _callsign: String {
+    get { Api.objectQ.sync { __callsign } }
+    set { Api.objectQ.sync(flags: .barrier) { __callsign = newValue }}}
+  var _chassisSerial: String {
+    get { Api.objectQ.sync { __chassisSerial } }
+    set { Api.objectQ.sync(flags: .barrier) { __chassisSerial = newValue }}}
+  var _clientIp: String {
+    get { Api.objectQ.sync { __clientIp } }
+    set { Api.objectQ.sync(flags: .barrier) { __clientIp = newValue }}}
+  var _daxIqAvailable: Int {
+    get { Api.objectQ.sync { __daxIqAvailable } }
+    set { Api.objectQ.sync(flags: .barrier) { __daxIqAvailable = newValue }}}
+  var _daxIqCapacity: Int {
+    get { Api.objectQ.sync { __daxIqCapacity } }
+    set { Api.objectQ.sync(flags: .barrier) { __daxIqCapacity = newValue }}}
+  var _enforcePrivateIpEnabled: Bool {
+    get { Api.objectQ.sync { __enforcePrivateIpEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __enforcePrivateIpEnabled = newValue }}}
+  var _extPresent: Bool {
+    get { Api.objectQ.sync { __extPresent } }
+    set { Api.objectQ.sync(flags: .barrier) { __extPresent = newValue }}}
+  var _filterCwAutoEnabled: Bool {
+    get { Api.objectQ.sync { __filterCwAutoEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __filterCwAutoEnabled = newValue }}}
+  var _filterDigitalAutoEnabled: Bool {
+    get { Api.objectQ.sync { __filterDigitalAutoEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __filterDigitalAutoEnabled = newValue }}}
+  var _filterVoiceAutoEnabled: Bool {
+    get { Api.objectQ.sync { __filterVoiceAutoEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __filterVoiceAutoEnabled = newValue }}}
+  var _filterCwLevel: Int {
+    get { Api.objectQ.sync { __filterCwLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __filterCwLevel = newValue }}}
+  var _filterDigitalLevel: Int {
+    get { Api.objectQ.sync { __filterDigitalLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __filterDigitalLevel = newValue }}}
+  var _filterVoiceLevel: Int {
+    get { Api.objectQ.sync { __filterVoiceLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __filterVoiceLevel = newValue }}}
+  var _fpgaMbVersion: String {
+    get { Api.objectQ.sync { __fpgaMbVersion } }
+    set { Api.objectQ.sync(flags: .barrier) { __fpgaMbVersion = newValue }}}
+  var _freqErrorPpb: Int {
+    get { Api.objectQ.sync { __freqErrorPpb } }
+    set { Api.objectQ.sync(flags: .barrier) { __freqErrorPpb = newValue }}}
+  var _frontSpeakerMute: Bool {
+    get { Api.objectQ.sync { __frontSpeakerMute } }
+    set { Api.objectQ.sync(flags: .barrier) { __frontSpeakerMute = newValue }}}
+  var _fullDuplexEnabled: Bool {
+    get { Api.objectQ.sync { __fullDuplexEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __fullDuplexEnabled = newValue }}}
+  var _gateway: String {
+    get { Api.objectQ.sync { __gateway } }
+    set { Api.objectQ.sync(flags: .barrier) { __gateway = newValue }}}
+  var _gpsdoPresent: Bool {
+    get { Api.objectQ.sync { __gpsdoPresent } }
+    set { Api.objectQ.sync(flags: .barrier) { __gpsdoPresent = newValue }}}
+  var _headphoneGain: Int {
+    get { Api.objectQ.sync { __headphoneGain } }
+    set { Api.objectQ.sync(flags: .barrier) { __headphoneGain = newValue.bound(kControlMin, kControlMax) }}}
+  var _headphoneMute: Bool {
+    get { Api.objectQ.sync { __headphoneMute } }
+    set { Api.objectQ.sync(flags: .barrier) { __headphoneMute = newValue }}}
+  var _ipAddress: String {
+    get { Api.objectQ.sync { __ipAddress } }
+    set { Api.objectQ.sync(flags: .barrier) { __ipAddress = newValue }}}
+  var _location: String {
+    get { Api.objectQ.sync { __location } }
+    set { Api.objectQ.sync(flags: .barrier) { __location = newValue }}}
+  var _macAddress: String {
+    get { Api.objectQ.sync { __macAddress } }
+    set { Api.objectQ.sync(flags: .barrier) { __macAddress = newValue }}}
+  var _lineoutGain: Int {
+    get { Api.objectQ.sync { __lineoutGain } }
+    set { Api.objectQ.sync(flags: .barrier) { __lineoutGain = newValue.bound(kControlMin, kControlMax) }}}
+  var _lineoutMute: Bool {
+    get { Api.objectQ.sync { __lineoutMute } }
+    set { Api.objectQ.sync(flags: .barrier) { __lineoutMute = newValue }}}
+  var _localPtt: Bool {              // (V3 only)
+    get { Api.objectQ.sync { __localPtt } }
+    set { Api.objectQ.sync(flags: .barrier) { __localPtt = newValue }}}
+  var _locked: Bool {
+    get { Api.objectQ.sync { __locked } }
+    set { Api.objectQ.sync(flags: .barrier) { __locked = newValue }}}
+  var _mox: Bool {
+    get { Api.objectQ.sync { __mox } }
+    set { Api.objectQ.sync(flags: .barrier) { __mox = newValue }}}
+  var _muteLocalAudio: Bool {
+    get { Api.objectQ.sync { __muteLocalAudio } }
+    set { Api.objectQ.sync(flags: .barrier) { __muteLocalAudio = newValue } } }
+
+  var _netmask: String {
+    get { Api.objectQ.sync { __netmask } }
+    set { Api.objectQ.sync(flags: .barrier) { __netmask = newValue }}}
+  var _nickname: String {
+    get { Api.objectQ.sync { __nickname } }
+    set { Api.objectQ.sync(flags: .barrier) { __nickname = newValue }}}
+  var _numberOfScus: Int {
+    get { Api.objectQ.sync { __numberOfScus } }
+    set { Api.objectQ.sync(flags: .barrier) { __numberOfScus = newValue }}}
+  var _numberOfSlices: Int {
+    get { Api.objectQ.sync { __numberOfSlices } }
+    set { Api.objectQ.sync(flags: .barrier) { __numberOfSlices = newValue }}}
+  var _numberOfTx: Int {
+    get { Api.objectQ.sync { __numberOfTx } }
+    set { Api.objectQ.sync(flags: .barrier) { __numberOfTx = newValue }}}
+  var _oscillator: String {
+    get { Api.objectQ.sync { __oscillator } }
+    set { Api.objectQ.sync(flags: .barrier) { __oscillator = newValue }}}
+  var _picDecpuVersion: String {
+    get { Api.objectQ.sync { __picDecpuVersion } }
+    set { Api.objectQ.sync(flags: .barrier) { __picDecpuVersion = newValue }}}
+  var _program: String {
+    get { Api.objectQ.sync { __program } }
+    set { Api.objectQ.sync(flags: .barrier) { __program = newValue }}}
+  var _psocMbPa100Version: String {
+    get { Api.objectQ.sync { __psocMbPa100Version } }
+    set { Api.objectQ.sync(flags: .barrier) { __psocMbPa100Version = newValue }}}
+  var _psocMbtrxVersion: String {
+    get { Api.objectQ.sync { __psocMbtrxVersion } }
+    set { Api.objectQ.sync(flags: .barrier) { __psocMbtrxVersion = newValue }}}
+  var _radioModel: String {
+    get { Api.objectQ.sync { __radioModel } }
+    set { Api.objectQ.sync(flags: .barrier) { __radioModel = newValue }}}
+  var _radioOptions: String {
+    get { Api.objectQ.sync { __radioOptions } }
+    set { Api.objectQ.sync(flags: .barrier) { __radioOptions = newValue }}}
+  var _radioScreenSaver: String {
+    get { Api.objectQ.sync { __radioScreenSaver } }
+    set { Api.objectQ.sync(flags: .barrier) { __radioScreenSaver = newValue }}}
+  var _region: String {
+    get { Api.objectQ.sync { __region } }
+    set { Api.objectQ.sync(flags: .barrier) { __region = newValue }}}
+  var _remoteOnEnabled: Bool {
+    get { Api.objectQ.sync { __remoteOnEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __remoteOnEnabled = newValue }}}
+  var _rttyMark: Int {
+    get { Api.objectQ.sync { __rttyMark } }
+    set { Api.objectQ.sync(flags: .barrier) { __rttyMark = newValue }}}
+  var _setting: String {
+    get { Api.objectQ.sync { __setting } }
+    set { Api.objectQ.sync(flags: .barrier) { __setting = newValue }}}
+  var _smartSdrMB: String {
+    get { Api.objectQ.sync { __smartSdrMB } }
+    set { Api.objectQ.sync(flags: .barrier) { __smartSdrMB = newValue }}}
+  var _snapTuneEnabled: Bool {
+    get { Api.objectQ.sync { __snapTuneEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __snapTuneEnabled = newValue }}}
+  var _softwareVersion: String {
+    get { Api.objectQ.sync { __softwareVersion } }
+    set { Api.objectQ.sync(flags: .barrier) { __softwareVersion = newValue }}}
+  var _startCalibration: Bool {
+    get { Api.objectQ.sync { __startCalibration } }
+    set { Api.objectQ.sync(flags: .barrier) { __startCalibration = newValue }}}
+  var _state: String {
+    get { Api.objectQ.sync { __state } }
+    set { Api.objectQ.sync(flags: .barrier) { __state = newValue }}}
+  var _staticGateway: String {
+    get { Api.objectQ.sync { __staticGateway } }
+    set { Api.objectQ.sync(flags: .barrier) { __staticGateway = newValue }}}
+  var _staticIp: String {
+    get { Api.objectQ.sync { __staticIp } }
+    set { Api.objectQ.sync(flags: .barrier) { __staticIp = newValue }}}
+  var _staticNetmask: String {
+    get { Api.objectQ.sync { __staticNetmask } }
+    set { Api.objectQ.sync(flags: .barrier) { __staticNetmask = newValue }}}
+  var _station: String {           // (V3 only)
+    get { Api.objectQ.sync { __station } }
+    set { Api.objectQ.sync(flags: .barrier) { __station = newValue }}}
+  var _tcxoPresent: Bool {
+    get { Api.objectQ.sync { __tcxoPresent } }
+    set { Api.objectQ.sync(flags: .barrier) { __tcxoPresent = newValue }}}
+  var _tnfsEnabled: Bool {
+    get { Api.objectQ.sync { __tnfsEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __tnfsEnabled = newValue } } }
+
   enum ClientToken : String {
     case host
     case id                             = "client_id"
@@ -1624,4 +1689,93 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private func xmitCmd(_ value: Any) {
     sendCommand("xmit " + "\(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  // A
+  private var __apfEnabled                  = false                         // auto-peaking filter enable
+  private var __apfGain                     = 0                             // auto-peaking gain (0 - 100)
+  private var __apfQFactor                  = 0                             // auto-peaking filter Q factor (0 - 33)
+  private var __availablePanadapters        = 0                             // (read only)
+  private var __availableSlices             = 0                             // (read only)
+  // B
+  private var __backlight                   = 0                             //
+  private var __bandPersistenceEnabled      = false                         //
+  private var __binauralRxEnabled           = false                         // Binaural enable
+  private var __boundClientId               : UUID?                         // The Client Id of this client's GUI (V3 only)
+  // C
+  private var __calFreq                     = 0                             // Calibration frequency
+  private var __callsign                    = ""                            // Callsign
+  private var __chassisSerial               = ""                            // Radio serial number (read only)
+  private var __clientIp                    = ""                            // Ip address returned by "client ip" command
+  // D
+  private var __daxIqAvailable              = 0                             //
+  private var __daxIqCapacity               = 0                             //
+  // E
+  private var __enforcePrivateIpEnabled     = false                         //
+  private var __extPresent                  = false                         //
+  // F
+  private var __filterCwAutoEnabled         = false                         //
+  private var __filterCwLevel               = 0                             //
+  private var __filterDigitalAutoEnabled    = false                         //
+  private var __filterDigitalLevel          = 0                             //
+  private var __filterVoiceAutoEnabled      = false                         //
+  private var __filterVoiceLevel            = 0                             //
+  private var __fpgaMbVersion               = ""                            // FPGA version (read only)
+  private var __freqErrorPpb                = 0                             // Calibration error (Hz)
+  private var __frontSpeakerMute            = false                         //
+  private var __fullDuplexEnabled           = false                         // Full duplex enable
+  // G
+  private var __gateway                     = ""                            // (read only)
+  private var __gpsdoPresent                = false                         //
+  // H
+  private var __headphoneGain               = 0                             // Headset gain (1-100)
+  private var __headphoneMute               = false                         // Headset muted
+  // I
+  private var __ipAddress                   = ""                            // IP Address (dotted decimal) (read only)
+  // L
+  private var __lineoutGain                 = 0                             // Speaker gain (1-100)
+  private var __lineoutMute                 = false                         // Speaker muted
+  private var __localPtt                    = false                         // PTT usage (V3 only)
+  private var __location                    = ""                            // (read only)
+  private var __locked                      = false                         //
+  // M
+  private var __macAddress                  = ""                            // Radio Mac Address (read only)
+  private var __mox                         = false                         // manual Transmit
+  private var __muteLocalAudio              = false                         // mute local audio when remote
+  // N
+  private var __netmask                     = ""                            //
+  private var __nickname                    = ""                            // User assigned name
+  private var __numberOfScus                = 0                             // NUmber of SCU's (read only)
+  private var __numberOfSlices              = 0                             // Number of Slices (read only)
+  private var __numberOfTx                  = 0                             // Number of TX (read only)
+  // O
+  private var __oscillator                  = ""                            //
+  // P
+  private var __picDecpuVersion             = ""                            //
+  private var __program                     = ""                            // Client program
+  private var __psocMbPa100Version          = ""                            // Power amplifier software version
+  private var __psocMbtrxVersion            = ""                            // System supervisor software version
+  // R
+  private var __radioModel                  = ""                            // Radio Model (e.g. FLEX-6500) (read only)
+  private var __radioOptions                = ""                            // (read only)
+  private var __radioScreenSaver            = ""                            // (read only)
+  private var __region                      = ""                            // (read only)
+  private var __remoteOnEnabled             = false                         // Remote Power On enable
+  private var __rttyMark                    = 0                             // RTTY mark default
+  // S
+  private var __setting                     = ""                            //
+  private var __smartSdrMB                  = ""                            // Microburst main CPU software version
+  private var __snapTuneEnabled             = false                         // Snap tune enable
+  private var __softwareVersion             = ""                            // (read only)
+  private var __startCalibration            = false                         // true if a Calibration is in progress
+  private var __state                       = ""                            //
+  private var __staticGateway               = ""                            // Static Gateway address
+  private var __staticIp                    = ""                            // Static IpAddress
+  private var __staticNetmask               = ""                            // Static Netmask
+  private var __station                     = ""                            // Station name (V3 only)
+  // T
+  private var __tcxoPresent                 = false                         //
+  private var __tnfsEnabled                 = false                         // TNF's enable
 }

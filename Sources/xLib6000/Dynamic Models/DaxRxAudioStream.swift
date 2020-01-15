@@ -25,7 +25,9 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   
   public      let id            : DaxRxStreamId
   
-  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
+  public var delegate : StreamHandler? {
+    get { Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
   @objc dynamic public var rxGain       : Int {
     get { _rxGain  }
@@ -38,8 +40,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   
   @objc dynamic public var clientHandle : Handle {
     get { _clientHandle  }
-    set { if _clientHandle != newValue { _clientHandle = newValue } } }
-  
+    set { if _clientHandle != newValue { _clientHandle = newValue }}}
   @objc dynamic public var daxChannel   : Int {
     get { _daxChannel }
     set {
@@ -52,24 +53,31 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   
   @objc dynamic public var daxClients   : Int {
     get { _daxClients  }
-    set { if _daxClients != newValue { _daxClients = newValue } } }
-  
+    set { if _daxClients != newValue { _daxClients = newValue }}}
   @objc dynamic public var slice        : xLib6000.Slice? {
     get { _slice }
-    set { if _slice != newValue { _slice = newValue } } }
-  
+    set { if _slice != newValue { _slice = newValue }}}
   public private(set) var rxLostPacketCount    = 0
 
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @BarrierClamped(50, Api.objectQ, range: 0...100)  var _rxGain
-
-  @Barrier(0, Api.objectQ)    var _clientHandle : Handle
-  @Barrier(0, Api.objectQ)    var _daxChannel
-  @Barrier(0, Api.objectQ)    var _daxClients
-  @Barrier(nil, Api.objectQ)  var _slice : xLib6000.Slice?
-
+  var _clientHandle : Handle {
+    get { Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+  var _daxChannel : Int {
+    get { Api.objectQ.sync { __daxChannel } }
+    set { Api.objectQ.sync(flags: .barrier) {__daxChannel = newValue }}}
+  var _daxClients : Int {
+    get { Api.objectQ.sync { __daxClients } }
+    set { Api.objectQ.sync(flags: .barrier) {__daxClients = newValue }}}
+  var _rxGain : Int {
+    get { Api.objectQ.sync { __rxGain } }
+    set { Api.objectQ.sync(flags: .barrier) {__rxGain = newValue }}}
+  var _slice : xLib6000.Slice? {
+    get { Api.objectQ.sync { __slice } }
+    set { Api.objectQ.sync(flags: .barrier) {__slice = newValue }}}
+  
   enum Token: String {
     case clientHandle                       = "client_handle"
     case daxChannel                         = "dax_channel"
@@ -273,6 +281,17 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   private func audioStreamCmd(_ token: String, _ value: Any) {
     _radio.sendCommand("audio stream \(id.hex) slice \(_slice!.id) " + token + " \(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _delegate       : StreamHandler? = nil
+
+  private var __clientHandle  : Handle = 0
+  private var __daxChannel    = 0
+  private var __daxClients    = 0
+  private var __rxGain        = 50
+  private var __slice         : xLib6000.Slice? = nil
 }
 
 

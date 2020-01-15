@@ -26,24 +26,19 @@ public final class Amplifier  : NSObject, DynamicModel {
 
   @objc dynamic public var ant: String {
     get { _ant }
-    set { if _ant != newValue { _ant = newValue ; amplifierCmd(.ant, newValue) } } }
-  
+    set { if _ant != newValue { _ant = newValue ; amplifierCmd(.ant, newValue) }}}
   @objc dynamic public var ip: String {
     get { _ip }
-    set { if _ip != newValue { _ip = newValue ; amplifierCmd(.ip, newValue) } } }
-  
+    set { if _ip != newValue { _ip = newValue ; amplifierCmd(.ip, newValue) }}}
   @objc dynamic public var model: String {
     get { _model }
-    set { if _model != newValue { _model = newValue ; amplifierCmd(.model, newValue) } } }
-  
+    set { if _model != newValue { _model = newValue ; amplifierCmd(.model, newValue) }}}
   @objc dynamic public var mode: String {
     get { _mode }
-    set { if _mode != newValue { _mode = newValue ; amplifierCmd(.mode, newValue) } } }
-  
+    set { if _mode != newValue { _mode = newValue ; amplifierCmd(.mode, newValue) }}}
   @objc dynamic public var port: Int {
     get { _port }
-    set { if _port != newValue { _port = newValue ; amplifierCmd( .port, newValue) } } }
-  
+    set { if _port != newValue { _port = newValue ; amplifierCmd( .port, newValue) }}}
   @objc dynamic public var serialNumber: String {
     get { _serialNumber }
     set { if _serialNumber != newValue { _serialNumber = newValue ; amplifierCmd( .serialNumber, newValue) } } }
@@ -51,13 +46,25 @@ public final class Amplifier  : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
 
-  @Barrier("", Api.objectQ) var _ant
-  @Barrier("", Api.objectQ) var _ip
-  @Barrier("", Api.objectQ) var _model
-  @Barrier("", Api.objectQ) var _mode
-  @Barrier(0, Api.objectQ)  var _port
-  @Barrier("", Api.objectQ) var _serialNumber
-  
+  var _ant : String {
+    get { Api.objectQ.sync { __ant } }
+    set { Api.objectQ.sync(flags: .barrier) {__ant = newValue }}}
+  var _ip : String {
+    get { Api.objectQ.sync { __ip } }
+    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+  var _model : String {
+    get { Api.objectQ.sync { __model } }
+    set { Api.objectQ.sync(flags: .barrier) {__model = newValue }}}
+  var _mode : String {
+    get { Api.objectQ.sync { __mode } }
+    set { Api.objectQ.sync(flags: .barrier) {__mode = newValue }}}
+  var _port : Int {
+    get { Api.objectQ.sync { __port } }
+    set { Api.objectQ.sync(flags: .barrier) {__port = newValue }}}
+  var _serialNumber : String {
+    get { Api.objectQ.sync { __serialNumber } }
+    set { Api.objectQ.sync(flags: .barrier) {__serialNumber = newValue }}}
+
   enum Token : String {
     case ant
     case ip
@@ -208,5 +215,15 @@ public final class Amplifier  : NSObject, DynamicModel {
   private func amplifierCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("amplifier set " + "\(id) " + token.rawValue + "=\(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __ant           = ""
+  private var __ip            = ""
+  private var __model         = ""
+  private var __mode          = ""
+  private var __port          = 0
+  private var __serialNumber  = ""
 }
 

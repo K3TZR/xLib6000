@@ -48,16 +48,23 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   
   @objc dynamic public var clientHandle     : Handle {
     get { _clientHandle  }
-    set { if _clientHandle != newValue { _clientHandle = newValue} } }
-  
+    set { if _clientHandle != newValue { _clientHandle = newValue}}}
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(0, Api.objectQ)      var _clientHandle : Handle
-  @Barrier(false, Api.objectQ)  var _isTransmitChannel
-  @BarrierClamped(50, Api.objectQ, range: 0...100)  var _txGain
-  @Barrier(1.0, Api.objectQ)    var _txGainScalar : Float
-  
+  var _clientHandle : Handle {
+    get { Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+  var _isTransmitChannel : Bool {
+    get { Api.objectQ.sync { __isTransmitChannel } }
+    set { Api.objectQ.sync(flags: .barrier) {__isTransmitChannel = newValue }}}
+  var _txGain : Int {
+    get { Api.objectQ.sync { __txGain } }
+    set { Api.objectQ.sync(flags: .barrier) {__txGain = newValue }}}
+  var _txGainScalar : Float {
+    get { Api.objectQ.sync { __txGainScalar } }
+    set { Api.objectQ.sync(flags: .barrier) {__txGainScalar = newValue }}}
+
   enum Token: String {
     case clientHandle         = "client_handle"
     case isTransmitChannel    = "dax_tx"
@@ -265,5 +272,13 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   private func txAudioCmd(_ value: Any) {
     _radio.sendCommand("dax tx" + " \(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __clientHandle        : Handle = 0
+  private var __isTransmitChannel   = false
+  private var __txGain              = 50
+  private var __txGainScalar        : Float = 1.0
 }
 

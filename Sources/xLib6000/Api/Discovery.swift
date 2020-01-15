@@ -27,7 +27,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   
   public var discoveredRadios: [DiscoveryStruct] {
     get { Api.objectQ.sync { _discoveredRadios } }
-    set { Api.objectQ.sync(flags: .barrier) { _discoveredRadios = newValue } } }
+    set { Api.objectQ.sync(flags: .barrier) { _discoveredRadios = newValue }}}
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

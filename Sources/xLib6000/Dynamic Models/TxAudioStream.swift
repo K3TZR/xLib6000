@@ -33,12 +33,10 @@ public final class TxAudioStream : NSObject, DynamicModel {
   
   @objc dynamic public var ip: String {
     get { _ip }
-    set { if _ip != newValue { _ip = newValue } } }
-  
+    set { if _ip != newValue { _ip = newValue }}}
   @objc dynamic public var port: Int {
     get { _port  }
-    set { if _port != newValue { _port = newValue } } }
-  
+    set { if _port != newValue { _port = newValue }}}
   @objc dynamic public var txGain: Int {
     get { _txGain  }
     set {
@@ -59,14 +57,25 @@ public final class TxAudioStream : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @BarrierClamped(59, Api.objectQ, range: 0...100)  var _txGain
+  var _inUse : Bool {
+    get { Api.objectQ.sync { __inUse } }
+    set { Api.objectQ.sync(flags: .barrier) {__inUse = newValue }}}
+  var _ip : String {
+    get { Api.objectQ.sync { __ip } }
+    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+  var _port : Int {
+    get { Api.objectQ.sync { __port } }
+    set { Api.objectQ.sync(flags: .barrier) {__port = newValue }}}
+  var _transmit : Bool {
+    get { Api.objectQ.sync { __transmit } }
+    set { Api.objectQ.sync(flags: .barrier) {__transmit = newValue }}}
+  var _txGain : Int {
+    get { Api.objectQ.sync { __txGain } }
+    set { Api.objectQ.sync(flags: .barrier) {__txGain = newValue }}}
+  var _txGainScalar : Float {
+    get { Api.objectQ.sync { __txGainScalar } }
+    set { Api.objectQ.sync(flags: .barrier) {__txGainScalar = newValue }}}
 
-  @Barrier(false, Api.objectQ)  var _inUse
-  @Barrier("", Api.objectQ)     var _ip
-  @Barrier(0, Api.objectQ)      var _port
-  @Barrier(false, Api.objectQ)  var _transmit
-  @Barrier(1.0, Api.objectQ)    var _txGainScalar : Float
-  
   enum Token: String {
     case daxTx      = "dax_tx"
     case inUse      = "in_use"
@@ -291,5 +300,15 @@ public final class TxAudioStream : NSObject, DynamicModel {
   private func txAudioCmd(_ value: Any) {
     _radio.sendCommand("dax " + "tx" + " \(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __inUse         = false
+  private var __ip            = ""
+  private var __port          = 0
+  private var __transmit      = false
+  private var __txGain        = 50
+  private var __txGainScalar  : Float = 1.0
 }
 

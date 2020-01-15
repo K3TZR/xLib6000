@@ -25,8 +25,12 @@ public final class Wan : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(false, Api.objectQ) var _radioAuthenticated
-  @Barrier(false, Api.objectQ) var _serverConnected
+  var _radioAuthenticated : Bool {
+    get { Api.objectQ.sync { __radioAuthenticated } }
+    set { Api.objectQ.sync(flags: .barrier) {__radioAuthenticated = newValue }}}
+  var _serverConnected : Bool {
+    get { Api.objectQ.sync { __serverConnected } }
+    set { Api.objectQ.sync(flags: .barrier) {__serverConnected = newValue }}}
 
   enum Token: String {
     case serverConnected    = "server_connected"
@@ -81,4 +85,10 @@ public final class Wan : NSObject, StaticModel {
       }
     }
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __radioAuthenticated  = false
+  private var __serverConnected     = false
 }

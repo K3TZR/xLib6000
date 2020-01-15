@@ -25,12 +25,13 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   
   public      let id          : DaxMicStreamId
   
-  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
+  public var delegate : StreamHandler? {
+    get { Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
   @objc dynamic public var clientHandle : Handle {
     get { _clientHandle  }
-    set { if _clientHandle != newValue { _clientHandle = newValue } } }
-  
+    set { if _clientHandle != newValue { _clientHandle = newValue }}}
   @objc dynamic public var micGain      : Int {
     get { _micGain  }
     set {
@@ -53,10 +54,16 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(0, Api.objectQ)    var _clientHandle : Handle
-  @BarrierClamped(50, Api.objectQ, range: 0...100)  var _micGain
-  @Barrier(1.0, Api.objectQ)  var _micGainScalar : Float
-  
+  var _clientHandle : Handle {
+    get { Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+  var _micGain : Int {
+    get { Api.objectQ.sync { __micGain } }
+    set { Api.objectQ.sync(flags: .barrier) {__micGain = newValue }}}
+  var _micGainScalar : Float {
+    get { Api.objectQ.sync { __micGainScalar } }
+    set { Api.objectQ.sync(flags: .barrier) {__micGainScalar = newValue }}}
+
   enum Token: String {
     case clientHandle      = "client_handle"
   }
@@ -241,4 +248,13 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
       _rxSeq = expectedSequenceNumber
     }
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _delegate         : StreamHandler? = nil
+
+  private var __clientHandle    : Handle = 0
+  private var __micGain         = 50
+  private var __micGainScalar   : Float = 1.0
 }

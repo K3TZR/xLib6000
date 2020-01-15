@@ -21,8 +21,7 @@ public final class Atu : NSObject, StaticModel {
   
   @objc dynamic public var memoriesEnabled: Bool {
     get {  return _memoriesEnabled }
-    set { if _memoriesEnabled != newValue { _memoriesEnabled = newValue ; atuCmd( .memoriesEnabled, newValue.as1or0) } } }
-  
+    set { if _memoriesEnabled != newValue { _memoriesEnabled = newValue ; atuCmd( .memoriesEnabled, newValue.as1or0) }}}
   @objc dynamic public var status: String {
     var value = ""
     guard let token = Status(rawValue: _status) else { return "Unknown" }
@@ -54,10 +53,18 @@ public final class Atu : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(false, Api.objectQ)                var _enabled
-  @Barrier(false, Api.objectQ)                var _memoriesEnabled
-  @Barrier(Status.none.rawValue, Api.objectQ) var _status
-  @Barrier(false, Api.objectQ)                var _usingMemories
+  var _enabled : Bool {
+    get { Api.objectQ.sync { __enabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__enabled = newValue }}}
+  var _memoriesEnabled : Bool {
+    get { Api.objectQ.sync { __memoriesEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) {__memoriesEnabled = newValue }}}
+  var _status : String {
+    get { Api.objectQ.sync { __status } }
+    set { Api.objectQ.sync(flags: .barrier) {__status = newValue }}}
+  var _usingMemories : Bool {
+    get { Api.objectQ.sync { __usingMemories } }
+    set { Api.objectQ.sync(flags: .barrier) {__usingMemories = newValue }}}
 
   enum Token: String {
     case status
@@ -170,4 +177,12 @@ public final class Atu : NSObject, StaticModel {
   private func atuCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("atu " + token.rawValue + "=\(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var __enabled           = false
+  private var __memoriesEnabled   = false
+  private var __status            = Status.none.rawValue
+  private var __usingMemories     = false
 }

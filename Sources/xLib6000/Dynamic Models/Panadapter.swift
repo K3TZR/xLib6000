@@ -32,102 +32,81 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   public      let id                : PanadapterStreamId
   public      var isStreaming       = false
 
-  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
+  public var delegate : StreamHandler? {
+    get { Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
   @objc dynamic public var average: Int {
     get { _average }
-    set {if _average != newValue { _average = newValue ; panadapterSet( .average, newValue) } } }
-  
+    set {if _average != newValue { _average = newValue ; panadapterSet( .average, newValue) }}}
   @objc dynamic public var band: String {
     get { _band }
-    set { if _band != newValue { _band = newValue ; panadapterSet( .band, newValue) } } }
-  
+    set { if _band != newValue { _band = newValue ; panadapterSet( .band, newValue) }}}
   @objc dynamic public var bandwidth: Hz {
     get { _bandwidth }
-    set { if _bandwidth != newValue { _bandwidth = newValue ; panadapterSet( .bandwidth, newValue.hzToMhz + " autocenter=1") } } }
-  
+    set { if _bandwidth != newValue { _bandwidth = newValue ; panadapterSet( .bandwidth, newValue.hzToMhz + " autocenter=1") }}}
   @objc dynamic public var bandZoomEnabled: Bool {
     get { _bandZoomEnabled }
-    set { if _bandZoomEnabled != newValue { _bandZoomEnabled = newValue ; panadapterSet( .bandZoomEnabled, newValue.as1or0) } } }
-  
+    set { if _bandZoomEnabled != newValue { _bandZoomEnabled = newValue ; panadapterSet( .bandZoomEnabled, newValue.as1or0) }}}
   // FIXME: Where does autoCenter come from?
   
   @objc dynamic public var center: Hz {
     get { _center }
-    set { if _center != newValue { _center = newValue ; panadapterSet( .center, newValue.hzToMhz) } } }
-  
+    set { if _center != newValue { _center = newValue ; panadapterSet( .center, newValue.hzToMhz) }}}
   @objc dynamic public var daxIqChannel: Int {
     get { _daxIqChannel }
-    set { if _daxIqChannel != newValue { _daxIqChannel = newValue ; panadapterSet( .daxIqChannel, newValue) } } }
-  
+    set { if _daxIqChannel != newValue { _daxIqChannel = newValue ; panadapterSet( .daxIqChannel, newValue) }}}
   @objc dynamic public var fps: Int {
     get { _fps }
-    set { if _fps != newValue { _fps = newValue ; panadapterSet( .fps, newValue) } } }
-  
+    set { if _fps != newValue { _fps = newValue ; panadapterSet( .fps, newValue) }}}
   @objc dynamic public var loggerDisplayEnabled: Bool {
     get { _loggerDisplayEnabled }
-    set { if _loggerDisplayEnabled != newValue { _loggerDisplayEnabled = newValue ; panadapterSet( .n1mmSpectrumEnable, newValue.as1or0) } } }
-  
+    set { if _loggerDisplayEnabled != newValue { _loggerDisplayEnabled = newValue ; panadapterSet( .n1mmSpectrumEnable, newValue.as1or0) }}}
   @objc dynamic public var loggerDisplayIpAddress: String {
     get { _loggerDisplayIpAddress }
-    set { if _loggerDisplayIpAddress != newValue { _loggerDisplayIpAddress = newValue ; panadapterSet( .n1mmAddress, newValue) } } }
-  
+    set { if _loggerDisplayIpAddress != newValue { _loggerDisplayIpAddress = newValue ; panadapterSet( .n1mmAddress, newValue) }}}
   @objc dynamic public var loggerDisplayPort: Int {
     get { _loggerDisplayPort }
-    set { if _loggerDisplayPort != newValue { _loggerDisplayPort = newValue ; panadapterSet( .n1mmPort, newValue) } } }
-  
+    set { if _loggerDisplayPort != newValue { _loggerDisplayPort = newValue ; panadapterSet( .n1mmPort, newValue) }}}
   @objc dynamic public var loggerDisplayRadioNumber: Int {
     get { _loggerDisplayRadioNumber }
-    set { if _loggerDisplayRadioNumber != newValue { _loggerDisplayRadioNumber = newValue ; panadapterSet( .n1mmRadio, newValue) } } }
-  
+    set { if _loggerDisplayRadioNumber != newValue { _loggerDisplayRadioNumber = newValue ; panadapterSet( .n1mmRadio, newValue) }}}
   @objc dynamic public var loopAEnabled: Bool {
     get { _loopAEnabled }
-    set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; panadapterSet( .loopAEnabled, newValue.as1or0) } } }
-  
+    set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; panadapterSet( .loopAEnabled, newValue.as1or0) }}}
   @objc dynamic public var loopBEnabled: Bool {
     get { _loopBEnabled }
-    set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; panadapterSet( .loopBEnabled, newValue.as1or0) } } }
-  
+    set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; panadapterSet( .loopBEnabled, newValue.as1or0) }}}
   @objc dynamic public var maxDbm: CGFloat {
     get { _maxDbm }
-    set { let value = newValue > 20.0 ? 20.0 : newValue ; if _maxDbm != value { _maxDbm = value ; panadapterSet( .maxDbm, value) } } }
-  
+    set { let value = newValue > 20.0 ? 20.0 : newValue ; if _maxDbm != value { _maxDbm = value ; panadapterSet( .maxDbm, value) }}}
   @objc dynamic public var minDbm: CGFloat {
     get { _minDbm }
-    set { let value  = newValue < -180.0 ? -180.0 : newValue ; if _minDbm != value { _minDbm = value ; panadapterSet( .minDbm, value) } } }
-  
+    set { let value  = newValue < -180.0 ? -180.0 : newValue ; if _minDbm != value { _minDbm = value ; panadapterSet( .minDbm, value) }}}
   @objc dynamic public var rfGain: Int {
     get { _rfGain }
-    set { if _rfGain != newValue { _rfGain = newValue ; panadapterSet( .rfGain, newValue) } } }
-  
+    set { if _rfGain != newValue { _rfGain = newValue ; panadapterSet( .rfGain, newValue) }}}
   @objc dynamic public var rxAnt: String {
     get { _rxAnt }
-    set { if _rxAnt != newValue { _rxAnt = newValue ; panadapterSet( .rxAnt, newValue) } } }
-  
+    set { if _rxAnt != newValue { _rxAnt = newValue ; panadapterSet( .rxAnt, newValue) }}}
   @objc dynamic public var segmentZoomEnabled: Bool {
     get { _segmentZoomEnabled }
-    set { if _segmentZoomEnabled != newValue { _segmentZoomEnabled = newValue ; panadapterSet( .segmentZoomEnabled, newValue.as1or0) } } }
-  
+    set { if _segmentZoomEnabled != newValue { _segmentZoomEnabled = newValue ; panadapterSet( .segmentZoomEnabled, newValue.as1or0) }}}
   @objc dynamic public var weightedAverageEnabled: Bool {
     get { _weightedAverageEnabled }
-    set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; panadapterSet( .weightedAverageEnabled, newValue.as1or0) } } }
-  
+    set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; panadapterSet( .weightedAverageEnabled, newValue.as1or0) }}}
   @objc dynamic public var wnbEnabled: Bool {
     get { _wnbEnabled }
-    set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; panadapterSet( .wnbEnabled, newValue.as1or0) } } }
-  
+    set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; panadapterSet( .wnbEnabled, newValue.as1or0) }}}
   @objc dynamic public var wnbLevel: Int {
     get { _wnbLevel }
-    set { if _wnbLevel != newValue { _wnbLevel = newValue ; panadapterSet( .wnbLevel, newValue) } } }
-  
+    set { if _wnbLevel != newValue { _wnbLevel = newValue ; panadapterSet( .wnbLevel, newValue) }}}
   @objc dynamic public var xPixels: CGFloat {
     get { _xPixels }
-    set { if _xPixels != newValue { _xPixels = newValue ; panadapterSet( "xpixels", newValue) } } }
-  
+    set { if _xPixels != newValue { _xPixels = newValue ; panadapterSet( "xpixels", newValue) }}}
   @objc dynamic public var yPixels: CGFloat {
     get { _yPixels }
-    set { if _yPixels != newValue { _yPixels = newValue ; panadapterSet( "ypixels", newValue) } } }
-  
+    set { if _yPixels != newValue { _yPixels = newValue ; panadapterSet( "ypixels", newValue) }}}
   @objc dynamic public var antList: [String] {
     return _antList }
   
@@ -154,45 +133,115 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
+  var _antList: [String] {
+    get { Api.objectQ.sync { __antList } }
+    set { Api.objectQ.sync(flags: .barrier) { __antList = newValue } } }  
+  var _average: Int {
+    get { Api.objectQ.sync { __average } }
+    set { Api.objectQ.sync(flags: .barrier) { __average = newValue }}}
+  var _band: String {
+    get { Api.objectQ.sync { __band } }
+    set { Api.objectQ.sync(flags: .barrier) { __band = newValue }}}
+  var _bandwidth: Hz {
+    get { Api.objectQ.sync { __bandwidth } }
+    set { Api.objectQ.sync(flags: .barrier) { __bandwidth = newValue }}}
+  var _bandZoomEnabled: Bool {
+    get { Api.objectQ.sync { __bandZoomEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __bandZoomEnabled = newValue }}}
+  var _center: Hz {
+    get { Api.objectQ.sync { __center } }
+    set { Api.objectQ.sync(flags: .barrier) { __center = newValue }}}
+  var _clientHandle: Handle {          // (V3 only)
+    get { Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue }}}
+  var _daxIqChannel: Int {
+    get { Api.objectQ.sync { __daxIqChannel } }
+    set { Api.objectQ.sync(flags: .barrier) { __daxIqChannel = newValue }}}
+  var _fps: Int {
+    get { Api.objectQ.sync { __fps } }
+    set { Api.objectQ.sync(flags: .barrier) { __fps = newValue }}}
+  var _loggerDisplayEnabled: Bool {
+    get { Api.objectQ.sync { __loggerDisplayEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __loggerDisplayEnabled = newValue }}}
+  var _loggerDisplayIpAddress: String {
+    get { Api.objectQ.sync { __loggerDisplayIpAddress } }
+    set { Api.objectQ.sync(flags: .barrier) { __loggerDisplayIpAddress = newValue }}}
+  var _loggerDisplayPort: Int {
+    get { Api.objectQ.sync { __loggerDisplayPort } }
+    set { Api.objectQ.sync(flags: .barrier) { __loggerDisplayPort = newValue }}}
+  var _loggerDisplayRadioNumber: Int {
+    get { Api.objectQ.sync { __loggerDisplayRadioNumber } }
+    set { Api.objectQ.sync(flags: .barrier) { __loggerDisplayRadioNumber = newValue }}}
+  var _loopAEnabled: Bool {
+    get { Api.objectQ.sync { __loopAEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __loopAEnabled = newValue }}}
+  var _loopBEnabled: Bool {
+    get { Api.objectQ.sync { __loopBEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __loopBEnabled = newValue }}}
+  var _maxBw: Int {
+    get { Api.objectQ.sync { __maxBw } }
+    set { Api.objectQ.sync(flags: .barrier) { __maxBw = newValue }}}
+  var _maxDbm: CGFloat {
+    get { Api.objectQ.sync { __maxDbm } }
+    set { Api.objectQ.sync(flags: .barrier) { __maxDbm = newValue }}}
+  var _minBw: Int {
+    get { Api.objectQ.sync { __minBw } }
+    set { Api.objectQ.sync(flags: .barrier) { __minBw = newValue }}}
+  var _minDbm: CGFloat {
+    get { Api.objectQ.sync { __minDbm } }
+    set { Api.objectQ.sync(flags: .barrier) { __minDbm = newValue }}}
+  var _preamp: String {
+    get { Api.objectQ.sync { __preamp } }
+    set { Api.objectQ.sync(flags: .barrier) { __preamp = newValue }}}
+  var _rfGain: Int {
+    get { Api.objectQ.sync { __rfGain } }
+    set { Api.objectQ.sync(flags: .barrier) { __rfGain = newValue }}}
+  var _rfGainHigh: Int {
+    get { Api.objectQ.sync { __rfGainHigh } }
+    set { Api.objectQ.sync(flags: .barrier) { __rfGainHigh = newValue }}}
+  var _rfGainLow: Int {
+    get { Api.objectQ.sync { __rfGainLow } }
+    set { Api.objectQ.sync(flags: .barrier) { __rfGainLow = newValue }}}
+  var _rfGainStep: Int {
+    get { Api.objectQ.sync { __rfGainStep } }
+    set { Api.objectQ.sync(flags: .barrier) { __rfGainStep = newValue }}}
+  var _rfGainValues: String {
+    get { Api.objectQ.sync { __rfGainValues } }
+    set { Api.objectQ.sync(flags: .barrier) { __rfGainValues = newValue }}}
+  var _rxAnt: String {
+    get { Api.objectQ.sync { __rxAnt } }
+    set { Api.objectQ.sync(flags: .barrier) { __rxAnt = newValue }}}
+  var _segmentZoomEnabled: Bool {
+    get { Api.objectQ.sync { __segmentZoomEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __segmentZoomEnabled = newValue }}}
+  var _waterfallId: WaterfallStreamId {
+    get { Api.objectQ.sync { __waterfallId } }
+    set { Api.objectQ.sync(flags: .barrier) { __waterfallId = newValue }}}
+  var _weightedAverageEnabled: Bool {
+    get { Api.objectQ.sync { __weightedAverageEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __weightedAverageEnabled = newValue }}}
+  var _wide: Bool {
+    get { Api.objectQ.sync { __wide } }
+    set { Api.objectQ.sync(flags: .barrier) { __wide = newValue }}}
+  var _wnbEnabled: Bool {
+    get { Api.objectQ.sync { __wnbEnabled } }
+    set { Api.objectQ.sync(flags: .barrier) { __wnbEnabled = newValue }}}
+  var _wnbLevel: Int {
+    get { Api.objectQ.sync { __wnbLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __wnbLevel = newValue }}}
+  var _wnbUpdating: Bool {
+    get { Api.objectQ.sync { __wnbUpdating } }
+    set { Api.objectQ.sync(flags: .barrier) { __wnbUpdating = newValue }}}
+  var _xPixels: CGFloat {
+    get { Api.objectQ.sync { __xPixels } }
+    set { Api.objectQ.sync(flags: .barrier) { __xPixels = newValue }}}
+  var _xvtrLabel: String {
+    get { Api.objectQ.sync { __xvtrLabel } }
+    set { Api.objectQ.sync(flags: .barrier) { __xvtrLabel = newValue }}}
+  var _yPixels: CGFloat {
+    get { Api.objectQ.sync { __yPixels } }
+    set { Api.objectQ.sync(flags: .barrier) { __yPixels = newValue }}}
 
-  @Barrier([String](), Api.objectQ) var _antList
-  @Barrier(false, Api.objectQ)      var _autoCenterEnabled
-  @BarrierClamped(0, Api.objectQ, range: 1...100) var _average
-  @Barrier("", Api.objectQ)         var _band
-  @Barrier(0, Api.objectQ)          var _bandwidth    : Hz
-  @Barrier(false, Api.objectQ)      var _bandZoomEnabled
-  @Barrier(0, Api.objectQ)          var _center       : Hz
-  @Barrier(0, Api.objectQ)          var _clientHandle : Handle
-  @Barrier(0, Api.objectQ)          var _daxIqChannel
-  @Barrier(0, Api.objectQ)          var _fps
-  @Barrier(false, Api.objectQ)      var _loopAEnabled
-  @Barrier(false, Api.objectQ)      var _loopBEnabled
-  @Barrier(false, Api.objectQ)      var _loggerDisplayEnabled
-  @Barrier("", Api.objectQ)         var _loggerDisplayIpAddress
-  @Barrier(0, Api.objectQ)          var _loggerDisplayPort
-  @Barrier(0, Api.objectQ)          var _loggerDisplayRadioNumber
-  @Barrier(0, Api.objectQ)          var _maxBw  : Hz
-  @Barrier(0, Api.objectQ)          var _minBw  : Hz
-  @Barrier(0.0, Api.objectQ)        var _maxDbm : CGFloat
-  @Barrier(0.0, Api.objectQ)        var _minDbm : CGFloat
-  @Barrier("", Api.objectQ)         var _preamp
-  @Barrier(0, Api.objectQ)          var _rfGain
-  @Barrier(0, Api.objectQ)          var _rfGainHigh
-  @Barrier(0, Api.objectQ)          var _rfGainLow
-  @Barrier(0, Api.objectQ)          var _rfGainStep
-  @Barrier("", Api.objectQ)         var _rfGainValues
-  @Barrier("", Api.objectQ)         var _rxAnt
-  @Barrier(false, Api.objectQ)      var _segmentZoomEnabled
-  @Barrier(0, Api.objectQ)          var _waterfallId : WaterfallStreamId
-  @Barrier(false, Api.objectQ)      var _weightedAverageEnabled
-  @Barrier(false, Api.objectQ)      var _wide
-  @Barrier(false, Api.objectQ)      var _wnbEnabled
-  @Barrier(0, Api.objectQ)          var _wnbLevel
-  @Barrier(false, Api.objectQ)      var _wnbUpdating
-  @Barrier(0, Api.objectQ)          var _xPixels : CGFloat
-  @Barrier(0, Api.objectQ)          var _yPixels : CGFloat
-  @Barrier("", Api.objectQ)         var _xvtrLabel
-  
   enum Token : String {
     // on Panadapter
     case antList                    = "ant_list"
@@ -490,4 +539,47 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
     _radio.sendCommand("display panafall set " + "\(id.hex) " + token + "=\(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _delegate                     : StreamHandler? = nil
+
+  private var __antList                     = [String]()
+  private var __autoCenterEnabled           = false
+  private var __average                     = 0
+  private var __band                        = ""
+  private var __bandwidth                   : Hz = 0
+  private var __bandZoomEnabled             = false
+  private var __center                      : Hz = 0
+  private var __clientHandle                : Handle = 0
+  private var __daxIqChannel                = 0
+  private var __fps                         = 0
+  private var __loopAEnabled                = false
+  private var __loopBEnabled                = false
+  private var __loggerDisplayEnabled        = false
+  private var __loggerDisplayIpAddress      = ""
+  private var __loggerDisplayPort           = 0
+  private var __loggerDisplayRadioNumber    = 0
+  private var __maxBw                       = 0
+  private var __minBw                       = 0
+  private var __maxDbm                      : CGFloat = 0.0
+  private var __minDbm                      : CGFloat = 0.0
+  private var __preamp                      = ""
+  private var __rfGain                      = 0
+  private var __rfGainHigh                  = 0
+  private var __rfGainLow                   = 0
+  private var __rfGainStep                  = 0
+  private var __rfGainValues                = ""
+  private var __rxAnt                       = ""
+  private var __segmentZoomEnabled          = false
+  private var __waterfallId                 : WaterfallStreamId = 0
+  private var __weightedAverageEnabled      = false
+  private var __wide                        = false
+  private var __wnbEnabled                  = false
+  private var __wnbLevel                    = 0
+  private var __wnbUpdating                 = false
+  private var __xPixels                     : CGFloat = 0
+  private var __yPixels                     : CGFloat = 0
+  private var __xvtrLabel                   = ""
 }

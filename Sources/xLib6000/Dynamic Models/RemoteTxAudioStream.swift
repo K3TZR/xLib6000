@@ -36,26 +36,31 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   public      let id                : RemoteTxStreamId
   public      var isStreaming       = false
 
-  @Barrier(nil, Api.objectQ) public var delegate : StreamHandler?
+  public var delegate : StreamHandler? {
+    get { Api.objectQ.sync { _delegate } }
+    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
   @objc dynamic public var clientHandle: Handle {
     get { _clientHandle  }
-    set { if _clientHandle != newValue { _clientHandle = newValue} } }
-  
+    set { if _clientHandle != newValue { _clientHandle = newValue}}}
   @objc dynamic public var compression: String {
     get { _compression  }
-    set { if _compression != newValue { _compression = newValue} } }
-  
+    set { if _compression != newValue { _compression = newValue}}}
   @objc dynamic public var ip: String {
     get { _ip  }
-    set { if _ip != newValue { _ip = newValue} } }
-    
+    set { if _ip != newValue { _ip = newValue}}}  
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier(0, Api.objectQ)                                  var _clientHandle                : Handle
-  @Barrier(RemoteRxAudioStream.kUncompressed, Api.objectQ)  var _compression
-  @Barrier("", Api.objectQ)                                 var _ip
+  var _clientHandle : Handle {
+    get { Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+  var _compression : String {
+    get { Api.objectQ.sync { __compression } }
+    set { Api.objectQ.sync(flags: .barrier) {__compression = newValue }}}
+  var _ip : String {
+    get { Api.objectQ.sync { __ip } }
+    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
 
   enum Token : String {
     case clientHandle         = "client_handle"
@@ -219,5 +224,14 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       _txSeq = (_txSeq + 1) % 16
     }
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
+  private var _delegate      : StreamHandler? = nil
+
+  private var __clientHandle : Handle = 0
+  private var __compression  : String = RemoteRxAudioStream.kUncompressed
+  private var __ip           = ""
 }
 
