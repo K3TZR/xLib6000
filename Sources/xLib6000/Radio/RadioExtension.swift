@@ -384,7 +384,7 @@ extension Radio {
     sendCommand("sub daxiq all")
     sendCommand("sub dax all")
     sendCommand("sub usb_cable all")
-    if version.isV3 { sendCommand("sub tnf all") }
+    sendCommand("sub tnf all")
     //      send("sub spot all")    // TODO:
   }
   /// Request MTU limit
