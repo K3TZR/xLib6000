@@ -702,7 +702,7 @@ extension Radio {
   public func requestTnf(at frequency: Hz, callback: ReplyHandler? = nil) {
     
     // tell the Radio to create a Tnf
-    sendCommand("tnf create " + "freq" + "=\(frequency)", replyTo: callback)
+    sendCommand("tnf create " + "freq" + "=\(frequency.hzToMhz)", replyTo: callback)
   }
   /// Given a Frequency, return a reference to the Tnf containing it (if any)
   ///
