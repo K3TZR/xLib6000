@@ -50,7 +50,11 @@ public final class Log {
   public func msg(_ msg: String, _ level: MessageLevel, _ function: StaticString, _ file: StaticString, _ line: Int ) {
     
     // pass the entry to the delegate (if any)
-    delegate?.msg(msg, level: level, function: function, file: file, line: line)
+    if delegate != nil {
+      delegate!.msg(msg, level: level, function: function, file: file, line: line)
+    } else {
+      NSLog(msg)
+    }
   }
 }
 
