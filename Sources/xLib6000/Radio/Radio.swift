@@ -349,7 +349,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   var _muteLocalAudio: Bool {
     get { Api.objectQ.sync { __muteLocalAudio } }
     set { Api.objectQ.sync(flags: .barrier) { __muteLocalAudio = newValue } } }
-
   var _netmask: String {
     get { Api.objectQ.sync { __netmask } }
     set { Api.objectQ.sync(flags: .barrier) { __netmask = newValue }}}
@@ -577,32 +576,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
   private let _log                          = Log.sharedInstance.msg
   
-  // Object Collections
-  // Barriered - should not be accessed, use the public versions instead
-//  private var _amplifiers                   = [AmplifierId: Amplifier]()
-//  private var _audioStreams                 = [AudioStreamId: AudioStream]()
-//  private var _daxIqStreams                 = [DaxIqStreamId: DaxIqStream]()
-//  private var _daxMicAudioStreams           = [DaxMicStreamId: DaxMicAudioStream]()
-//  private var _daxRxAudioStreams            = [DaxRxStreamId: DaxRxAudioStream]()
-//  private var _daxTxAudioStreams            = [DaxTxStreamId: DaxTxAudioStream]()
-//  private var _equalizers                   = [Equalizer.EqType: Equalizer]()
-//  private var _iqStreams                    = [DaxIqStreamId: IqStream]()
-//  private var _memories                     = [MemoryId: Memory]()
-  private var _meters                       = [MeterId: Meter]()
-//  private var _micAudioStreams              = [DaxMicStreamId: MicAudioStream]()
-//  private var _opusStreams                  = [OpusId: Opus]()
-//  private var _panadapters                  = [PanadapterStreamId: Panadapter]()
-//  private var _profiles                     = [ProfileId: Profile]()
-//  private var _remoteRxAudioStreams         = [RemoteRxStreamId: RemoteRxAudioStream]()
-//  private var _remoteTxAudioStreams         = [RemoteTxStreamId: RemoteTxAudioStream]()
-  private var _replyHandlers                = [SequenceNumber: ReplyTuple]()
-//  private var _slices                       = [SliceId: Slice]()
-//  private var _tnfs                         = [TnfId: Tnf]()
-//  private var _txAudioStreams               = [TxStreamId: TxAudioStream]()
-//  private var _usbCables                    = [UsbCableId: UsbCable]()
-//  private var _waterfalls                   = [WaterfallStreamId: Waterfall]()
-//  private var _xvtrs                        = [XvtrId: Xvtr]()
-
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -1714,4 +1687,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // T
   private var __tcxoPresent                 = false                         //
   private var __tnfsEnabled                 = false                         // TNF's enable
+
+  // object collections
+  private var _meters                       = [MeterId: Meter]()
+  private var _replyHandlers                = [SequenceNumber: ReplyTuple]()
 }
