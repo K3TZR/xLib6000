@@ -1,5 +1,7 @@
 # xLib6000
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://en.wikipedia.org/wiki/MIT_License)
+
 ### Built on:
 
 *  macOS 10.14.6 (Deployment Target of macOS 10.11)
