@@ -184,6 +184,9 @@ public final class Profile                  : NSObject, StaticModel {
     
     // tell the Radio to delete the Profile name in the specified Profile type
     _radio.sendCommand("profile "  + "\(id)" + " delete \"" + name + "\"", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.profileWillBeRemoved, object: self as Any?)
   }
   /// Save a Profile entry
   ///

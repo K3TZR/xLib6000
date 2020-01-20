@@ -471,6 +471,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     
     // tell the Radio to remove a Panafall
     _radio.sendCommand("display pan remove \(id.hex)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.panadapterWillBeRemoved, object: self as Any?)
   }
   /// Process the Panadapter Vita struct
   ///

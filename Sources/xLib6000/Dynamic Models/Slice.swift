@@ -911,6 +911,9 @@ public final class Slice  : NSObject, DynamicModel {
   public func remove() {
     // tell the Radio to remove this Slice
     _radio.sendCommand("slice remove \(id)")
+    
+    // notify all observers
+    NC.post(.sliceWillBeRemoved, object: self as Any?)
   }
   /// Requent the Slice frequency error values
   ///

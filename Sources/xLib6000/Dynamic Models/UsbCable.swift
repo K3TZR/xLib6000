@@ -323,6 +323,9 @@ public final class UsbCable : NSObject, DynamicModel {
     
     // tell the Radio to remove a USB Cable
     _radio.sendCommand("usb_cable " + "remove" + " \(id)")
+    
+    // notify all observers
+    NC.post(.usbCableWillBeRemoved, object: self as Any?)
   }
   
   // ----------------------------------------------------------------------------

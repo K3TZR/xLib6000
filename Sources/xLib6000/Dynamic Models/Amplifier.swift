@@ -191,6 +191,9 @@ public final class Amplifier  : NSObject, DynamicModel {
   public func remove(callback: ReplyHandler? = nil) {
     
     // TODO: add code
+    
+    // notify all observers
+    NC.post(.amplifierWillBeRemoved, object: self as Any?)
   }
   /// Change the Amplifier Mode
   ///

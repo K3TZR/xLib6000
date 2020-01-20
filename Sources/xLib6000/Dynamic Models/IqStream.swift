@@ -221,6 +221,9 @@ public final class IqStream : NSObject, DynamicModelWithStream {
 
     // tell the Radio to remove the Stream
     _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.iqStreamWillBeRemoved, object: self as Any?)
   }
 
   // ------------------------------------------------------------------------------

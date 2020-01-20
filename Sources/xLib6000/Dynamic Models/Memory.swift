@@ -392,6 +392,9 @@ public final class Memory                   : NSObject, DynamicModel {
     
     // tell the Radio to remove the Memory
     _radio.sendCommand("memory remove " + "\(id)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.memoryWillBeRemoved, object: self as Any?)
   }
   /// Select a Memory
   ///

@@ -301,6 +301,9 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   //
   //    // tell the Radio to remove the Stream
   //    Api.sharedInstance.send(Opus.kStreamRemoveCmd + "0x\(id)", replyTo: callback)
+
+  // notify all observers
+  //  NC.post(.opusWillBeRemoved, object: self as Any?)
   //  }
 
   /// Set an Opus property on the Radio

@@ -240,6 +240,9 @@ public final class Xvtr : NSObject, DynamicModel {
   ///
   public func remove(callback: ReplyHandler? = nil) {
     _radio.sendCommand("xvtr remove " + "\(id)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.xvtrWillBeRemoved, object: self as Any?)
   }
   
   // ----------------------------------------------------------------------------

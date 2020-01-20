@@ -219,6 +219,9 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     
     // tell the Radio to remove a Stream
     _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.audioStreamWillBeRemoved, object: self as Any?)
   }
 
   // ------------------------------------------------------------------------------

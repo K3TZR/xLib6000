@@ -263,7 +263,9 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     // notify all observers
     NC.post(.waterfallWillBeRemoved, object: self as Any?)
     
-    // remove the Tnf
+    // TODO: Is this needed, will ParseStatus remove the Waterfall?
+    
+    // remove the Waterfall
     _radio.waterfalls[id] = nil
   }
   
