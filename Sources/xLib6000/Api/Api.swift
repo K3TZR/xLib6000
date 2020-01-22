@@ -43,7 +43,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   public                var connectionHandle      : Handle?
   public                var connectionHandleWan   = ""
-//  public                var delegate              : ApiDelegate?
   public                var isWan                 = false
   @objc dynamic public  var radio                 : Radio?
   public private(set)   var radioVersion          = Version()
