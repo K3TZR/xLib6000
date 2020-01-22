@@ -10,5 +10,23 @@
 			<integer>0</integer>
 		</dict>
 	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>CocoaAsyncSocket</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>xLib6000</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>xLib6000Tests</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
 </dict>
 </plist>
