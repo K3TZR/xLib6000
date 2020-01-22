@@ -396,6 +396,14 @@ public struct Version {
     }
   }
   
+  public init() {
+    
+    let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
+    let build   = Bundle.main.infoDictionary![kCFBundleVersionKey as String] as! String
+    
+    self.init(version + "." + build)
+   }
+  
   public var string       : String  { "\(major).\(minor).\(build).\(revision)" }
   public var shortString  : String  { "\(major).\(minor).\(build).x" }
   public var isV3         : Bool    { return major >= 2 && minor >= 5 }
