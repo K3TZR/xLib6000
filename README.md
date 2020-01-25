@@ -14,15 +14,9 @@
 
 ## Usage
 
-**NOTE: This app is a "work in progress" and is not fully functional**  
+Portions of this code do not work and changes may be added from time to time which will break all or part of this app. 
 
-Portions of this app do not work and changes may be added from time to time which will break all or part of this app.  
-
-## Builds
-
-Compiled RELEASE builds will be created at relatively stable points, please use them.  
-
-If you require a DEBUG build you will have to build from sources. 
+**NOTE: This code is structured as a Swift Package and should be used as such.
 
 
 ## Comments / Questions
@@ -34,7 +28,7 @@ Please send any bugs / comments / questions to douglas.adams@me.com
 
 Please see ChangeLog.txt for a running list of changes.
 
-This version currently supports Radios using the Flex v2 API. A Future version of this library will support all Radio versions.
+This version currently supports Radios using the Flex v2 API. A Future version of this code will support all Radio versions.
 
 Flex Radios can have one of four different version groups:
 *  v1.x.x, the v1 API
