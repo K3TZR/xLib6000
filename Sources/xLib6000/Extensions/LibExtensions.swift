@@ -378,21 +378,18 @@ public struct Version {
   var major     : Int = 1
   var minor     : Int = 0
   var build     : Int = 0
-  var revision  : String = "x"
   
-  public init(_ versionString: String = "1.0.0.x") {
+  public init(_ versionString: String = "1.0.0") {
     
     let components = versionString.components(separatedBy: ".")
-    if components.count == 4 {
-      major = Int(components[0]) ?? 0
+    if components.count == 3 {
+      major = Int(components[0]) ?? 1
       minor = Int(components[1]) ?? 0
       build = Int(components[2]) ?? 0
-      revision = components[3]
-    } else if components.count == 3 {
-      major = Int(components[0]) ?? 0
-      minor = Int(components[1]) ?? 0
-      build = Int(components[2]) ?? 0
-      revision = "x"
+    } else {
+      major = 1
+      minor = 0
+      build = 0
     }
   }
   
@@ -400,17 +397,17 @@ public struct Version {
     
     let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
     let build   = Bundle.main.infoDictionary![kCFBundleVersionKey as String] as! String
-    
     self.init(version + "." + build)
    }
   
-  public var string       : String  { "\(major).\(minor).\(build).\(revision)" }
-  public var shortString  : String  { "\(major).\(minor).\(build).x" }
+  public var string       : String  { "\(major).\(minor).\(build)" }
+  public var shortString  : String  { "\(major).\(minor).x" }
   public var isV3         : Bool    { return major >= 2 && minor >= 5 }
   public var isV2         : Bool    { return major >= 2 && minor < 5 }
   public var isV1         : Bool    { major == 1 }
 
   static func ==(lhs: Version, rhs: Version) -> Bool { lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.build == rhs.build }
+  
   static func <(lhs: Version, rhs: Version) -> Bool {
     
     switch (lhs, rhs) {

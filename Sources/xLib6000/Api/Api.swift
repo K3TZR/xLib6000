@@ -21,7 +21,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("1.0.3")    // temp fix for lack of Package Tag visibility
+  public static let kVersion                = Version("1.0.4")    // temp fix for lack of Package Tag visibility
   public static let kVersionSupported       = Version("2.4.9")
 
   public static let kBundleIdentifier       = "net.k3tzr." + Api.kName
@@ -38,7 +38,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
-  public                var libVersion            = Version()
   public                var apiState              : Api.State! {
     didSet { _log( "Api state = \(apiState.rawValue)", .debug, #function, #file, #line)}}
 
@@ -340,7 +339,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
     if Api.kVersionSupported < radioVersion  {
       _log("Radio may need to be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersionSupported.shortString)", .warning, #function, #file, #line)
-      NC.post(.radioDowngrade, object: [libVersion, radioVersion])
+      NC.post(.radioDowngrade, object: [Api.kVersion, radioVersion])
     }
   }
   /// Reply handler for the "client ip" command
