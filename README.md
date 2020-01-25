@@ -16,7 +16,7 @@
 
 Portions of this code do not work and changes may be added from time to time which will break all or part of this app. 
 
-**NOTE: This code is structured as a Swift Package and should be used as such.
+**NOTE: This code is structured as a Swift Package and should be used as such**
 
 
 ## Comments / Questions
