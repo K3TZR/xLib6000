@@ -1500,7 +1500,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if opus.isStreaming == false {
           opus.isStreaming = true
           // log the start of the stream
-          _log("Opus Stream started: Stream Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+          _log("Opus Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
         }
         opus.vitaProcessor( vitaPacket )
       }
@@ -1512,7 +1512,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if panadapter.isStreaming == false {
           panadapter.isStreaming = true
           // log the start of the stream
-          _log("Panadapter Stream started: Stream Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+          _log("Panadapter Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
         }
         panadapter.vitaProcessor(vitaPacket)
       }
@@ -1524,7 +1524,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if waterfall.isStreaming == false {
           waterfall.isStreaming = true
           // log the start of the stream
-          _log("Waterfall Stream started: Stream Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+          _log("Waterfall Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
         }
         waterfall.vitaProcessor(vitaPacket)
       }
