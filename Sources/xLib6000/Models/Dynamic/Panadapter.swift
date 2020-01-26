@@ -250,7 +250,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     case bandwidth
     case bandZoomEnabled            = "band_zoom"
     case center
-    case daxIqChannel               = "daxiq"
+    case clientHandle               = "client_handle"
+    case daxIq                      = "daxiq"
+    case daxIqChannel               = "daxiq_channel"
     case fps
     case loopAEnabled               = "loopa"
     case loopBEnabled               = "loopb"
@@ -421,6 +423,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       case .bandwidth:              update(self, &_bandwidth,               to: property.value.mhzToHz,         signal: \.bandwidth)
       case .bandZoomEnabled:        update(self, &_bandZoomEnabled,         to: property.value.bValue,          signal: \.bandZoomEnabled)
       case .center:                 update(self, &_center,                  to: property.value.mhzToHz,         signal: \.center)
+      case .daxIq:                  update(self, &_daxIqChannel,            to: property.value.iValue,          signal: \.daxIqChannel)
       case .daxIqChannel:           update(self, &_daxIqChannel,            to: property.value.iValue,          signal: \.daxIqChannel)
       case .fps:                    update(self, &_fps,                     to: property.value.iValue,          signal: \.fps)
       case .loopAEnabled:           update(self, &_loopAEnabled,            to: property.value.bValue,          signal: \.loopAEnabled)
