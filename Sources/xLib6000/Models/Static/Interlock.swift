@@ -219,41 +219,50 @@ public final class Interlock : NSObject, StaticModel {
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
-    // process each key/value pair, <key=value>
-    for property in properties {
+    // is it a Band Setting?
+    if properties[0].key == "band" {
       
-      // Check for Unknown Keys
-      guard let token = Token(rawValue: property.key)  else {
-        // log it and ignore the Key
-        _log("Unknown Interlock token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
-        continue
-      }
-      // Known tokens, in alphabetical order
-      switch token {
+      // YES, drop the "band", parse in BandSetting model
+      BandSetting.parseStatus(radio, Array(properties.dropFirst()))
+    
+    } else {
+      
+      // NO, process each key/value pair, <key=value>
+      for property in properties {
         
-      case .accTxEnabled:     update(self, &_accTxEnabled,      to: property.value.bValue,      signal: \.accTxEnabled)
-      case .accTxDelay:       update(self, &_accTxDelay,        to: property.value.iValue,      signal: \.accTxDelay)
-      case .accTxReqEnabled:  update(self, &_accTxReqEnabled,   to: property.value.bValue,      signal: \.accTxReqEnabled)
-      case .accTxReqPolarity: update(self, &_accTxReqPolarity,  to: property.value.bValue,      signal: \.accTxReqPolarity)
-      case .amplifier:        update(self, &_amplifier,         to: property.value,             signal: \.amplifier)
-      case .rcaTxReqEnabled:  update(self, &_rcaTxReqEnabled,   to: property.value.bValue,      signal: \.rcaTxReqEnabled)
-      case .rcaTxReqPolarity: update(self, &_rcaTxReqPolarity,  to: property.value.bValue,      signal: \.rcaTxReqPolarity)
-      case .reason:           update(self, &_reason,            to: property.value,             signal: \.reason)
-      case .source:           update(self, &_source,            to: property.value,             signal: \.source)
-      case .state:            update(self, &_state,             to: property.value,             signal: \.state)
+        // Check for Unknown Keys
+        guard let token = Token(rawValue: property.key)  else {
+          // log it and ignore the Key
+          _log("Unknown Interlock token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+          continue
+        }
+        // Known tokens, in alphabetical order
+        switch token {
+          
+        case .accTxEnabled:     update(self, &_accTxEnabled,      to: property.value.bValue,      signal: \.accTxEnabled)
+        case .accTxDelay:       update(self, &_accTxDelay,        to: property.value.iValue,      signal: \.accTxDelay)
+        case .accTxReqEnabled:  update(self, &_accTxReqEnabled,   to: property.value.bValue,      signal: \.accTxReqEnabled)
+        case .accTxReqPolarity: update(self, &_accTxReqPolarity,  to: property.value.bValue,      signal: \.accTxReqPolarity)
+        case .amplifier:        update(self, &_amplifier,         to: property.value,             signal: \.amplifier)
+        case .rcaTxReqEnabled:  update(self, &_rcaTxReqEnabled,   to: property.value.bValue,      signal: \.rcaTxReqEnabled)
+        case .rcaTxReqPolarity: update(self, &_rcaTxReqPolarity,  to: property.value.bValue,      signal: \.rcaTxReqPolarity)
+        case .reason:           update(self, &_reason,            to: property.value,             signal: \.reason)
+        case .source:           update(self, &_source,            to: property.value,             signal: \.source)
+        case .state:            update(self, &_state,             to: property.value,             signal: \.state)
         // determine if a Mox change is needed
         _radio.interlockStateChange(_state)
-
-      case .timeout:          update(self, &_timeout,           to: property.value.iValue,      signal: \.timeout)
-      case .txAllowed:        update(self, &_txAllowed,         to: property.value.bValue,      signal: \.txAllowed)
-      case .txClientHandle:   update(self, &_txClientHandle,    to: property.value.handle ?? 0, signal: \.txClientHandle)
-      case .txDelay:          update(self, &_txDelay,           to: property.value.iValue,      signal: \.txDelay)
-      case .tx1Delay:         update(self, &_tx1Delay,          to: property.value.iValue,      signal: \.tx1Delay)
-      case .tx1Enabled:       update(self, &_tx1Enabled,        to: property.value.bValue,      signal: \.tx1Enabled)
-      case .tx2Delay:         update(self, &_tx2Delay,          to: property.value.iValue,      signal: \.tx2Delay)
-      case .tx2Enabled:       update(self, &_tx2Enabled,        to: property.value.bValue,      signal: \.tx2Enabled)
-      case .tx3Delay:         update(self, &_tx3Delay,          to: property.value.iValue,      signal: \.tx3Delay)
-      case .tx3Enabled:       update(self, &_tx3Enabled,        to: property.value.bValue,      signal: \.tx3Enabled)
+          
+        case .timeout:          update(self, &_timeout,           to: property.value.iValue,      signal: \.timeout)
+        case .txAllowed:        update(self, &_txAllowed,         to: property.value.bValue,      signal: \.txAllowed)
+        case .txClientHandle:   update(self, &_txClientHandle,    to: property.value.handle ?? 0, signal: \.txClientHandle)
+        case .txDelay:          update(self, &_txDelay,           to: property.value.iValue,      signal: \.txDelay)
+        case .tx1Delay:         update(self, &_tx1Delay,          to: property.value.iValue,      signal: \.tx1Delay)
+        case .tx1Enabled:       update(self, &_tx1Enabled,        to: property.value.bValue,      signal: \.tx1Enabled)
+        case .tx2Delay:         update(self, &_tx2Delay,          to: property.value.iValue,      signal: \.tx2Delay)
+        case .tx2Enabled:       update(self, &_tx2Enabled,        to: property.value.bValue,      signal: \.tx2Enabled)
+        case .tx3Delay:         update(self, &_tx3Delay,          to: property.value.iValue,      signal: \.tx3Delay)
+        case .tx3Enabled:       update(self, &_tx3Enabled,        to: property.value.bValue,      signal: \.tx3Enabled)
+        }
       }
     }
   }

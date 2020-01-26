@@ -36,6 +36,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
   public var amplifiers             = [AmplifierId: Amplifier]()
   public var audioStreams           = [AudioStreamId: AudioStream]()
+  public var bandSettings           = [BandId: BandSetting]()                   
   public var daxIqStreams           = [DaxIqStreamId: DaxIqStream]()
   public var daxMicAudioStreams     = [DaxMicStreamId: DaxMicAudioStream]()
   public var daxRxAudioStreams      = [DaxRxStreamId: DaxRxAudioStream]()

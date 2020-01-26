@@ -93,6 +93,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     // on Waterfall
     case autoBlackEnabled     = "auto_black"
     case blackLevel           = "black_level"
+    case clientHandle         = "client_handle"
     case colorGain            = "color_gain"
     case gradientIndex        = "gradient_index"
     case lineDuration         = "line_duration"
@@ -104,6 +105,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     case capacity
     case center
     case daxIq                = "daxiq"
+    case daxIqChannel         = "daxiq_channel"
     case daxIqRate            = "daxiq_rate"
     case loopA                = "loopa"
     case loopB                = "loopb"
@@ -228,13 +230,14 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
         
       case .autoBlackEnabled: update(self, &_autoBlackEnabled,  to: property.value.bValue,        signal: \.autoBlackEnabled)
       case .blackLevel:       update(self, &_blackLevel,        to: property.value.iValue,        signal: \.blackLevel)
+      case .clientHandle:     update(self, &_clientHandle,      to: property.value.handle ?? 0,   signal: \.clientHandle)
       case .colorGain:        update(self, &_colorGain,         to: property.value.iValue,        signal: \.colorGain)
       case .gradientIndex:    update(self, &_gradientIndex,     to: property.value.iValue,        signal: \.gradientIndex)
       case .lineDuration:     update(self, &_lineDuration,      to: property.value.iValue,        signal: \.lineDuration)
       case .panadapterId:     update(self, &_panadapterId,      to: property.value.streamId ?? 0, signal: \.panadapterId)
       
-      case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqRate,
-           .loopA, .loopB, .rfGain, .rxAnt, .segmentZoomEnabled, .wide, .xPixels, .xvtr:
+      case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqChannel,
+           .daxIqRate, .loopA, .loopB, .rfGain, .rxAnt, .segmentZoomEnabled, .wide, .xPixels, .xvtr:
         // ignored here
         break
       }
@@ -320,6 +323,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   private var __blackLevel        = 0
   private var __clientHandle      : Handle = 0
   private var __colorGain         = 0
+  private var __daxIqChannel      = 0
   private var __gradientIndex     = 0
   private var __lineDuration      = 0
   private var __panadapterId      : PanadapterStreamId = 0

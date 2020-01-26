@@ -93,10 +93,10 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private      let _radio                   : Radio
   private      var _initialized             = false
-  private      var _rxSeq                   : Int?
   private      let _log                     = Log.sharedInstance.msg
+  private      let _radio                   : Radio
+  private      var _rxSeq                   : Int?
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
