@@ -62,11 +62,12 @@ public final class Interlock : NSObject, StaticModel {
   @objc dynamic public var tx3Delay: Int {
     get { _tx3Delay }
     set { if _tx3Delay != newValue { _tx3Delay = newValue ; interlockCmd( .tx3Delay, newValue) }}}
-  @objc dynamic public var amplifier  : String  { _amplifier }
-  @objc dynamic public var reason     : String  { _reason }
-  @objc dynamic public var source     : String  { _source }
-  @objc dynamic public var state      : String  { _state }
-  @objc dynamic public var txAllowed  : Bool    { _txAllowed }
+  @objc dynamic public var amplifier      : String  { _amplifier }
+  @objc dynamic public var reason         : String  { _reason }
+  @objc dynamic public var source         : String  { _source }
+  @objc dynamic public var state          : String  { _state }
+  @objc dynamic public var txAllowed      : Bool    { _txAllowed }
+  @objc dynamic public var txClientHandle : Handle    { _txClientHandle }
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -107,6 +108,9 @@ public final class Interlock : NSObject, StaticModel {
   var _txAllowed: Bool {
     get { Api.objectQ.sync { __txAllowed } }
     set { Api.objectQ.sync(flags: .barrier) { __txAllowed = newValue }}}
+  var _txClientHandle: Handle {
+    get { Api.objectQ.sync { __txClientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) { __txClientHandle = newValue }}}
   var _txDelay: Int {
     get { Api.objectQ.sync { __txDelay } }
     set { Api.objectQ.sync(flags: .barrier) { __txDelay = newValue }}}
@@ -142,6 +146,7 @@ public final class Interlock : NSObject, StaticModel {
     case state
     case timeout
     case txAllowed          = "tx_allowed"
+    case txClientHandle     = "tx_client_handle"
     case txDelay            = "tx_delay"
     case tx1Enabled         = "tx1_enabled"
     case tx1Delay           = "tx1_delay"
@@ -226,28 +231,29 @@ public final class Interlock : NSObject, StaticModel {
       // Known tokens, in alphabetical order
       switch token {
         
-      case .accTxEnabled:     update(self, &_accTxEnabled,      to: property.value.bValue,  signal: \.accTxEnabled)
-      case .accTxDelay:       update(self, &_accTxDelay,        to: property.value.iValue,  signal: \.accTxDelay)
-      case .accTxReqEnabled:  update(self, &_accTxReqEnabled,   to: property.value.bValue,  signal: \.accTxReqEnabled)
-      case .accTxReqPolarity: update(self, &_accTxReqPolarity,  to: property.value.bValue,  signal: \.accTxReqPolarity)
-      case .amplifier:        update(self, &_amplifier,         to: property.value,         signal: \.amplifier)
-      case .rcaTxReqEnabled:  update(self, &_rcaTxReqEnabled,   to: property.value.bValue,  signal: \.rcaTxReqEnabled)
-      case .rcaTxReqPolarity: update(self, &_rcaTxReqPolarity,  to: property.value.bValue,  signal: \.rcaTxReqPolarity)
-      case .reason:           update(self, &_reason,            to: property.value,         signal: \.reason)
-      case .source:           update(self, &_source,            to: property.value,         signal: \.source)
-      case .state:            update(self, &_state,             to: property.value,         signal: \.state)
+      case .accTxEnabled:     update(self, &_accTxEnabled,      to: property.value.bValue,      signal: \.accTxEnabled)
+      case .accTxDelay:       update(self, &_accTxDelay,        to: property.value.iValue,      signal: \.accTxDelay)
+      case .accTxReqEnabled:  update(self, &_accTxReqEnabled,   to: property.value.bValue,      signal: \.accTxReqEnabled)
+      case .accTxReqPolarity: update(self, &_accTxReqPolarity,  to: property.value.bValue,      signal: \.accTxReqPolarity)
+      case .amplifier:        update(self, &_amplifier,         to: property.value,             signal: \.amplifier)
+      case .rcaTxReqEnabled:  update(self, &_rcaTxReqEnabled,   to: property.value.bValue,      signal: \.rcaTxReqEnabled)
+      case .rcaTxReqPolarity: update(self, &_rcaTxReqPolarity,  to: property.value.bValue,      signal: \.rcaTxReqPolarity)
+      case .reason:           update(self, &_reason,            to: property.value,             signal: \.reason)
+      case .source:           update(self, &_source,            to: property.value,             signal: \.source)
+      case .state:            update(self, &_state,             to: property.value,             signal: \.state)
         // determine if a Mox change is needed
         _radio.interlockStateChange(_state)
 
-      case .timeout:          update(self, &_timeout,           to: property.value.iValue,  signal: \.timeout)
-      case .txAllowed:        update(self, &_txAllowed,         to: property.value.bValue,  signal: \.txAllowed)
-      case .txDelay:          update(self, &_txDelay,           to: property.value.iValue,  signal: \.txDelay)
-      case .tx1Delay:         update(self, &_tx1Delay,          to: property.value.iValue,  signal: \.tx1Delay)
-      case .tx1Enabled:       update(self, &_tx1Enabled,        to: property.value.bValue,  signal: \.tx1Enabled)
-      case .tx2Delay:         update(self, &_tx2Delay,          to: property.value.iValue,  signal: \.tx2Delay)
-      case .tx2Enabled:       update(self, &_tx2Enabled,        to: property.value.bValue,  signal: \.tx2Enabled)
-      case .tx3Delay:         update(self, &_tx3Delay,          to: property.value.iValue,  signal: \.tx3Delay)
-      case .tx3Enabled:       update(self, &_tx3Enabled,        to: property.value.bValue,  signal: \.tx3Enabled)
+      case .timeout:          update(self, &_timeout,           to: property.value.iValue,      signal: \.timeout)
+      case .txAllowed:        update(self, &_txAllowed,         to: property.value.bValue,      signal: \.txAllowed)
+      case .txClientHandle:   update(self, &_txClientHandle,    to: property.value.handle ?? 0, signal: \.txClientHandle)
+      case .txDelay:          update(self, &_txDelay,           to: property.value.iValue,      signal: \.txDelay)
+      case .tx1Delay:         update(self, &_tx1Delay,          to: property.value.iValue,      signal: \.tx1Delay)
+      case .tx1Enabled:       update(self, &_tx1Enabled,        to: property.value.bValue,      signal: \.tx1Enabled)
+      case .tx2Delay:         update(self, &_tx2Delay,          to: property.value.iValue,      signal: \.tx2Delay)
+      case .tx2Enabled:       update(self, &_tx2Enabled,        to: property.value.bValue,      signal: \.tx2Enabled)
+      case .tx3Delay:         update(self, &_tx3Delay,          to: property.value.iValue,      signal: \.tx3Delay)
+      case .tx3Enabled:       update(self, &_tx3Enabled,        to: property.value.bValue,      signal: \.tx3Enabled)
       }
     }
   }
@@ -280,6 +286,7 @@ public final class Interlock : NSObject, StaticModel {
   private var __state             = ""
   private var __timeout           = 0
   private var __txAllowed         = false
+  private var __txClientHandle    : Handle = 0
   private var __txDelay           = 0
   private var __tx1Delay          = 0
   private var __tx1Enabled        = false
