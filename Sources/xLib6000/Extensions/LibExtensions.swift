@@ -372,41 +372,51 @@ public extension CGFloat {
 
 // ----------------------------------------------------------------------------
 
-/// Struct to hold a Version number
+/// Struct to hold a Semantic Version number
+///     with provision for a Build Number
 ///
 public struct Version {
   var major     : Int = 1
   var minor     : Int = 0
-  var build     : Int = 0
-  
+  var patch     : Int = 0
+  var build     : Int = 1
+
   public init(_ versionString: String = "1.0.0") {
     
     let components = versionString.components(separatedBy: ".")
-    if components.count == 3 {
+    switch components.count {
+    case 3:
       major = Int(components[0]) ?? 1
       minor = Int(components[1]) ?? 0
-      build = Int(components[2]) ?? 0
-    } else {
+      patch = Int(components[2]) ?? 0
+      build = 1
+    case 4:
+      major = Int(components[0]) ?? 1
+      minor = Int(components[1]) ?? 0
+      patch = Int(components[2]) ?? 0
+      build = Int(components[3]) ?? 1
+    default:
       major = 1
       minor = 0
-      build = 0
+      patch = 0
+      build = 1
     }
   }
   
   public init() {
     
-    let version = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
-    let build   = Bundle.main.infoDictionary![kCFBundleVersionKey as String] as! String
-    self.init(version + "." + build)
+    let versions = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
+    let patch   = Bundle.main.infoDictionary![kCFBundleVersionKey as String] as! String
+    self.init(versions + "." + patch)
    }
   
-  public var string       : String  { "\(major).\(minor).\(build)" }
-  public var shortString  : String  { "\(major).\(minor).x" }
-  public var isV3         : Bool    { return major >= 2 && minor >= 5 }
-  public var isV2         : Bool    { return major >= 2 && minor < 5 }
-  public var isV1         : Bool    { major == 1 }
+  public var longString : String  { "\(major).\(minor).\(patch).\(build)" }
+  public var string     : String  { "\(major).\(minor).\(patch)" }
+  public var isV3       : Bool    { return major >= 2 && minor >= 5 }
+  public var isV2       : Bool    { return major >= 2 && minor < 5 }
+  public var isV1       : Bool    { major == 1 }
 
-  static func ==(lhs: Version, rhs: Version) -> Bool { lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.build == rhs.build }
+  static func ==(lhs: Version, rhs: Version) -> Bool { lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.patch == rhs.patch }
   
   static func <(lhs: Version, rhs: Version) -> Bool {
     
@@ -415,7 +425,7 @@ public struct Version {
     case (let l, let r) where l == r: return false
     case (let l, let r) where l.major < r.major: return true
     case (let l, let r) where l.major == r.major && l.minor < r.minor: return true
-    case (let l, let r) where l.major == r.major && l.minor == r.minor && l.build < r.build: return true
+    case (let l, let r) where l.major == r.major && l.minor == r.minor && l.patch < r.patch: return true
     default: return false
     }
   }

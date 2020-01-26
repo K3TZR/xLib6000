@@ -239,7 +239,7 @@ public struct DiscoveryStruct : Equatable {
   public var availableSlices                = 0
   public var callsign                       = ""                            // user assigned call sign
   public var discoveryVersion               = ""                            // e.g. 2.0.0.1
-  public var firmwareVersion                = ""                            // Radio firmware version (e.g. 2.0.1.17)
+  public var firmwareVersion                = ""                            // Radio firmware version (e.g. 2.4.9)
   public var fpcMac                         = ""                            // ??
   public var guiClients                     = [GuiClient]()
   public var guiClientHandles               : String = ""

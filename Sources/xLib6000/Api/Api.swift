@@ -338,7 +338,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     radioVersion = Version(selectedRadio.firmwareVersion)
 
     if Api.kVersionSupported < radioVersion  {
-      _log("Radio may need to be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersionSupported.shortString)", .warning, #function, #file, #line)
+      _log("Radio may need to be downgraded: Radio version = \(radioVersion.longString), API supports version = \(Api.kVersionSupported.string)", .warning, #function, #file, #line)
       NC.post(.radioDowngrade, object: [Api.kVersion, radioVersion])
     }
   }
