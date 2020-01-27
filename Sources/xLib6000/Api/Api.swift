@@ -140,6 +140,45 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   /// Connect to a Radio
   ///
+  ///   ----- v3 API explanation -----
+  ///
+  ///   Definitions
+  ///     Client:   The application using a radio
+  ///     Api:      The intermediary between the Client and a Radio (e.g. FlexLib, xLib6000, etc.)
+  ///     Radio:    The physical radio (e.g. a Flex-6500)
+  ///
+  ///   There are 5 scenarios:
+  ///
+  ///     1. The Client connects as a Gui, ClientId is known
+  ///         The Client passes clientId = <ClientId>, isGui = true to the Api
+  ///         The Api sends a "client gui <ClientId>" command to the Radio
+  ///
+  ///     2. The Client connects as a Gui, ClientId is NOT known
+  ///         The Client passes clientId = nil, isGui = true to the Api
+  ///         The Api sends a "client gui" command to the Radio
+  ///         The Radio generates a ClientId
+  ///         The Client receives GuiClientHasBeenAdded / Removed / Updated notification(s)
+  ///         The Client finds the desired ClientId
+  ///         The Client persists the ClientId (if desired))
+  ///
+  ///     3. The Client connects as a non-Gui, binding is desired, ClientId is known
+  ///         The Client passes clientId = <ClientId>, isGui = false to the Api
+  ///         The Api sends a "client bind <ClientId>" command to the Radio
+  ///
+  ///     4. The Client connects as a non-Gui, binding is desired, ClientId is NOT known
+  ///         The Client passes clientId = nil, isGui = false to the Api
+  ///         The Client receives GuiClientHasBeenAdded / Removed / Updated notification(s)
+  ///         The Client finds the desired ClientId
+  ///         The Client sets the boundClientId property on the radio class of the Api
+  ///         The radio class causes a "client bind client_id=<ClientId>" command to be sent to the Radio
+  ///         The Client persists the ClientId (if desired))
+  ///
+  ///     5. The Client connects as a non-Gui, binding is NOT desired
+  ///         The Client passes clientId = nil, isGui = false to the Api
+  ///
+  ///     Scenarios 2 & 4 are typically executed once which then allows the Client to use scenarios 1 & 4
+  ///     for all subsequent connections (if the Client has persisted the ClientId)
+  ///
   /// - Parameters:
   ///     - discoveryPacket:      a DiscoveredRadio struct for the desired Radio
   ///     - clientStation:        the name of the Station using this library (V3 only)
@@ -308,11 +347,17 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     if let radio = radio {
       
       // clientIp
-      if _isGui { send("client gui") }
-      send("client program " + _programName)
-      // clientStation
-      // clientBind
       
+      if radio.version.isV3 && _isGui && _clientId != nil {
+        send("client gui " + (_clientId!.uuidString))
+      } else if _isGui {
+        send("client gui")
+      }
+      
+      send("client program " + _programName)
+      if radioVersion.isV3 { send("client station " + _clientStation) }
+      if radioVersion.isV3 && !_isGui && _clientId != nil { send("client bind client_id=" + _clientId!.uuidString) }
+
       if _lowBandwidthConnect { radio.requestLowBandwidthConnect() }
       radio.requestInfo()
       radio.requestVersion()
