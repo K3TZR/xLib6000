@@ -104,7 +104,6 @@ public final class Slice  : NSObject, DynamicModel {
   @objc dynamic public var frequency: Hz {
     get { _frequency }
     set { if !_locked { if _frequency != newValue { _frequency = newValue ; sliceTuneCmd( newValue.hzToMhz) } } } }
-
   @objc dynamic public var locked: Bool {
     get { _locked }
     set { if _locked != newValue { _locked = newValue ; sliceLock( newValue == true ? "lock" : "unlock") }}}
@@ -146,8 +145,7 @@ public final class Slice  : NSObject, DynamicModel {
     set { if _ritEnabled != newValue { _ritEnabled = newValue ; sliceCmd( .ritEnabled, newValue.as1or0) }}}
   @objc dynamic public var ritOffset: Int {
     get { _ritOffset }
-    set { if _ritOffset != newValue {  _ritOffset = newValue ; sliceCmd( .ritOffset, newValue) } } } 
-  
+    set { if _ritOffset != newValue {  _ritOffset = newValue ; sliceCmd( .ritOffset, newValue) } } }
   @objc dynamic public var rttyMark: Int {
     get { _rttyMark }
     set { if _rttyMark != newValue { _rttyMark = newValue ; sliceCmd( .rttyMark, newValue) }}}
@@ -247,6 +245,9 @@ public final class Slice  : NSObject, DynamicModel {
     get { _rxAntList }
     set { _rxAntList = newValue } }
   
+  @objc dynamic public var clientHandle: Handle {
+    return _clientHandle }
+  
   @objc dynamic public var sliceLetter: String? {
     return _sliceLetter }
   
@@ -332,6 +333,9 @@ public final class Slice  : NSObject, DynamicModel {
   var _autoPan : Bool {
     get { Api.objectQ.sync { __autoPan } }
     set { Api.objectQ.sync(flags: .barrier) {__autoPan = newValue }}}
+  var _clientHandle : Handle {
+    get { Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
   var _daxChannel : Int {
     get { Api.objectQ.sync { __daxChannel } }
     set { Api.objectQ.sync(flags: .barrier) {__daxChannel = newValue }}}
@@ -528,6 +532,7 @@ public final class Slice  : NSObject, DynamicModel {
     case audioGain                  = "audio_gain"
     case audioMute                  = "audio_mute"
     case audioPan                   = "audio_pan"
+    case clientHandle               = "client_handle"
     case daxChannel                 = "dax"
     case daxClients                 = "dax_clients"
     case daxTxEnabled               = "dax_tx"
@@ -576,6 +581,7 @@ public final class Slice  : NSObject, DynamicModel {
     case rttyShift                  = "rtty_shift"
     case rxAnt                      = "rxant"
     case rxAntList                  = "ant_list"
+    case sliceLetter                = "slice_letter"
     case squelchEnabled             = "squelch"
     case squelchLevel               = "squelch_level"
     case step
@@ -813,17 +819,18 @@ public final class Slice  : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
-      case .active:       update(self, &_active,        to: property.value.bValue,  signal: \.active)
-      case .agcMode:      update(self, &_agcMode,       to: property.value,         signal: \.agcMode)
-      case .agcOffLevel:  update(self, &_agcOffLevel,   to: property.value.iValue,  signal: \.agcOffLevel)
-      case .agcThreshold: update(self, &_agcThreshold,  to: property.value.iValue,  signal: \.agcThreshold)
-      case .anfEnabled:   update(self, &_anfEnabled,    to: property.value.bValue,  signal: \.anfEnabled)
-      case .anfLevel:     update(self, &_anfLevel,      to: property.value.iValue,  signal: \.anfLevel)
-      case .apfEnabled:   update(self, &_apfEnabled,    to: property.value.bValue,  signal: \.apfEnabled)
-      case .apfLevel:     update(self, &_apfLevel,      to: property.value.iValue,  signal: \.apfLevel)
-      case .audioGain:    update(self, &_audioGain,     to: property.value.iValue,  signal: \.audioGain)
-      case .audioMute:    update(self, &_audioMute,     to: property.value.bValue,  signal: \.audioMute)
-      case .audioPan:     update(self, &_audioPan,      to: property.value.iValue,  signal: \.audioPan)
+      case .active:       update(self, &_active,        to: property.value.bValue,      signal: \.active)
+      case .agcMode:      update(self, &_agcMode,       to: property.value,             signal: \.agcMode)
+      case .agcOffLevel:  update(self, &_agcOffLevel,   to: property.value.iValue,      signal: \.agcOffLevel)
+      case .agcThreshold: update(self, &_agcThreshold,  to: property.value.iValue,      signal: \.agcThreshold)
+      case .anfEnabled:   update(self, &_anfEnabled,    to: property.value.bValue,      signal: \.anfEnabled)
+      case .anfLevel:     update(self, &_anfLevel,      to: property.value.iValue,      signal: \.anfLevel)
+      case .apfEnabled:   update(self, &_apfEnabled,    to: property.value.bValue,      signal: \.apfEnabled)
+      case .apfLevel:     update(self, &_apfLevel,      to: property.value.iValue,      signal: \.apfLevel)
+      case .audioGain:    update(self, &_audioGain,     to: property.value.iValue,      signal: \.audioGain)
+      case .audioMute:    update(self, &_audioMute,     to: property.value.bValue,      signal: \.audioMute)
+      case .audioPan:     update(self, &_audioPan,      to: property.value.iValue,      signal: \.audioPan)
+      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
 
       case .daxChannel:
         if _daxChannel != 0 && property.value.iValue == 0 {
@@ -880,6 +887,7 @@ public final class Slice  : NSObject, DynamicModel {
       case .rttyShift:                update(self, &_rttyShift,               to: property.value.iValue,  signal: \.rttyShift)
       case .rxAnt:                    update(self, &_rxAnt,                   to: property.value,         signal: \.rxAnt)
       case .rxAntList:                update(self, &_rxAntList,               to: property.value.list,    signal: \.rxAntList)
+      case .sliceLetter:              update(self, &_sliceLetter,             to: property.value,         signal: \.sliceLetter)
       case .squelchEnabled:           update(self, &_squelchEnabled,          to: property.value.bValue,  signal: \.squelchEnabled)
       case .squelchLevel:             update(self, &_squelchLevel,            to: property.value.iValue,  signal: \.squelchLevel)
       case .step:                     update(self, &_step,                    to: property.value.iValue,  signal: \.step)
@@ -1012,6 +1020,7 @@ public final class Slice  : NSObject, DynamicModel {
   private var __audioMute               = false
   private var __audioPan                = 0
   private var __autoPan                 = false
+  private var __clientHandle            : Handle = 0
   private var __daxChannel              = 0
   private var __daxClients              = 0
   private var __daxTxEnabled            = false
