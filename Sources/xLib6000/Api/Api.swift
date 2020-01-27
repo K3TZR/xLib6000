@@ -348,11 +348,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // clientIp
       
-      if radio.version.isV3 && _isGui && _clientId != nil {
-        send("client gui " + (_clientId!.uuidString))
-      } else if _isGui {
-        send("client gui")
-      }
+      if radio.version.isV3 && _isGui && _clientId != nil { send("client gui " + _clientId!.uuidString) }
+      if radio.version.isV2 && _isGui { send("client gui") }
+      
       
       send("client program " + _programName)
       if radioVersion.isV3 { send("client station " + _clientStation) }
