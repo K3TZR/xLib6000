@@ -59,6 +59,9 @@ public final class Slice  : NSObject, DynamicModel {
   @objc dynamic public var audioGain: Int {
     get { _audioGain }
     set { if _audioGain != newValue { _audioGain = newValue ; audioCmd("gain", value: newValue) }}}
+  @objc dynamic public var audioLevel: Int {
+    get { _audioLevel }
+    set { if _audioLevel != newValue { _audioLevel = newValue ; audioCmd(.audioLevel, value: newValue) }}}
   @objc dynamic public var audioMute: Bool {
     get { _audioMute }
     set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue.as1or0) }}}
@@ -324,6 +327,9 @@ public final class Slice  : NSObject, DynamicModel {
   var _audioGain : Int {
     get { Api.objectQ.sync { __audioGain } }
     set { Api.objectQ.sync(flags: .barrier) {__audioGain = newValue }}}
+  var _audioLevel : Int {
+    get { Api.objectQ.sync { __audioLevel } }
+    set { Api.objectQ.sync(flags: .barrier) {__audioLevel = newValue }}}
   var _audioMute : Bool {
     get { Api.objectQ.sync { __audioMute } }
     set { Api.objectQ.sync(flags: .barrier) {__audioMute = newValue }}}
@@ -530,6 +536,7 @@ public final class Slice  : NSObject, DynamicModel {
     case apfEnabled                 = "apf"
     case apfLevel                   = "apf_level"
     case audioGain                  = "audio_gain"
+    case audioLevel                 = "audio_level"
     case audioMute                  = "audio_mute"
     case audioPan                   = "audio_pan"
     case clientHandle               = "client_handle"
@@ -581,7 +588,7 @@ public final class Slice  : NSObject, DynamicModel {
     case rttyShift                  = "rtty_shift"
     case rxAnt                      = "rxant"
     case rxAntList                  = "ant_list"
-    case sliceLetter                = "slice_letter"
+    case sliceLetter                = "index_letter"
     case squelchEnabled             = "squelch"
     case squelchLevel               = "squelch_level"
     case step
@@ -828,6 +835,7 @@ public final class Slice  : NSObject, DynamicModel {
       case .apfEnabled:   update(self, &_apfEnabled,    to: property.value.bValue,      signal: \.apfEnabled)
       case .apfLevel:     update(self, &_apfLevel,      to: property.value.iValue,      signal: \.apfLevel)
       case .audioGain:    update(self, &_audioGain,     to: property.value.iValue,      signal: \.audioGain)
+      case .audioLevel:   update(self, &_audioLevel,    to: property.value.iValue,      signal: \.audioLevel)
       case .audioMute:    update(self, &_audioMute,     to: property.value.bValue,      signal: \.audioMute)
       case .audioPan:     update(self, &_audioPan,      to: property.value.iValue,      signal: \.audioPan)
       case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
@@ -987,6 +995,15 @@ public final class Slice  : NSObject, DynamicModel {
   /// Set an Audio property on the Radio
   ///
   /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func audioCmd(_ token: Token, value: Any) {
+    _radio.sendCommand("audio client 0 slice " + "0x\(id) " + token.rawValue + " \(value)")
+  }
+  /// Set an Audio property on the Radio
+  ///
+  /// - Parameters:
   ///   - token:      a String
   ///   - value:      the new value
   ///
@@ -1017,6 +1034,7 @@ public final class Slice  : NSObject, DynamicModel {
   private var __apfEnabled              = false
   private var __apfLevel                = 0
   private var __audioGain               = 0
+  private var __audioLevel              = 0
   private var __audioMute               = false
   private var __audioPan                = 0
   private var __autoPan                 = false
