@@ -106,6 +106,9 @@ public final class Transmit : NSObject, StaticModel {
   @objc dynamic public var tunePower: Int {
     get {  _tunePower }
     set { if _tunePower != newValue { _tunePower = newValue ; transmitCmd( .tunePower, newValue) }}}
+  @objc dynamic public var txAntenna: String {
+    get { _txAntenna }
+    set { if _txAntenna != newValue { _txAntenna = newValue ; transmitCmd( .txAntenna, newValue) }}}
   @objc dynamic public var txFilterHigh: Int {
     get { _txFilterHigh }
     set { if _txFilterHigh != newValue { let value = txFilterHighLimits(txFilterLow, newValue) ; _txFilterHigh = value ; transmitCmd( "filter_high", value) }}}
@@ -130,6 +133,9 @@ public final class Transmit : NSObject, StaticModel {
   @objc dynamic public var txMonitorPanSb: Int {
     get { _txMonitorPanSb }
     set { if _txMonitorPanSb != newValue { _txMonitorPanSb = newValue ; transmitCmd( .txMonitorPanSb, newValue) }}}
+  @objc dynamic public var txSliceMode: String {
+    get { _txSliceMode }
+    set { if _txSliceMode != newValue { _txSliceMode = newValue ; transmitCmd( .txSliceMode, newValue) }}}
   @objc dynamic public var voxEnabled: Bool {
     get { _voxEnabled }
     set { if _voxEnabled != newValue { _voxEnabled = newValue ; transmitCmd( .voxEnabled, newValue.as1or0) }}}
@@ -239,6 +245,9 @@ public final class Transmit : NSObject, StaticModel {
   var _speechProcessorLevel: Int {
     get { Api.objectQ.sync { __speechProcessorLevel } }
     set { Api.objectQ.sync(flags: .barrier) { __speechProcessorLevel = newValue }}}
+  var _txAntenna: String {
+    get { Api.objectQ.sync { __txAntenna } }
+    set { Api.objectQ.sync(flags: .barrier) { __txAntenna = newValue }}}
   var _txFilterChanges: Bool {
     get { Api.objectQ.sync { __txFilterChanges } }
     set { Api.objectQ.sync(flags: .barrier) { __txFilterChanges = newValue }}}
@@ -272,6 +281,9 @@ public final class Transmit : NSObject, StaticModel {
   var _txRfPowerChanges: Bool {
     get { Api.objectQ.sync { __txRfPowerChanges } }
     set { Api.objectQ.sync(flags: .barrier) { __txRfPowerChanges = newValue }}}
+  var _txSliceMode: String {
+    get { Api.objectQ.sync { __txSliceMode } }
+    set { Api.objectQ.sync(flags: .barrier) { __txSliceMode = newValue }}}
   var _tune: Bool {
     get { Api.objectQ.sync { __tune } }
     set { Api.objectQ.sync(flags: .barrier) { __tune = newValue }}}
@@ -319,6 +331,7 @@ public final class Transmit : NSObject, StaticModel {
     case speechProcessorLevel     = "speech_processor_level"
     case tune
     case tunePower                = "tunepower"
+    case txAntenna                = "tx_antenna"
     case txFilterChanges          = "tx_filter_changes_allowed"
     case txFilterHigh             = "hi"                            // "filter_high"
     case txFilterLow              = "lo"                            // "filter_low"
@@ -330,6 +343,7 @@ public final class Transmit : NSObject, StaticModel {
     case txMonitorPanCw           = "mon_pan_cw"
     case txMonitorPanSb           = "mon_pan_sb"
     case txRfPowerChanges         = "tx_rf_power_changes_allowed"
+    case txSliceMode              = "tx_slice_mode"
     case voxEnabled               = "vox_enable"
     case voxDelay                 = "vox_delay"
     case voxLevel                 = "vox_level"
@@ -416,6 +430,7 @@ public final class Transmit : NSObject, StaticModel {
         case .rfPower:                update(self, &_rfPower,                 to: property.value.iValue,  signal: \.rfPower)
         case .speechProcessorEnabled: update(self, &_speechProcessorEnabled,  to: property.value.bValue,  signal: \.speechProcessorEnabled)
         case .speechProcessorLevel:   update(self, &_speechProcessorLevel,    to: property.value.iValue,  signal: \.speechProcessorLevel)
+        case .txAntenna:              update(self, &_txAntenna,               to: property.value,         signal: \.txAntenna)
         case .txFilterChanges:        update(self, &_txFilterChanges,         to: property.value.bValue,  signal: \.txFilterChanges)
         case .txFilterHigh:           update(self, &_txFilterHigh,            to: property.value.iValue,  signal: \.txFilterHigh)
         case .txFilterLow:            update(self, &_txFilterLow,             to: property.value.iValue,  signal: \.txFilterLow)
@@ -427,6 +442,7 @@ public final class Transmit : NSObject, StaticModel {
         case .txMonitorPanCw:         update(self, &_txMonitorPanCw,          to: property.value.iValue,  signal: \.txMonitorPanCw)
         case .txMonitorPanSb:         update(self, &_txMonitorPanSb,          to: property.value.iValue,  signal: \.txMonitorPanSb)
         case .txRfPowerChanges:       update(self, &_txRfPowerChanges,        to: property.value.bValue,  signal: \.txRfPowerChanges)
+        case .txSliceMode:            update(self, &_txSliceMode,             to: property.value,         signal: \.txSliceMode)
         case .tune:                   update(self, &_tune,                    to: property.value.bValue,  signal: \.tune)
         case .tunePower:              update(self, &_tunePower,               to: property.value.iValue,  signal: \.tunePower)
         case .voxEnabled:             update(self, &_voxEnabled,              to: property.value.bValue,  signal: \.voxEnabled)
@@ -552,6 +568,7 @@ public final class Transmit : NSObject, StaticModel {
   private var __rfPower                     = 0
   private var __speechProcessorEnabled      = false
   private var __speechProcessorLevel        = 0
+  private var __txAntenna                   = ""
   private var __txFilterChanges             = false
   private var __txFilterHigh                = 0
   private var __txFilterLow                 = 0
@@ -563,6 +580,7 @@ public final class Transmit : NSObject, StaticModel {
   private var __txMonitorPanCw              = 0
   private var __txMonitorPanSb              = 0
   private var __txRfPowerChanges            = false
+  private var __txSliceMode                 = ""
   private var __tune                        = false
   private var __tunePower                   = 0
   private var __voxDelay                    = 0
