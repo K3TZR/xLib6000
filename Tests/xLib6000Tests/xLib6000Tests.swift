@@ -251,6 +251,33 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertEqual(radio.waterfalls[id], nil, "Failed to remove Waterfall")
   }
   
+  private var xvtrStatus = "0 name=220 rf_freq=220 if_freq=28 lo_error=0 max_power=10 rx_gain=0 order=0 rx_only=1 is_valid=1 preferred=1 two_meter_int=0"
+  func testXvtr() {
+    
+    let discovery = Discovery.sharedInstance
+    sleep(2)
+    let radio = Radio(discovery.discoveredRadios[0], api: Api.sharedInstance)
+    XCTAssertNotNil(radio, "Failed to instantiate Radio")
+
+    let id: XvtrId = xvtrStatus.keyValuesArray()[0].key
+    Xvtr.parseStatus(radio, xvtrStatus.keyValuesArray(), true)
+    let xvtr = radio.xvtrs[id]
+    
+    XCTAssertNotNil(xvtr, "Failed to create Xvtr")
+    XCTAssertEqual(xvtr?.ifFrequency, 28)
+    XCTAssertEqual(xvtr?.inUse, true)
+    XCTAssertEqual(xvtr?.isValid, true)
+    XCTAssertEqual(xvtr?.loError, 0)
+    XCTAssertEqual(xvtr?.name, "220")
+    XCTAssertEqual(xvtr?.maxPower, 10)
+    XCTAssertEqual(xvtr?.order, 0)
+    XCTAssertEqual(xvtr?.preferred, true)
+    XCTAssertEqual(xvtr?.rfFrequency, 220)
+    XCTAssertEqual(xvtr?.rxGain, 0)
+    XCTAssertEqual(xvtr?.rxOnly, true)
+    XCTAssertEqual(xvtr?.twoMeterInt, 0)
+  }
+  
   static var allTests = [
     ("testApi", testApi),
     ("testLog", testLog),
