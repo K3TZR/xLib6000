@@ -410,11 +410,12 @@ public struct Version {
     self.init(versions + "." + patch)
    }
   
-  public var longString : String  { "\(major).\(minor).\(patch).\(build)" }
-  public var string     : String  { "\(major).\(minor).\(patch)" }
-  public var isV3       : Bool    { return major >= 2 && minor >= 5 }
-  public var isV2       : Bool    { return major >= 2 && minor < 5 }
-  public var isV1       : Bool    { major == 1 }
+  public var longString       : String  { "\(major).\(minor).\(patch).\(build)" }
+  public var string           : String  { "\(major).\(minor).\(patch)" }
+  public var isV3             : Bool    { major >= 2 && minor >= 5 }
+  public var isGreaterThan22  : Bool    { major >= 2 && minor >= 2 }
+  public var isV2             : Bool    { major >= 2 && minor < 5 }
+  public var isV1             : Bool    { major == 1 }
 
   static func ==(lhs: Version, rhs: Version) -> Bool { lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.patch == rhs.patch }
   
