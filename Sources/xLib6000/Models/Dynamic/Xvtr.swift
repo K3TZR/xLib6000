@@ -28,8 +28,6 @@ public final class Xvtr : NSObject, DynamicModel {
     get { _ifFrequency }
     set { if _ifFrequency != newValue { _ifFrequency = newValue ; xvtrCmd( .ifFrequency, newValue) }}}
 
-  @objc dynamic public var inUse: Bool { _inUse }
-
   @objc dynamic public var isValid: Bool { _isValid }
 
   @objc dynamic public var loError: Int {
@@ -70,9 +68,6 @@ public final class Xvtr : NSObject, DynamicModel {
   var _ifFrequency : Hz {
     get { Api.objectQ.sync { __ifFrequency } }
     set { Api.objectQ.sync(flags: .barrier) {__ifFrequency = newValue }}}
-  var _inUse : Bool {
-    get { Api.objectQ.sync { __inUse } }
-    set { Api.objectQ.sync(flags: .barrier) {__inUse = newValue }}}
   var _isValid : Bool {
     get { Api.objectQ.sync { __isValid } }
     set { Api.objectQ.sync(flags: .barrier) {__isValid = newValue }}}
@@ -107,7 +102,6 @@ public final class Xvtr : NSObject, DynamicModel {
   enum Token : String {
     case name
     case ifFrequency        = "if_freq"
-    case inUse              = "in_use"
     case isValid            = "is_valid"
     case loError            = "lo_error"
     case maxPower           = "max_power"
@@ -211,7 +205,6 @@ public final class Xvtr : NSObject, DynamicModel {
         
       case .name:         update(self, &_name,        to: property.value,         signal: \.name)
       case .ifFrequency:  update(self, &_ifFrequency, to: property.value.mhzToHz, signal: \.ifFrequency)
-      case .inUse:        update(self, &_inUse,       to: property.value.bValue,  signal: \.inUse)
       case .isValid:      update(self, &_isValid,     to: property.value.bValue,  signal: \.isValid)
       case .loError:      update(self, &_loError,     to: property.value.iValue,  signal: \.loError)
       case .maxPower:     update(self, &_maxPower,    to: property.value.iValue,  signal: \.maxPower)
@@ -224,7 +217,7 @@ public final class Xvtr : NSObject, DynamicModel {
       }
     }
     // is the waterfall initialized?
-    if !_initialized && _inUse {
+    if !_initialized {
       
       // YES, the Radio (hardware) has acknowledged this Waterfall
       _initialized = true
@@ -262,7 +255,6 @@ public final class Xvtr : NSObject, DynamicModel {
   // *** Hidden properties (Do NOT use) ***
   
   private var __ifFrequency : Hz = 0
-  private var __inUse       = false
   private var __isValid     = false
   private var __loError     = 0
   private var __name        = ""

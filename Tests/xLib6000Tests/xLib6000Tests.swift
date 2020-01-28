@@ -265,7 +265,6 @@ final class xLib6000Tests: XCTestCase {
     
     XCTAssertNotNil(xvtr, "Failed to create Xvtr")
     XCTAssertEqual(xvtr?.ifFrequency, 28)
-    XCTAssertEqual(xvtr?.inUse, true)
     XCTAssertEqual(xvtr?.isValid, true)
     XCTAssertEqual(xvtr?.loError, 0)
     XCTAssertEqual(xvtr?.name, "220")
