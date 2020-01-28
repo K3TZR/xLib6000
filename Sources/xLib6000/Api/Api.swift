@@ -45,7 +45,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public                var connectionHandleWan   = ""
   public                var isWan                 = false
   @objc dynamic public  var radio                 : Radio?
-  public private(set)   var radioVersion          = Version()
+//  public private(set)   var radioVersion          : Version?
   public                var testerDelegate        : ApiDelegate?
   public                var testerModeEnabled     = false
   public                var pingerEnabled         = true
@@ -308,7 +308,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     _log("Client connected", .info, #function, #file, #line)
     
     // could this be a remote connection?
-    if radioVersion.major >= 2 {
+    if radio.version.major >= 2 {
       
       // YES, when connecting to a WAN radio, the public IP address of the connected
       // client must be obtained from the radio.  This value is used to determine
@@ -353,8 +353,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       
       send("client program " + _programName)
-      if radioVersion.isV3 { send("client station " + _clientStation) }
-      if radioVersion.isV3 && !_isGui && _clientId != nil { send("client bind client_id=" + _clientId!.uuidString) }
+      if radio.version.isV3 { send("client station " + _clientStation) }
+      if radio.version.isV3 && !_isGui && _clientId != nil { send("client bind client_id=" + _clientId!.uuidString) }
 
       if _lowBandwidthConnect { radio.requestLowBandwidthConnect() }
       radio.requestInfo()
@@ -378,7 +378,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private func checkVersion(_ selectedRadio: DiscoveryStruct) {
     
     // get the Radio Version
-    radioVersion = Version(selectedRadio.firmwareVersion)
+    let radioVersion = Version(selectedRadio.firmwareVersion)
 
     if Api.kVersionSupported < radioVersion  {
       _log("Radio may need to be downgraded: Radio version = \(radioVersion.longString), API supports version = \(Api.kVersionSupported.string)", .warning, #function, #file, #line)
