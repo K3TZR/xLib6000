@@ -209,7 +209,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public var softwareVersion      : String  { _softwareVersion }
   @objc dynamic public var tcxoPresent          : Bool    { _tcxoPresent }
   
-  public               let discoveryPacket      : DiscoveryStruct
+  public               var discoveryPacket      : DiscoveryStruct
   public               let version              : Version
   public private(set)  var sliceErrors          = [String]()  // milliHz
   public private(set)  var uptime               = 0
@@ -437,14 +437,14 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
   enum ClientToken : String {
     case host
-    case id                             = "client_id"
+    case id                       = "client_id"
     case ip
-    case localPttEnabled                = "local_ptt"
+    case localPttEnabled          = "local_ptt"
     case program
     case station
   }
   enum DisplayToken: String {
-    case panadapter                         = "pan"
+    case panadapter               = "pan"
     case waterfall
   }
   enum EqApfToken: String {
@@ -453,54 +453,54 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case qFactor
   }
   enum InfoToken: String {
-    case atuPresent                         = "atu_present"
+    case atuPresent               = "atu_present"
     case callsign
-    case chassisSerial                      = "chassis_serial"
+    case chassisSerial            = "chassis_serial"
     case gateway
     case gps
-    case ipAddress                          = "ip"
+    case ipAddress                = "ip"
     case location
-    case macAddress                         = "mac"
+    case macAddress               = "mac"
     case model
     case netmask
     case name
-    case numberOfScus                       = "num_scu"
-    case numberOfSlices                     = "num_slice"
-    case numberOfTx                         = "num_tx"
+    case numberOfScus             = "num_scu"
+    case numberOfSlices           = "num_slice"
+    case numberOfTx               = "num_tx"
     case options
     case region
     case screensaver
-    case softwareVersion                    = "software_ver"
+    case softwareVersion          = "software_ver"
   }
   enum RadioToken: String {
     case backlight
-    case bandPersistenceEnabled             = "band_persistence_enabled"
-    case binauralRxEnabled                  = "binaural_rx"
-    case calFreq                            = "cal_freq"
+    case bandPersistenceEnabled   = "band_persistence_enabled"
+    case binauralRxEnabled        = "binaural_rx"
+    case calFreq                  = "cal_freq"
     case callsign
-    case daxIqAvailable                     = "daxiq_available"
-    case daxIqCapacity                      = "daxiq_capacity"
-    case enforcePrivateIpEnabled            = "enforce_private_ip_connections"
-    case freqErrorPpb                       = "freq_error_ppb"
-    case frontSpeakerMute                   = "front_speaker_mute"
-    case fullDuplexEnabled                  = "full_duplex_enabled"
-    case headphoneGain                      = "headphone_gain"
-    case headphoneMute                      = "headphone_mute"
-    case lineoutGain                        = "lineout_gain"
-    case lineoutMute                        = "lineout_mute"
-    case muteLocalAudio                     = "mute_local_audio_when_remote"
+    case daxIqAvailable           = "daxiq_available"
+    case daxIqCapacity            = "daxiq_capacity"
+    case enforcePrivateIpEnabled  = "enforce_private_ip_connections"
+    case freqErrorPpb             = "freq_error_ppb"
+    case frontSpeakerMute         = "front_speaker_mute"
+    case fullDuplexEnabled        = "full_duplex_enabled"
+    case headphoneGain            = "headphone_gain"
+    case headphoneMute            = "headphone_mute"
+    case lineoutGain              = "lineout_gain"
+    case lineoutMute              = "lineout_mute"
+    case muteLocalAudio           = "mute_local_audio_when_remote"
     case nickname
     case panadapters
-    case pllDone                            = "pll_done"
-    case remoteOnEnabled                    = "remote_on_enabled"
-    case rttyMark                           = "rtty_mark_default"
+    case pllDone                  = "pll_done"
+    case remoteOnEnabled          = "remote_on_enabled"
+    case rttyMark                 = "rtty_mark_default"
     case slices
-    case snapTuneEnabled                    = "snap_tune_enabled"
-    case tnfsEnabled                        = "tnf_enabled"
+    case snapTuneEnabled          = "snap_tune_enabled"
+    case tnfsEnabled              = "tnf_enabled"
   }
   enum RadioTokenCategory: String {
-    case filterSharpness                    = "filter_sharpness"
-    case staticNetParams                    = "static_net_params"
+    case filterSharpness  = "filter_sharpness"
+    case staticNetParams  = "static_net_params"
     case oscillator
   }
   enum RadioFilterSharpness: String {
@@ -510,7 +510,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 //    case DIGITAL
     case voice
 //    case VOICE
-    case autoLevel                          = "auto_level"
+    case autoLevel        = "auto_level"
     case level
   }
   enum RadioStaticNet: String {
@@ -519,16 +519,16 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case netmask
   }
   enum RadioOscillator: String {
-    case extPresent                         = "ext_present"
-    case gpsdoPresent                       = "gpsdo_present"
+    case extPresent       = "ext_present"
+    case gpsdoPresent     = "gpsdo_present"
     case locked
     case setting
     case state
-    case tcxoPresent                        = "tcxo_present"
+    case tcxoPresent      = "tcxo_present"
   }
   enum StatusToken : String {
     case amplifier
-    case audioStream                        = "audio_stream"  // (pre V3 only)
+    case audioStream      = "audio_stream"  // (pre V3 only)
     case atu
     case client
     case cwx
@@ -540,9 +540,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case interlock
     case memory
     case meter
-    case micAudioStream                     = "mic_audio_stream"  // (pre V3 only)
+    case micAudioStream   = "mic_audio_stream"  // (pre V3 only)
     case mixer
-    case opusStream                         = "opus_stream"
+    case opusStream       = "opus_stream"
     case profile
     case radio
     case slice
@@ -550,19 +550,31 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case tnf
     case transmit
     case turf
-    case txAudioStream                      = "tx_audio_stream"  // (pre V3 only)
-    case usbCable                           = "usb_cable"
+    case txAudioStream    = "tx_audio_stream"  // (pre V3 only)
+    case usbCable         = "usb_cable"
     case wan
     case waveform
     case xvtr
   }
   enum VersionToken: String {
-    case fpgaMb                             = "fpga-mb"
-    case psocMbPa100                        = "psoc-mbpa100"
-    case psocMbTrx                          = "psoc-mbtrx"
-    case smartSdrMB                         = "smartsdr-mb"
-    case picDecpu                           = "pic-decpu"
+    case fpgaMb           = "fpga-mb"
+    case psocMbPa100      = "psoc-mbpa100"
+    case psocMbTrx        = "psoc-mbtrx"
+    case smartSdrMB       = "smartsdr-mb"
+    case picDecpu         = "pic-decpu"
   }
+  enum ClientTokenV3Connection : String {
+    case clientId         = "client_id"
+    case localPttEnabled  = "local_ptt"
+    case program
+    case station
+  }
+  enum ClientTokenV3Disconnection : String {
+    case duplicateClientId     = "duplicate_client_id"
+    case forced
+    case wanValidationFailed   = "wan_validation_failed"
+  }
+
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -741,6 +753,142 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
+  private func removeGuiClient(with handle: Handle) {
+    
+    // find the GuiClient
+    for (i, guiClient) in discoveryPacket.guiClients.enumerated() {
+      if guiClient.handle == handle {
+        discoveryPacket.guiClients.remove(at: i)
+        return
+      }
+    }
+    // none found
+    return
+  }
+  private func parseV3Connection(properties: KeyValuesArray, handle: Handle) {
+    var clientId : String?
+    var program = ""
+    var station = ""
+    var isLocalPtt = false
+    
+    // parse remaining properties
+    for property in properties.dropFirst(2) {
+      
+      // check for unknown Keys
+      guard let token = ClientTokenV3Connection(rawValue: property.key) else {
+        // log it and ignore this Key
+        _log("Unknown Client Connection token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        continue
+      }
+      // Known keys, in alphabetical order
+      switch token {
+        
+      case .clientId:
+        clientId = property.value
+        
+      case .localPttEnabled:
+        isLocalPtt = property.value.bValue
+        
+      case .program:
+        program = property.value
+        
+      case .station:
+        station = property.value
+      }
+    }
+    var guiClient = findGuiClient(with: handle)
+    
+    // is there a Gui Client with this handle?
+    //    may have been added by Discovery (without a ClientId)
+    if guiClient != nil {
+      // YES, update it
+      guiClient!.program = program
+      guiClient!.station = station
+      guiClient!.isLocalPtt = isLocalPtt
+      guiClient!.isThisClient = (_api.connectionHandle! == handle)
+
+      // does it contain a ClientId?
+      if guiClient!.clientId == nil {
+        // NO, add it
+        guiClient!.clientId = clientId
+
+        // notify all observers
+        NC.post(.guiClientHasBeenAdded, object: guiClient as Any?)
+      }
+      
+    } else {
+      // NO, add one
+      guiClient = GuiClient(handle: handle,
+                            clientId: clientId,
+                            program: program,
+                            station: station,
+                            isLocalPtt: isLocalPtt,
+                            isThisClient: (_api.connectionHandle! == handle))
+      discoveryPacket.guiClients.append(guiClient!)
+
+      // notify all observers
+      NC.post(.guiClientHasBeenAdded, object: guiClient as Any?)
+    }
+  }
+
+  private func findGuiClient(with handle: Handle) -> GuiClient? {
+    
+    // find an existing GuiClient
+    for guiClient in discoveryPacket.guiClients {
+      
+      if guiClient.handle == handle {
+        return guiClient
+      }
+    }
+    // none found
+    return nil
+  }
+  
+  
+  private func findGuiClient(with clientId: String) -> GuiClient? {
+    
+    // find an existing GuiClient
+    for guiClient in discoveryPacket.guiClients where guiClient.clientId == clientId {
+      
+      return guiClient
+    }
+    // none found
+    return nil
+  }
+
+  private func parseV3Disconnection(properties: KeyValuesArray, handle: Handle) {
+    var duplicateClientId = false
+    var forced = false
+    var wanValidationFailed = false
+    
+    // parse remaining properties
+    for property in properties.dropFirst(2) {
+      
+      // check for unknown Keys
+      guard let token = ClientTokenV3Disconnection(rawValue: property.key) else {
+        // log it and ignore this Key
+        _log("Unknown Client Disconnection token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        continue
+      }
+      // Known keys, in alphabetical order
+      switch token {
+        
+      case .duplicateClientId:
+        duplicateClientId = property.value.bValue
+        
+      case .forced:
+        forced = property.value.bValue
+        
+      case .wanValidationFailed:
+        wanValidationFailed = property.value.bValue
+      }
+      if duplicateClientId || forced || wanValidationFailed {
+        _log("Disconnected with: \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , .warning, #function, #file, #line)
+      }
+      removeGuiClient(with: handle)
+      NC.post(.guiClientHasBeenRemoved, object: handle as Any?)
+    }
+  }
   /// Parse a Message.
   ///   format: <messageNumber>|<messageText>
   ///
@@ -900,28 +1048,46 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  private func parseClient(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
-
-    guard keyValues.count >= 2 else {
-      _log("Invalid client status", .warning, #function, #file, #line)
+  private func parseClient(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
+    
+    guard properties.count >= 2 else {
+      _log("Invalid client status", .warning, #function, #file,  #line)
       return
     }
-    // guard that the message has my API Handle
-    guard _api.connectionHandle! == keyValues[0].key.handle else { return }
     
-    // what is the message?
-    if keyValues[1].key == "connected" {
-      // Connected
-      _api.clientConnected(radio)
+    // is there a valid handle"
+    if let handle = properties[0].key.handle {
       
-    } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
-      // FIXME: Handle the disconnect?
-      // Disconnected
-      _log("Disconnect, forced = \(keyValues[2].value)", .info, #function, #file, #line)
-      
-    } else {
-      // Unrecognized
-      _log("Unprocessed Client message: \(keyValues[0].key)", .warning, #function, #file, #line)
+      // is it In Use?
+      if inUse {
+        
+        // IN USE, i.e. connected, is it V3 API?
+        if version.isV3 {
+          // V3, is the status for a Gui-client?, otherwise ignore it
+          if properties.count > 2 {
+            // YES, it's a Gui-client status
+            parseV3Connection(properties: properties, handle: handle)
+          }
+        } else {
+          // pre V3, guard that the message has my API Handle
+          guard _api.connectionHandle! == properties[0].key.handle else { return }
+          
+          // YES, Finish the UDP initialization & set the API state
+          _api.clientConnected(radio)
+        }
+        
+      } else {
+        // NOT IN USE, i.e. disconnected
+        if version.isV3 {
+          // V3 API
+          parseV3Disconnection(properties: properties, handle: handle)
+          removeGuiClient(with: handle)
+          NC.post(.guiClientHasBeenRemoved, object: handle as Any?)
+          
+        } else {
+          // pre V3 API
+        }
+      }
     }
   }
   /// Parse a Display status message

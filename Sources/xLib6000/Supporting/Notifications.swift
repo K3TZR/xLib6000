@@ -17,7 +17,7 @@ public enum NotificationType : String {
   
   case audioStreamHasBeenAdded
   case audioStreamWillBeRemoved
-  
+
   case clientDidConnect
   case clientDidDisconnect
   
@@ -43,8 +43,9 @@ public enum NotificationType : String {
   case globalProfileUpdated
   
   case guiClientHasBeenAdded
-  case guiClientWillBeRemoved
-  
+  case guiClientHasBeenRemoved
+  case guiClientHasBeenUpdated
+
   case iqStreamHasBeenAdded
   case iqStreamWillBeRemoved
   
@@ -73,8 +74,6 @@ public enum NotificationType : String {
   case radioHasBeenAdded
   case radioWillBeRemoved
   case radioHasBeenRemoved
-  
-  case radiosAvailable
   
   case radioDowngrade
   case radioUpgrade
@@ -106,7 +105,7 @@ public enum NotificationType : String {
 
   case txAudioStreamHasBeenAdded
   case txAudioStreamWillBeRemoved
-  
+
   case udpDidBind
   
   case usbCableHasBeenAdded
