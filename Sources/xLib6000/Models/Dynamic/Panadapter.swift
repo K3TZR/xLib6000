@@ -491,7 +491,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   func vitaProcessor(_ vita: Vita) {
     
     // convert the Vita struct to a PanadapterFrame
-    if _panadapterframes[_index].accumulate(vita: vita, expectedFrame: &packetFrame) {
+    if _panadapterframes[_index].accumulate(version: _radio.version, vita: vita, expectedFrame: &packetFrame) {
       
       // Pass the data frame to this Panadapter's delegate
       delegate?.streamHandler(_panadapterframes[_index])
@@ -589,4 +589,131 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private var __xPixels                     : CGFloat = 0
   private var __yPixels                     : CGFloat = 0
   private var __xvtrLabel                   = ""
+}
+
+/// Class containing Panadapter Stream data
+///
+///   populated by the Panadapter vitaHandler
+///
+public class PanadapterFrame {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
+  public private(set) var startingBin       = 0                             // Index of first bin
+  public private(set) var numberOfBins      = 0                             // Number of bins
+  public private(set) var binSize           = 0                             // Bin size in bytes
+  public private(set) var totalBins         = 0                             // number of bins in the complete frame
+  public private(set) var receivedFrame     = 0                             // Frame number
+  public var bins                           = [UInt16]()                    // Array of bin values
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Private properties
+  
+  private var _log                          = Log.sharedInstance.msg
+  
+  private struct PayloadHeaderOld {                                        // struct to mimic payload layout
+    var startingBin                         : UInt32
+    var numberOfBins                        : UInt32
+    var binSize                             : UInt32
+    var frameIndex                          : UInt32
+  }
+  private struct PayloadHeader {                                            // struct to mimic payload layout
+    var startingBin                         : UInt16
+    var numberOfBins                        : UInt16
+    var binSize                             : UInt16
+    var totalBins                           : UInt16
+    var frameIndex                          : UInt32
+  }
+  private var _expectedIndex                = 0
+  //  private var _binsProcessed                = 0
+  private var _byteOffsetToBins             = 0
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize a PanadapterFrame
+  ///
+  /// - Parameter frameSize:    max number of Panadapter samples
+  ///
+  public init(frameSize: Int) {
+    
+    // allocate the bins array
+    self.bins = [UInt16](repeating: 0, count: frameSize)
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods
+  
+  /// Accumulate Vita object(s) into a PanadapterFrame
+  ///
+  /// - Parameter vita:         incoming Vita object
+  /// - Returns:                true if entire frame processed
+  ///
+  public func accumulate(version: Version, vita: Vita, expectedFrame: inout Int) -> Bool {
+    
+    let payloadPtr = UnsafeRawPointer(vita.payloadData)
+    
+    if version.isGreaterThan23 {
+      // 2.3.x or greater
+      // Bins are just beyond the payload
+      _byteOffsetToBins = MemoryLayout<PayloadHeader>.size
+      
+      // map the payload to the New Payload struct
+      let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
+      
+      // byte swap and convert each payload component
+      startingBin = Int(CFSwapInt16BigToHost(p.pointee.startingBin))
+      numberOfBins = Int(CFSwapInt16BigToHost(p.pointee.numberOfBins))
+      binSize = Int(CFSwapInt16BigToHost(p.pointee.binSize))
+      totalBins = Int(CFSwapInt16BigToHost(p.pointee.totalBins))
+      receivedFrame = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
+      
+    } else {
+      // pre 2.3.x
+      // Bins are just beyond the payload
+      _byteOffsetToBins = MemoryLayout<PayloadHeaderOld>.size
+      
+      // map the payload to the Old Payload struct
+      let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
+      
+      // byte swap and convert each payload component
+      startingBin = Int(CFSwapInt32BigToHost(p.pointee.startingBin))
+      numberOfBins = Int(CFSwapInt32BigToHost(p.pointee.numberOfBins))
+      binSize = Int(CFSwapInt32BigToHost(p.pointee.binSize))
+      totalBins = numberOfBins
+      receivedFrame = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
+    }
+    // initial frame?
+    if expectedFrame == -1 { expectedFrame = receivedFrame }
+    
+    switch (expectedFrame, receivedFrame) {
+      
+    case (let expected, let received) where received < expected:
+      // from a previous group, ignore it
+      _log("Ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      return false
+      
+    case (let expected, let received) where received > expected:
+      // from a later group, jump forward
+      _log("Missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      expectedFrame = received
+      fallthrough
+      
+    default:
+      // received == expected
+      // get a pointer to the Bins in the payload
+      let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
+      
+      // Swap the byte ordering of the data & place it in the bins
+      for i in 0..<numberOfBins {
+        bins[i+startingBin] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
+      }
+      
+      // reset the count if the entire frame has been accumulated
+      if startingBin + numberOfBins == totalBins { numberOfBins = totalBins  ; expectedFrame += 1 }
+    }
+    // return true if the entire frame has been accumulated
+    return numberOfBins == totalBins
+  }
 }

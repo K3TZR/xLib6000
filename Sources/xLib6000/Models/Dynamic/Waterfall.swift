@@ -287,7 +287,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   func vitaProcessor(_ vita: Vita) {
     
     // convert the Vita struct and accumulate a WaterfallFrame
-    if _waterfallframes[_index].accumulate(vita: vita, expectedFrame: &packetFrame) {
+    if _waterfallframes[_index].accumulate(version: _radio.version, vita: vita, expectedFrame: &packetFrame) {
 
       // save the auto black level
       _autoBlackLevel = _waterfallframes[_index].autoBlackLevel
@@ -327,4 +327,152 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   private var __gradientIndex     = 0
   private var __lineDuration      = 0
   private var __panadapterId      : PanadapterStreamId = 0
+}
+
+/// Class containing Waterfall Stream data
+///
+///   populated by the Waterfall vitaHandler
+///
+public class WaterfallFrame {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
+  public private(set) var firstBinFreq      : CGFloat   = 0.0               // Frequency of first Bin (Hz)
+  public private(set) var binBandwidth      : CGFloat   = 0.0               // Bandwidth of a single bin (Hz)
+  public private(set) var lineDuration      = 0                             // Duration of this line (ms)
+  public private(set) var numberOfBins      = 0                             // Number of bins
+  public private(set) var height            = 0                             // Height of frame (pixels)
+  public private(set) var receivedFrame     = 0                             // Time code
+  public private(set) var autoBlackLevel    : UInt32 = 0                    // Auto black level
+  public private(set) var totalBins         = 0                             //
+  public private(set) var startingBin       = 0                             //
+  public var bins                           = [UInt16]()                    // Array of bin values
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Private properties
+  
+  private var _binsProcessed                = 0
+  private var _byteOffsetToBins             = 0
+  private var _log                          = Log.sharedInstance.msg
+  
+  private struct PayloadHeaderOld {                                         // struct to mimic payload layout
+    var firstBinFreq                        : UInt64                        // 8 bytes
+    var binBandwidth                        : UInt64                        // 8 bytes
+    var lineDuration                        : UInt32                        // 4 bytes
+    var numberOfBins                        : UInt16                        // 2 bytes
+    var lineHeight                          : UInt16                        // 2 bytes
+    var receivedFrame                       : UInt32                        // 4 bytes
+    var autoBlackLevel                      : UInt32                        // 4 bytes
+  }
+  
+  private struct PayloadHeader {                                            // struct to mimic payload layout
+    var firstBinFreq                        : UInt64                        // 8 bytes
+    var binBandwidth                        : UInt64                        // 8 bytes
+    var lineDuration                        : UInt32                        // 4 bytes
+    var numberOfBins                        : UInt16                        // 2 bytes
+    var height                              : UInt16                        // 2 bytes
+    var receivedFrame                       : UInt32                        // 4 bytes
+    var autoBlackLevel                      : UInt32                        // 4 bytes
+    var totalBins                           : UInt16                        // 2 bytes
+    var firstBin                            : UInt16                        // 2 bytes
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize a WaterfallFrame
+  ///
+  /// - Parameter frameSize:    max number of Waterfall samples
+  ///
+  public init(frameSize: Int) {
+    
+    // allocate the bins array
+    self.bins = [UInt16](repeating: 0, count: frameSize)
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods
+  
+  /// Accumulate Vita object(s) into a WaterfallFrame
+  ///
+  /// - Parameter vita:         incoming Vita object
+  /// - Returns:                true if entire frame processed
+  ///
+  public func accumulate(version: Version, vita: Vita, expectedFrame: inout Int) -> Bool {
+    
+    let payloadPtr = UnsafeRawPointer(vita.payloadData)
+    
+    if version.isGreaterThan23 {
+      // 2.3.x or greater
+      // map the payload to the New Payload struct
+      let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
+      
+      // 2.3.x or greater
+      // Bins are just beyond the payload
+      _byteOffsetToBins = MemoryLayout<PayloadHeader>.size
+      
+      // byte swap and convert each payload component
+      firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
+      binBandwidth = CGFloat(CFSwapInt64BigToHost(p.pointee.binBandwidth)) / 1.048576E6
+      lineDuration = Int( CFSwapInt32BigToHost(p.pointee.lineDuration) )
+      numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
+      height = Int( CFSwapInt16BigToHost(p.pointee.height) )
+      receivedFrame = Int( CFSwapInt32BigToHost(p.pointee.receivedFrame) )
+      autoBlackLevel = CFSwapInt32BigToHost(p.pointee.autoBlackLevel)
+      totalBins = Int( CFSwapInt16BigToHost(p.pointee.totalBins) )
+      startingBin = Int( CFSwapInt16BigToHost(p.pointee.firstBin) )
+      
+    } else {
+      // pre 2.3.x
+      // map the payload to the Old Payload struct
+      let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
+      
+      // pre 2.3.x
+      // Bins are just beyond the payload
+      _byteOffsetToBins = MemoryLayout<PayloadHeaderOld>.size
+      
+      // byte swap and convert each payload component
+      firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
+      binBandwidth = CGFloat(CFSwapInt64BigToHost(p.pointee.binBandwidth)) / 1.048576E6
+      lineDuration = Int( CFSwapInt32BigToHost(p.pointee.lineDuration) )
+      numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
+      height = Int( CFSwapInt16BigToHost(p.pointee.lineHeight) )
+      receivedFrame = Int( CFSwapInt32BigToHost(p.pointee.receivedFrame) )
+      autoBlackLevel = CFSwapInt32BigToHost(p.pointee.autoBlackLevel)
+      totalBins = numberOfBins
+      startingBin = 0
+    }
+    // initial frame?
+    if expectedFrame == -1 { expectedFrame = receivedFrame }
+    
+    switch (expectedFrame, receivedFrame) {
+      
+    case (let expected, let received) where received < expected:
+      // from a previous group, ignore it
+      _log("Waterfall ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      return false
+      
+    case (let expected, let received) where received > expected:
+      // from a later group, jump forward
+      _log("Waterfall missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      expectedFrame = received
+      fallthrough
+      
+    default:
+      // received == expected
+      // get a pointer to the Bins in the payload
+      let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
+      
+      // Swap the byte ordering of the data & place it in the bins
+      for i in 0..<numberOfBins {
+        bins[i+startingBin] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
+      }
+
+      // reset the count if the entire frame has been accumulated
+      if startingBin + numberOfBins == totalBins { numberOfBins = totalBins  ; expectedFrame += 1 }
+    }
+    // return true if the entire frame has been accumulated
+    return numberOfBins == totalBins
+  }
 }
