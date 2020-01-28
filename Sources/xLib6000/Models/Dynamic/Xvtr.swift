@@ -81,7 +81,7 @@ public final class Xvtr : NSObject, DynamicModel {
     set { Api.objectQ.sync(flags: .barrier) {__loError = newValue }}}
   var _name : String {
     get { Api.objectQ.sync { __name } }
-    set { Api.objectQ.sync(flags: .barrier) {__name = newValue }}}
+    set { Api.objectQ.sync(flags: .barrier) {__name = String(newValue.prefix(4)) }}}
   var _maxPower : Int {
     get { Api.objectQ.sync { __maxPower } }
     set { Api.objectQ.sync(flags: .barrier) {__maxPower = newValue }}}
@@ -209,18 +209,18 @@ public final class Xvtr : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
-      case .name:         update(self, &_name,        to: String(property.value.prefix(4)), signal: \.name)
-      case .ifFrequency:  update(self, &_ifFrequency, to: property.value.mhzToHz,           signal: \.ifFrequency)
-      case .inUse:        update(self, &_inUse,       to: property.value.bValue,            signal: \.inUse)
-      case .isValid:      update(self, &_isValid,     to: property.value.bValue,            signal: \.isValid)
-      case .loError:      update(self, &_loError,     to: property.value.iValue,            signal: \.loError)
-      case .maxPower:     update(self, &_maxPower,    to: property.value.iValue,            signal: \.maxPower)
-      case .order:        update(self, &_order,       to: property.value.iValue,            signal: \.order)
-      case .preferred:    update(self, &_preferred,   to: property.value.bValue,            signal: \.preferred)
-      case .rfFrequency:  update(self, &_rfFrequency, to: property.value.mhzToHz,           signal: \.rfFrequency)
-      case .rxGain:       update(self, &_rxGain,      to: property.value.iValue,            signal: \.rxGain)
-      case .rxOnly:       update(self, &_rxOnly,      to: property.value.bValue,            signal: \.rxOnly)
-      case .twoMeterInt:  update(self, &_twoMeterInt, to: property.value.iValue,            signal: \.twoMeterInt)
+      case .name:         update(self, &_name,        to: property.value,         signal: \.name)
+      case .ifFrequency:  update(self, &_ifFrequency, to: property.value.mhzToHz, signal: \.ifFrequency)
+      case .inUse:        update(self, &_inUse,       to: property.value.bValue,  signal: \.inUse)
+      case .isValid:      update(self, &_isValid,     to: property.value.bValue,  signal: \.isValid)
+      case .loError:      update(self, &_loError,     to: property.value.iValue,  signal: \.loError)
+      case .maxPower:     update(self, &_maxPower,    to: property.value.iValue,  signal: \.maxPower)
+      case .order:        update(self, &_order,       to: property.value.iValue,  signal: \.order)
+      case .preferred:    update(self, &_preferred,   to: property.value.bValue,  signal: \.preferred)
+      case .rfFrequency:  update(self, &_rfFrequency, to: property.value.mhzToHz, signal: \.rfFrequency)
+      case .rxGain:       update(self, &_rxGain,      to: property.value.iValue,  signal: \.rxGain)
+      case .rxOnly:       update(self, &_rxOnly,      to: property.value.bValue,  signal: \.rxOnly)
+      case .twoMeterInt:  update(self, &_twoMeterInt, to: property.value.iValue,  signal: \.twoMeterInt)
       }
     }
     // is the waterfall initialized?
@@ -265,7 +265,7 @@ public final class Xvtr : NSObject, DynamicModel {
   private var __inUse       = false
   private var __isValid     = false
   private var __loError     = 0
-  private var __name        = "" { didSet { _name = String(_name.prefix(4)) }}
+  private var __name        = ""
   private var __maxPower    = 0
   private var __order       = 0
   private var __preferred   = false
