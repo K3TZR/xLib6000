@@ -44,12 +44,13 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public                var connectionHandle      : Handle?
   public                var connectionHandleWan   = ""
   public                var isWan                 = false
-  @objc dynamic public  var radio                 : Radio?
-//  public private(set)   var radioVersion          : Version?
   public                var testerDelegate        : ApiDelegate?
   public                var testerModeEnabled     = false
   public                var pingerEnabled         = true
 
+  public var radio        : Radio? {
+    get { Api.objectQ.sync { _radio } }
+    set { Api.objectQ.sync(flags: .barrier) {_radio = newValue }}}
   public var delegate     : ApiDelegate? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
@@ -571,6 +572,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // *** Hidden properties (Do NOT use) ***
   
+  private var _radio         : Radio? = nil
   private var _delegate      : ApiDelegate? = nil
   private var _localIP       = "0.0.0.0"
   private var _localUDPPort  : UInt16 = 0
