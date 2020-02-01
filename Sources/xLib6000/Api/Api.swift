@@ -134,13 +134,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     // set the initial State
     apiState = .disconnected
-
-    _log("abcd debug", .debug, #function, #file, #line)
-    _log("abcd verbose", .verbose, #function, #file, #line)
-    _log("abcd info", .info, #function, #file, #line)
-    _log("abcd warning", .warning, #function, #file, #line)
-    _log("abcd error", .error, #function, #file, #line)
-    _log("abcd severe", .severe, #function, #file, #line)
   }
 
   // ----------------------------------------------------------------------------
