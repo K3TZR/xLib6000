@@ -72,7 +72,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance.msg
+  private let _log                          = Log.sharedInstance.logMessage
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
   private var _vita                         : Vita?                         // a Vita class

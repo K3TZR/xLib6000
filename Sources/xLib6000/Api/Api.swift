@@ -112,7 +112,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   private let _clientIpSemaphore            = DispatchSemaphore(value: 0)
   private let _isTnfSubscribed              = true // TODO:
-  private let _log                          = Log.sharedInstance.msg
+  private let _log                          = Log.sharedInstance.logMessage
 
   // ----------------------------------------------------------------------------
   // MARK: - Singleton

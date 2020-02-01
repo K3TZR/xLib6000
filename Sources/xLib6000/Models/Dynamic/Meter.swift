@@ -137,7 +137,7 @@ public final class Meter : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized                  = false
-  private let _log                          = Log.sharedInstance.msg
+  private let _log                          = Log.sharedInstance.logMessage
   private let _radio                        : Radio
   private var _voltsAmpsDenom               : Float = 256.0  // denominator for voltage/amperage depends on API version
 
@@ -276,7 +276,7 @@ public final class Meter : NSObject, DynamicModel {
           // remove it
           radio.meters[id] = nil
           
-          Log.sharedInstance.msg("Meter removed: id = \(id)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("Meter removed: id = \(id)", .debug, #function, #file, #line)
         }
       }
     }

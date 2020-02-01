@@ -609,7 +609,7 @@ public final class Slice  : NSObject, DynamicModel {
   
   private var _diversityIsAllowed   : Bool { return _radio.radioModel == "FLEX-6700" || _radio.radioModel == "FLEX-6700R" }
   private var _initialized          = false
-  private let _log                  = Log.sharedInstance.msg
+  private let _log                  = Log.sharedInstance.logMessage
   private let _radio                : Radio
 
   private let kTuneStepList         = [1, 10, 50, 100, 500, 1_000, 2_000, 3_000]
@@ -664,7 +664,7 @@ public final class Slice  : NSObject, DynamicModel {
         // remove it
         radio.slices[id] = nil
         
-        Log.sharedInstance.msg("Slice removed: id = \(id)", .debug, #function, #file, #line)
+        Log.sharedInstance.logMessage("Slice removed: id = \(id)", .debug, #function, #file, #line)
       }
     }
   }

@@ -109,7 +109,7 @@ public final class Equalizer : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized  = false
-  private let _log          = Log.sharedInstance.msg
+  private let _log          = Log.sharedInstance.logMessage
   private let _radio        : Radio
 
   // ------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ public final class Equalizer : NSObject, DynamicModel {
       
     default:
       // unknown type, log & ignore it
-      Log.sharedInstance.msg("Unknown Equalizer type: \(type)", .warning, #function, #file, #line)
+      Log.sharedInstance.logMessage("Unknown Equalizer type: \(type)", .warning, #function, #file, #line)
     }
     // if an equalizer was found
     if let equalizer = equalizer {

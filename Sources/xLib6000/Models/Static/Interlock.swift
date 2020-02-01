@@ -187,7 +187,7 @@ public final class Interlock : NSObject, StaticModel {
   // MARK: - Private properties
   
   private let _radio        : Radio
-  private let _log          = Log.sharedInstance.msg
+  private let _log          = Log.sharedInstance.logMessage
 
  // ------------------------------------------------------------------------------
   // MARK: - Initialization

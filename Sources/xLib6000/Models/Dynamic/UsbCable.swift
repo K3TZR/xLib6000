@@ -171,7 +171,7 @@ public final class UsbCable : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized                  = false
-  private let _log                          = Log.sharedInstance.msg
+  private let _log                          = Log.sharedInstance.logMessage
   private let _radio                        : Radio
 
   // ------------------------------------------------------------------------------
@@ -210,7 +210,7 @@ public final class UsbCable : NSObject, DynamicModel {
       } else {
         
         // NO, log the error and ignore it
-        Log.sharedInstance.msg("Invalid UsbCable Type: \(keyValues[1].value)", .warning, #function, #file, #line)
+        Log.sharedInstance.logMessage("Invalid UsbCable Type: \(keyValues[1].value)", .warning, #function, #file, #line)
 
         return
       }

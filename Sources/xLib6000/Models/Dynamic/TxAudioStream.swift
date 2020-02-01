@@ -87,7 +87,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized                  = false
-  private var _log                          = Log.sharedInstance.msg
+  private var _log                          = Log.sharedInstance.logMessage
   private let _radio                        : Radio
   private var _txSeq                        = 0
   

@@ -76,7 +76,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   
   private var _expectedFrame                : Int?
   private var _initialized                  = false
-  private let _log                          = Log.sharedInstance.msg
+  private let _log                          = Log.sharedInstance.logMessage
   private let _radio                        : Radio
   private var _vita                         : Vita?
   private var _rxPacketCount                = 0

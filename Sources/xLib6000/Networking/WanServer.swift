@@ -74,7 +74,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   // MARK: - Private properties
   
   private weak  var _delegate               : WanServerDelegate?
-  private       let _log                    = Log.sharedInstance.msg
+  private       let _log                    = Log.sharedInstance.logMessage
 
   private let _api                          = Api.sharedInstance
   private var _appName                      = ""

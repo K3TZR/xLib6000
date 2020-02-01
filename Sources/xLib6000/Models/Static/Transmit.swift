@@ -353,7 +353,7 @@ public final class Transmit : NSObject, StaticModel {
   // MARK: - Private properties
 
   private var _initialized                  = false
-  private let _log                          = Log.sharedInstance.msg
+  private let _log                          = Log.sharedInstance.logMessage
   private var _radio                        : Radio
   
   // ------------------------------------------------------------------------------

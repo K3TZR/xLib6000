@@ -102,7 +102,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private var _initialized                  = false
-  private let _log                          = Log.sharedInstance.msg
+  private let _log                          = Log.sharedInstance.logMessage
   private var _radio                        : Radio
 
   private var _clientHandle                 : UInt32 = 0

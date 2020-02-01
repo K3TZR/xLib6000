@@ -630,7 +630,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _radioInitialized             = false
   
   private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
-  private let _log                          = Log.sharedInstance.msg
+  private let _log                          = Log.sharedInstance.logMessage
   
   // ----------------------------------------------------------------------------
   // MARK: - Initialization

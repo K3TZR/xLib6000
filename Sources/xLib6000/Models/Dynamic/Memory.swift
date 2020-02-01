@@ -181,7 +181,7 @@ public final class Memory                   : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized                  = false
-  private let _log                          = Log.sharedInstance.msg
+  private let _log                          = Log.sharedInstance.logMessage
   private var _radio                        : Radio
 
   // ------------------------------------------------------------------------------

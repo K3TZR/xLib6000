@@ -80,7 +80,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private      var _initialized       = false       // True if initialized by Radio hardware
-  private      let _log               = Log.sharedInstance.msg
+  private      let _log               = Log.sharedInstance.logMessage
   public       let _radio             : Radio
   private      var _rxSeq             : Int?              // Rx sequence number
 

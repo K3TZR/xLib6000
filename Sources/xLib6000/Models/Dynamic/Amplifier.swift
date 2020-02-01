@@ -78,7 +78,7 @@ public final class Amplifier  : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized  = false
-  private let _log          = Log.sharedInstance.msg
+  private let _log          = Log.sharedInstance.logMessage
   private let _radio        : Radio
 
   // ------------------------------------------------------------------------------
