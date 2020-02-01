@@ -215,7 +215,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Opus token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Opus token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -263,7 +263,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
 
 //    case (let expected, let received) where received < expected:
 //      // from a previous group, ignore it
-//      _log("Delayed frame(s): expected \(expected), received \(received)", .warning, #function, #file, #line)
+//      _log(Api.kName + ": Delayed frame(s): expected \(expected), received \(received)", .warning, #function, #file, #line)
 //      return
       
     case (let expected, let received) where received > expected:
@@ -271,7 +271,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       
       // from a later group, jump forward
       let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
-      _log("Opus Missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+      _log(Api.kName + ": Opus Missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
 
       // Pass an error frame (count == 0) to the Opus delegate
       delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: 0) )

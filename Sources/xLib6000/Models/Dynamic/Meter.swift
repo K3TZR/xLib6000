@@ -193,7 +193,7 @@ public final class Meter : NSObject, DynamicModel {
           // check for unknown Units
           guard let token = Units(rawValue: meter.units) else {
             //      // log it and ignore it
-            //      _log("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", .warning, #function, #file, #line)
+            //      _log(Api.kName + ": Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", .warning, #function, #file, #line)
             return
           }
           var adjNewValue: Float = 0.0
@@ -249,32 +249,34 @@ public final class Meter : NSObject, DynamicModel {
       if components.count != 2 {return }
       
       // the Meter Number is the 0th item
-      if let meterId = components[0].objectId {
+      if let id = components[0].objectId {
         
         // does the meter exist?
-        if radio.meters[meterId] == nil {
+        if radio.meters[id] == nil {
           
           // DOES NOT EXIST, create a new Meter & add it to the Meters collection
-          radio.meters[meterId] = Meter(radio: radio, id: meterId)
+          radio.meters[id] = Meter(radio: radio, id: id)
         }
         
         // pass the key values to the Meter for parsing
-        radio.meters[meterId]!.parseProperties(radio, keyValues )
+        radio.meters[id]!.parseProperties(radio, keyValues )
       }
       
     } else {
       
       // NOT IN USE, extract the Meter Id
-      if let meterId = keyValues[0].key.components(separatedBy: " ")[0].objectId {
+      if let id = keyValues[0].key.components(separatedBy: " ")[0].objectId {
         
         // does it exist?
-        if let meter = radio.meters[meterId] {
+        if let meter = radio.meters[id] {
           
           // notify all observers
           NC.post(.meterWillBeRemoved, object: meter as Any?)
           
           // remove it
-          radio.meters[meterId] = nil
+          radio.meters[id] = nil
+          
+          Log.sharedInstance.msg(Api.kName + ": Meter removed: id = \(id)", .debug, #function, #file, #line)
         }
       }
     }
@@ -323,7 +325,7 @@ public final class Meter : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: key) else {
         // log it and ignore the Key
-        _log("Unknown Meter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Meter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       
@@ -347,6 +349,8 @@ public final class Meter : NSObject, DynamicModel {
       
       // notify all observers
       NC.post(.meterHasBeenAdded, object: self as Any?)
+
+      _log(Api.kName + ": Meter added: id = \(id)", .debug, #function, #file, #line)
     }
   }
   

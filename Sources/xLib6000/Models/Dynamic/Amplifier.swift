@@ -160,7 +160,7 @@ public final class Amplifier  : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Amplifier token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Amplifier token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order

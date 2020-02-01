@@ -125,7 +125,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       } catch {
         
         // We didn't get the port we wanted
-        _log("Unable to bind to UDP port \(portToUse)", .info, #function, #file, #line)
+        _log(Api.kName + ": Unable to bind to UDP port \(portToUse)", .info, #function, #file, #line)
 
         // try the next Port Number
         portToUse += 1
@@ -147,7 +147,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       
       _udpBound = true
       
-      _log("UDP: Receive port = \(_udpRcvPort), Send port = \(_udpSendPort)", .info, #function, #file, #line)
+      _log(Api.kName + ": UDP: Receive port = \(_udpRcvPort), Send port = \(_udpSendPort)", .info, #function, #file, #line)
 
       // if a Wan connection, register
       if isWan { register(clientHandle: clientHandle) }
@@ -164,7 +164,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       
     } catch let error {
       // read error
-      _log("UDP: Begin receiving error - \(error.localizedDescription)", .error, #function, #file, #line)
+      _log(Api.kName + ": UDP: Begin receiving error - \(error.localizedDescription)", .error, #function, #file, #line)
     }
   }
   /// Unbind from the UDP port
@@ -188,7 +188,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
     
     guard clientHandle != nil else {
       // should not happen
-      _log("UDP: No client handle in register UDP", .error, #function, #file, #line)
+      _log(Api.kName + ": UDP: No client handle in register UDP", .error, #function, #file, #line)
 
       return
     }
@@ -204,7 +204,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
         // pause
         usleep(self.kRegistrationDelay)
       }
-      self._log("SmartLink - register UDP successful", .info, #function, #file, #line)
+      self._log(Api.kName + ": SmartLink - register UDP successful", .info, #function, #file, #line)
 
 //      // as long as connected after Registration
 //      while self._udpSocket != nil && self._udpBound {
@@ -220,7 +220,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
 //        sleep(self.kPingDelay)
 //      }
 //
-//      _log("SmartLink - pinging stopped", .info, #function, #file, #line)
+//      _log(Api.kName + ": SmartLink - pinging stopped", .info, #function, #file, #line)
     }
   }
 
@@ -275,7 +275,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
 
       } else {
         // log the error
-        self?._log("Invalid packetType - \(packetType)", .warning, #function, #file, #line)
+        self?._log(Api.kName + ": Invalid packetType - \(packetType)", .warning, #function, #file, #line)
       }
     }
   }

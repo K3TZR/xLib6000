@@ -27,35 +27,78 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // MARK: - Public properties
   
   // Object Collections
+  public var amplifiers : [AmplifierId: Amplifier] {
+    get { Api.objectQ.sync { _amplifiers } }
+    set { Api.objectQ.sync(flags: .barrier) { _amplifiers = newValue }}}
+  public var audioStreams : [AudioStreamId: AudioStream] {
+    get { Api.objectQ.sync { _audioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _audioStreams = newValue }}}
+  public var bandSettings : [BandId: BandSetting] {
+    get { Api.objectQ.sync { _bandSettings } }
+    set { Api.objectQ.sync(flags: .barrier) { _bandSettings = newValue }}}
+  public var daxIqStreams           : [DaxIqStreamId: DaxIqStream] {
+    get { Api.objectQ.sync { _daxIqStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _daxIqStreams = newValue }}}
+  public var daxMicAudioStreams     : [DaxMicStreamId: DaxMicAudioStream] {
+    get { Api.objectQ.sync { _daxMicAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _daxMicAudioStreams = newValue }}}
+  public var daxRxAudioStreams      : [DaxRxStreamId: DaxRxAudioStream] {
+    get { Api.objectQ.sync { _daxRxAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _daxRxAudioStreams = newValue }}}
+  public var daxTxAudioStreams      : [DaxTxStreamId: DaxTxAudioStream] {
+    get { Api.objectQ.sync { _daxTxAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _daxTxAudioStreams = newValue }}}
+  public var equalizers             : [Equalizer.EqType: Equalizer] {
+    get { Api.objectQ.sync { _equalizers } }
+    set { Api.objectQ.sync(flags: .barrier) { _equalizers = newValue }}}
+  public var iqStreams              : [DaxIqStreamId: IqStream] {
+    get { Api.objectQ.sync { _iqStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _iqStreams = newValue }}}
+  public var memories               : [MemoryId: Memory] {
+    get { Api.objectQ.sync { _memories } }
+    set { Api.objectQ.sync(flags: .barrier) { _memories = newValue }}}
   public var meters : [MeterId: Meter] {
     get { Api.objectQ.sync { _meters } }
     set { Api.objectQ.sync(flags: .barrier) { _meters = newValue }}}
-  public var replyHandlers: [SequenceNumber: ReplyTuple] {
+  public var micAudioStreams        : [DaxMicStreamId: MicAudioStream] {
+    get { Api.objectQ.sync { _micAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _micAudioStreams = newValue }}}
+  public var opusStreams            : [OpusId: Opus] {
+    get { Api.objectQ.sync { _opusStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _opusStreams = newValue }}}
+  public var panadapters            : [PanadapterStreamId: Panadapter] {
+    get { Api.objectQ.sync { _panadapters } }
+    set { Api.objectQ.sync(flags: .barrier) { _panadapters = newValue }}}
+  public var profiles               : [ProfileId: Profile] {
+    get { Api.objectQ.sync { _profiles } }
+    set { Api.objectQ.sync(flags: .barrier) { _profiles = newValue }}}
+  public var remoteRxAudioStreams   : [RemoteRxStreamId: RemoteRxAudioStream] {
+    get { Api.objectQ.sync { _remoteRxAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _remoteRxAudioStreams = newValue }}}
+  public var remoteTxAudioStreams   : [RemoteTxStreamId: RemoteTxAudioStream] {
+    get { Api.objectQ.sync { _remoteTxAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _remoteTxAudioStreams = newValue }}}
+  public var replyHandlers : [SequenceNumber: ReplyTuple] {
     get { Api.objectQ.sync { _replyHandlers } }
     set { Api.objectQ.sync(flags: .barrier) { _replyHandlers = newValue }}}
-
-  public var amplifiers             = [AmplifierId: Amplifier]()
-  public var audioStreams           = [AudioStreamId: AudioStream]()
-  public var bandSettings           = [BandId: BandSetting]()                   
-  public var daxIqStreams           = [DaxIqStreamId: DaxIqStream]()
-  public var daxMicAudioStreams     = [DaxMicStreamId: DaxMicAudioStream]()
-  public var daxRxAudioStreams      = [DaxRxStreamId: DaxRxAudioStream]()
-  public var daxTxAudioStreams      = [DaxTxStreamId: DaxTxAudioStream]()
-  public var equalizers             = [Equalizer.EqType: Equalizer]()
-  public var iqStreams              = [DaxIqStreamId: IqStream]()
-  public var memories               = [MemoryId: Memory]()
-  public var micAudioStreams        = [DaxMicStreamId: MicAudioStream]()
-  public var opusStreams            = [OpusId: Opus]()
-  public var panadapters            = [PanadapterStreamId: Panadapter]()
-  public var profiles               = [ProfileId: Profile]()
-  public var remoteRxAudioStreams   = [RemoteRxStreamId: RemoteRxAudioStream]()
-  public var remoteTxAudioStreams   = [RemoteTxStreamId: RemoteTxAudioStream]()
-  public var slices                 = [SliceId: Slice]()
-  public var tnfs                   = [TnfId: Tnf]()
-  public var txAudioStreams         = [TxStreamId: TxAudioStream]()
-  public var usbCables              = [UsbCableId: UsbCable]()
-  public var waterfalls             = [WaterfallStreamId: Waterfall]()
-  public var xvtrs                  = [XvtrId: Xvtr]()
+  public var slices                 : [SliceId: Slice] {
+    get { Api.objectQ.sync { _slices } }
+    set { Api.objectQ.sync(flags: .barrier) { _slices = newValue }}}
+  public var tnfs                   : [TnfId: Tnf] {
+    get { Api.objectQ.sync { _tnfs } }
+    set { Api.objectQ.sync(flags: .barrier) { _tnfs = newValue }}}
+  public var txAudioStreams         : [TxStreamId: TxAudioStream] {
+    get { Api.objectQ.sync { _txAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _txAudioStreams = newValue }}}
+  public var usbCables              : [UsbCableId: UsbCable] {
+    get { Api.objectQ.sync { _usbCables } }
+    set { Api.objectQ.sync(flags: .barrier) { _usbCables = newValue }}}
+  public var waterfalls             : [WaterfallStreamId: Waterfall] {
+    get { Api.objectQ.sync { _waterfalls } }
+    set { Api.objectQ.sync(flags: .barrier) { _waterfalls = newValue }}}
+  public var xvtrs                  : [XvtrId: Xvtr] {
+    get { Api.objectQ.sync { _xvtrs } }
+    set { Api.objectQ.sync(flags: .barrier) { _xvtrs = newValue }}}
 
   // Static models
   @objc dynamic public private(set) var atu         : Atu!
@@ -777,7 +820,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Keys
       guard let token = ClientTokenV3Connection(rawValue: property.key) else {
         // log it and ignore this Key
-        _log("Unknown Client Connection token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Client Connection token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -867,7 +910,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Keys
       guard let token = ClientTokenV3Disconnection(rawValue: property.key) else {
         // log it and ignore this Key
-        _log("Unknown Client Disconnection token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Client Disconnection token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -883,7 +926,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         wanValidationFailed = property.value.bValue
       }
       if duplicateClientId || forced || wanValidationFailed {
-        _log("Disconnected with: \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , .warning, #function, #file, #line)
+        _log(Api.kName + ": Disconnected with: \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , .warning, #function, #file, #line)
       }
       removeGuiClient(with: handle)
       NC.post(.guiClientHasBeenRemoved, object: handle as Any?)
@@ -904,13 +947,13 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // ignore incorrectly formatted messages
     if components.count < 2 {
-      _log("Incomplete message: c\(commandSuffix)", .warning, #function,  #file,  #line)
+      _log(Api.kName + ": Incomplete message: c\(commandSuffix)", .warning, #function,  #file,  #line)
       return
     }
     let msgText = components[1]
     
     // log it
-    _log("\(msgText)", flexErrorLevel(errorCode: components[0]), #function, #file, #line)
+    _log(Api.kName + ": \(msgText)", flexErrorLevel(errorCode: components[0]), #function, #file, #line)
     
     // FIXME: Take action on some/all errors?
   }
@@ -929,7 +972,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // ignore incorrectly formatted replies
     if components.count < 2 {
-      _log("Incomplete reply: r\(replySuffix)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Incomplete reply: r\(replySuffix)", .warning, #function, #file, #line)
       return
     }
     // is there an Object expecting to be notified?
@@ -956,7 +999,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
       // no Object is waiting for this reply, log it if it is a non-zero Reply (i.e a possible error)
       if components[1] != Api.kNoError {
-        _log("Unhandled non-zero reply: c\(components[0]), r\(replySuffix), \(flexErrorString(errorCode: components[1]))", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unhandled non-zero reply: c\(components[0]), r\(replySuffix), \(flexErrorString(errorCode: components[1]))", .warning, #function, #file, #line)
       }
     }
   }
@@ -975,7 +1018,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // ignore incorrectly formatted status
     guard components.count > 1 else {
-      _log("Incomplete status: c\(commandSuffix)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Incomplete status: c\(commandSuffix)", .warning, #function, #file, #line)
       return
     }
     // find the space & get the msgType
@@ -989,7 +1032,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // Check for unknown Message Types
     guard let token = StatusToken(rawValue: msgType)  else {
       // log it and ignore the message
-      _log("Unknown Status token: \(msgType)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Unknown Status token: \(msgType)", .warning, #function, #file, #line)
       return
     }
     // Known Message Types, in alphabetical order
@@ -1003,13 +1046,13 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .daxiq:          break // obsolete token, included to prevent log messages
     case .display:        parseDisplay(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .eq:             Equalizer.parseStatus(self, remainder.keyValuesArray())
-    case .file:           _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
+    case .file:           _log(Api.kName + ": Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
     case .gps:            gps.parseProperties(self, remainder.keyValuesArray(delimiter: "#") )
     case .interlock:      interlock.parseProperties(self, remainder.keyValuesArray())
     case .memory:         Memory.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .meter:          Meter.parseStatus(self, remainder.keyValuesArray(delimiter: "#"), !remainder.contains(Api.kRemoved))
     case .micAudioStream: MicAudioStream.parseStatus(self, remainder.keyValuesArray())
-    case .mixer:          _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
+    case .mixer:          _log(Api.kName + ": Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
     case .opusStream:     Opus.parseStatus(self, remainder.keyValuesArray())
     case .profile:        Profile.parseStatus(self, remainder.keyValuesArray(delimiter: "="))
     case .radio:          parseProperties(self, remainder.keyValuesArray())
@@ -1017,7 +1060,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .stream:         IqStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
     case .tnf:            Tnf.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .transmit:       transmit.parseProperties(self, remainder.keyValuesArray())
-    case .turf:           _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
+    case .turf:           _log(Api.kName + ": Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
     case .txAudioStream:  TxAudioStream.parseStatus(self, remainder.keyValuesArray())
     case .usbCable:       UsbCable.parseStatus(self, remainder.keyValuesArray())
     case .wan:            wan.parseProperties(self, remainder.keyValuesArray())
@@ -1051,7 +1094,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private func parseClient(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     
     guard properties.count >= 2 else {
-      _log("Invalid client status", .warning, #function, #file,  #line)
+      _log(Api.kName + ": Invalid client status", .warning, #function, #file,  #line)
       return
     }
     
@@ -1108,7 +1151,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case DisplayToken.panadapter.rawValue:  Panadapter.parseStatus(radio, keyValues, inUse)
     case DisplayToken.waterfall.rawValue:   Waterfall.parseStatus(radio, keyValues, inUse)
       
-    default:            _log("Unknown Display type: \(keyValues[0].key)", .warning, #function, #file, #line)
+    default:            _log(Api.kName + ": Unknown Display type: \(keyValues[0].key)", .warning, #function, #file, #line)
     }
   }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
@@ -1126,7 +1169,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Keys
       guard let token = InfoToken(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Info token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Info token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -1249,7 +1292,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Keys
       guard let token = VersionToken(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Version token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Version token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1281,7 +1324,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Check for Unknown Keys
       guard let token = RadioFilterSharpness(rawValue: property.key.lowercased())  else {
         // log it and ignore the Key
-        _log("Unknown Filter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Filter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1317,7 +1360,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Check for Unknown Keys
       guard let token = RadioStaticNet(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log("Unknown Static token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Static token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1344,7 +1387,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Check for Unknown Keys
       guard let token = RadioOscillator(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log("Unknown Oscillator token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Oscillator token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1396,7 +1439,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         // Check for Unknown Keys
         guard let token = RadioToken(rawValue: property.key)  else {
           // log it and ignore the Key
-          _log("Unknown Radio token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+          _log(Api.kName + ": Unknown Radio token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
           continue
         }
         // Known tokens, in alphabetical order
@@ -1464,7 +1507,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case "V", "v":  _hardwareVersion = suffix
       
     default:    // Unknown Type
-      _log("Unexpected message: \(msg)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Unexpected message: \(msg)", .warning, #function, #file, #line)
     }
   }
   /// Process outbound Tcp messages
@@ -1506,7 +1549,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
         // Anything other than 0 is an error, log it and ignore the Reply
         let errorLevel = flexErrorLevel(errorCode: responseValue)
-        _log("c\(sequenceNumber), \(command), non-zero reply \(responseValue), \(flexErrorString(errorCode: responseValue))", errorLevel, #function, #file, #line)
+        _log(Api.kName + ": c\(sequenceNumber), \(command), non-zero reply \(responseValue), \(flexErrorString(errorCode: responseValue))", errorLevel, #function, #file, #line)
         
         // FIXME: ***** Temporarily commented out until bugs in v2.4.9 are fixed *****
         
@@ -1667,7 +1710,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if opus.isStreaming == false {
           opus.isStreaming = true
           // log the start of the stream
-          _log("Opus Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+          _log(Api.kName + ": Opus Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
         }
         opus.vitaProcessor( vitaPacket )
       }
@@ -1679,7 +1722,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if panadapter.isStreaming == false {
           panadapter.isStreaming = true
           // log the start of the stream
-          _log("Panadapter Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+          _log(Api.kName + ": Panadapter Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
         }
         panadapter.vitaProcessor(vitaPacket)
       }
@@ -1691,14 +1734,14 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if waterfall.isStreaming == false {
           waterfall.isStreaming = true
           // log the start of the stream
-          _log("Waterfall Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+          _log(Api.kName + ": Waterfall Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
         }
         waterfall.vitaProcessor(vitaPacket)
       }
       
     default:
       // log the error
-      _log("UDP Stream error, no object: \(vitaPacket.classCode.description()) Stream Id = \(vitaPacket.streamId.hex)", .error, #function, #file, #line)
+      _log(Api.kName + ": UDP Stream error, no object: \(vitaPacket.classCode.description()) Stream Id = \(vitaPacket.streamId.hex)", .error, #function, #file, #line)
     }
   }
   
@@ -1856,6 +1899,28 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __tnfsEnabled                 = false                         // TNF's enable
 
   // object collections
-  private var _meters                       = [MeterId: Meter]()
-  private var _replyHandlers                = [SequenceNumber: ReplyTuple]()
+  private var _amplifiers             = [AmplifierId: Amplifier]()
+  private var _audioStreams           = [AudioStreamId: AudioStream]()
+  private var _bandSettings           = [BandId: BandSetting]()
+  private var _daxIqStreams           = [DaxIqStreamId: DaxIqStream]()
+  private var _daxMicAudioStreams     = [DaxMicStreamId: DaxMicAudioStream]()
+  private var _daxRxAudioStreams      = [DaxRxStreamId: DaxRxAudioStream]()
+  private var _daxTxAudioStreams      = [DaxTxStreamId: DaxTxAudioStream]()
+  private var _equalizers             = [Equalizer.EqType: Equalizer]()
+  private var _iqStreams              = [DaxIqStreamId: IqStream]()
+  private var _memories               = [MemoryId: Memory]()
+  private var _meters                 = [MeterId: Meter]()
+  private var _micAudioStreams        = [DaxMicStreamId: MicAudioStream]()
+  private var _opusStreams            = [OpusId: Opus]()
+  private var _panadapters            = [PanadapterStreamId: Panadapter]()
+  private var _profiles               = [ProfileId: Profile]()
+  private var _remoteRxAudioStreams   = [RemoteRxStreamId: RemoteRxAudioStream]()
+  private var _remoteTxAudioStreams   = [RemoteTxStreamId: RemoteTxAudioStream]()
+  private var _replyHandlers          = [SequenceNumber: ReplyTuple]()
+  private var _slices                 = [SliceId: Slice]()
+  private var _tnfs                   = [TnfId: Tnf]()
+  private var _txAudioStreams         = [TxStreamId: TxAudioStream]()
+  private var _usbCables              = [UsbCableId: UsbCable]()
+  private var _waterfalls             = [WaterfallStreamId: Waterfall]()
+  private var _xvtrs                  = [XvtrId: Xvtr]()
 }

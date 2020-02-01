@@ -197,7 +197,7 @@ public final class Xvtr : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Xvtr token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Xvtr token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order

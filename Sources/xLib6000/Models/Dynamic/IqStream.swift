@@ -185,7 +185,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown IqStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown IqStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -280,7 +280,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      _log("Missing IqStream packet(s), rcvdSeq: \(vita.sequence), != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Missing IqStream packet(s), rcvdSeq: \(vita.sequence), != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1

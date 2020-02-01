@@ -147,7 +147,7 @@ public final class Profile                  : NSObject, StaticModel {
     // check for unknown Keys
     guard let token = Token(rawValue: properties[0].key) else {
       // log it and ignore the Key
-      _log("Unknown Profile token: \(properties[0].key) = \(properties[0].value)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Unknown Profile token: \(properties[0].key) = \(properties[0].value)", .warning, #function, #file, #line)
       return
     }
     // Known keys, in alphabetical order

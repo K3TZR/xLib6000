@@ -266,7 +266,7 @@ public final class UsbCable : NSObject, DynamicModel {
         // check for unknown Keys
         guard let token = Token(rawValue: property.key) else {
           // log it and ignore the Key
-          _log("Unknown UsbCable token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+          _log(Api.kName + ": Unknown UsbCable token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
           continue
         }
         // Known keys, in alphabetical order
@@ -301,7 +301,7 @@ public final class UsbCable : NSObject, DynamicModel {
     } else {
       
       // NO, log the error
-      _log("Status type: \(properties[0].key) != Cable type: \(cableType.rawValue)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Status type: \(properties[0].key) != Cable type: \(cableType.rawValue)", .warning, #function, #file, #line)
     }
     
     // is the waterfall initialized?

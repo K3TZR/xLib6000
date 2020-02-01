@@ -3,8 +3,6 @@ import XCTest
 
 final class xLib6000Tests: XCTestCase {
  
-
-  
   func testApi() {
     let api = Api.sharedInstance
     XCTAssertNotNil(api, "Api singleton not present")
@@ -207,6 +205,47 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertEqual(panadapter?.antList, ["ANT1","ANT2","RX_A","XVTR"])
   }
 
+  func testPanadapter2() {
+
+    // find a radio
+    let discovery = Discovery.sharedInstance
+    sleep(2)
+    XCTAssertGreaterThan(discovery.discoveredRadios.count, 0, "No Radios discovered")
+
+    // connect to the radio
+    let radio = Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "testPanadapter2")
+    XCTAssertNotNil(radio, "Failed to instantiate Radio")
+    sleep(1)
+
+    if let radio = radio {
+      
+      for (_, panadapter) in radio.panadapters {
+        for (_, slice) in radio.slices where slice.panadapterId == panadapter.id {
+          slice.remove()
+        }
+        panadapter.remove()
+      }
+
+      sleep(1)
+      XCTAssertTrue(radio.panadapters.count == 0, "Panadapter(s) NOT removed")
+      XCTAssertTrue(radio.slices.count == 0, "Slice(s) NOT removed")
+
+      radio.requestPanadapter(frequency: 7_250_000)
+      sleep(1)
+      
+      for (_, panadapter) in radio.panadapters {
+        
+        XCTAssertEqual(panadapter.center, 7_205_446)
+        XCTAssertEqual(panadapter.bandwidth, 198_436)
+      
+        for (_, slice) in radio.slices where slice.panadapterId == panadapter.id {
+          XCTAssertEqual(slice.frequency, 7_157_000)
+        }
+      }
+      Api.sharedInstance.disconnect()
+    }
+  }
+
   private var tnfStatus = "1 freq=14.26 depth=2 width=0.000100 permanent=1"
   func testTnf() {
     let discovery = Discovery.sharedInstance
@@ -220,7 +259,7 @@ final class xLib6000Tests: XCTestCase {
     let tnf = radio.tnfs[id]
     XCTAssertNotNil(tnf, "Failed to create Tnf")
     XCTAssertEqual(tnf?.depth, 2)
-    XCTAssertEqual(tnf?.frequency, "14.26".mhzToHz)
+    XCTAssertEqual(tnf?.frequency, 14_260_000)
     XCTAssertEqual(tnf?.permanent, true)
     XCTAssertEqual(tnf?.width, 100)
     

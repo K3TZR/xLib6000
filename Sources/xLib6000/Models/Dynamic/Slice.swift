@@ -631,16 +631,16 @@ public final class Slice  : NSObject, DynamicModel {
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
     // get the Slice Id
-    if let sliceId = keyValues[0].key.objectId {
+    if let id = keyValues[0].key.objectId {
       
       // is the Slice in use?
       if inUse {
         
         // YES, does the Slice exist?
-        if radio.slices[sliceId] == nil {
+        if radio.slices[id] == nil {
           
           // NO, create a new Slice & add it to the Slices collection
-          radio.slices[sliceId] = xLib6000.Slice(radio: radio, id: sliceId)
+          radio.slices[id] = xLib6000.Slice(radio: radio, id: id)
           
           //        // scan the meters
           //        for (_, meter) in radio.meters {
@@ -654,16 +654,17 @@ public final class Slice  : NSObject, DynamicModel {
           //        }
         }
         // pass the remaining key values to the Slice for parsing (dropping the Id)
-        radio.slices[sliceId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+        radio.slices[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
         // NO, notify all observers
-        NC.post(.sliceWillBeRemoved, object: radio.slices[sliceId] as Any?)
+        NC.post(.sliceWillBeRemoved, object: radio.slices[id] as Any?)
         
         // remove it
-        radio.slices[sliceId] = nil
+        radio.slices[id] = nil
         
+        Log.sharedInstance.msg(Api.kName + ": Slice removed: id = \(id)", .debug, #function, #file, #line)
       }
     }
   }
@@ -746,7 +747,7 @@ public final class Slice  : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-        _log("Cannot change Filter width in FM mode", .info, #function, #file, #line)
+        _log(Api.kName + ": Cannot change Filter width in FM mode", .info, #function, #file, #line)
         newValue = value
         
       case .CW:
@@ -783,7 +784,7 @@ public final class Slice  : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-        _log("Cannot change Filter width in FM mode", .info, #function, #file, #line)
+        _log(Api.kName + ": Cannot change Filter width in FM mode", .info, #function, #file, #line)
         newValue = value
         
       case .CW:
@@ -820,7 +821,7 @@ public final class Slice  : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Slice token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Slice token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -867,7 +868,7 @@ public final class Slice  : NSObject, DynamicModel {
       case .fmToneMode:               update(self, &_fmToneMode,              to: property.value,         signal: \.fmToneMode)
       case .fmToneFreq:               update(self, &_fmToneFreq,              to: property.value.fValue,  signal: \.fmToneFreq)
       case .frequency:                update(self, &_frequency,               to: property.value.mhzToHz, signal: \.frequency)
-      case .ghost:                    _log("Unprocessed Slice property: \( property.key).\(property.value)", .warning, #function, #file, #line)
+      case .ghost:                    _log(Api.kName + ": Unprocessed Slice property: \( property.key).\(property.value)", .warning, #function, #file, #line)
       case .inUse:                    update(self, &_inUse,                   to: property.value.bValue,  signal: \.inUse)
       case .locked:                   update(self, &_locked,                  to: property.value.bValue,  signal: \.locked)
       case .loopAEnabled:             update(self, &_loopAEnabled,            to: property.value.bValue,  signal: \.loopAEnabled)
@@ -920,6 +921,8 @@ public final class Slice  : NSObject, DynamicModel {
       
       // notify all observers
       NC.post(.sliceHasBeenAdded, object: self)
+
+      _log(Api.kName + ": Slice added: id = \(id)", .debug, #function, #file, #line)
     }
   }
   /// Remove this Slice

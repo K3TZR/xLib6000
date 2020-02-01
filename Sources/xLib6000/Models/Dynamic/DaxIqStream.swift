@@ -151,7 +151,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _log("Unknown IqStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown IqStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order

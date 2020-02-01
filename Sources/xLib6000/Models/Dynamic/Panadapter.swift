@@ -326,24 +326,24 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // Format: <"pan", ""> <streamId, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
     
     // get the streamId
-    if let streamId = keyValues[1].key.streamId {
+    if let id = keyValues[1].key.streamId {
       
       // is the Panadapter in use?
       if inUse {
         
         // YES, does it exist?
-        if radio.panadapters[streamId] == nil {
+        if radio.panadapters[id] == nil {
           
           // NO, Create a Panadapter & add it to the Panadapters collection
-          radio.panadapters[streamId] = Panadapter(radio: radio, id: streamId)
+          radio.panadapters[id] = Panadapter(radio: radio, id: id)
         }
         // pass the key values to the Panadapter for parsing (dropping the Type and Id)
-        radio.panadapters[streamId]!.parseProperties(radio, Array(keyValues.dropFirst(2)))
+        radio.panadapters[id]!.parseProperties(radio, Array(keyValues.dropFirst(2)))
         
       } else {
         
         // NO, notify all observers
-        NC.post(.panadapterWillBeRemoved, object: radio.panadapters[streamId] as Any?)
+        NC.post(.panadapterWillBeRemoved, object: radio.panadapters[id] as Any?)
       }
     }
   }
@@ -387,7 +387,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // Anything other than 0 is an error
     guard responseValue == Api.kNoError else {
       // log it and ignore the Reply
-      _log("\(command), non-zero reply: \(responseValue), \(flexErrorString(errorCode: responseValue))", .warning, #function, #file, #line)
+      _log(Api.kName + ": \(command), non-zero reply: \(responseValue), \(flexErrorString(errorCode: responseValue))", .warning, #function, #file, #line)
       return
     }
     // parse out the values
@@ -411,7 +411,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Panadapter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Panadapter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -464,6 +464,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       
       // notify all observers
       NC.post(.panadapterHasBeenAdded, object: self as Any?)
+      
+      _log(Api.kName + ": Panadapter added: id = \(id.hex) frequency = \(center.hzToMhz)", .debug, #function, #file, #line)
     }
   }
   /// Remove this Panafall
@@ -691,12 +693,12 @@ public class PanadapterFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log("Ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       return false
       
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
-      _log("Missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       expectedFrame = received
       fallthrough
       

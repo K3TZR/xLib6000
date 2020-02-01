@@ -177,30 +177,34 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     // Format: <"waterfall", ""> <streamId, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
     
     // get the Id
-    if let waterfallStreamId = keyValues[1].key.streamId {
+    if let id = keyValues[1].key.streamId {
       
       // is the Waterfall in use?
       if inUse {
         
         // YES, does it exist?
-        if radio.waterfalls[waterfallStreamId] == nil {
+        if radio.waterfalls[id] == nil {
           
           // NO, Create a Waterfall & add it to the Waterfalls collection
-          radio.waterfalls[waterfallStreamId] = Waterfall(radio: radio, id: waterfallStreamId)
+          radio.waterfalls[id] = Waterfall(radio: radio, id: id)
         }
         // pass the key values to the Waterfall for parsing (dropping the Type and Id)
-        radio.waterfalls[waterfallStreamId]!.parseProperties(radio, Array(keyValues.dropFirst(2)))
+        radio.waterfalls[id]!.parseProperties(radio, Array(keyValues.dropFirst(2)))
         
       } else {
         
         // notify all observers
-        NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[waterfallStreamId] as Any?)
+        NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[id] as Any?)
         
         // remove the associated Panadapter
-        radio.panadapters[radio.waterfalls[waterfallStreamId]!.panadapterId] = nil
+        radio.panadapters[radio.waterfalls[id]!.panadapterId] = nil
         
+        Log.sharedInstance.msg(Api.kName + ": Panadapter removed: id = \(radio.waterfalls[id]!.panadapterId.hex)", .debug, #function, #file, #line)
+
         // remove the Waterfall
-        radio.waterfalls[waterfallStreamId] = nil
+        radio.waterfalls[id] = nil
+        
+        Log.sharedInstance.msg(Api.kName + ": Waterfall removed: id = \(id.hex)", .debug, #function, #file, #line)
       }
     }
   }
@@ -222,7 +226,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Waterfall token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Waterfall token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -250,6 +254,8 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       
       // notify all observers
       NC.post(.waterfallHasBeenAdded, object: self as Any?)
+
+      _log(Api.kName + ": Waterfall added: id = \(id.hex)", .debug, #function, #file, #line)
     }
   }
 
@@ -450,12 +456,12 @@ public class WaterfallFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log("Waterfall ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Waterfall ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       return false
       
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
-      _log("Waterfall missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Waterfall missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       expectedFrame = received
       fallthrough
       

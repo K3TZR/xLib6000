@@ -116,27 +116,29 @@ public final class Tnf : NSObject, DynamicModel {
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
 
     // get the Tnf Id as a UInt
-    if let tnfId = keyValues[0].key.objectId {
+    if let id = keyValues[0].key.objectId {
       
       // is the Tnf in use?
       if inUse {
         
         // does the TNF exist?
-        if radio.tnfs[tnfId] == nil {
+        if radio.tnfs[id] == nil {
           
           // NO, create a new Tnf & add it to the Tnfs collection
-          radio.tnfs[tnfId] = Tnf(radio: radio, id: tnfId)
+          radio.tnfs[id] = Tnf(radio: radio, id: id)
         }
         // pass the remaining key values to the Tnf for parsing (dropping the Id)
-        radio.tnfs[tnfId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+        radio.tnfs[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
         // NO, notify all observers
-        NC.post(.tnfWillBeRemoved, object: radio.tnfs[tnfId] as Any?)
+        NC.post(.tnfWillBeRemoved, object: radio.tnfs[id] as Any?)
         
         // remove it
-        radio.tnfs[tnfId]  = nil
+        radio.tnfs[id]  = nil
+
+        Log.sharedInstance.msg("Tnf removed: id = \(id)", .debug, #function, #file, #line)
       }
     }
   }
@@ -158,7 +160,7 @@ public final class Tnf : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Tnf token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown Tnf token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -177,6 +179,8 @@ public final class Tnf : NSObject, DynamicModel {
         
         // notify all observers
         NC.post(.tnfHasBeenAdded, object: self as Any?)
+
+        _log(Api.kName + ": Tnf added: id = \(id)", .debug, #function, #file, #line)
       }
     }
   }

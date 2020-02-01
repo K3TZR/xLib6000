@@ -207,7 +207,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      _log("sendConnectMessageForRadio, Not connected", .warning, #function, #file, #line)
+      _log(Api.kName + ": sendConnectMessageForRadio, Not connected", .warning, #function, #file, #line)
       return
     }
     // send a command to SmartLink to request a connection to the specified Radio
@@ -222,7 +222,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      _log("sendDisconnectUsersMessageToServer, Not connected", .warning, #function, #file, #line)
+      _log(Api.kName + ": sendDisconnectUsersMessageToServer, Not connected", .warning, #function, #file, #line)
       return
     }
     // send a command to SmartLink to request disconnection from the specified Radio
@@ -236,7 +236,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      _log("sendTestConnection, Not connected", .warning, #function, #file, #line)
+      _log(Api.kName + ": sendTestConnection, Not connected", .warning, #function, #file, #line)
       return
     }
     // send a command to SmartLink to test the connection for the specified Radio
@@ -267,7 +267,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // Check for unknown Message Types
     guard let token = Token(rawValue: msgType)  else {
       // log it and ignore the message
-      _log("Unknown WanServer Message token: \(msg)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Unknown WanServer Message token: \(msg)", .warning, #function, #file, #line)
       return
     }
     // which primary message type?
@@ -294,7 +294,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // Check for unknown Message Types
     guard let token = ApplicationToken(rawValue: msgType)  else {
       // log it and ignore the message
-      _log("Unknown WanServer Application token: \(msg)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Unknown WanServer Application token: \(msg)", .warning, #function, #file, #line)
       return
     }
     // which secondary message type?
@@ -327,7 +327,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // Check for unknown Message Types
     guard let token = RadioToken(rawValue: msgType)  else {
       // log it and ignore the message
-      _log("Unknown WanServer Radio token: \(msg)", .warning, #function, #file, #line)
+      _log(Api.kName + ": Unknown WanServer Radio token: \(msg)", .warning, #function, #file, #line)
       return
     }
     // which secondary message type?
@@ -350,7 +350,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       // Check for Unknown Keys
       guard let token = ApplicationInfoToken(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log("Unknown WanServer Info token: \(property.key)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown WanServer Info token: \(property.key)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -366,7 +366,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   private func parseRegistrationInvalid(_ msg: String) {
     
-    _log("WanServer: \(msg)", .warning, #function, #file, #line)
+    _log(Api.kName + ": WanServer: \(msg)", .warning, #function, #file, #line)
   }
   /// Parse User properties
   ///
@@ -384,7 +384,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       // Check for Unknown Keys
       guard let token = ApplicationUserSettingsToken(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log("Unknown WanServer User Setting token: \(property.key)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown WanServer User Setting token: \(property.key)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -416,7 +416,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       // Check for Unknown Keys
       guard let token = RadioConnectReadyToken(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log("Unknown WanServer Radio Connect token: \(property.key)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown WanServer Radio Connect token: \(property.key)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -465,7 +465,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
         // Check for Unknown Keys
         guard let token = RadioListToken(rawValue: property.key)  else {
           // log it and ignore the Key
-          _log("Unknown WanServer Radio List token: \(property.key)", .warning, #function, #file, #line)
+          _log(Api.kName + ": Unknown WanServer Radio List token: \(property.key)", .warning, #function, #file, #line)
           continue
         }
         
@@ -481,7 +481,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
           dateFormatter.dateFormat = "M/d/yyy_H:mm:ss_a"
           
           guard let date = dateFormatter.date(from: property.value.lowercased()) else {
-            _log("WanServer LastSeen date mismatched format: \(property.value)", .error, #function, #file, #line)
+            _log(Api.kName + ": WanServer LastSeen date mismatched format: \(property.value)", .error, #function, #file, #line)
             break
           }
           // use date constant here
@@ -547,7 +547,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       // Check for Unknown Keys
       guard let token = RadioTestConnectionResultsToken(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log("Unknown WanServer TestConnection token: \(property.key)", .warning, #function, #file, #line)
+        _log(Api.kName + ": Unknown WanServer TestConnection token: \(property.key)", .warning, #function, #file, #line)
         continue
       }
       
@@ -590,7 +590,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // start the timer
     _pingTimer?.resume()
 
-    _log("Started pinging SmartLink Server: \(_currentHost), port \(_currentPort)", .info, #function, #file, #line)
+    _log(Api.kName + ": Started pinging SmartLink Server: \(_currentHost), port \(_currentPort)", .info, #function, #file, #line)
   }
   /// Stop pinging the server
   ///
@@ -599,7 +599,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // stop the Timer (if any)
     _pingTimer?.cancel();
 
-    _log("Stopped pinging SmartLink Server: \(_currentHost), port \(_currentPort)", .info, #function, #file, #line)
+    _log(Api.kName + ": Stopped pinging SmartLink Server: \(_currentHost), port \(_currentPort)", .info, #function, #file, #line)
   }
   /// Send a command to the server
   ///
@@ -628,7 +628,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
 
     // Disconnected from the SmartLInk server
     let error = (err == nil ? "" : " with error = " + err!.localizedDescription)
-    _log("Disconnected from SmartLink Server: \(_currentHost), port \(_currentPort) \(error)", .info, #function, #file, #line)
+    _log(Api.kName + ": Disconnected from SmartLink Server: \(_currentHost), port \(_currentPort) \(error)", .info, #function, #file, #line)
 
     _isConnected = false
     _currentHost = ""
@@ -647,7 +647,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     _currentHost = sock.connectedHost ?? ""
     _currentPort = sock.connectedPort
     
-    _log("Connected to SmartLink Server: \(_currentHost), port \(_currentPort)", .info, #function, #file, #line)
+    _log(Api.kName + ": Connected to SmartLink Server: \(_currentHost), port \(_currentPort)", .info, #function, #file, #line)
 
     // start a secure (TLS) connection to the SmartLink server
     var tlsSettings = [String : NSObject]()
@@ -693,7 +693,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // starting the communication with the server over TLS
     let command = "application register name" + "=\(_appName)" + " platform" + "=\(_platform)" + " token" + "=\(_token)"
     
-    _log("TLS connection to SmartLink server \"Did Secure\"", .info, #function, #file, #line)
+    _log(Api.kName + ": TLS connection to SmartLink server \"Did Secure\"", .info, #function, #file, #line)
 
     // register the Application / token pair with the SmartLink server
     sendCommand(command)
