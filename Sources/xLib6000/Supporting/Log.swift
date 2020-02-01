@@ -51,7 +51,7 @@ public final class Log {
     
     // pass the entry to the delegate (if any)
     if delegate != nil {
-      delegate!.msg(msg, level: level, function: function, file: file, line: line)
+      delegate!.msg(level.prefix + msg, level: level, function: function, file: file, line: line)
     } else {
       NSLog(msg)
     }
@@ -89,6 +89,17 @@ public enum MessageLevel: Int {
       value = MessageLevel(rawValue: bitValue)!
     }
     return value
+  }
+  
+  var prefix :String {
+    switch self {
+    case .debug:    return String(repeating: " ", count: "verbose".count - "debug".count)
+    case .verbose:  return String(repeating: " ", count: "verbose".count - "debug".count)
+    case .info:     return String(repeating: " ", count: "verbose".count - "debug".count)
+    case .warning:  return String(repeating: " ", count: "verbose".count - "debug".count)
+    case .error:    return String(repeating: " ", count: "verbose".count - "debug".count)
+    case .severe:   return String(repeating: " ", count: "verbose".count - "debug".count)
+    }
   }
 }
 
