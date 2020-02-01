@@ -53,7 +53,7 @@ public final class Log {
     if delegate != nil {
       delegate!.log(msg, level, function, file, line, Api.kName)
     } else {
-      NSLog(level.prefix + ": " + msg)
+      NSLog(Api.kName + ": " + msg)
     }
   }
 }
@@ -93,12 +93,12 @@ public enum MessageLevel: Int {
   
   public var prefix :String {
     switch self {
-    case .debug:    return String(repeating: " ", count: "verbose".count - "debug".count)
-    case .verbose:  return String(repeating: " ", count: "verbose".count - "verbose".count)
-    case .info:     return String(repeating: " ", count: "verbose".count - "info".count)
-    case .warning:  return String(repeating: " ", count: "verbose".count - "warning".count)
-    case .error:    return String(repeating: " ", count: "verbose".count - "error".count)
-    case .severe:   return String(repeating: " ", count: "verbose".count - "severe".count)
+    case .debug:    return String(repeating: " ", count: 2)
+    case .verbose:  return String(repeating: " ", count: 0)
+    case .info:     return String(repeating: " ", count: 3)
+    case .warning:  return String(repeating: " ", count: 0)
+    case .error:    return String(repeating: " ", count: 2)
+    case .severe:   return String(repeating: " ", count: 1)
     }
   }
 }
