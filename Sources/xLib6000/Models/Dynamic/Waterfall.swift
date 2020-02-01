@@ -199,12 +199,12 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
         // remove the associated Panadapter
         radio.panadapters[radio.waterfalls[id]!.panadapterId] = nil
         
-        Log.sharedInstance.msg(Api.kName + ": Panadapter removed: id = \(radio.waterfalls[id]!.panadapterId.hex)", .debug, #function, #file, #line)
+        Log.sharedInstance.msg("Panadapter removed: id = \(radio.waterfalls[id]!.panadapterId.hex)", .debug, #function, #file, #line)
 
         // remove the Waterfall
         radio.waterfalls[id] = nil
         
-        Log.sharedInstance.msg(Api.kName + ": Waterfall removed: id = \(id.hex)", .debug, #function, #file, #line)
+        Log.sharedInstance.msg("Waterfall removed: id = \(id.hex)", .debug, #function, #file, #line)
       }
     }
   }
@@ -226,7 +226,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Api.kName + ": Unknown Waterfall token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Waterfall token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -255,7 +255,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       // notify all observers
       NC.post(.waterfallHasBeenAdded, object: self as Any?)
 
-      _log(Api.kName + ": Waterfall added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log("Waterfall added: id = \(id.hex)", .debug, #function, #file, #line)
     }
   }
 
@@ -456,12 +456,12 @@ public class WaterfallFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log(Api.kName + ": Waterfall ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Waterfall ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       return false
       
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
-      _log(Api.kName + ": Waterfall missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Waterfall missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       expectedFrame = received
       fallthrough
       

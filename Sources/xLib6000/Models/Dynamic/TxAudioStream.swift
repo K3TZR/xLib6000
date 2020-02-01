@@ -174,7 +174,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Api.kName + ": Unknown TxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown TxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order

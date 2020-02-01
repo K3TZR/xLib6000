@@ -51,9 +51,9 @@ public final class Log {
     
     // pass the entry to the delegate (if any)
     if delegate != nil {
-      delegate!.msg(msg, level, function, file, line, Api.kName)
+      delegate!.logMessage(msg, level, function, file, line, Api.kName)
     } else {
-      NSLog(level.prefix + Api.kName + ": " + msg)
+      NSLog(level.prefix + ": " + msg)
     }
   }
 }

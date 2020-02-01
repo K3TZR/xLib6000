@@ -159,7 +159,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Api.kName + ": Unknown DaxRxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown DaxRxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order

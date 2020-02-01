@@ -387,7 +387,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // Anything other than 0 is an error
     guard responseValue == Api.kNoError else {
       // log it and ignore the Reply
-      _log(Api.kName + ": \(command), non-zero reply: \(responseValue), \(flexErrorString(errorCode: responseValue))", .warning, #function, #file, #line)
+      _log("\(command), non-zero reply: \(responseValue), \(flexErrorString(errorCode: responseValue))", .warning, #function, #file, #line)
       return
     }
     // parse out the values
@@ -411,7 +411,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Api.kName + ": Unknown Panadapter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Panadapter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -465,7 +465,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // notify all observers
       NC.post(.panadapterHasBeenAdded, object: self as Any?)
       
-      _log(Api.kName + ": Panadapter added: id = \(id.hex) frequency = \(center.hzToMhz)", .debug, #function, #file, #line)
+      _log("Panadapter added: id = \(id.hex) frequency = \(center.hzToMhz)", .debug, #function, #file, #line)
     }
   }
   /// Remove this Panafall
@@ -693,12 +693,12 @@ public class PanadapterFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log(Api.kName + ": Ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       return false
       
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
-      _log(Api.kName + ": Missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       expectedFrame = received
       fallthrough
       

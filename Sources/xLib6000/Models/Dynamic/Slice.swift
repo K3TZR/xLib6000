@@ -664,7 +664,7 @@ public final class Slice  : NSObject, DynamicModel {
         // remove it
         radio.slices[id] = nil
         
-        Log.sharedInstance.msg(Api.kName + ": Slice removed: id = \(id)", .debug, #function, #file, #line)
+        Log.sharedInstance.msg("Slice removed: id = \(id)", .debug, #function, #file, #line)
       }
     }
   }
@@ -747,7 +747,7 @@ public final class Slice  : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-        _log(Api.kName + ": Cannot change Filter width in FM mode", .info, #function, #file, #line)
+        _log("Cannot change Filter width in FM mode", .info, #function, #file, #line)
         newValue = value
         
       case .CW:
@@ -784,7 +784,7 @@ public final class Slice  : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-        _log(Api.kName + ": Cannot change Filter width in FM mode", .info, #function, #file, #line)
+        _log("Cannot change Filter width in FM mode", .info, #function, #file, #line)
         newValue = value
         
       case .CW:
@@ -821,7 +821,7 @@ public final class Slice  : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Api.kName + ": Unknown Slice token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Slice token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -868,7 +868,7 @@ public final class Slice  : NSObject, DynamicModel {
       case .fmToneMode:               update(self, &_fmToneMode,              to: property.value,         signal: \.fmToneMode)
       case .fmToneFreq:               update(self, &_fmToneFreq,              to: property.value.fValue,  signal: \.fmToneFreq)
       case .frequency:                update(self, &_frequency,               to: property.value.mhzToHz, signal: \.frequency)
-      case .ghost:                    _log(Api.kName + ": Unprocessed Slice property: \( property.key).\(property.value)", .warning, #function, #file, #line)
+      case .ghost:                    _log("Unprocessed Slice property: \( property.key).\(property.value)", .warning, #function, #file, #line)
       case .inUse:                    update(self, &_inUse,                   to: property.value.bValue,  signal: \.inUse)
       case .locked:                   update(self, &_locked,                  to: property.value.bValue,  signal: \.locked)
       case .loopAEnabled:             update(self, &_loopAEnabled,            to: property.value.bValue,  signal: \.loopAEnabled)
@@ -922,7 +922,7 @@ public final class Slice  : NSObject, DynamicModel {
       // notify all observers
       NC.post(.sliceHasBeenAdded, object: self)
 
-      _log(Api.kName + ": Slice added: id = \(id)", .debug, #function, #file, #line)
+      _log("Slice added: id = \(id)", .debug, #function, #file, #line)
     }
   }
   /// Remove this Slice

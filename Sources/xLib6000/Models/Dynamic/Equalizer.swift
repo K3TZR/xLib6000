@@ -193,7 +193,7 @@ public final class Equalizer : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Api.kName + ": Unknown Equalizer token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Equalizer token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order

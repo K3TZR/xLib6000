@@ -193,7 +193,7 @@ public final class Meter : NSObject, DynamicModel {
           // check for unknown Units
           guard let token = Units(rawValue: meter.units) else {
             //      // log it and ignore it
-            //      _log(Api.kName + ": Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", .warning, #function, #file, #line)
+            //      _log("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", .warning, #function, #file, #line)
             return
           }
           var adjNewValue: Float = 0.0
@@ -276,7 +276,7 @@ public final class Meter : NSObject, DynamicModel {
           // remove it
           radio.meters[id] = nil
           
-          Log.sharedInstance.msg(Api.kName + ": Meter removed: id = \(id)", .debug, #function, #file, #line)
+          Log.sharedInstance.msg("Meter removed: id = \(id)", .debug, #function, #file, #line)
         }
       }
     }
@@ -325,7 +325,7 @@ public final class Meter : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: key) else {
         // log it and ignore the Key
-        _log(Api.kName + ": Unknown Meter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Meter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       
@@ -350,7 +350,7 @@ public final class Meter : NSObject, DynamicModel {
       // notify all observers
       NC.post(.meterHasBeenAdded, object: self as Any?)
 
-      _log(Api.kName + ": Meter added: id = \(id)", .debug, #function, #file, #line)
+      _log("Meter added: id = \(id)", .debug, #function, #file, #line)
     }
   }
   

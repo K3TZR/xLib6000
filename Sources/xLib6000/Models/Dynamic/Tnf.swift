@@ -160,7 +160,7 @@ public final class Tnf : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Api.kName + ": Unknown Tnf token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Tnf token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -180,7 +180,7 @@ public final class Tnf : NSObject, DynamicModel {
         // notify all observers
         NC.post(.tnfHasBeenAdded, object: self as Any?)
 
-        _log(Api.kName + ": Tnf added: id = \(id)", .debug, #function, #file, #line)
+        _log("Tnf added: id = \(id)", .debug, #function, #file, #line)
       }
     }
   }
