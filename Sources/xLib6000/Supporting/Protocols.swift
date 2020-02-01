@@ -22,8 +22,9 @@ public protocol LogHandler: class {
   ///   - function:             name of the function posting the message
   ///   - file:                 file containing the function posting the message
   ///   - line:                 line number of the function posting the message
+  ///   - source:               a String describing the source
   ///
-  func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int )
+  func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int, source: String )
 }
 
 /// Models for which there will only be one instance
