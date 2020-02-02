@@ -404,7 +404,7 @@ public struct Version {
   }
   
   public init() {
-    
+    // only useful for Apps & Frameworks (which have a Bundle), not Packages
     let versions = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
     let patch   = Bundle.main.infoDictionary![kCFBundleVersionKey as String] as! String
     self.init(versions + "." + patch)
@@ -412,6 +412,7 @@ public struct Version {
   
   public var longString       : String  { "\(major).\(minor).\(patch).\(build)" }
   public var string           : String  { "\(major).\(minor).\(patch)" }
+  public var isV3m            : Bool    { major >= 3 }
   public var isV3             : Bool    { major >= 2 && minor >= 5 }
   public var isGreaterThan22  : Bool    { major >= 2 && minor >= 2 }
   public var isV2             : Bool    { major >= 2 && minor < 5 }
