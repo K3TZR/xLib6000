@@ -134,6 +134,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public var binauralRxEnabled: Bool {
     get {  return _binauralRxEnabled }
     set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) }}}
+  @objc dynamic public var boundClientId: UUID? { 
+    get { Api.objectQ.sync { _boundClientId } }
+    set { Api.objectQ.sync(flags: .barrier) { if let uuidString = newValue?.uuidString { _boundClientId = newValue ; sendCommand("client bind client_id=\(uuidString)")} }}}
   @objc dynamic public var calFreq: Hz {
     get {  return _calFreq }
     set { if _calFreq != newValue { _calFreq = newValue ; radioSetCmd( .calFreq, newValue.hzToMhz) }}}
