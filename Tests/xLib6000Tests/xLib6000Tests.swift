@@ -21,7 +21,7 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertGreaterThan(discovery.discoveredRadios.count, 0, "No Radios discovered")
   }
   
-  func testRadio() {
+  func testObjectCreation() {
     let discovery = Discovery.sharedInstance
     sleep(2)
     let radio = Radio(discovery.discoveredRadios[0], api: Api.sharedInstance)
@@ -123,16 +123,103 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertNotNil(xvtr, "Failed to instantiate Xvtr")
   }
 
-  private var equalizerRxStatus = "rxsc mode=0 63Hz=0 125Hz=10 250Hz=20 500Hz=30 1000Hz=-10 2000Hz=-20 4000Hz=-30 8000Hz=-40"
-  func testEqualizerRx() {
+  // Helper function
+  func discoverRadio() -> Radio? {
     let discovery = Discovery.sharedInstance
     sleep(2)
-    let radio = Radio(discovery.discoveredRadios[0], api: Api.sharedInstance)
-    XCTAssertNotNil(radio, "Failed to instantiate Radio")
-    
-    Equalizer.parseStatus(radio, equalizerRxStatus.keyValuesArray())
+    if discovery.discoveredRadios.count > 0 {
+      if let radio = Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "xLib6000Tests") {
+        sleep(1)
+        return radio
+      } else {
+        XCTAssertTrue(false, "Failed to connect to Radio")
+        return nil
+      }
+    } else {
+      XCTAssertTrue(false, "No Radio(s) found")
+      return nil
+    }
+  }
+  
+  func removeAllPanadapters(radio: Radio) {
 
-    let eqRx = radio.equalizers[.rxsc]
+    for (_, panadapter) in radio.panadapters {
+      for (_, slice) in radio.slices where slice.panadapterId == panadapter.id {
+        slice.remove()
+      }
+      panadapter.remove()
+    }
+    sleep(1)
+    XCTAssertTrue(radio.panadapters.count == 0, "Panadapter(s) NOT removed")
+    XCTAssertTrue(radio.slices.count == 0, "Slice(s) NOT removed")
+  }
+
+ // MARK: ---- Amplifier ----
+  
+  ///   Format:  <Id, > <"ant", ant> <"ip", ip> <"model", model> <"port", port> <"serial_num", serialNumber>
+  private var amplifierStatus = "0x12345678 ant=ANT1 ip=10.0.1.106 model=6500 port=4123 serial_num=1234-5678-9012"
+  func testAmplifierParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    Amplifier.parseStatus(radio!, amplifierStatus.keyValuesArray(), true)
+
+    let amplifier = radio!.amplifiers["12345678"]
+    XCTAssertNotNil(amplifier, "Failed to create Amplifier")
+    XCTAssertEqual(amplifier?.ant, "ANT1")
+    XCTAssertEqual(amplifier?.ip, "10.0.1.106")
+    XCTAssertEqual(amplifier?.model, "6500")
+    XCTAssertEqual(amplifier?.port, 4123)
+    XCTAssertEqual(amplifier?.serialNumber, "1234-5678-9012")
+    
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  // MARK: ---- AudioStream ----
+   
+  ///   Format:  <streamId, > <"dax", channel> <"in_use", 1|0> <"slice", number> <"ip", ip> <"port", port>
+  private var audioStreamStatus = "0x23456789 dax=3 slice=0 ip=10.0.1.107 port=4124"
+  func testAudioStreamParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    switch radio!.version.group {
+    case .v1, .v2:
+      AudioStream.parseStatus(radio!, audioStreamStatus.keyValuesArray(), true)
+      
+      if let audioStream = radio!.audioStreams["0x23456789".streamId ?? 99999999] {
+        XCTAssertEqual(audioStream.id, "0x23456789".streamId)
+        XCTAssertEqual(audioStream.daxChannel, 3)
+        XCTAssertEqual(audioStream.ip, "10.0.1.107")
+        XCTAssertEqual(audioStream.port, 4124)
+        XCTAssertEqual(audioStream.slice, radio!.slices["0".objectId!])
+      } else {
+        XCTAssertTrue(false, "Failed to create AudioStream")
+      }
+    case .v3, .v3m:
+      // test not applicable
+      break
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  // MARK: ---- Rx Equalizer ----
+   
+  private var equalizerRxStatus = "rxsc mode=0 63Hz=0 125Hz=10 250Hz=20 500Hz=30 1000Hz=-10 2000Hz=-20 4000Hz=-30 8000Hz=-40"
+  func testEqualizerRxParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    let eqType = Equalizer.EqType(rawValue:equalizerRxStatus.keyValuesArray()[0].key)!
+
+    Equalizer.parseStatus(radio!, equalizerRxStatus.keyValuesArray(), true)
+
+    let eqRx = radio!.equalizers[eqType]
     XCTAssertNotNil(eqRx, "Failed to create Rx Equalizer")
     XCTAssertEqual(eqRx?.eqEnabled, false)
     XCTAssertEqual(eqRx?.level63Hz, 0)
@@ -143,18 +230,24 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertEqual(eqRx?.level2000Hz, -20)
     XCTAssertEqual(eqRx?.level4000Hz, -30)
     XCTAssertEqual(eqRx?.level8000Hz, -40)
+    
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
   }
 
-  private var qualizerTxStatus = "txsc mode=1 63Hz=-40 125Hz=-30 250Hz=-20 500Hz=-10 1000Hz=30 2000Hz=20 4000Hz=10 8000Hz=0"
-  func testEqualizerTx() {
-    let discovery = Discovery.sharedInstance
-    sleep(2)
-    let radio = Radio(discovery.discoveredRadios[0], api: Api.sharedInstance)
-    XCTAssertNotNil(radio, "Failed to instantiate Radio")
+  // MARK: ---- Tx Equalizer ----
+   
+  private var equalizerTxStatus = "txsc mode=1 63Hz=-40 125Hz=-30 250Hz=-20 500Hz=-10 1000Hz=30 2000Hz=20 4000Hz=10 8000Hz=0"
+  func testEqualizerTxParse() {
     
-    Equalizer.parseStatus(radio, qualizerTxStatus.keyValuesArray())
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    let eqType = Equalizer.EqType(rawValue:equalizerTxStatus.keyValuesArray()[0].key)!
 
-    let eqTx = radio.equalizers[.txsc]
+    Equalizer.parseStatus(radio!, equalizerTxStatus.keyValuesArray(), true)
+
+    let eqTx = radio!.equalizers[eqType]
     XCTAssertNotNil(eqTx, "Failed to create Tx Equalizer")
     XCTAssertEqual(eqTx?.eqEnabled, true)
     XCTAssertEqual(eqTx?.level63Hz, -40)
@@ -165,19 +258,25 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertEqual(eqTx?.level2000Hz, 20)
     XCTAssertEqual(eqTx?.level4000Hz, 10)
     XCTAssertEqual(eqTx?.level8000Hz, 0)
+    
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
   }
 
+  // MARK: ---- Panadapter ----
+   
   private let panadapterStatus = "pan 0x40000000 wnb=0 wnb_level=92 wnb_updating=0 band_zoom=0 segment_zoom=0 x_pixels=50 y_pixels=0 center=14.100000 bandwidth=0.200000 min_dbm=-125.00 max_dbm=-40.00 fps=25 average=0 weighted_average=0 rfgain=0 rxant=ANT1 wide=0 loopa=0 loopb=0 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 waterfall=42000000 min_bw=0.004920 max_bw=14.745601 xvtr= pre= ant_list=ANT1,ANT2,RX_A,XVTR"
-  func testPanadapter() {
-    let discovery = Discovery.sharedInstance
-    sleep(2)
-    let radio = Radio(discovery.discoveredRadios[0], api: Api.sharedInstance)
-    XCTAssertNotNil(radio, "Failed to instantiate Radio")
+  func testPanadapterParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    removeAllPanadapters(radio: radio!)
     
     let id: StreamId = panadapterStatus.keyValuesArray()[1].key.streamId!
-    Panadapter.parseStatus(radio, panadapterStatus.keyValuesArray())
+    Panadapter.parseStatus(radio!, panadapterStatus.keyValuesArray(), true)
 
-    let panadapter = radio.panadapters[id]
+    let panadapter = radio!.panadapters[id]
     XCTAssertNotNil(panadapter, "Failed to create Panadapter")
     XCTAssertEqual(panadapter?.wnbLevel, 92)
     XCTAssertEqual(panadapter?.wnbUpdating, false)
@@ -203,60 +302,78 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertEqual(panadapter?.minBw, 4_920)
     XCTAssertEqual(panadapter?.maxBw, 14_745_601)
     XCTAssertEqual(panadapter?.antList, ["ANT1","ANT2","RX_A","XVTR"])
+    
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
   }
 
-  func testPanadapter2() {
-
-    // find a radio
-    let discovery = Discovery.sharedInstance
-    sleep(2)
-    XCTAssertGreaterThan(discovery.discoveredRadios.count, 0, "No Radios discovered")
-
-    // connect to the radio
-    let radio = Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "testPanadapter2")
-    XCTAssertNotNil(radio, "Failed to instantiate Radio")
+  func testPanadapterCreateRemove() {
+    // find a radio & connect
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    // remove any panadapters & slices
+    removeAllPanadapters(radio: radio!)
+    
+    // ask for a new panadapter
+    radio!.requestPanadapter(frequency: 7_250_000)
     sleep(1)
-
-    if let radio = radio {
+    
+    // verify panadapter added
+    XCTAssertNotEqual(radio!.panadapters.count, 0, "No Panadapter")
+    if let panadapter = radio!.panadapters[0] {
       
-      for (_, panadapter) in radio.panadapters {
-        for (_, slice) in radio.slices where slice.panadapterId == panadapter.id {
-          slice.remove()
-        }
-        panadapter.remove()
-      }
+      // save panadapter params
+      let center = panadapter.center
+      let bandwidth = panadapter.bandwidth
+      
+      // verify slice added
+      XCTAssertNotEqual(radio!.slices.count, 0, "No Slice")
+      
+      // save slice params
+      let sliceFrequency = radio!.slices[0]!.frequency
 
-      sleep(1)
-      XCTAssertTrue(radio.panadapters.count == 0, "Panadapter(s) NOT removed")
-      XCTAssertTrue(radio.slices.count == 0, "Slice(s) NOT removed")
-
-      radio.requestPanadapter(frequency: 7_250_000)
+      // remove any panadapters & slices
+      removeAllPanadapters(radio: radio!)
+      
+      // ask for a new panadapter
+      radio!.requestPanadapter(frequency: 7_250_000)
       sleep(1)
       
-      for (_, panadapter) in radio.panadapters {
+      // verify panadapter added
+      XCTAssertNotEqual(radio!.panadapters.count, 0, "No Panadapter")
+      if let panadapter2 = radio!.panadapters[0] {
         
-        XCTAssertEqual(panadapter.center, 7_205_446)
-        XCTAssertEqual(panadapter.bandwidth, 198_436)
-      
-        for (_, slice) in radio.slices where slice.panadapterId == panadapter.id {
-          XCTAssertEqual(slice.frequency, 7_157_000)
-        }
+        // check panadapter params
+        XCTAssertEqual(panadapter2.center, center, "Center incorrect")
+        XCTAssertEqual(panadapter2.bandwidth, bandwidth, "Bandwidth incorrect")
+        
+        // verify slice added
+        XCTAssertNotEqual(radio!.slices.count, 0, "No Slice")
+
+        // check slice params
+        XCTAssertEqual(radio!.slices[0]!.frequency, sliceFrequency, "Slice frequency incorrect")
       }
-      Api.sharedInstance.disconnect()
     }
+    // remove any panadapters & slices
+    removeAllPanadapters(radio: radio!)
+    
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
   }
 
+  // MARK: ---- Tnf ----
+   
   private var tnfStatus = "1 freq=14.26 depth=2 width=0.000100 permanent=1"
-  func testTnf() {
-    let discovery = Discovery.sharedInstance
-    sleep(2)
-    let radio = Radio(discovery.discoveredRadios[0], api: Api.sharedInstance)
-    XCTAssertNotNil(radio, "Failed to instantiate Radio")
+  func testTnfParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
     
     let id: ObjectId = tnfStatus.keyValuesArray()[0].key.objectId!
-    Tnf.parseStatus(radio, tnfStatus.keyValuesArray())
+    Tnf.parseStatus(radio!, tnfStatus.keyValuesArray(), true)
 
-    let tnf = radio.tnfs[id]
+    let tnf = radio!.tnfs[id]
     XCTAssertNotNil(tnf, "Failed to create Tnf")
     XCTAssertEqual(tnf?.depth, 2)
     XCTAssertEqual(tnf?.frequency, 14_260_000)
@@ -264,19 +381,23 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertEqual(tnf?.width, 100)
     
     tnf?.remove()
-    XCTAssertEqual(radio.tnfs[id], nil, "Failed to remove Tnf")
-  }
+    XCTAssertEqual(radio!.tnfs[id], nil, "Failed to remove Tnf")
     
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  // MARK: ---- Waterfall ----
+     
   private var waterfallStatus = "waterfall 0x42000000 x_pixels=50 center=14.100000 bandwidth=0.200000 band_zoom=0 segment_zoom=0 line_duration=100 rfgain=0 rxant=ANT1 wide=0 loopa=0 loopb=0 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 panadapter=40000000 color_gain=50 auto_black=1 black_level=20 gradient_index=1 xvtr="
-  func testWaterfall() {
-    let discovery = Discovery.sharedInstance
-    sleep(2)
-    let radio = Radio(discovery.discoveredRadios[0], api: Api.sharedInstance)
-    XCTAssertNotNil(radio, "Failed to instantiate Radio")
+  func testWaterfallParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
     
     let id: StreamId = waterfallStatus.keyValuesArray()[1].key.streamId!
-    Waterfall.parseStatus(radio, waterfallStatus.keyValuesArray(), true)
-    let waterfall = radio.waterfalls[id]
+    Waterfall.parseStatus(radio!, waterfallStatus.keyValuesArray(), true)
+    let waterfall = radio!.waterfalls[id]
 
     XCTAssertNotNil(waterfall, "Failed to create Waterfall")
     XCTAssertEqual(waterfall?.autoBlackEnabled, true)
@@ -287,37 +408,40 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertEqual(waterfall?.panadapterId, "0x40000000".streamId)
     
     waterfall?.remove()
-    XCTAssertEqual(radio.waterfalls[id], nil, "Failed to remove Waterfall")
-  }
-  
-  private var xvtrStatus1 = "0 name=220 rf_freq=220 if_freq=28 lo_error=0 max_power=10 rx_gain=0 order=0 rx_only=1 is_valid=1 preferred=1 two_meter_int=0"
-  private var xvtrStatus2 = "0 name=12345678 rf_freq=220 if_freq=28 lo_error=0 max_power=10 rx_gain=0 order=0 rx_only=1 is_valid=1 preferred=1 two_meter_int=0"
-
-  func testXvtr1() {
-    xvtrCheck(status: xvtrStatus1, name: "220")
-  }
-
-  func testXvtr2() {
-    // check that name is limited to 4 characters
-    xvtrCheck(status: xvtrStatus2, name: "1234")
-  }
-
-  func xvtrCheck(status: String, name: String) {
+    XCTAssertEqual(radio!.waterfalls[id], nil, "Failed to remove Waterfall")
     
-    let discovery = Discovery.sharedInstance
-    sleep(2)
-    let radio = Radio(discovery.discoveredRadios[0], api: Api.sharedInstance)
-    XCTAssertNotNil(radio, "Failed to instantiate Radio")
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
 
+  // MARK: ---- Xvtr ----
+   
+  private var xvtrStatus = "0 name=220 rf_freq=220 if_freq=28 lo_error=0 max_power=10 rx_gain=0 order=0 rx_only=1 is_valid=1 preferred=1 two_meter_int=0"
+  private var xvtrStatusLongName = "0 name=12345678 rf_freq=220 if_freq=28 lo_error=0 max_power=10 rx_gain=0 order=0 rx_only=1 is_valid=1 preferred=1 two_meter_int=0"
+
+  func testXvtrParse() {
+    xvtrCheck(status: xvtrStatus, expectedName: "220")
+  }
+
+  func testXvtrName() {
+    // check that name is limited to 4 characters
+    xvtrCheck(status: xvtrStatusLongName, expectedName: "1234")
+  }
+
+  func xvtrCheck(status: String, expectedName: String) {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
     let id: XvtrId = status.keyValuesArray()[0].key
-    Xvtr.parseStatus(radio, status.keyValuesArray(), true)
-    let xvtr = radio.xvtrs[id]
+    Xvtr.parseStatus(radio!, status.keyValuesArray(), true)
+    let xvtr = radio!.xvtrs[id]
     
     XCTAssertNotNil(xvtr, "Failed to create Xvtr")
     XCTAssertEqual(xvtr?.ifFrequency, 28_000_000)
     XCTAssertEqual(xvtr?.isValid, true)
     XCTAssertEqual(xvtr?.loError, 0)
-    XCTAssertEqual(xvtr?.name, name)
+    XCTAssertEqual(xvtr?.name, expectedName)
     XCTAssertEqual(xvtr?.maxPower, 10)
     XCTAssertEqual(xvtr?.order, 0)
     XCTAssertEqual(xvtr?.preferred, true)
@@ -325,6 +449,9 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertEqual(xvtr?.rxGain, 0)
     XCTAssertEqual(xvtr?.rxOnly, true)
     XCTAssertEqual(xvtr?.twoMeterInt, 0)
+    
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
   }
   
 //  static var allTests = [
