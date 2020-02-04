@@ -465,7 +465,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // notify all observers
       NC.post(.panadapterHasBeenAdded, object: self as Any?)
       
-      _log("Panadapter added: id = \(id.hex) frequency = \(center.hzToMhz)", .debug, #function, #file, #line)
+      _log("Panadapter added: id = \(id.hex) center = \(center.hzToMhz), bandwidth = \(bandwidth.hzToMhz)", .debug, #function, #file, #line)
     }
   }
   /// Remove this Panafall

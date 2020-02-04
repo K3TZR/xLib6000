@@ -171,7 +171,7 @@ public final class BandSetting                : NSObject, DynamicModel {
       
       } else {
         // NO, notify all observers
-        //      NC.post(.bandSettingWillBeRemoved, object: radio.bandSettings[bandId] as Any?)
+        NC.post(.bandSettingWillBeRemoved, object: radio.bandSettings[id] as Any?)
         
         // remove it
         radio.bandSettings[id] = nil
@@ -238,9 +238,21 @@ public final class BandSetting                : NSObject, DynamicModel {
       _initialized = true
       
       // notify all observers
-//      NC.post(.amplifierHasBeenAdded, object: self as Any?)
+      NC.post(.bandSettingHasBeenAdded, object: self as Any?)
     }
   }
+  /// Remove this BandSetting record
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // TODO: test this
+    
+    // tell the Radio to remove a Stream
+    _radio.sendCommand("band setting remove " + "\(id)", replyTo: callback)
+  }
+
 
   private var __accTxEnabled                = false
   private var __accTxReqEnabled             = false

@@ -21,12 +21,15 @@ public enum NotificationType : String {
   case clientDidConnect
   case clientDidDisconnect
   
-  case daxMicAudioStreamHasBeenAdded
-  case daxMicAudioStreamWillBeRemoved
+  case bandSettingHasBeenAdded
+  case bandSettingWillBeRemoved
   
   case daxIqStreamHasBeenAdded
   case daxIqStreamWillBeRemoved
   
+  case daxMicAudioStreamHasBeenAdded
+  case daxMicAudioStreamWillBeRemoved
+
   case daxRxAudioStreamHasBeenAdded
   case daxRxAudioStreamWillBeRemoved
   

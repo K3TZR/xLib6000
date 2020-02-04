@@ -96,34 +96,32 @@ public final class Amplifier  : NSObject, DynamicModel {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
-    // TODO: Add format
-    
+    ///   Format:  <Id, > <"ant", ant> <"ip", ip> <"model", model> <"port", port> <"serial_num", serialNumber>
     
     // TODO: verify
-    
-    
+        
     //get the AmplifierId (remove the "0x" prefix)
-    let streamId = String(keyValues[0].key.dropFirst(2))
+    let id = String(keyValues[0].key.dropFirst(2))
     
     // is the Amplifier in use
     if inUse {
       
       // YES, does the Amplifier exist?
-      if radio.amplifiers[streamId] == nil {
+      if radio.amplifiers[id] == nil {
         
         // NO, create a new Amplifier & add it to the Amplifiers collection
-        radio.amplifiers[streamId] = Amplifier(radio: radio, id: streamId)
+        radio.amplifiers[id] = Amplifier(radio: radio, id: id)
       }
       // pass the remaining key values to the Amplifier for parsing
-      radio.amplifiers[streamId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+      radio.amplifiers[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
       
     } else {
       
       // NO, notify all observers
-      NC.post(.amplifierWillBeRemoved, object: radio.amplifiers[streamId] as Any?)
+      NC.post(.amplifierWillBeRemoved, object: radio.amplifiers[id] as Any?)
       
       // remove it
-      radio.amplifiers[streamId] = nil
+      radio.amplifiers[id] = nil
     }
   }
 
@@ -190,10 +188,10 @@ public final class Amplifier  : NSObject, DynamicModel {
   ///
   public func remove(callback: ReplyHandler? = nil) {
     
-    // TODO: add code
+    // TODO: test this
     
-    // notify all observers
-    NC.post(.amplifierWillBeRemoved, object: self as Any?)
+    // tell the Radio to remove a Stream
+    _radio.sendCommand("amplifier remove " + "\(id)", replyTo: callback)
   }
   /// Change the Amplifier Mode
   ///

@@ -36,8 +36,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     get { _daxClients  }
     set { if _daxClients != newValue { _daxClients = newValue }}}
 
-  @objc dynamic public var inUse: Bool { _inUse }
-
   @objc dynamic public var ip: String {
     get { _ip }
     set { if _ip != newValue { _ip = newValue }}}
@@ -65,9 +63,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   var _daxClients : Int {
     get { Api.objectQ.sync { __daxClients } }
     set { Api.objectQ.sync(flags: .barrier) {__daxClients = newValue }}}
-  var _inUse : Bool {
-    get { Api.objectQ.sync { __inUse } }
-    set { Api.objectQ.sync(flags: .barrier) {__inUse = newValue }}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
     set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
@@ -84,7 +79,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   internal enum Token: String {
     case daxChannel                         = "dax"
     case daxClients                         = "dax_clients"
-    case inUse                              = "in_use"
     case ip
     case port
     case slice
@@ -114,34 +108,34 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
-    //get the Id
-    if let audioStreamId =  keyValues[0].key.streamId {
+    //get the Audio StreamId
+    if let id =  keyValues[0].key.streamId {
       
       // is the AudioStream in use?
       if inUse {
         
         // YES, does the object exist?
-        if radio.audioStreams[audioStreamId] == nil {
+        if radio.audioStreams[id] == nil {
           
           // NO, is this stream for this client?
-          if !isForThisClient(keyValues) { return }
+          if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
           
           // create a new object & add it to the collection
-          radio.audioStreams[audioStreamId] = AudioStream(radio: radio, id: audioStreamId)
+          radio.audioStreams[id] = AudioStream(radio: radio, id: id)
         }
         // pass the remaining key values for parsing (dropping the Id)
-        radio.audioStreams[audioStreamId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+        radio.audioStreams[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
         // does the object exist?
-        if let stream = radio.audioStreams[audioStreamId] {
+        if let stream = radio.audioStreams[id] {
           
           // notify all observers
           NC.post(.audioStreamWillBeRemoved, object: stream as Any?)
           
           // remove the object
-          radio.audioStreams[audioStreamId] = nil
+          radio.audioStreams[id] = nil
         }
       }
     }
@@ -188,7 +182,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
         
       case .daxChannel: update(self, &_daxChannel,  to: property.value.iValue,  signal: \.daxChannel)
       case .daxClients: update(self, &_daxClients,  to: property.value.iValue,  signal: \.daxClients)
-      case .inUse:      update(self, &_inUse,       to: property.value.bValue,  signal: \.inUse)
       case .ip:         update(self, &_ip,          to: property.value,         signal: \.ip)
       case .port:       update(self, &_port,        to: property.value.iValue,  signal: \.port)
       case .slice:
@@ -201,7 +194,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       }
     }    
     // if this is not yet initialized and inUse becomes true
-    if !_initialized && _inUse && _ip != "" {
+    if !_initialized && _ip != "" {
       
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
@@ -308,7 +301,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
 
   private var __daxChannel  = 0
   private var __daxClients  = 0
-  private var __inUse       = false
   private var __ip          = ""
   private var __port        = 0
   private var __rxGain      = 50
