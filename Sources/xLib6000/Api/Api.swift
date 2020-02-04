@@ -144,8 +144,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///   ----- v3 API explanation -----
   ///
   ///   Definitions
-  ///     Client:   The application using a radio
-  ///     Api:      The intermediary between the Client and a Radio (e.g. FlexLib, xLib6000, etc.)
+  ///     Client:    The application using a radio
+  ///     Api:        The intermediary between the Client and a Radio (e.g. FlexLib, xLib6000, etc.)
   ///     Radio:    The physical radio (e.g. a Flex-6500)
   ///
   ///   There are 5 scenarios:
@@ -177,7 +177,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     5. The Client connects as a non-Gui, binding is NOT desired
   ///         The Client passes clientId = nil, isGui = false to the Api
   ///
-  ///     Scenarios 2 & 4 are typically executed once which then allows the Client to use scenarios 1 & 4
+  ///     Scenarios 2 & 4 are typically executed once which then allows the Client to use scenarios 1 & 3
   ///     for all subsequent connections (if the Client has persisted the ClientId)
   ///
   /// - Parameters:
@@ -349,15 +349,15 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // clientIp
       
-      if radio.version.isV3 && _isGui && _clientId != nil { send("client gui " + _clientId!.uuidString) }
-      if radio.version.isV2 && _isGui { send("client gui") }
+      if radio.version.isV3 && _isGui && _clientId != nil   { send("client gui " + _clientId!.uuidString) }
+      if radio.version.isV2 && _isGui                       { send("client gui") }
       
       
       send("client program " + _programName)
-      if radio.version.isV3 { send("client station " + _clientStation) }
-      if radio.version.isV3 && !_isGui && _clientId != nil { send("client bind client_id=" + _clientId!.uuidString) }
+      if radio.version.isV3                                 { send("client station " + _clientStation) }
+      if radio.version.isV3 && !_isGui && _clientId != nil  { send("client bind client_id=" + _clientId!.uuidString) }
 
-      if _lowBandwidthConnect { radio.requestLowBandwidthConnect() }
+      if _lowBandwidthConnect           { radio.requestLowBandwidthConnect() }
       radio.requestInfo()
       radio.requestVersion()
       radio.requestAntennaList()
@@ -367,8 +367,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       radio.requestMicProfile()
       radio.requestDisplayProfile()
       radio.requestSubAll()
-      radio.requestMtuLimit(1_500)
-      radio.requestDaxBandwidthLimit(true)
+      if radio.version.isGreaterThan22  { radio.requestMtuLimit(1_500) }
+      if radio.version.isV3             { radio.requestDaxBandwidthLimit(true) }
     }
   }
   /// Determine if the Radio Firmware version is compatable with the API version
