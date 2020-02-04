@@ -10,6 +10,9 @@ let package = Package(
     .library(
       name: "xLib6000",
       targets: ["xLib6000"]),
+    .library(
+      name: "CocoaAsyncSocket",
+      targets: ["CocoaAsyncSocket"]),
   ],
   dependencies: [
     // Dependencies declare other packages that this package depends on.
