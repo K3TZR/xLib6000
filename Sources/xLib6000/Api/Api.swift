@@ -5,7 +5,7 @@
 //  Created by Douglas Adams on 12/27/17.
 //  Copyright © 2018 Douglas Adams & Mario Illgen. All rights reserved.
 //
-// Test for fork
+
 import Foundation
 
 /// API Class implementation
