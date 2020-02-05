@@ -121,6 +121,11 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
 
     case callsign
     case firmwareVersion            = "version"
+    case guiClientHandles           = "gui_client_handles"
+    case guiClientHosts             = "gui_client_hosts"
+    case guiClientIps               = "gui_client_ips"
+    case guiClientPrograms          = "gui_client_programs"
+    case guiClientStations          = "gui_client_stations"
     case inUseHost                  = "inusehost"
     case inUseIp                    = "inuseip"
     case maxLicensedVersion         = "max_licensed_version"
@@ -188,7 +193,10 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       try _tlsSocket.connect(toHost: kHostName, onPort: UInt16(kHostPort), withTimeout: _timeout)
     } catch _ {
       success = false
+      _log("SmartLink server: connection failed", .debug, #function, #file, #line)
     }
+    
+    if success { _log("SmartLink server: connection successful", .debug, #function, #file, #line) }
     return success
   }
   /// Disconnect from the SmartLink server
@@ -236,7 +244,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      _log("sendTestConnection, Not connected", .warning, #function, #file, #line)
+      _log("TestConnection: Not connected", .warning, #function, #file, #line)
       return
     }
     // send a command to SmartLink to test the connection for the specified Radio
@@ -447,7 +455,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     for message in radioMessages where message != "" {
       
       // create a minimal DiscoveredRadio with now as "lastSeen"
-      var radio = DiscoveryStruct()
+      var discoveredRadio = DiscoveryStruct()
       
       var publicTlsPortToUse = -1
       var publicUdpPortToUse = -1
@@ -472,9 +480,14 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
         // Known tokens, in alphabetical order
         switch token {
           
-        case .callsign:                   radio.callsign = property.value
-        case .inUseIp:                    radio.inUseIp = property.value
-        case .inUseHost:                  radio.inUseHost = property.value
+        case .callsign:                   discoveredRadio.callsign = property.value
+        case .guiClientHandles:           discoveredRadio.guiClientHandles = property.value
+        case .guiClientHosts:             discoveredRadio.guiClientHosts = property.value
+        case .guiClientIps:               discoveredRadio.guiClientIps = property.value
+        case .guiClientPrograms:          discoveredRadio.guiClientPrograms = property.value
+        case .guiClientStations:          discoveredRadio.guiClientStations = property.value
+        case .inUseIp:                    discoveredRadio.inUseIp = property.value
+        case .inUseHost:                  discoveredRadio.inUseHost = property.value
         case .lastSeen:
           let dateFormatter = DateFormatter()
           // date format is like: 2/6/2018_5:20:16_AM
@@ -485,21 +498,21 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
             break
           }
           // use date constant here
-          radio.lastSeen = date
-        case .maxLicensedVersion:         radio.maxLicensedVersion = property.value
-        case .model:                      radio.model = property.value
-        case .nickName:                   radio.nickname = property.value
-        case .publicIp:                   radio.publicIp = property.value
+          discoveredRadio.lastSeen = date
+        case .maxLicensedVersion:         discoveredRadio.maxLicensedVersion = property.value
+        case .model:                      discoveredRadio.model = property.value
+        case .nickName:                   discoveredRadio.nickname = property.value
+        case .publicIp:                   discoveredRadio.publicIp = property.value
         case .publicTlsPort:              publicTlsPort = property.value.iValue
         case .publicUdpPort:              publicUdpPort = property.value.iValue
         case .publicUpnpTlsPort:          publicUpnpTlsPort = property.value.iValue
         case .publicUpnpUdpPort:          publicUpnpUdpPort = property.value.iValue
-        case .requiresAdditionalLicense:  radio.requiresAdditionalLicense = property.value.bValue
-        case .radioLicenseId:             radio.radioLicenseId = property.value
-        case .serialNumber:               radio.serialNumber = property.value
-        case .status:                     radio.status = property.value
-        case .upnpSupported:              radio.upnpSupported = property.value.bValue
-        case .firmwareVersion:            radio.firmwareVersion = property.value
+        case .requiresAdditionalLicense:  discoveredRadio.requiresAdditionalLicense = property.value.bValue
+        case .radioLicenseId:             discoveredRadio.radioLicenseId = property.value
+        case .serialNumber:               discoveredRadio.serialNumber = property.value
+        case .status:                     discoveredRadio.status = property.value
+        case .upnpSupported:              discoveredRadio.upnpSupported = property.value.bValue
+        case .firmwareVersion:            discoveredRadio.firmwareVersion = property.value
         }
       }
       // now continue to fill the radio parameters
@@ -508,28 +521,28 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
         publicTlsPortToUse = publicTlsPort
         publicUdpPortToUse = publicUdpPort
         isPortForwardOn = true;
-      } else if (radio.upnpSupported) {
+      } else if (discoveredRadio.upnpSupported) {
         publicTlsPortToUse = publicUpnpTlsPort
         publicUdpPortToUse = publicUpnpUdpPort
         isPortForwardOn = false
       }
       
-      if ( !radio.upnpSupported && !isPortForwardOn ) {
+      if ( !discoveredRadio.upnpSupported && !isPortForwardOn ) {
         /* This will require extra negotiation that chooses
          * a port for both sides to try
          */
         //TODO: We also need to check the NAT for preserve_ports coming from radio here
         // if the NAT DOES NOT preserve ports then we can't do hole punch
-        radio.requiresHolePunch = true
+        discoveredRadio.requiresHolePunch = true
       }
-      radio.publicTlsPort = publicTlsPortToUse
-      radio.publicUdpPort = publicUdpPortToUse
-      radio.isPortForwardOn = isPortForwardOn
+      discoveredRadio.publicTlsPort = publicTlsPortToUse
+      discoveredRadio.publicUdpPort = publicUdpPortToUse
+      discoveredRadio.isPortForwardOn = isPortForwardOn
       if let localAddr = _tlsSocket.localHost {
-        radio.localInterfaceIP = localAddr
+        discoveredRadio.localInterfaceIP = localAddr
       }
       
-      wanRadioList.append(radio)
+      wanRadioList.append(discoveredRadio)
     }
     // delegate call
     _delegate?.wanRadioListReceived(wanRadioList: wanRadioList)
@@ -590,7 +603,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // start the timer
     _pingTimer?.resume()
 
-    _log("Started pinging SmartLink Server: \(_currentHost), port \(_currentPort)", .info, #function, #file, #line)
+    _log("SmartLink Server \(_currentHost), port \(_currentPort): Started pinging", .debug, #function, #file, #line)
   }
   /// Stop pinging the server
   ///
@@ -599,7 +612,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // stop the Timer (if any)
     _pingTimer?.cancel();
 
-    _log("Stopped pinging SmartLink Server: \(_currentHost), port \(_currentPort)", .info, #function, #file, #line)
+    _log("SmartLink Server \(_currentHost), port \(_currentPort): Stopped pinging", .debug, #function, #file, #line)
   }
   /// Send a command to the server
   ///
@@ -626,9 +639,9 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     stopPinging()
 
-    // Disconnected from the SmartLInk server
+    // Disconnected from the SmartLink server
     let error = (err == nil ? "" : " with error = " + err!.localizedDescription)
-    _log("Disconnected from SmartLink Server: \(_currentHost), port \(_currentPort) \(error)", .info, #function, #file, #line)
+    _log("SmartLink Server \(_currentHost), port \(_currentPort): Disconnected with error: \(error)", .info, #function, #file, #line)
 
     _isConnected = false
     _currentHost = ""
@@ -647,7 +660,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     _currentHost = sock.connectedHost ?? ""
     _currentPort = sock.connectedPort
     
-    _log("Connected to SmartLink Server: \(_currentHost), port \(_currentPort)", .info, #function, #file, #line)
+    _log("SmartLink Server \(_currentHost), port \(_currentPort): Connected", .info, #function, #file, #line)
 
     // start a secure (TLS) connection to the SmartLink server
     var tlsSettings = [String : NSObject]()
@@ -693,7 +706,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // starting the communication with the server over TLS
     let command = "application register name" + "=\(_appName)" + " platform" + "=\(_platform)" + " token" + "=\(_token)"
     
-    _log("TLS connection to SmartLink server \"Did Secure\"", .info, #function, #file, #line)
+    _log("SmartLink server \"Did Secure\": TLS connection", .info, #function, #file, #line)
 
     // register the Application / token pair with the SmartLink server
     sendCommand(command)

@@ -196,10 +196,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       clientId: UUID? = nil,
                       isGui: Bool = true,
                       isWan: Bool = false,
-                      wanHandle: String = "") -> Radio? {
+                      wanHandle: String = "") -> Bool {
 
     // must be in the Disconnected state to connect
-    guard apiState == .disconnected else { return nil }
+    guard apiState == .disconnected else { return false }
         
     // Create a Radio class
     radio = Radio(discoveryPacket, api: self)
@@ -221,7 +221,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // Failed to connect
       radio = nil
     }
-    return radio
+    return radio != nil
   }
   /// Disconnect the active Radio
   ///
