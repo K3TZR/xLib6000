@@ -128,9 +128,9 @@ final class xLib6000Tests: XCTestCase {
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
-      if let radio = Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "xLib6000Tests") {
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "xLib6000Tests") {
         sleep(1)
-        return radio
+        return Api.sharedInstance.radio
       } else {
         XCTAssertTrue(false, "Failed to connect to Radio")
         return nil
