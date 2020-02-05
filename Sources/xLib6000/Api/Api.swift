@@ -43,6 +43,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   public                var connectionHandle      : Handle?
   public                var connectionHandleWan   = ""
+  public                var isGui                 = true
   public                var isWan                 = false
   public                var testerDelegate        : ApiDelegate?
   public                var testerModeEnabled     = false
@@ -96,7 +97,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
   private var _clientId                     : UUID?
   private var _clientStation                = ""
-  private var _isGui                        = true
   private var _lowBandwidthConnect          = false
   private var _pinger                       : Pinger?
   private var _programName                  = ""
@@ -213,7 +213,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _programName = programName
       _clientId = clientId
       _clientStation = clientStation
-      _isGui = isGui
+      self.isGui = isGui
       self.isWan = isWan
       connectionHandleWan = wanHandle
             
@@ -347,15 +347,19 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     if let radio = radio {
       
-      // clientIp
-      
-      if radio.version.isV3 && _isGui && _clientId != nil   { send("client gui " + _clientId!.uuidString) }
-      if radio.version.isV2 && _isGui                       { send("client gui") }
-      
+      // gui clientId
+      if isGui {
+
+        if radio.version.isV3 && _clientId != nil   {
+          send("client gui " + _clientId!.uuidString)
+        } else {
+          send("client gui")
+        }
+      }      
       
       send("client program " + _programName)
       if radio.version.isV3                                 { send("client station " + _clientStation) }
-      if radio.version.isV3 && !_isGui && _clientId != nil  { send("client bind client_id=" + _clientId!.uuidString) }
+      if radio.version.isV3 && !isGui && _clientId != nil  { send("client bind client_id=" + _clientId!.uuidString) }
 
       if _lowBandwidthConnect           { radio.requestLowBandwidthConnect() }
       radio.requestInfo()
@@ -456,7 +460,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     // log it
     let wanStatus = isWan ? "REMOTE" : "LOCAL"
-    let guiStatus = _isGui ? "(GUI) " : ""
+    let guiStatus = isGui ? "(GUI) " : ""
     _log("TCP connected to \(host), port \(port) \(guiStatus)(\(wanStatus))", .info, #function, #file, #line)
 
     // a tcp connection has been established, inform observers
@@ -486,7 +490,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       }
     }
     // if another Gui client connected, disconnect it
-    if radio?.discoveryPacket.status == "In_Use" && _isGui {
+    if radio?.discoveryPacket.status == "In_Use" && isGui {
       
       send("client disconnect")
       _log("client disconnect sent", .info, #function, #file, #line)

@@ -660,6 +660,22 @@ extension Radio {
     // return the first one
     return filteredSlices[0]
   }
+  /// Find a Slice by Slice letter
+  ///
+  /// - Parameter
+  ///   - letter:                                 slice letter
+  ///   - guiClientHandle:                the handle for the GUI client the slice belongs to
+  /// - Returns:             a Slice (if any)
+  ///
+  public func findSlice(letter: String, guiClientHandle: Handle) -> xLib6000.Slice? {
+    
+    // find the Slices with the specified Channel (if any)
+    let filteredSlices = slices.values.filter { $0.sliceLetter == letter && $0.clientHandle == guiClientHandle }
+    guard filteredSlices.count >= 1 else { return nil }
+    
+    // return the first one
+    return filteredSlices[0]
+  }
   
   // ----------------------------------------------------------------------------
   // MARK: -  RemoteRxAudioStream methods
