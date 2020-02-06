@@ -850,26 +850,25 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         station = property.value
       }
     }
+    
+    if clientId == nil || clientId == "" {
+      return
+    }
+    
     var guiClient = findGuiClient(with: handle)
     
     // is there a Gui Client with this handle?
     //    may have been added by Discovery (without a ClientId)
     if guiClient != nil {
       // YES, update it
+      guiClient!.clientId = clientId
       guiClient!.program = program
       guiClient!.station = station
       guiClient!.isLocalPtt = isLocalPtt
       guiClient!.isThisClient = (_api.connectionHandle! == handle)
-
-      // does it contain a ClientId?
-      if guiClient!.clientId == nil {
-        // NO, add it
-        guiClient!.clientId = clientId
-
-        // notify all observers
-        NC.post(.guiClientHasBeenAdded, object: guiClient as Any?)
-      }
       
+      // notify all observers
+      NC.post(.guiClientHasBeenUpdated, object: guiClient as Any?)
     } else {
       // NO, add one
       guiClient = GuiClient(handle: handle,
