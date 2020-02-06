@@ -14,9 +14,11 @@ public enum NotificationType : String {
   
   case amplifierHasBeenAdded
   case amplifierWillBeRemoved
-  
+  case amplifierHasBeenRemoved
+
   case audioStreamHasBeenAdded
   case audioStreamWillBeRemoved
+  case audioStreamHasBeenRemoved
 
   case clientDidConnect
   case clientDidDisconnect
