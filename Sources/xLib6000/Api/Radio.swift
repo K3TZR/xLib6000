@@ -134,13 +134,12 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public var binauralRxEnabled: Bool {
     get {  return _binauralRxEnabled }
     set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) }}}
-  @objc dynamic public var boundClientId: UUID? { 
-    get { Api.objectQ.sync { _boundClientId }}
-    set { Api.objectQ.sync(flags: .barrier) {
-        if !_api.isGui {
-          if let uuidString = newValue?.uuidString {
-            _boundClientId = newValue ; sendCommand("client bind client_id=\(uuidString)")
-          }
+  @objc dynamic public var boundClientId: String? {
+    get { return _boundClientId }
+    set {
+      if !_api.isGui {
+        if let uuidString = newValue {
+          _boundClientId = newValue ; sendCommand("client bind client_id=\(uuidString)")
         }
       }
     }
@@ -308,7 +307,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   var _binauralRxEnabled: Bool {
     get { Api.objectQ.sync { __binauralRxEnabled } }
     set { Api.objectQ.sync(flags: .barrier) { __binauralRxEnabled = newValue }}}
-  var _boundClientId: UUID? {                          // (V3 only)
+  var _boundClientId: String? {                          // (V3 only)
     get { Api.objectQ.sync { __boundClientId } }
     set { Api.objectQ.sync(flags: .barrier) { __boundClientId = newValue }}}
   var _calFreq: Int {
@@ -1218,7 +1217,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // only v3 returns a Client Id
     for property in properties {
       // save the returned ID
-      _boundClientId = UUID(uuidString: property.key)
+      _boundClientId = property.key
       break
     }
   }
@@ -1832,7 +1831,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __backlight                   = 0                             //
   private var __bandPersistenceEnabled      = false                         //
   private var __binauralRxEnabled           = false                         // Binaural enable
-  private var __boundClientId               : UUID?                         // The Client Id of this client's GUI (V3 only)
+  private var __boundClientId               : String?                         // The Client Id of this client's GUI (V3 only)
   // C
   private var __calFreq                     = 0                             // Calibration frequency
   private var __callsign                    = ""                            // Callsign
