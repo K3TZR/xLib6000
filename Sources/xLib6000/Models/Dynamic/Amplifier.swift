@@ -117,11 +117,13 @@ public final class Amplifier  : NSObject, DynamicModel {
       
     } else {
       
-      // NO, notify all observers
-      NC.post(.amplifierWillBeRemoved, object: radio.amplifiers[id] as Any?)
-      
       // remove it
       radio.amplifiers[id] = nil
+      
+      Log.sharedInstance.logMessage("Amplifier removed: id = \(id)", .debug, #function, #file, #line)
+
+      // NO, notify all observers
+      NC.post(.amplifierHasBeenRemoved, object: id as Any?)
     }
   }
 
@@ -177,7 +179,9 @@ public final class Amplifier  : NSObject, DynamicModel {
       
       // YES, the Radio (hardware) has acknowledged this Amplifier
       _initialized = true
-      
+                  
+      Log.sharedInstance.logMessage("Amplifier added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.amplifierHasBeenAdded, object: self as Any?)
     }
@@ -192,6 +196,9 @@ public final class Amplifier  : NSObject, DynamicModel {
     
     // tell the Radio to remove a Stream
     _radio.sendCommand("amplifier remove " + "\(id)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.amplifierWillBeRemoved, object: self as Any?)
   }
   /// Change the Amplifier Mode
   ///
@@ -215,6 +222,9 @@ public final class Amplifier  : NSObject, DynamicModel {
   ///
   private func amplifierCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("amplifier set " + "\(id) " + token.rawValue + "=\(value)")
+    
+    // notify all observers
+    NC.post(.amplifierWillBeRemoved, object: self as Any?)
   }
   
   // ----------------------------------------------------------------------------

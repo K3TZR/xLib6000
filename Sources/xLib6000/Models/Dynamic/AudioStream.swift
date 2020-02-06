@@ -131,11 +131,13 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
         // does the object exist?
         if let stream = radio.audioStreams[id] {
           
-          // notify all observers
-          NC.post(.audioStreamWillBeRemoved, object: stream as Any?)
-          
           // remove the object
           radio.audioStreams[id] = nil
+          
+          Log.sharedInstance.logMessage("AudioStream removed: id = \(id)", .debug, #function, #file, #line)
+
+          // notify all observers
+          NC.post(.audioStreamHasBeenRemoved, object: id as Any?)
         }
       }
     }
@@ -198,7 +200,9 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
-      
+            
+      Log.sharedInstance.logMessage("AudioStream added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.audioStreamHasBeenAdded, object: self as Any?)
     }

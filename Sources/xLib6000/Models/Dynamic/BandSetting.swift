@@ -170,11 +170,13 @@ public final class BandSetting                : NSObject, DynamicModel {
         radio.bandSettings[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
       
       } else {
-        // NO, notify all observers
-        NC.post(.bandSettingWillBeRemoved, object: radio.bandSettings[id] as Any?)
-        
-        // remove it
+        // NO, remove it
         radio.bandSettings[id] = nil
+        
+        Log.sharedInstance.logMessage("BandSetting removed: id = \(id)", .debug, #function, #file, #line)
+
+        // notify all observers
+        NC.post(.bandSettingHasBeenRemoved, object: id as Any?)
       }
     }
   }
@@ -236,7 +238,9 @@ public final class BandSetting                : NSObject, DynamicModel {
       
       // YES, the Radio (hardware) has acknowledged this BandSetting
       _initialized = true
-      
+            
+      Log.sharedInstance.logMessage("BandSetting added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.bandSettingHasBeenAdded, object: self as Any?)
     }
@@ -251,6 +255,9 @@ public final class BandSetting                : NSObject, DynamicModel {
     
     // tell the Radio to remove a Stream
     _radio.sendCommand("band setting remove " + "\(id)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.bandSettingWillBeRemoved, object: self as Any?)
   }
 
 
