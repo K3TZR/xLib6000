@@ -630,13 +630,13 @@ public final class Slice  : NSObject, DynamicModel {
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
-    // get the Slice Id
+    // get the Id
     if let id = keyValues[0].key.objectId {
       
-      // is the Slice in use?
+      // is the object in use?
       if inUse {
         
-        // YES, does the Slice exist?
+        // YES, does it exist?
         if radio.slices[id] == nil {
           
           // NO, create a new Slice & add it to the Slices collection
@@ -653,18 +653,22 @@ public final class Slice  : NSObject, DynamicModel {
           //          }
           //        }
         }
-        // pass the remaining key values to the Slice for parsing (dropping the Id)
+        // pass the remaining key values to the Slice for parsing
         radio.slices[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
-        // NO, notify all observers
-        NC.post(.sliceWillBeRemoved, object: radio.slices[id] as Any?)
-        
-        // remove it
-        radio.slices[id] = nil
-        
-        Log.sharedInstance.logMessage("Slice removed: id = \(id)", .debug, #function, #file, #line)
+        // does it exist?
+        if radio.slices[id] == nil {
+          
+          // YES, remove it
+          radio.slices[id] = nil
+          
+          Log.sharedInstance.logMessage("Slice removed: id = \(id)", .debug, #function, #file, #line)
+
+          // notify all observers
+          NC.post(.sliceHasBeenRemoved, object: id as Any?)
+        }
       }
     }
   }
@@ -919,10 +923,10 @@ public final class Slice  : NSObject, DynamicModel {
       // mark it as initialized
       _initialized = true
       
+      _log("Slice added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.sliceHasBeenAdded, object: self)
-
-      _log("Slice added: id = \(id)", .debug, #function, #file, #line)
     }
   }
   /// Remove this Slice

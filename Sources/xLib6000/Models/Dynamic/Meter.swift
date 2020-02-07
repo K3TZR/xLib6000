@@ -241,10 +241,10 @@ public final class Meter : NSObject, DynamicModel {
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
-    // is the Meter in use?
+    // is the object in use?
     if inUse {
       
-      // IN USE, extract the Meter Number from the first KeyValues entry
+      // YES, extract the Meter Number from the first KeyValues entry
       let components = keyValues[0].key.components(separatedBy: ".")
       if components.count != 2 {return }
       
@@ -254,7 +254,7 @@ public final class Meter : NSObject, DynamicModel {
         // does the meter exist?
         if radio.meters[id] == nil {
           
-          // DOES NOT EXIST, create a new Meter & add it to the Meters collection
+          // NO, create a new Meter & add it to the Meters collection
           radio.meters[id] = Meter(radio: radio, id: id)
         }
         
@@ -264,19 +264,19 @@ public final class Meter : NSObject, DynamicModel {
       
     } else {
       
-      // NOT IN USE, extract the Meter Id
+      // NO, extract the Id
       if let id = keyValues[0].key.components(separatedBy: " ")[0].objectId {
         
         // does it exist?
         if let meter = radio.meters[id] {
           
-          // notify all observers
-          NC.post(.meterWillBeRemoved, object: meter as Any?)
-          
           // remove it
           radio.meters[id] = nil
           
           Log.sharedInstance.logMessage("Meter removed: id = \(id)", .debug, #function, #file, #line)
+
+          // notify all observers
+          NC.post(.meterHasBeenRemoved, object: meter as Any?)
         }
       }
     }
@@ -347,10 +347,10 @@ public final class Meter : NSObject, DynamicModel {
       // the Radio (hardware) has acknowledged this Meter
       _initialized = true
       
+      _log("Meter added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.meterHasBeenAdded, object: self as Any?)
-
-      _log("Meter added: id = \(id)", .debug, #function, #file, #line)
     }
   }
   

@@ -100,13 +100,13 @@ public final class Amplifier  : NSObject, DynamicModel {
     
     // TODO: verify
         
-    //get the AmplifierId (remove the "0x" prefix)
+    // get the Id
     let id = String(keyValues[0].key.dropFirst(2))
     
-    // is the Amplifier in use
+    // is the object in use
     if inUse {
       
-      // YES, does the Amplifier exist?
+      // YES, does it exist?
       if radio.amplifiers[id] == nil {
         
         // NO, create a new Amplifier & add it to the Amplifiers collection
@@ -117,11 +117,17 @@ public final class Amplifier  : NSObject, DynamicModel {
       
     } else {
       
-      // NO, notify all observers
-      NC.post(.amplifierWillBeRemoved, object: radio.amplifiers[id] as Any?)
-      
-      // remove it
-      radio.amplifiers[id] = nil
+      // does it exist?
+      if radio.amplifiers[id] != nil {
+        
+        // YES, remove it
+        radio.amplifiers[id] = nil
+        
+        Log.sharedInstance.logMessage("Amplifier removed: id = \(id)", .debug, #function, #file, #line)
+        
+        // notify all observers
+        NC.post(.amplifierHasBeenRemoved, object: id as Any?)
+      }
     }
   }
 
@@ -177,7 +183,9 @@ public final class Amplifier  : NSObject, DynamicModel {
       
       // YES, the Radio (hardware) has acknowledged this Amplifier
       _initialized = true
-      
+                  
+      _log("Amplifier added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.amplifierHasBeenAdded, object: self as Any?)
     }
@@ -188,10 +196,13 @@ public final class Amplifier  : NSObject, DynamicModel {
   ///
   public func remove(callback: ReplyHandler? = nil) {
     
-    // TODO: test this
+    // TODO: DOES NOT WORK
     
     // tell the Radio to remove a Stream
     _radio.sendCommand("amplifier remove " + "\(id)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.amplifierWillBeRemoved, object: self as Any?)
   }
   /// Change the Amplifier Mode
   ///
@@ -215,6 +226,9 @@ public final class Amplifier  : NSObject, DynamicModel {
   ///
   private func amplifierCmd(_ token: Token, _ value: Any) {
     _radio.sendCommand("amplifier set " + "\(id) " + token.rawValue + "=\(value)")
+    
+    // notify all observers
+    NC.post(.amplifierWillBeRemoved, object: self as Any?)
   }
   
   // ----------------------------------------------------------------------------

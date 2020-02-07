@@ -215,6 +215,8 @@ public final class Equalizer : NSObject, DynamicModel {
       // NO, the Radio (hardware) has acknowledged this Equalizer
       _initialized = true
       
+      _log("Equalizer added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.equalizerHasBeenAdded, object: self as Any?)
     }

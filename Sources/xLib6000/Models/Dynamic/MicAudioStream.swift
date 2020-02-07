@@ -103,34 +103,36 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
-    //get the MicAudioStreamId (remove the "0x" prefix)
-    if let daxMicStreamId =  keyValues[0].key.streamId {
+    // get the Id
+    if let id =  keyValues[0].key.streamId {
       
-      // is the Stream in use?
+      // is the object in use?
       if inUse {
         
-        // YES, does the object exist?
-        if radio.micAudioStreams[daxMicStreamId] == nil {
+        // YES, does it exist?
+        if radio.micAudioStreams[id] == nil {
           
-          // NO, is this stream for this client?
+          // NO, is it for this client?
           if !isForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
-          radio.micAudioStreams[daxMicStreamId] = MicAudioStream(radio: radio, id: daxMicStreamId)
+          radio.micAudioStreams[id] = MicAudioStream(radio: radio, id: id)
         }
         // pass the remaining key values for parsing (dropping the Id)
-        radio.micAudioStreams[daxMicStreamId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+        radio.micAudioStreams[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
-        // does the object exist?
-        if let stream = radio.micAudioStreams[daxMicStreamId] {
+        // does it exist?
+        if radio.micAudioStreams[id] != nil {
           
+          // YES, remove it
+          radio.micAudioStreams[id] = nil
+          
+          Log.sharedInstance.logMessage("MicAudioStream removed: id = \(id)", .debug, #function, #file, #line)
+
           // notify all observers
-          NC.post(.micAudioStreamWillBeRemoved, object: stream as Any?)
-          
-          // remove the object
-          radio.micAudioStreams[daxMicStreamId] = nil
+          NC.post(.micAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
     }
@@ -191,6 +193,8 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
+      _log("MicAudioStream added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.micAudioStreamHasBeenAdded, object: self as Any?)
     }

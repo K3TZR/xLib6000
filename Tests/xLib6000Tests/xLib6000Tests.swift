@@ -157,7 +157,7 @@ final class xLib6000Tests: XCTestCase {
  // MARK: ---- Amplifier ----
   
   ///   Format:  <Id, > <"ant", ant> <"ip", ip> <"model", model> <"port", port> <"serial_num", serialNumber>
-  private var amplifierStatus = "0x12345678 ant=ANT1 ip=10.0.1.106 model=6500 port=4123 serial_num=1234-5678-9012"
+  private var amplifierStatus = "0x12345678 ant=ANT1 ip=10.0.1.106 model=PGXL port=4123 serial_num=1234-5678-9012"
   func testAmplifierParse() {
     
     let radio = discoverRadio()
@@ -165,14 +165,40 @@ final class xLib6000Tests: XCTestCase {
     
     Amplifier.parseStatus(radio!, amplifierStatus.keyValuesArray(), true)
 
-    let amplifier = radio!.amplifiers["12345678"]
-    XCTAssertNotNil(amplifier, "Failed to create Amplifier")
-    XCTAssertEqual(amplifier?.ant, "ANT1")
-    XCTAssertEqual(amplifier?.ip, "10.0.1.106")
-    XCTAssertEqual(amplifier?.model, "6500")
-    XCTAssertEqual(amplifier?.port, 4123)
-    XCTAssertEqual(amplifier?.serialNumber, "1234-5678-9012")
-    
+    if let amplifier = radio!.amplifiers["12345678"] {
+      // verify properties
+      XCTAssertNotNil(amplifier, "Failed to create Amplifier")
+      XCTAssertEqual(amplifier.id, "12345678")
+      XCTAssertEqual(amplifier.ant, "ANT1")
+      XCTAssertEqual(amplifier.ip, "10.0.1.106")
+      XCTAssertEqual(amplifier.model, "PGXL")
+      XCTAssertEqual(amplifier.port, 4123)
+      XCTAssertEqual(amplifier.serialNumber, "1234-5678-9012")
+      
+      // change properties
+      amplifier.ant = "ANT2"
+      amplifier.ip = "11.1.217"
+      amplifier.model = "QIYM"
+      amplifier.port = 3214
+      amplifier.serialNumber = "2109-8765-4321"
+      
+      // re-verify properties
+      XCTAssertEqual(amplifier.id, "12345678")
+      XCTAssertEqual(amplifier.ant, "ANT2")
+      XCTAssertEqual(amplifier.ip, "11.1.217")
+      XCTAssertEqual(amplifier.model, "QIYM")
+      XCTAssertEqual(amplifier.port, 3214)
+      XCTAssertEqual(amplifier.serialNumber, "2109-8765-4321")
+      
+      // remove
+      amplifier.remove()
+      sleep(1)
+      XCTAssert(radio!.amplifiers["12345678"] == nil, "Failed to remove Amplifier")
+      
+    } else {
+      XCTAssertTrue(false, "Failed to create Amplifier")
+    }
+
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
@@ -190,12 +216,32 @@ final class xLib6000Tests: XCTestCase {
     case .v1, .v2:
       AudioStream.parseStatus(radio!, audioStreamStatus.keyValuesArray(), true)
       
-      if let audioStream = radio!.audioStreams["0x23456789".streamId ?? 99999999] {
+      if let audioStream = radio!.audioStreams["0x23456789".streamId!] {
+        // verify properties
         XCTAssertEqual(audioStream.id, "0x23456789".streamId)
         XCTAssertEqual(audioStream.daxChannel, 3)
         XCTAssertEqual(audioStream.ip, "10.0.1.107")
         XCTAssertEqual(audioStream.port, 4124)
         XCTAssertEqual(audioStream.slice, radio!.slices["0".objectId!])
+
+        // change properties
+        audioStream.daxChannel = 4
+        audioStream.ip = "12.2.3.218"
+        audioStream.port = 4214
+        audioStream.slice = radio!.slices["0".objectId!]
+
+        // re-verify properties
+        XCTAssertEqual(audioStream.id, "0x23456789".streamId)
+        XCTAssertEqual(audioStream.daxChannel, 4)
+        XCTAssertEqual(audioStream.ip, "12.2.3.218")
+        XCTAssertEqual(audioStream.port, 4214)
+        XCTAssertEqual(audioStream.slice, radio!.slices["0".objectId!])
+
+        // remove
+        audioStream.remove()
+        sleep(1)
+        XCTAssert(radio!.audioStreams["0x23456789".streamId!] == nil, "Failed to remove AudioStream")
+        
       } else {
         XCTAssertTrue(false, "Failed to create AudioStream")
       }

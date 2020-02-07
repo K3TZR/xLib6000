@@ -14,28 +14,35 @@ public enum NotificationType : String {
   
   case amplifierHasBeenAdded
   case amplifierWillBeRemoved
-  
+  case amplifierHasBeenRemoved
+
   case audioStreamHasBeenAdded
   case audioStreamWillBeRemoved
+  case audioStreamHasBeenRemoved
 
   case clientDidConnect
   case clientDidDisconnect
   
   case bandSettingHasBeenAdded
   case bandSettingWillBeRemoved
-  
+  case bandSettingHasBeenRemoved
+
   case daxIqStreamHasBeenAdded
   case daxIqStreamWillBeRemoved
-  
+  case daxIqStreamHasBeenRemoved
+
   case daxMicAudioStreamHasBeenAdded
   case daxMicAudioStreamWillBeRemoved
+  case daxMicAudioStreamHasBeenRemoved
 
   case daxRxAudioStreamHasBeenAdded
   case daxRxAudioStreamWillBeRemoved
-  
+  case daxRxAudioStreamHasBeenRemoved
+
   case daxTxAudioStreamHasBeenAdded
   case daxTxAudioStreamWillBeRemoved
-  
+  case daxTxAudioStreamHasBeenRemoved
+
   case discoveredRadios
   
   case equalizerHasBeenAdded
@@ -51,17 +58,21 @@ public enum NotificationType : String {
 
   case iqStreamHasBeenAdded
   case iqStreamWillBeRemoved
-  
+  case iqStreamHasBeenRemoved
+
   case memoryHasBeenAdded
   case memoryWillBeRemoved
-  
+  case memoryHasBeenRemoved
+
   case meterHasBeenAdded
   case meterWillBeRemoved
+  case meterHasBeenRemoved
   case meterUpdated
   
   case micAudioStreamHasBeenAdded
   case micAudioStreamWillBeRemoved
-  
+  case micAudioStreamHasBeenRemoved
+
   case opusRxHasBeenAdded
   case opusRxWillBeRemoved
 
@@ -70,7 +81,8 @@ public enum NotificationType : String {
 
   case panadapterHasBeenAdded
   case panadapterWillBeRemoved
-  
+  case panadapterHasBeenRemoved
+
   case profileHasBeenAdded
   case profileWillBeRemoved
   
@@ -83,14 +95,17 @@ public enum NotificationType : String {
 
   case remoteRxAudioStreamHasBeenAdded
   case remoteRxAudioStreamWillBeRemoved
-  
+  case remoteRxAudioStreamHasBeenRemoved
+
   case remoteTxAudioStreamHasBeenAdded
   case remoteTxAudioStreamWillBeRemoved
+  case remoteTxAudioStreamHasBeenRemoved
 
   case sliceBecameActive
   case sliceHasBeenAdded
   case sliceWillBeRemoved
-  
+  case sliceHasBeenRemoved
+
   case sliceMeterHasBeenAdded
   case sliceMeterWillBeRemoved
 
@@ -103,21 +118,26 @@ public enum NotificationType : String {
   
   case tnfHasBeenAdded
   case tnfWillBeRemoved
-  
+  case tnfHasBeenRemoved
+
   case transmitHasBeenAdded
 
   case txAudioStreamHasBeenAdded
   case txAudioStreamWillBeRemoved
+  case txAudioStreamHasBeenRemoved
 
   case udpDidBind
   
   case usbCableHasBeenAdded
   case usbCableWillBeRemoved
-  
+  case usbCableHasBeenRemoved
+
   case waterfallHasBeenAdded
   case waterfallWillBeRemoved
-  
+  case waterfallHasBeenRemoved
+
   case xvtrHasBeenAdded
   case xvtrWillBeRemoved
+  case xvtrHasBeenRemoved
 }
 

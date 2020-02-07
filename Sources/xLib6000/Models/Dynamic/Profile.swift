@@ -87,27 +87,27 @@ public final class Profile                  : NSObject, StaticModel {
 
     let components = keyValues[0].key.split(separator: " ")
     
-    // get the Profile Id
-    let profileId = String(components[0])
+    // get the Id
+    let id = String(components[0])
 
     // check for unknown Keys
-    guard let _ = Group(rawValue: profileId) else {
+    guard let _ = Group(rawValue: id) else {
       // log it and ignore the Key
-      Log.sharedInstance.logMessage("Unknown Profile group: \(profileId)", .warning, #function, #file, #line)
+      Log.sharedInstance.logMessage("Unknown Profile group: \(id)", .warning, #function, #file, #line)
       return
     }
     // remove the Id from the KeyValues
     var adjustedKeyValues = keyValues
     adjustedKeyValues[0].key = String(components[1])
     
-    // does the Profile exist?
-    if  radio.profiles[profileId] == nil {
+    // does the object exist?
+    if  radio.profiles[id] == nil {
       
       // NO, create a new Profile & add it to the Profiles collection
-      radio.profiles[profileId] = Profile(radio: radio, id: profileId)
+      radio.profiles[id] = Profile(radio: radio, id: id)
     }
-    // pass the key values to Profile for parsing (dropping the Id)
-    radio.profiles[profileId]!.parseProperties(radio, adjustedKeyValues )
+    // pass the remaining values to Profile for parsing
+    radio.profiles[id]!.parseProperties(radio, adjustedKeyValues )
   }
 
   // ------------------------------------------------------------------------------
@@ -169,6 +169,8 @@ public final class Profile                  : NSObject, StaticModel {
       // YES, the Radio (hardware) has acknowledged this Panadapter
       _initialized = true
       
+      _log("Profile added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.profileHasBeenAdded, object: self as Any?)
     }

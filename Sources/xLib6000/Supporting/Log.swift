@@ -53,7 +53,7 @@ public final class Log {
     if delegate != nil {
       delegate!.logMessage(msg, level, function, file, line, Api.kName)
     } else {
-      NSLog(Api.kName + ": " + msg)
+      NSLog(Api.kName.prefix(4) + ": " + msg)
     }
   }
 }

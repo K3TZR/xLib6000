@@ -109,20 +109,38 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_rx"> <"dax_channel", channel> <"slice", sliceNumber> <"dax_clients", number> <"client_handle", handle>
     
-    //get the StreamId
-    if let daxRxStreamId =  properties[0].key.streamId {
+    // get the Id
+    if let id =  properties[0].key.streamId {
       
-      // does the Stream exist?
-      if radio.daxRxAudioStreams[daxRxStreamId] == nil {
+      // is the object in use?
+      if inUse {
         
-        // exit if this stream is not for this client
-        if isForThisClient( properties ) == false { return }
-
-        // create a new Stream & add it to the collection
-        radio.daxRxAudioStreams[daxRxStreamId] = DaxRxAudioStream(radio: radio, id: daxRxStreamId)
+        // YES, does it exist?
+        if radio.daxRxAudioStreams[id] == nil {
+          
+          // NO, is it for this client?
+          if radio.version.isV3 { if !isForThisClient(properties) { return } }
+          
+          // create a new object & add it to the collection
+          radio.daxRxAudioStreams[id] = DaxRxAudioStream(radio: radio, id: id)
+        }
+        // pass the remaining key values for parsing
+        radio.daxRxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
+        
+      } else {
+        
+        // does it exist?
+        if radio.daxRxAudioStreams[id] != nil {
+          
+          // YES< remove the object
+          radio.daxRxAudioStreams[id] = nil
+          
+          Log.sharedInstance.logMessage("DaxRxAudioStream removed: id = \(id)", .debug, #function, #file, #line)
+          
+          // notify all observers
+          NC.post(.daxRxAudioStreamHasBeenRemoved, object: id as Any?)
+        }
       }
-      // pass the remaining key values for parsing (dropping the Id & Type)
-      radio.daxRxAudioStreams[daxRxStreamId]!.parseProperties(radio, Array(properties.dropFirst(2)) )
     }
   }
 
@@ -183,6 +201,8 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
+      _log("DaxRxAudioStream added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.daxRxAudioStreamHasBeenAdded, object: self as Any?)
     }
@@ -194,14 +214,11 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   ///
   public func remove(callback: ReplyHandler? = nil) {
     
-    // notify all observers
-    NC.post(.daxRxAudioStreamWillBeRemoved, object: self as Any?)
-    
-    // remove the stream
-    _radio.daxRxAudioStreams[id] = nil
-    
     // tell the Radio to remove this Stream
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.daxRxAudioStreamWillBeRemoved, object: self as Any?)
   }
 
   // ------------------------------------------------------------------------------
