@@ -189,9 +189,15 @@ final class xLib6000Tests: XCTestCase {
       XCTAssertEqual(amplifier.model, "QIYM")
       XCTAssertEqual(amplifier.port, 3214)
       XCTAssertEqual(amplifier.serialNumber, "2109-8765-4321")
-      } else {
-        XCTAssertTrue(false, "Failed to create Amplifier")
-      }
+      
+      // remove
+      amplifier.remove()
+      sleep(1)
+      XCTAssert(radio!.amplifiers["12345678"] == nil, "Failed to remove Amplifier")
+      
+    } else {
+      XCTAssertTrue(false, "Failed to create Amplifier")
+    }
 
     // disconnect the radio
     Api.sharedInstance.disconnect()
@@ -210,7 +216,7 @@ final class xLib6000Tests: XCTestCase {
     case .v1, .v2:
       AudioStream.parseStatus(radio!, audioStreamStatus.keyValuesArray(), true)
       
-      if let audioStream = radio!.audioStreams["0x23456789".streamId ?? 99999999] {
+      if let audioStream = radio!.audioStreams["0x23456789".streamId!] {
         // verify properties
         XCTAssertEqual(audioStream.id, "0x23456789".streamId)
         XCTAssertEqual(audioStream.daxChannel, 3)
@@ -234,7 +240,7 @@ final class xLib6000Tests: XCTestCase {
         // remove
         audioStream.remove()
         sleep(1)
-        XCTAssert(radio!.audioStreams["0x23456789".streamId ?? 99999999] == nil, "Failed to remove AudioStream")
+        XCTAssert(radio!.audioStreams["0x23456789".streamId!] == nil, "Failed to remove AudioStream")
         
       } else {
         XCTAssertTrue(false, "Failed to create AudioStream")
