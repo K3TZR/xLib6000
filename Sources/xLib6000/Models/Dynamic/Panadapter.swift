@@ -325,40 +325,35 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     //      OR
     // Format: <"pan", ""> <streamId, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
     
-      //get the Id
-      if let id =  keyValues[0].key.streamId {
+    //get the Id
+    if let id =  keyValues[1].key.streamId {
+      
+      // is the object in use?
+      if inUse {
         
-        // is the object in use?
-        if inUse {
+        // YES, does it exist?
+        if radio.panadapters[id] == nil {
           
-          // YES, does it exist?
-          if radio.panadapters[id] == nil {
-            
-            // NO, is it for this client?
-            if !isForThisClient(keyValues) { return }
-            
-            // create a new object & add it to the collection
-            radio.panadapters[id] = Panadapter(radio: radio, id: id)
-          }
-          // pass the remaining key values for parsing
-          radio.panadapters[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+          // NO, is it for this client?
+          if !isForThisClient(keyValues) { return }
           
-        } else {
+          // create a new object & add it to the collection
+          radio.panadapters[id] = Panadapter(radio: radio, id: id)
+        }
+        // pass the remaining key values for parsing
+        radio.panadapters[id]!.parseProperties(radio, Array(keyValues.dropFirst(2)) )
+      
+      } else {
+        
+        // does it exist?
+        if radio.panadapters[id] == nil {
           
-          // does it exist?
-          if radio.panadapters[id] != nil {
-            
-            // remove it
-            radio.panadapters[id] = nil
-            
-            Log.sharedInstance.logMessage("Panadapter removed: id = \(id)", .debug, #function, #file, #line)
-
-            // notify all observers
-            NC.post(.panadapterHasBeenRemoved, object: id as Any?)
-          }
+          // notify all observers
+          NC.post(.panadapterWillBeRemoved, object: self as Any?)
         }
       }
     }
+  }
 
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
@@ -488,7 +483,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   public func remove(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove a Panafall
-    _radio.sendCommand("display pan remove \(id.hex)", replyTo: callback)
+    _radio.sendCommand("display panafall remove \(id.hex)", replyTo: callback)
     
     // notify all observers
     NC.post(.panadapterWillBeRemoved, object: self as Any?)

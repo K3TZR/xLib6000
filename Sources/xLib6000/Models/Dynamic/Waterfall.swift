@@ -196,19 +196,20 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
         // does it exist?
         if radio.waterfalls[id] == nil {
           
-          // remove the associated Panadapter
-          radio.panadapters[radio.waterfalls[id]!.panadapterId] = nil
-
-          Log.sharedInstance.logMessage("Panadapter removed: id = \(radio.waterfalls[id]!.panadapterId.hex)", .debug, #function, #file, #line)
-          
           // notify all observers
-          NC.post(.panadapterHasBeenRemoved, object: id as Any?)
+          NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[id] as Any?)
+          
+          // remove the associated Panadapter
+          let panadapterId = radio.waterfalls[id]!.panadapterId
+          radio.panadapters[panadapterId] = nil
+          
+          Log.sharedInstance.logMessage("Panadapter removed: id = \(panadapterId.hex)", .debug, #function, #file, #line)
 
           // remove the Waterfall
           radio.waterfalls[id] = nil
           
-          Log.sharedInstance.logMessage("Waterfall removed: id = \(id.hex)", .debug, #function, #file, #line)
-
+           Log.sharedInstance.logMessage("Waterfall removed: id = \(id.hex)", .debug, #function, #file, #line)
+          
           // notify all observers
           NC.post(.waterfallHasBeenRemoved, object: id as Any?)
         }
@@ -264,25 +265,6 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       // notify all observers
       NC.post(.waterfallHasBeenAdded, object: self as Any?)
     }
-  }
-
-  /// Remove a Waterfall
-  ///
-  /// - Parameters:
-  ///   - callback:           ReplyHandler (optional)
-  ///
-  public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove the Waterfall
-    _radio.sendCommand("display panafall remove " + " \(id.hex)", replyTo: callback)
-    
-    // notify all observers
-    NC.post(.waterfallWillBeRemoved, object: self as Any?)
-    
-    // TODO: Is this needed, will ParseStatus remove the Waterfall?
-    
-    // remove the Waterfall
-    _radio.waterfalls[id] = nil
   }
   
   // ----------------------------------------------------------------------------
