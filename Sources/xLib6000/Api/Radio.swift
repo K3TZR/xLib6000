@@ -1054,7 +1054,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .atu:            atu.parseProperties(self, remainder.keyValuesArray() )
     case .client:         parseClient(self, remainder.keyValuesArray())
     case .cwx:            cwx.parseProperties(self, remainder.fix().keyValuesArray() )
-    case .daxiq:          break // obsolete token, included to prevent log messages
+    case .daxiq:          IqStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
     case .display:        parseDisplay(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .eq:             Equalizer.parseStatus(self, remainder.keyValuesArray())
     case .file:           _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
@@ -1068,7 +1068,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .profile:        Profile.parseStatus(self, remainder.keyValuesArray(delimiter: "="))
     case .radio:          parseProperties(self, remainder.keyValuesArray())
     case .slice:          xLib6000.Slice.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
-    case .stream:         IqStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
+    case .stream:         DaxIqStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .tnf:            Tnf.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .transmit:       transmit.parseProperties(self, remainder.keyValuesArray())
     case .turf:           _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
