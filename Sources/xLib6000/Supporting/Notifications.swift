@@ -25,19 +25,24 @@ public enum NotificationType : String {
   
   case bandSettingHasBeenAdded
   case bandSettingWillBeRemoved
-  
+  case bandSettingHasBeenRemoved
+
   case daxIqStreamHasBeenAdded
   case daxIqStreamWillBeRemoved
-  
+  case daxIqStreamHasBeenRemoved
+
   case daxMicAudioStreamHasBeenAdded
   case daxMicAudioStreamWillBeRemoved
+  case daxMicAudioStreamHasBeenRemoved
 
   case daxRxAudioStreamHasBeenAdded
   case daxRxAudioStreamWillBeRemoved
-  
+  case daxRxAudioStreamHasBeenRemoved
+
   case daxTxAudioStreamHasBeenAdded
   case daxTxAudioStreamWillBeRemoved
-  
+  case daxTxAudioStreamHasBeenRemoved
+
   case discoveredRadios
   
   case equalizerHasBeenAdded
@@ -53,17 +58,20 @@ public enum NotificationType : String {
 
   case iqStreamHasBeenAdded
   case iqStreamWillBeRemoved
-  
+  case iqStreamHasBeenRemoved
+
   case memoryHasBeenAdded
   case memoryWillBeRemoved
-  
+  case memoryHasBeenRemoved
+
   case meterHasBeenAdded
   case meterWillBeRemoved
   case meterUpdated
   
   case micAudioStreamHasBeenAdded
   case micAudioStreamWillBeRemoved
-  
+  case micAudioStreamHasBeenRemoved
+
   case opusRxHasBeenAdded
   case opusRxWillBeRemoved
 
@@ -85,9 +93,11 @@ public enum NotificationType : String {
 
   case remoteRxAudioStreamHasBeenAdded
   case remoteRxAudioStreamWillBeRemoved
-  
+  case remoteRxAudioStreamHasBeenRemoved
+
   case remoteTxAudioStreamHasBeenAdded
   case remoteTxAudioStreamWillBeRemoved
+  case remoteTxAudioStreamHasBeenRemoved
 
   case sliceBecameActive
   case sliceHasBeenAdded
@@ -110,6 +120,7 @@ public enum NotificationType : String {
 
   case txAudioStreamHasBeenAdded
   case txAudioStreamWillBeRemoved
+  case txAudioStreamHasBeenRemoved
 
   case udpDidBind
   

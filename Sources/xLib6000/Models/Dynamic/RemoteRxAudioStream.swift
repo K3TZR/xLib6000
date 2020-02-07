@@ -100,20 +100,38 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "remote_audio_rx"> <"compression", "none"|"opus"> <"client_handle", handle> <"ip", ip>
     
-    // get the Id
-    if let remoteRxStreamId = properties[0].key.streamId {
+    //get the Id
+    if let id =  properties[0].key.streamId {
       
-      // does the object exist?
-      if  radio.remoteRxAudioStreams[remoteRxStreamId] == nil {
+      // is the Stream in use?
+      if inUse {
         
-        // exit if this stream is not for this client
-        if isForThisClient( properties ) == false { return }
-
-        // create a new object & add it to the collection
-        radio.remoteRxAudioStreams[remoteRxStreamId] = RemoteRxAudioStream(radio: radio, id: remoteRxStreamId)
+        // YES, does the object exist?
+        if radio.remoteRxAudioStreams[id] == nil {
+          
+          // NO, is this stream for this client?
+          if radio.version.isV3 { if !isForThisClient(properties) { return } }
+          
+          // create a new object & add it to the collection
+          radio.remoteRxAudioStreams[id] = RemoteRxAudioStream(radio: radio, id: id)
+        }
+        // pass the remaining key values for parsing (dropping the Id)
+        radio.remoteRxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
+        
+      } else {
+        
+        // does the object exist?
+        if radio.remoteRxAudioStreams[id] != nil {
+          
+          // remove the object
+          radio.remoteRxAudioStreams[id] = nil
+          
+          Log.sharedInstance.logMessage("RemoteRxAudioStream removed: id = \(id)", .debug, #function, #file, #line)
+          
+          // notify all observers
+          NC.post(.remoteRxAudioStreamHasBeenRemoved, object: id as Any?)
+        }
       }
-      // pass the remaining key values for parsing (dropping the Id & Type)
-      radio.remoteRxAudioStreams[remoteRxStreamId]!.parseProperties(radio, Array(properties.dropFirst(2)) )
     }
   }
 
@@ -168,7 +186,9 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       
       // YES, the Radio (hardware) has acknowledged this RxRemoteAudioStream
       _initialized = true
-      
+                  
+      Log.sharedInstance.logMessage("RemoteRxAudioStream added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.remoteRxAudioStreamHasBeenAdded, object: self as Any?)
     }
@@ -180,14 +200,11 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   ///
   public func remove(callback: ReplyHandler? = nil) {
 
-    // notify all observers
-    NC.post(.remoteRxAudioStreamWillBeRemoved, object: self as Any?)
-    
-    // remove the stream
-    _radio.remoteRxAudioStreams[id] = nil
-
     // tell the Radio to remove the Stream
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
+
+    // notify all observers
+    NC.post(.remoteRxAudioStreamWillBeRemoved, object: self as Any?)
   }
   
   // ------------------------------------------------------------------------------

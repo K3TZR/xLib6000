@@ -270,13 +270,13 @@ public final class Meter : NSObject, DynamicModel {
         // does it exist?
         if let meter = radio.meters[id] {
           
-          // notify all observers
-          NC.post(.meterWillBeRemoved, object: meter as Any?)
-          
           // remove it
           radio.meters[id] = nil
           
           Log.sharedInstance.logMessage("Meter removed: id = \(id)", .debug, #function, #file, #line)
+
+          // notify all observers
+          NC.post(.meterWillBeRemoved, object: meter as Any?)          
         }
       }
     }
@@ -347,10 +347,10 @@ public final class Meter : NSObject, DynamicModel {
       // the Radio (hardware) has acknowledged this Meter
       _initialized = true
       
+      _log("Meter added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.meterHasBeenAdded, object: self as Any?)
-
-      _log("Meter added: id = \(id)", .debug, #function, #file, #line)
     }
   }
   

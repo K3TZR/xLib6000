@@ -202,29 +202,30 @@ public final class Memory                   : NSObject, DynamicModel {
     var memory: Memory?
     
     // get the Memory Id
-    let memoryId = keyValues[0].key
+    let id = keyValues[0].key
     
     // is the Memory in use?
     if inUse {
       
       // YES, does it exist?
-      memory = radio.memories[memoryId]
+      memory = radio.memories[id]
       if memory == nil {
         
         // NO, create a new Memory & add it to the Memories collection
-        memory = Memory(radio: radio, id: memoryId)
-        radio.memories[memoryId] = memory
+        memory = Memory(radio: radio, id: id)
+        radio.memories[id] = memory
       }
       // pass the key values to the Memory for parsing (dropping the Id)
       memory!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
       
     } else {
-      
-      // NO, notify all observers
-      NC.post(.memoryWillBeRemoved, object: radio.memories[memoryId] as Any?)
-      
       // remove it
-      radio.memories[memoryId] = nil
+      radio.memories[id] = nil
+
+      Log.sharedInstance.logMessage("Memory removed: id = \(id)", .debug, #function, #file, #line)
+
+      // NO, notify all observers
+      NC.post(.memoryHasBeenRemoved, object: radio.memories[id] as Any?)
     }
   }
 
@@ -369,7 +370,9 @@ public final class Memory                   : NSObject, DynamicModel {
       
       // YES, the Radio (hardware) has acknowledged this Memory
       _initialized = true
-      
+                  
+      Log.sharedInstance.logMessage("Memory added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.memoryHasBeenAdded, object: self as Any?)
     }

@@ -192,7 +192,7 @@ public final class Amplifier  : NSObject, DynamicModel {
   ///
   public func remove(callback: ReplyHandler? = nil) {
     
-    // TODO: test this
+    // TODO: DOES NOT WORK
     
     // tell the Radio to remove a Stream
     _radio.sendCommand("amplifier remove " + "\(id)", replyTo: callback)

@@ -120,33 +120,35 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
     //get the Id
-    if let daxIqStreamId =  keyValues[0].key.streamId {
+    if let id =  keyValues[0].key.streamId {
       
       // is the Stream in use?
       if inUse {
         
         // YES, does the object exist?
-        if radio.iqStreams[daxIqStreamId] == nil {
+        if radio.iqStreams[id] == nil {
           
           // NO, is this stream for this client?
           if !isForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
-          radio.iqStreams[daxIqStreamId] = IqStream(radio: radio, id: daxIqStreamId)
+          radio.iqStreams[id] = IqStream(radio: radio, id: id)
         }
         // pass the remaining key values for parsing (dropping the Id)
-        radio.iqStreams[daxIqStreamId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+        radio.iqStreams[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
         // does the object exist?
-        if let stream = radio.iqStreams[daxIqStreamId] {
-          
-          // notify all observers
-          NC.post(.iqStreamWillBeRemoved, object: stream as Any?)
+        if radio.iqStreams[id] != nil {
           
           // remove the object
-          radio.iqStreams[daxIqStreamId] = nil
+          radio.iqStreams[id] = nil
+          
+          Log.sharedInstance.logMessage("IqStream removed: id = \(id)", .debug, #function, #file, #line)
+
+          // notify all observers
+          NC.post(.iqStreamHasBeenRemoved, object: id as Any?)
         }
       }
     }
@@ -207,7 +209,9 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       
       // YES, the Radio (hardware) has acknowledged this Stream
       _initialized = true
-      
+                  
+      Log.sharedInstance.logMessage("IqStream added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.iqStreamHasBeenAdded, object: self as Any?)
     }

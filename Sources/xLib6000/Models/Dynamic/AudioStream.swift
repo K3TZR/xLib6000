@@ -129,7 +129,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       } else {
         
         // does the object exist?
-        if let stream = radio.audioStreams[id] {
+        if radio.audioStreams[id] != nil {
           
           // remove the object
           radio.audioStreams[id] = nil

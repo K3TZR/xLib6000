@@ -103,19 +103,37 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
     // Format:  <streamId, > <"type", "dax_iq"> <"daxiq_channel", channel> <"pan", panStreamId> <"daxiq_rate", rate> <"client_handle", handle>
 
     //get the Id
-    if let daxIqStreamId =  properties[0].key.streamId {
+    if let id =  properties[0].key.streamId {
       
-      // does the Stream exist?
-      if radio.daxIqStreams[daxIqStreamId] == nil {
+      // is the AudioStream in use?
+      if inUse {
         
-        // exit if this stream is not for this client
-        if isForThisClient( properties ) == false { return }
+        // YES, does the object exist?
+        if radio.daxIqStreams[id] == nil {
+          
+          // NO, is this stream for this client?
+          if radio.version.isV3 { if !isForThisClient(properties) { return } }
+          
+          // create a new object & add it to the collection
+          radio.daxIqStreams[id] = DaxIqStream(radio: radio, id: id)
+        }
+        // pass the remaining key values for parsing (dropping the Id)
+        radio.daxIqStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
+        
+      } else {
+        
+        // does the object exist?
+        if radio.daxIqStreams[id] != nil {
+          
+          // remove the object
+          radio.daxIqStreams[id] = nil
+          
+          Log.sharedInstance.logMessage("DaxIqStream removed: id = \(id)", .debug, #function, #file, #line)
 
-        // create a new Stream & add it to the collection
-        radio.daxIqStreams[daxIqStreamId] = DaxIqStream(radio: radio, id: daxIqStreamId)
+          // notify all observers
+          NC.post(.daxIqStreamHasBeenRemoved, object: id as Any?)
+        }
       }
-      // pass the remaining key values for parsing (dropping the Id)
-      radio.daxIqStreams[daxIqStreamId]!.parseProperties(radio, Array(properties.dropFirst(1)) )
     }
   }
 
@@ -169,7 +187,9 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       
       // YES, the Radio (hardware) has acknowledged this Stream
       _initialized = true
-      
+
+      Log.sharedInstance.logMessage("DaxIqStream added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.daxIqStreamHasBeenAdded, object: self as Any?)
     }
@@ -181,14 +201,11 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   ///
   public func remove(callback: ReplyHandler? = nil) {
     
-    // notify all observers
-    NC.post(.daxIqStreamWillBeRemoved, object: self as Any?)
-
-    // remove the stream
-    _radio.daxIqStreams[id] = nil
-
     // tell the Radio to remove this Stream
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
+
+    // notify all observers
+    NC.post(.daxIqStreamWillBeRemoved, object: self as Any?)
   }
   /// Get error ???
   ///

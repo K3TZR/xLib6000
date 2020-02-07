@@ -108,34 +108,36 @@ public final class TxAudioStream : NSObject, DynamicModel {
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"dax_tx", channel> <"in_use", 1|0> <"ip", ip> <"port", port>
     
-    //get the Id
-    if let txAudioStreamId =  keyValues[0].key.streamId {
+    // get the Id
+    if let id =  keyValues[0].key.streamId {
       
       // is the Stream in use?
       if inUse {
         
         // In use, does the object exist?
-        if radio.txAudioStreams[txAudioStreamId] == nil {
+        if radio.txAudioStreams[id] == nil {
           
           // NO, is the stream for this client?
           if !isForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
-          radio.txAudioStreams[txAudioStreamId] = TxAudioStream(radio: radio, id: txAudioStreamId)
+          radio.txAudioStreams[id] = TxAudioStream(radio: radio, id: id)
         }
         // pass the remaining key values for parsing (dropping the Id)
-        radio.txAudioStreams[txAudioStreamId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+        radio.txAudioStreams[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
         // NOT in use, does the object exist?
-        if let stream = radio.txAudioStreams[txAudioStreamId] {
-          
-          // YES, notify all observers
-          NC.post(.txAudioStreamWillBeRemoved, object: stream as Any?)
+        if radio.txAudioStreams[id] != nil {
           
           // remove the object
-          radio.txAudioStreams[txAudioStreamId] = nil
+          radio.txAudioStreams[id] = nil
+          
+          Log.sharedInstance.logMessage("TxAudioStream removed: id = \(id)", .debug, #function, #file, #line)
+          
+          // YES, notify all observers
+          NC.post(.txAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
     }
@@ -191,7 +193,9 @@ public final class TxAudioStream : NSObject, DynamicModel {
       
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
-      
+                  
+      Log.sharedInstance.logMessage("TxAudioStream added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)
     }
