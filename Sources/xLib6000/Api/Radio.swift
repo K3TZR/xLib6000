@@ -139,7 +139,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     set {
       if !_api.isGui {
         if let uuidString = newValue {
-          _boundClientId = newValue ; sendCommand("client bind client_id=\(uuidString)")
+          bindGuiClient(uuidString)
         }
       }
     }

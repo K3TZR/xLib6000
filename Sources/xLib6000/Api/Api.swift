@@ -359,7 +359,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       send("client program " + _programName)
       if radio.version.isV3                                 { send("client station " + _clientStation) }
-      if radio.version.isV3 && !isGui && _clientId != nil  { send("client bind client_id=" + _clientId!) }
+      if radio.version.isV3 && !isGui && _clientId != nil  { radio.bindGuiClient(_clientId!) }
 
       if _lowBandwidthConnect           { radio.requestLowBandwidthConnect() }
       radio.requestInfo()
