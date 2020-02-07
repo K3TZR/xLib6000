@@ -659,7 +659,7 @@ public final class Slice  : NSObject, DynamicModel {
       } else {
         
         // does it exist?
-        if radio.slices[id] == nil {
+        if radio.slices[id] != nil {
           
           // YES, remove it
           radio.slices[id] = nil

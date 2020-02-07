@@ -173,7 +173,7 @@ public final class Xvtr : NSObject, DynamicModel {
     } else {
       
       // does it exist?
-      if radio.xvtrs[id] == nil {
+      if radio.xvtrs[id] != nil {
         
         // remove it
         radio.xvtrs[id] = nil

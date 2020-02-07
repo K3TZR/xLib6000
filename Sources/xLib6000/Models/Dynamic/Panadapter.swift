@@ -346,9 +346,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       } else {
         
         // does it exist?
-        if radio.panadapters[id] == nil {
+        if radio.panadapters[id] != nil {
           
-          // notify all observers
+          // YES, notify all observers
           NC.post(.panadapterWillBeRemoved, object: self as Any?)
         }
       }

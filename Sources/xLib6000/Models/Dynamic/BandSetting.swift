@@ -172,8 +172,8 @@ public final class BandSetting                : NSObject, DynamicModel {
       
       } else {
 
-        // YES, does it exist?
-        if radio.bandSettings[id] == nil {
+        // does it exist?
+        if radio.bandSettings[id] != nil {
           
           // YES, remove it
           radio.bandSettings[id] = nil

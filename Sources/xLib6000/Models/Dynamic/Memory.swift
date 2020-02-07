@@ -221,9 +221,9 @@ public final class Memory                   : NSObject, DynamicModel {
     } else {
       
       // does it exist?
-      if radio.memories[id] == nil {
+      if radio.memories[id] != nil {
         
-        // remove it
+        // YES, remove it
         radio.memories[id] = nil
         
         Log.sharedInstance.logMessage("Memory removed: id = \(id)", .debug, #function, #file, #line)

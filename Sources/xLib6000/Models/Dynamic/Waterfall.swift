@@ -194,7 +194,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       } else {
         
         // does it exist?
-        if radio.waterfalls[id] == nil {
+        if radio.waterfalls[id] != nil {
           
           // notify all observers
           NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[id] as Any?)
