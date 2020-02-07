@@ -111,32 +111,32 @@ public final class TxAudioStream : NSObject, DynamicModel {
     // get the Id
     if let id =  keyValues[0].key.streamId {
       
-      // is the Stream in use?
+      // is the object in use?
       if inUse {
         
-        // In use, does the object exist?
+        // YES, does it exist?
         if radio.txAudioStreams[id] == nil {
           
-          // NO, is the stream for this client?
+          // NO, is it for this client?
           if !isForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
           radio.txAudioStreams[id] = TxAudioStream(radio: radio, id: id)
         }
-        // pass the remaining key values for parsing (dropping the Id)
+        // pass the remaining key values for parsing
         radio.txAudioStreams[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
-        // NOT in use, does the object exist?
+        // does the object exist?
         if radio.txAudioStreams[id] != nil {
           
-          // remove the object
+          // YES, remove it
           radio.txAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage("TxAudioStream removed: id = \(id)", .debug, #function, #file, #line)
           
-          // YES, notify all observers
+          // notify all observers
           NC.post(.txAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
@@ -194,7 +194,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
                   
-      Log.sharedInstance.logMessage("TxAudioStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("TxAudioStream added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)

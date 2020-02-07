@@ -195,28 +195,44 @@ public final class UsbCable : NSObject, DynamicModel {
     
     // FIXME: Need other formats
     
-    // get the UsbCable Id
-    let usbCableId = keyValues[0].key
+    // get the Id
+    let id = keyValues[0].key
     
-    // does the UsbCable exist?
-    if radio.usbCables[usbCableId] == nil {
+    // is the object in use?
+    if inUse {
       
-      // NO, is it a valid cable type?
-      if let cableType = UsbCable.UsbCableType(rawValue: keyValues[1].value) {
+      // YES, does it exist?
+      if radio.usbCables[id] == nil {
+        // NO, is it a valid cable type?
+        if let cableType = UsbCable.UsbCableType(rawValue: keyValues[1].value) {
+          
+          // YES, create a new UsbCable & add it to the UsbCables collection
+          radio.usbCables[id] = UsbCable(radio: radio, id: id, cableType: cableType)
+          
+        } else {
+          
+          // NO, log the error and ignore it
+          Log.sharedInstance.logMessage("Invalid UsbCable Type: \(keyValues[1].value)", .warning, #function, #file, #line)
+          return
+        }
+      }
+      // pass the remaining key values to the Usb Cable for parsing
+      radio.usbCables[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+      
+    } else {
+      
+      // does the object exist?
+      if radio.usbCables[id] != nil {
         
-        // YES, create a new UsbCable & add it to the UsbCables collection
-        radio.usbCables[usbCableId] = UsbCable(radio: radio, id: usbCableId, cableType: cableType)
+        // YES, remove it
+        radio.usbCables[id] = nil
         
-      } else {
+        Log.sharedInstance.logMessage("UsbCable removed: id = \(id)", .debug, #function, #file, #line)
         
-        // NO, log the error and ignore it
-        Log.sharedInstance.logMessage("Invalid UsbCable Type: \(keyValues[1].value)", .warning, #function, #file, #line)
-
-        return
+        // notify all observers
+        NC.post(.usbCableHasBeenRemoved, object: id as Any?)
       }
     }
-    // pass the remaining key values to the Usb Cable for parsing (dropping the Id)
-    radio.usbCables[usbCableId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
   }
 
   // ------------------------------------------------------------------------------
@@ -309,7 +325,9 @@ public final class UsbCable : NSObject, DynamicModel {
       
       // YES, the Radio (hardware) has acknowledged this UsbCable
       _initialized = true
-      
+
+      _log("UsbCable added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.usbCableHasBeenAdded, object: self as Any?)
     }

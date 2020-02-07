@@ -66,6 +66,7 @@ public enum NotificationType : String {
 
   case meterHasBeenAdded
   case meterWillBeRemoved
+  case meterHasBeenRemoved
   case meterUpdated
   
   case micAudioStreamHasBeenAdded
@@ -80,7 +81,8 @@ public enum NotificationType : String {
 
   case panadapterHasBeenAdded
   case panadapterWillBeRemoved
-  
+  case panadapterHasBeenRemoved
+
   case profileHasBeenAdded
   case profileWillBeRemoved
   
@@ -102,7 +104,8 @@ public enum NotificationType : String {
   case sliceBecameActive
   case sliceHasBeenAdded
   case sliceWillBeRemoved
-  
+  case sliceHasBeenRemoved
+
   case sliceMeterHasBeenAdded
   case sliceMeterWillBeRemoved
 
@@ -115,7 +118,8 @@ public enum NotificationType : String {
   
   case tnfHasBeenAdded
   case tnfWillBeRemoved
-  
+  case tnfHasBeenRemoved
+
   case transmitHasBeenAdded
 
   case txAudioStreamHasBeenAdded
@@ -126,11 +130,14 @@ public enum NotificationType : String {
   
   case usbCableHasBeenAdded
   case usbCableWillBeRemoved
-  
+  case usbCableHasBeenRemoved
+
   case waterfallHasBeenAdded
   case waterfallWillBeRemoved
-  
+  case waterfallHasBeenRemoved
+
   case xvtrHasBeenAdded
   case xvtrWillBeRemoved
+  case xvtrHasBeenRemoved
 }
 

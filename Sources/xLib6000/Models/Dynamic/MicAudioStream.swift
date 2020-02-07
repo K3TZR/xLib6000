@@ -103,16 +103,16 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
-    //get the MicAudioStreamId (remove the "0x" prefix)
+    // get the Id
     if let id =  keyValues[0].key.streamId {
       
-      // is the Stream in use?
+      // is the object in use?
       if inUse {
         
-        // YES, does the object exist?
+        // YES, does it exist?
         if radio.micAudioStreams[id] == nil {
           
-          // NO, is this stream for this client?
+          // NO, is it for this client?
           if !isForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
@@ -123,10 +123,10 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
         
       } else {
         
-        // does the object exist?
+        // does it exist?
         if radio.micAudioStreams[id] != nil {
           
-          // remove the object
+          // YES, remove it
           radio.micAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage("MicAudioStream removed: id = \(id)", .debug, #function, #file, #line)

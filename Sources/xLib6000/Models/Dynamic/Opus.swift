@@ -128,18 +128,17 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
-    // get the Opus Id (without the "0x" prefix)
-    //        let opusId = String(keyValues[0].key.characters.dropFirst(2))
-    if let streamId =  keyValues[0].key.streamId {
+    // get the Id
+    if let id =  keyValues[0].key.streamId {
       
-      // does the Opus exist?
-      if  radio.opusStreams[streamId] == nil {
+      // does the object exist?
+      if  radio.opusStreams[id] == nil {
         
         // NO, create a new Opus & add it to the OpusStreams collection
-        radio.opusStreams[streamId] = Opus(radio: radio, id: streamId)
+        radio.opusStreams[id] = Opus(radio: radio, id: id)
       }
-      // pass the key values to Opus for parsing  (dropping the Id)
-      radio.opusStreams[streamId]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+      // pass the remaining values to Opus for parsing
+      radio.opusStreams[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
     }
   }
 
@@ -235,6 +234,8 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Opus
       _initialized = true
       
+      _log("Opus added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.opusRxHasBeenAdded, object: self as Any?)
     }

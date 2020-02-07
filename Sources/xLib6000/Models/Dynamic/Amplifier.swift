@@ -100,13 +100,13 @@ public final class Amplifier  : NSObject, DynamicModel {
     
     // TODO: verify
         
-    //get the AmplifierId (remove the "0x" prefix)
+    // get the Id
     let id = String(keyValues[0].key.dropFirst(2))
     
-    // is the Amplifier in use
+    // is the object in use
     if inUse {
       
-      // YES, does the Amplifier exist?
+      // YES, does it exist?
       if radio.amplifiers[id] == nil {
         
         // NO, create a new Amplifier & add it to the Amplifiers collection
@@ -117,13 +117,17 @@ public final class Amplifier  : NSObject, DynamicModel {
       
     } else {
       
-      // remove it
-      radio.amplifiers[id] = nil
-      
-      Log.sharedInstance.logMessage("Amplifier removed: id = \(id)", .debug, #function, #file, #line)
-
-      // NO, notify all observers
-      NC.post(.amplifierHasBeenRemoved, object: id as Any?)
+      // does it exist?
+      if radio.amplifiers[id] != nil {
+        
+        // YES, remove it
+        radio.amplifiers[id] = nil
+        
+        Log.sharedInstance.logMessage("Amplifier removed: id = \(id)", .debug, #function, #file, #line)
+        
+        // notify all observers
+        NC.post(.amplifierHasBeenRemoved, object: id as Any?)
+      }
     }
   }
 
@@ -180,7 +184,7 @@ public final class Amplifier  : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Amplifier
       _initialized = true
                   
-      Log.sharedInstance.logMessage("Amplifier added: id = \(id)", .debug, #function, #file, #line)
+      _log("Amplifier added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.amplifierHasBeenAdded, object: self as Any?)

@@ -102,30 +102,30 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_iq"> <"daxiq_channel", channel> <"pan", panStreamId> <"daxiq_rate", rate> <"client_handle", handle>
 
-    //get the Id
+    // get the Id
     if let id =  properties[0].key.streamId {
       
-      // is the AudioStream in use?
+      // is the object in use?
       if inUse {
         
-        // YES, does the object exist?
+        // YES, does it exist?
         if radio.daxIqStreams[id] == nil {
           
-          // NO, is this stream for this client?
+          // NO, is it for this client?
           if radio.version.isV3 { if !isForThisClient(properties) { return } }
           
           // create a new object & add it to the collection
           radio.daxIqStreams[id] = DaxIqStream(radio: radio, id: id)
         }
-        // pass the remaining key values for parsing (dropping the Id)
+        // pass the remaining key values for parsing
         radio.daxIqStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
         
       } else {
         
-        // does the object exist?
+        // does it exist?
         if radio.daxIqStreams[id] != nil {
           
-          // remove the object
+          // YES, remove it
           radio.daxIqStreams[id] = nil
           
           Log.sharedInstance.logMessage("DaxIqStream removed: id = \(id)", .debug, #function, #file, #line)
@@ -188,7 +188,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Stream
       _initialized = true
 
-      Log.sharedInstance.logMessage("DaxIqStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("DaxIqStream added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.daxIqStreamHasBeenAdded, object: self as Any?)

@@ -98,16 +98,16 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "remote_audio_tx"> <"compression", "1"|"0"> <"client_handle", handle> <"ip", value>
     
-    //get the Id
+    // get the Id
     if let id =  properties[0].key.streamId {
       
-      // is the Stream in use?
+      // is the object in use?
       if inUse {
         
-        // YES, does the object exist?
+        // YES, does it exist?
         if radio.remoteTxAudioStreams[id] == nil {
           
-          // NO, is this stream for this client?
+          // NO, is it for this client?
           if radio.version.isV3 { if !isForThisClient(properties) { return } }
           
           // create a new object & add it to the collection
@@ -118,10 +118,10 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
         
       } else {
         
-        // does the object exist?
+        // does it exist?
         if radio.remoteTxAudioStreams[id] != nil {
           
-          // remove the object
+          // YES, remove it
           radio.remoteTxAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage("RemoteTxAudioStream removed: id = \(id)", .debug, #function, #file, #line)
@@ -185,7 +185,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Opus
       _initialized = true
                   
-      Log.sharedInstance.logMessage("RemoteTxAudioStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("RemoteTxAudioStream added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.remoteTxAudioStreamHasBeenAdded, object: self as Any?)

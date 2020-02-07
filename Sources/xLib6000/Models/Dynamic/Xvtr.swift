@@ -155,28 +155,35 @@ public final class Xvtr : NSObject, DynamicModel {
     //      OR
     // Format: <index, > <"in_use", 0>
     
-    // get the Name
-    let name = keyValues[0].key
+    // get the id
+    let id = keyValues[0].key
     
     // isthe Xvtr in use?
     if inUse {
       
-      // YES, does the Xvtr exist?
-      if radio.xvtrs[name] == nil {
+      // YES, does the object exist?
+      if radio.xvtrs[id] == nil {
         
         // NO, create a new Xvtr & add it to the Xvtrs collection
-        radio.xvtrs[name] = Xvtr(radio: radio, id: name)
+        radio.xvtrs[id] = Xvtr(radio: radio, id: id)
       }
-      // pass the remaining key values to the Xvtr for parsing (dropping the Id)
-      radio.xvtrs[name]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+      // pass the remaining key values to the Xvtr for parsing
+      radio.xvtrs[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
       
     } else {
       
-      // NO, notify all observers
-      NC.post(.xvtrWillBeRemoved, object: radio.xvtrs[name] as Any?)
-      
-      // remove it
-      radio.xvtrs[name] = nil
+      // does it exist?
+      if radio.xvtrs[id] == nil {
+        
+        // remove it
+        radio.xvtrs[id] = nil
+        
+        Log.sharedInstance.logMessage("Xvtr removed: id = \(id)", .debug, #function, #file, #line)
+        
+        // notify all observers
+        NC.post(.xvtrHasBeenRemoved, object: id as Any?)
+        
+      }
     }
   }
   
@@ -222,6 +229,8 @@ public final class Xvtr : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Waterfall
       _initialized = true
       
+      _log("Xvtr added: id = \(id)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.xvtrHasBeenAdded, object: self as Any?)
     }

@@ -325,28 +325,40 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     //      OR
     // Format: <"pan", ""> <streamId, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
     
-    // get the streamId
-    if let id = keyValues[1].key.streamId {
-      
-      // is the Panadapter in use?
-      if inUse {
+      //get the Id
+      if let id =  keyValues[0].key.streamId {
         
-        // YES, does it exist?
-        if radio.panadapters[id] == nil {
+        // is the object in use?
+        if inUse {
           
-          // NO, Create a Panadapter & add it to the Panadapters collection
-          radio.panadapters[id] = Panadapter(radio: radio, id: id)
+          // YES, does it exist?
+          if radio.panadapters[id] == nil {
+            
+            // NO, is it for this client?
+            if !isForThisClient(keyValues) { return }
+            
+            // create a new object & add it to the collection
+            radio.panadapters[id] = Panadapter(radio: radio, id: id)
+          }
+          // pass the remaining key values for parsing
+          radio.panadapters[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+          
+        } else {
+          
+          // does it exist?
+          if radio.panadapters[id] != nil {
+            
+            // remove it
+            radio.panadapters[id] = nil
+            
+            Log.sharedInstance.logMessage("Panadapter removed: id = \(id)", .debug, #function, #file, #line)
+
+            // notify all observers
+            NC.post(.panadapterHasBeenRemoved, object: id as Any?)
+          }
         }
-        // pass the key values to the Panadapter for parsing (dropping the Type and Id)
-        radio.panadapters[id]!.parseProperties(radio, Array(keyValues.dropFirst(2)))
-        
-      } else {
-        
-        // NO, notify all observers
-        NC.post(.panadapterWillBeRemoved, object: radio.panadapters[id] as Any?)
       }
     }
-  }
 
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
@@ -462,10 +474,10 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Panadapter
       _initialized = true
       
+      _log("Panadapter added: id = \(id.hex) center = \(center.hzToMhz), bandwidth = \(bandwidth.hzToMhz)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.panadapterHasBeenAdded, object: self as Any?)
-      
-      _log("Panadapter added: id = \(id.hex) center = \(center.hzToMhz), bandwidth = \(bandwidth.hzToMhz)", .debug, #function, #file, #line)
     }
   }
   /// Remove this Panafall

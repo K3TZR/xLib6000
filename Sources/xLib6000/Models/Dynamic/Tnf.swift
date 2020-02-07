@@ -115,30 +115,34 @@ public final class Tnf : NSObject, DynamicModel {
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
 
-    // get the Tnf Id as a UInt
+    // get the Id
     if let id = keyValues[0].key.objectId {
       
-      // is the Tnf in use?
+      // is the object in use?
       if inUse {
         
-        // does the TNF exist?
+        // YES, does it exist?
         if radio.tnfs[id] == nil {
           
           // NO, create a new Tnf & add it to the Tnfs collection
           radio.tnfs[id] = Tnf(radio: radio, id: id)
         }
-        // pass the remaining key values to the Tnf for parsing (dropping the Id)
+        // pass the remaining key values to the Tnf for parsing
         radio.tnfs[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
-        // NO, notify all observers
-        NC.post(.tnfWillBeRemoved, object: radio.tnfs[id] as Any?)
-        
-        // remove it
-        radio.tnfs[id]  = nil
+        // does it exist?
+        if radio.tnfs[id] == nil {
+          
+          // remove it
+          radio.tnfs[id]  = nil
+          
+          Log.sharedInstance.logMessage("Tnf removed: id = \(id)", .debug, #function, #file, #line)
 
-        Log.sharedInstance.logMessage("Tnf removed: id = \(id)", .debug, #function, #file, #line)
+          // YES, notify all observers
+          NC.post(.tnfHasBeenRemoved, object: id as Any?)
+        }
       }
     }
   }
@@ -177,10 +181,10 @@ public final class Tnf : NSObject, DynamicModel {
         // YES, the Radio (hardware) has acknowledged this Tnf
         _initialized = true
         
+        _log("Tnf added: id = \(id)", .debug, #function, #file, #line)
+
         // notify all observers
         NC.post(.tnfHasBeenAdded, object: self as Any?)
-
-        _log("Tnf added: id = \(id)", .debug, #function, #file, #line)
       }
     }
   }

@@ -108,30 +108,30 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
-    //get the Audio StreamId
+    // get the Id
     if let id =  keyValues[0].key.streamId {
       
-      // is the AudioStream in use?
+      // is the object in use?
       if inUse {
         
-        // YES, does the object exist?
+        // YES, does it exist?
         if radio.audioStreams[id] == nil {
           
-          // NO, is this stream for this client?
+          // NO, is it for this client?
           if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
           
           // create a new object & add it to the collection
           radio.audioStreams[id] = AudioStream(radio: radio, id: id)
         }
-        // pass the remaining key values for parsing (dropping the Id)
+        // pass the remaining key values for parsing
         radio.audioStreams[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
       } else {
         
-        // does the object exist?
+        // does it exist?
         if radio.audioStreams[id] != nil {
           
-          // remove the object
+          // YES, remove it
           radio.audioStreams[id] = nil
           
           Log.sharedInstance.logMessage("AudioStream removed: id = \(id)", .debug, #function, #file, #line)
@@ -201,7 +201,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
             
-      Log.sharedInstance.logMessage("AudioStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("AudioStream added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.audioStreamHasBeenAdded, object: self as Any?)

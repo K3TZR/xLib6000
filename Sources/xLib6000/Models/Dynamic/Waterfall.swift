@@ -179,7 +179,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     // get the Id
     if let id = keyValues[1].key.streamId {
       
-      // is the Waterfall in use?
+      // is the object in use?
       if inUse {
         
         // YES, does it exist?
@@ -193,18 +193,25 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
         
       } else {
         
-        // notify all observers
-        NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[id] as Any?)
-        
-        // remove the associated Panadapter
-        radio.panadapters[radio.waterfalls[id]!.panadapterId] = nil
-        
-        Log.sharedInstance.logMessage("Panadapter removed: id = \(radio.waterfalls[id]!.panadapterId.hex)", .debug, #function, #file, #line)
+        // does it exist?
+        if radio.waterfalls[id] == nil {
+          
+          // remove the associated Panadapter
+          radio.panadapters[radio.waterfalls[id]!.panadapterId] = nil
 
-        // remove the Waterfall
-        radio.waterfalls[id] = nil
-        
-        Log.sharedInstance.logMessage("Waterfall removed: id = \(id.hex)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("Panadapter removed: id = \(radio.waterfalls[id]!.panadapterId.hex)", .debug, #function, #file, #line)
+          
+          // notify all observers
+          NC.post(.panadapterHasBeenRemoved, object: id as Any?)
+
+          // remove the Waterfall
+          radio.waterfalls[id] = nil
+          
+          Log.sharedInstance.logMessage("Waterfall removed: id = \(id.hex)", .debug, #function, #file, #line)
+
+          // notify all observers
+          NC.post(.waterfallHasBeenRemoved, object: id as Any?)
+        }
       }
     }
   }
@@ -252,10 +259,10 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Waterfall
       _initialized = true
       
+      _log("Waterfall added: id = \(id.hex)", .debug, #function, #file, #line)
+
       // notify all observers
       NC.post(.waterfallHasBeenAdded, object: self as Any?)
-
-      _log("Waterfall added: id = \(id.hex)", .debug, #function, #file, #line)
     }
   }
 

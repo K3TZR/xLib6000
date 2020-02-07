@@ -94,30 +94,30 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_tx"> <"client_handle", handle> <"dax_tx", isTransmitChannel>
     
-      //get the Id
+      // get the Id
       if let id =  properties[0].key.streamId {
         
-        // is the Stream in use?
+        // is the object in use?
         if inUse {
           
-          // YES, does the object exist?
+          // YES, does it exist?
           if radio.daxTxAudioStreams[id] == nil {
             
-            // NO, is this stream for this client?
+            // NO, is it for this client?
             if radio.version.isV3 { if !isForThisClient(properties) { return } }
             
             // create a new object & add it to the collection
             radio.daxTxAudioStreams[id] = DaxTxAudioStream(radio: radio, id: id)
           }
-          // pass the remaining key values for parsing (dropping the Id)
+          // pass the remaining key values for parsing
           radio.daxTxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
           
         } else {
           
-          // does the object exist?
+          // does it exist?
           if radio.daxTxAudioStreams[id] != nil {
             
-            // remove the object
+            // YES, remove it
             radio.daxTxAudioStreams[id] = nil
             
             Log.sharedInstance.logMessage("DaxTxAudioStream removed: id = \(id)", .debug, #function, #file, #line)
@@ -178,7 +178,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
-      Log.sharedInstance.logMessage("DaxTxAudioStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("DaxTxAudioStream added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.daxTxAudioStreamHasBeenAdded, object: self as Any?)

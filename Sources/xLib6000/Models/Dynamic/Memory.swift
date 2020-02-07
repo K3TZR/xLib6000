@@ -199,33 +199,38 @@ public final class Memory                   : NSObject, DynamicModel {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
-    var memory: Memory?
     
-    // get the Memory Id
+    // get the Id
     let id = keyValues[0].key
     
-    // is the Memory in use?
+    // is the object in use?
     if inUse {
       
       // YES, does it exist?
-      memory = radio.memories[id]
-      if memory == nil {
+      if radio.memories[id] == nil {
         
-        // NO, create a new Memory & add it to the Memories collection
-        memory = Memory(radio: radio, id: id)
-        radio.memories[id] = memory
+        // NO, is it for this client?
+        if !isForThisClient(keyValues) { return }
+        
+        // create a new object & add it to the collection
+        radio.memories[id] = Memory(radio: radio, id: id)
       }
-      // pass the key values to the Memory for parsing (dropping the Id)
-      memory!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+      // pass the key values to the Memory for parsing
+      radio.memories[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
       
     } else {
-      // remove it
-      radio.memories[id] = nil
-
-      Log.sharedInstance.logMessage("Memory removed: id = \(id)", .debug, #function, #file, #line)
-
-      // NO, notify all observers
-      NC.post(.memoryHasBeenRemoved, object: radio.memories[id] as Any?)
+      
+      // does it exist?
+      if radio.memories[id] == nil {
+        
+        // remove it
+        radio.memories[id] = nil
+        
+        Log.sharedInstance.logMessage("Memory removed: id = \(id)", .debug, #function, #file, #line)
+        
+        // NO, notify all observers
+        NC.post(.memoryHasBeenRemoved, object: radio.memories[id] as Any?)
+      }
     }
   }
 
@@ -371,7 +376,7 @@ public final class Memory                   : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Memory
       _initialized = true
                   
-      Log.sharedInstance.logMessage("Memory added: id = \(id)", .debug, #function, #file, #line)
+      _log("Memory added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.memoryHasBeenAdded, object: self as Any?)
