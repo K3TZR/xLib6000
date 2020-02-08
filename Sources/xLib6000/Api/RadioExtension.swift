@@ -158,6 +158,23 @@ extension Radio {
   }
   
   // ----------------------------------------------------------------------------
+  // MARK: - Binding to gui clients methods
+  
+  /// Binds non-gui client (user of the API) to gui client
+  ///
+  /// - Parameters:
+  ///   - clientId:           GUI client ID (UUID as string)
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func bindGuiClient(_ clientId: String, callback:  ReplyHandler? = nil) {
+    
+    if Api.sharedInstance.isGui { return }
+    
+    sendCommand("client bind client_id=" + clientId, replyTo: callback)
+    update(self, &_boundClientId, to: clientId, signal: \.boundClientId)
+  }
+  
+  // ----------------------------------------------------------------------------
   // MARK: - IQ Stream methods
   
   /// Create an IQ Stream

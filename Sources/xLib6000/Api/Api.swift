@@ -34,6 +34,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   static        let kTcpTimeout             = 0.5     // seconds
   static        let kNotInUse               = "in_use=0"
   static        let kRemoved                = "removed"
+  static        let kDisconnected           = "disconnected"
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -95,7 +96,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _clientId                     : UUID?
+  private var _clientId                     : String?
   private var _clientStation                = ""
   private var _lowBandwidthConnect          = false
   private var _pinger                       : Pinger?
@@ -193,7 +194,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public func connect(_ discoveryPacket: DiscoveryStruct,
                       clientStation: String = "",
                       programName: String,
-                      clientId: UUID? = nil,
+                      clientId: String? = nil,
                       isGui: Bool = true,
                       isWan: Bool = false,
                       wanHandle: String = "") -> Bool {
@@ -351,7 +352,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       if isGui {
 
         if radio.version.isV3 && _clientId != nil   {
-          send("client gui " + _clientId!.uuidString)
+          send("client gui " + _clientId!)
         } else {
           send("client gui")
         }
@@ -359,7 +360,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       send("client program " + _programName)
       if radio.version.isV3                                 { send("client station " + _clientStation) }
-      if radio.version.isV3 && !isGui && _clientId != nil  { send("client bind client_id=" + _clientId!.uuidString) }
+      if radio.version.isV3 && !isGui && _clientId != nil  { radio.bindGuiClient(_clientId!) }
 
       if _lowBandwidthConnect           { radio.requestLowBandwidthConnect() }
       radio.requestInfo()
