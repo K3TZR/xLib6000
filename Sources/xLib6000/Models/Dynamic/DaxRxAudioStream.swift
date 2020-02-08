@@ -135,7 +135,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
           // YES, remove the object
           radio.daxRxAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage("DaxRxAudioStream removed: id = \(id)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("DaxRxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           
           // notify all observers
           NC.post(.daxRxAudioStreamHasBeenRemoved, object: id as Any?)
