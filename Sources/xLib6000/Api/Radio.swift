@@ -1050,7 +1050,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     switch token {
       
     case .amplifier:      Amplifier.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
-    case .audioStream:    AudioStream.parseStatus(self, remainder.keyValuesArray())
+    case .audioStream:    AudioStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
     case .atu:            atu.parseProperties(self, remainder.keyValuesArray() )
     case .client:         parseClient(self, remainder.keyValuesArray(), !remainder.contains(Api.kDisconnected))
     case .cwx:            cwx.parseProperties(self, remainder.fix().keyValuesArray() )
