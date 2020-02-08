@@ -421,17 +421,17 @@ public struct Version {
   public var longString       : String  { "\(major).\(minor).\(patch).\(build)" }
   public var string           : String  { "\(major).\(minor).\(patch)" }
   public var isV3m            : Bool    { major >= 3 }
-  public var isV3             : Bool    { major >= 2 && minor >= 5 || major >= 3 }
+  public var isV3             : Bool    { major == 2 && minor >= 5 || major >= 3 }
   public var isGreaterThan22  : Bool    { major >= 2 && minor >= 2 }
-  public var isV2             : Bool    { major >= 2 && minor < 5 }
+  public var isV2             : Bool    { major == 2 && minor < 5 }
   public var isV1             : Bool    { major == 1 }
 
   public var group            : Versions {
-    if major == 1 {
+    if isV1 {
       return .v1
-    } else if major >= 2 && minor < 5 {
+    } else if isV2 {
       return .v2
-    } else if major >= 2 && minor >= 5 {
+    } else if isV3 {
       return .v3
     }
     return .v3m
