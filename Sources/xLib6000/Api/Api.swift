@@ -34,6 +34,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   static        let kTcpTimeout             = 0.5     // seconds
   static        let kNotInUse               = "in_use=0"
   static        let kRemoved                = "removed"
+  static        let kDisconnected           = "disconnected"
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

@@ -806,17 +806,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
-  private func removeGuiClient(with handle: Handle) {
+  private func removeGuiClient(with handle: Handle) -> Bool {
     
     // find the GuiClient
     for (i, guiClient) in discoveryPacket.guiClients.enumerated() {
       if guiClient.handle == handle {
         discoveryPacket.guiClients.remove(at: i)
-        return
+        return true
       }
     }
     // none found
-    return
+    return false
   }
   private func parseV3Connection(properties: KeyValuesArray, handle: Handle) {
     var clientId : String?
@@ -846,7 +846,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         program = property.value
         
       case .station:
-        station = property.value
+        station = property.value.replacingOccurrences(of: "\u{007f}", with: " ")
       }
     }
     
@@ -934,11 +934,13 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       case .wanValidationFailed:
         wanValidationFailed = property.value.bValue
       }
-      if duplicateClientId || forced || wanValidationFailed {
+      if handle == _api.connectionHandle && (duplicateClientId || forced || wanValidationFailed) {
         _log("Disconnected with: \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , .warning, #function, #file, #line)
+        NC.post(.clientDidDisconnect, object: handle as Any?)
       }
-      removeGuiClient(with: handle)
-      NC.post(.guiClientHasBeenRemoved, object: handle as Any?)
+      if removeGuiClient(with: handle) {
+        NC.post(.guiClientHasBeenRemoved, object: handle as Any?)
+      }
     }
   }
   /// Parse a Message.
@@ -1050,7 +1052,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .amplifier:      Amplifier.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .audioStream:    AudioStream.parseStatus(self, remainder.keyValuesArray())
     case .atu:            atu.parseProperties(self, remainder.keyValuesArray() )
-    case .client:         parseClient(self, remainder.keyValuesArray())
+    case .client:         parseClient(self, remainder.keyValuesArray(), !remainder.contains(Api.kDisconnected))
     case .cwx:            cwx.parseProperties(self, remainder.fix().keyValuesArray() )
     case .daxiq:          IqStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
     case .display:        parseDisplay(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
@@ -1102,45 +1104,88 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///
   private func parseClient(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     
-    guard properties.count >= 2 else {
-      _log("Invalid client status", .warning, #function, #file,  #line)
+    guard properties.count >= 3 else {
+      _log("Invalid client status", .warning, #function, #file, #line)
       return
     }
     
     // is there a valid handle"
     if let handle = properties[0].key.handle {
       
-      // is it In Use?
-      if inUse {
+      if version.isV3 {
         
-        // IN USE, i.e. connected, is it V3 API?
-        if version.isV3 {
-          // V3, is the status for a Gui-client?, otherwise ignore it
-          if properties.count > 2 {
-            // YES, it's a Gui-client status
-            parseV3Connection(properties: properties, handle: handle)
-          }
-        } else {
-          // pre V3, guard that the message has my API Handle
-          guard _api.connectionHandle! == properties[0].key.handle else { return }
+        switch properties[1].key {
           
-          // YES, Finish the UDP initialization & set the API state
-          _api.clientConnected(radio)
+        case "connected":
+          parseV3Connection(properties: properties, handle: handle)
+        case "disconnected":
+          parseV3Disconnection(properties: properties, handle: handle)
+        default:
+          break
         }
         
       } else {
-        // NOT IN USE, i.e. disconnected
-        if version.isV3 {
-          // V3 API
-          parseV3Disconnection(properties: properties, handle: handle)
-          removeGuiClient(with: handle)
-          NC.post(.guiClientHasBeenRemoved, object: handle as Any?)
+        // pre V3
+        // is it In Use?
+        if inUse {
+          
+          // guard that the message has my API Handle
+          guard _api.connectionHandle! == handle else { return }
+          
+          // YES, Finish the UDP initialization & set the API state
+          _api.clientConnected(radio)
           
         } else {
           // pre V3 API
+          if properties[2].key == "forced" {
+            // FIXME: Handle the disconnect?
+            // NO, Disconnected
+            _log("Disconnect, forced = \(properties[2].value)", .info, #function, #file, #line)
+          }
         }
       }
     }
+    
+//    original version
+//    guard properties.count >= 2 else {
+//      _log("Invalid client status", .warning, #function, #file,  #line)
+//      return
+//    }
+//
+//    // is there a valid handle"
+//    if let handle = properties[0].key.handle {
+//
+//      // is it In Use?
+//      if inUse {
+//
+//        // IN USE, i.e. connected, is it V3 API?
+//        if version.isV3 {
+//          // V3, is the status for a Gui-client?, otherwise ignore it
+//          if properties.count > 2 {
+//            // YES, it's a Gui-client status
+//            parseV3Connection(properties: properties, handle: handle)
+//          }
+//        } else {
+//          // pre V3, guard that the message has my API Handle
+//          guard _api.connectionHandle! == properties[0].key.handle else { return }
+//
+//          // YES, Finish the UDP initialization & set the API state
+//          _api.clientConnected(radio)
+//        }
+//
+//      } else {
+//        // NOT IN USE, i.e. disconnected
+//        if version.isV3 {
+//          // V3 API
+//          parseV3Disconnection(properties: properties, handle: handle)
+//          removeGuiClient(with: handle)
+//          NC.post(.guiClientHasBeenRemoved, object: handle as Any?)
+//
+//        } else {
+//          // pre V3 API
+//        }
+//      }
+//    }
   }
   /// Parse a Display status message
   ///   Format:

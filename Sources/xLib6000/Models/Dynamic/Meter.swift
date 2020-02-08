@@ -77,6 +77,7 @@ public final class Meter : NSObject, DynamicModel {
     case tx
     case slice      = "slc"
     case radio      = "rad"
+    case amplifier  = "amp"
   }
   public enum Units : String {
     case none
