@@ -154,6 +154,15 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertTrue(radio.slices.count == 0, "Slice(s) NOT removed")
   }
 
+  func removeAllAudioStreams(radio: Radio) {
+
+    for (_, stream) in radio.audioStreams {
+      stream.remove()
+    }
+    sleep(1)
+    XCTAssertTrue(radio.audioStreams.count == 0, "AudioStream(s) NOT removed")
+  }
+
  // MARK: ---- Amplifier ----
   
   ///   Format:  <Id, > <"ant", ant> <"ip", ip> <"model", model> <"port", port> <"serial_num", serialNumber>
@@ -212,8 +221,8 @@ final class xLib6000Tests: XCTestCase {
     let radio = discoverRadio()
     guard radio != nil else { return }
     
-    switch radio!.version.group {
-    case .v1, .v2:
+    if radio!.version.isV1 || radio!.version.isV2 {
+      
       AudioStream.parseStatus(radio!, audioStreamStatus.keyValuesArray(), true)
       
       if let audioStream = radio!.audioStreams["0x23456789".streamId!] {
@@ -245,14 +254,56 @@ final class xLib6000Tests: XCTestCase {
       } else {
         XCTAssertTrue(false, "Failed to create AudioStream")
       }
-    case .v3, .v3m:
-      // test not applicable
-      break
+      
+    } else {
+      // V3 - test not applicable
     }
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
 
+  func testAudioStreamCreateRemove() {
+    // find a radio & connect
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV1 || radio!.version.isV2 {
+      // remove any AudioStreams
+      removeAllAudioStreams(radio: radio!)
+      
+      // ask for a new AudioStream
+      radio!.requestAudioStream( "2")
+      sleep(1)
+      
+      // verify AudioStream added
+      XCTAssertNotEqual(radio!.audioStreams.count, 0, "No AudioStream")
+      if let stream = radio!.audioStreams[0] {
+        
+        // save params
+        
+        // remove any AudioStreams
+        removeAllAudioStreams(radio: radio!)
+        
+        // ask for a new AudioStream
+        radio!.requestAudioStream( "2")
+        sleep(1)
+        
+        // verify AudioStream added
+        XCTAssertNotEqual(radio!.audioStreams.count, 0, "No AudioStream")
+        if let stream = radio!.audioStreams[0] {
+          
+          // check params
+          
+        }
+      }
+      // remove any AudioStreams
+      removeAllAudioStreams(radio: radio!)
+    }
+
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+  
   // MARK: ---- Rx Equalizer ----
    
   private var equalizerRxStatus = "rxsc mode=0 63Hz=0 125Hz=10 250Hz=20 500Hz=30 1000Hz=-10 2000Hz=-20 4000Hz=-30 8000Hz=-40"
@@ -311,7 +362,7 @@ final class xLib6000Tests: XCTestCase {
 
   // MARK: ---- Panadapter ----
    
-  private let panadapterStatus = "pan 0x40000000 wnb=0 wnb_level=92 wnb_updating=0 band_zoom=0 segment_zoom=0 x_pixels=50 y_pixels=0 center=14.100000 bandwidth=0.200000 min_dbm=-125.00 max_dbm=-40.00 fps=25 average=0 weighted_average=0 rfgain=0 rxant=ANT1 wide=0 loopa=0 loopb=0 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 waterfall=42000000 min_bw=0.004920 max_bw=14.745601 xvtr= pre= ant_list=ANT1,ANT2,RX_A,XVTR"
+  private let panadapterStatus = "pan 0x40000000 wnb=0 wnb_level=92 wnb_updating=0 band_zoom=0 segment_zoom=0 x_pixels=50 y_pixels=100 center=14.100000 bandwidth=0.200000 min_dbm=-125.00 max_dbm=-40.00 fps=25 average=23 weighted_average=0 rfgain=50 rxant=ANT1 wide=0 loopa=0 loopb=1 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 waterfall=42000000 min_bw=0.004920 max_bw=14.745601 xvtr= pre= ant_list=ANT1,ANT2,RX_A,XVTR"
   func testPanadapterParse() {
     
     let radio = discoverRadio()
@@ -319,94 +370,255 @@ final class xLib6000Tests: XCTestCase {
     
     removeAllPanadapters(radio: radio!)
     
-    let id: StreamId = panadapterStatus.keyValuesArray()[1].key.streamId!
     Panadapter.parseStatus(radio!, panadapterStatus.keyValuesArray(), true)
-
-    let panadapter = radio!.panadapters[id]
-    XCTAssertNotNil(panadapter, "Failed to create Panadapter")
-    XCTAssertEqual(panadapter?.wnbLevel, 92)
-    XCTAssertEqual(panadapter?.wnbUpdating, false)
-    XCTAssertEqual(panadapter?.bandZoomEnabled, false)
-    XCTAssertEqual(panadapter?.segmentZoomEnabled, false)
-    XCTAssertEqual(panadapter?.xPixels, 0.0)
-    XCTAssertEqual(panadapter?.yPixels, 0.0)
-    XCTAssertEqual(panadapter?.center, 14_100_000)
-    XCTAssertEqual(panadapter?.bandwidth, 200_000)
-    XCTAssertEqual(panadapter?.minDbm, -125.0)
-    XCTAssertEqual(panadapter?.maxDbm, -40.0)
-    XCTAssertEqual(panadapter?.fps, 25)
-    XCTAssertEqual(panadapter?.average, 0)
-    XCTAssertEqual(panadapter?.weightedAverageEnabled, false)
-    XCTAssertEqual(panadapter?.rfGain, 0)
-    XCTAssertEqual(panadapter?.rxAnt, "ANT1")
-    XCTAssertEqual(panadapter?.wide, false)
-    XCTAssertEqual(panadapter?.loopAEnabled, false)
-    XCTAssertEqual(panadapter?.loopBEnabled, false)
-    XCTAssertEqual(panadapter?.band, "20")
-    XCTAssertEqual(panadapter?.daxIqChannel, 0)
-    XCTAssertEqual(panadapter?.waterfallId, "0x42000000".streamId!)
-    XCTAssertEqual(panadapter?.minBw, 4_920)
-    XCTAssertEqual(panadapter?.maxBw, 14_745_601)
-    XCTAssertEqual(panadapter?.antList, ["ANT1","ANT2","RX_A","XVTR"])
     
+    if let panadapter = radio!.panadapters["0x40000000".streamId!] {
+      XCTAssertNotNil(panadapter, "Failed to create Panadapter")
+      XCTAssertEqual(panadapter.wnbLevel, 92)
+      XCTAssertEqual(panadapter.wnbUpdating, false)
+      XCTAssertEqual(panadapter.bandZoomEnabled, false)
+      XCTAssertEqual(panadapter.segmentZoomEnabled, false)
+      XCTAssertEqual(panadapter.xPixels, 0)
+      XCTAssertEqual(panadapter.yPixels, 0)
+      XCTAssertEqual(panadapter.center, 14_100_000)
+      XCTAssertEqual(panadapter.bandwidth, 200_000)
+      XCTAssertEqual(panadapter.minDbm, -125.00)
+      XCTAssertEqual(panadapter.maxDbm, -40.00)
+      XCTAssertEqual(panadapter.fps, 25)
+      XCTAssertEqual(panadapter.average, 23)
+      XCTAssertEqual(panadapter.weightedAverageEnabled, false)
+      XCTAssertEqual(panadapter.rfGain, 50)
+      XCTAssertEqual(panadapter.rxAnt, "ANT1")
+      XCTAssertEqual(panadapter.wide, false)
+      XCTAssertEqual(panadapter.loopAEnabled, false)
+      XCTAssertEqual(panadapter.loopBEnabled, true)
+      XCTAssertEqual(panadapter.band, "20")
+      XCTAssertEqual(panadapter.daxIqChannel, 0)
+      XCTAssertEqual(panadapter.waterfallId, "0x42000000".streamId!)
+      XCTAssertEqual(panadapter.minBw, 4_920)
+      XCTAssertEqual(panadapter.maxBw, 14_745_601)
+      XCTAssertEqual(panadapter.antList, ["ANT1","ANT2","RX_A","XVTR"])
+    }
+    removeAllPanadapters(radio: radio!)
+
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
 
   func testPanadapterCreateRemove() {
-    // find a radio & connect
+    
     let radio = discoverRadio()
     guard radio != nil else { return }
     
-    // remove any panadapters & slices
-    removeAllPanadapters(radio: radio!)
-    
-    // ask for a new panadapter
-    radio!.requestPanadapter(frequency: 7_250_000)
-    sleep(1)
-    
-    // verify panadapter added
-    XCTAssertNotEqual(radio!.panadapters.count, 0, "No Panadapter")
-    if let panadapter = radio!.panadapters[0] {
-      
-      // save panadapter params
-      let center = panadapter.center
-      let bandwidth = panadapter.bandwidth
-      
-      // verify slice added
-      XCTAssertNotEqual(radio!.slices.count, 0, "No Slice")
-      
-      // save slice params
-      let sliceFrequency = radio!.slices[0]!.frequency
+    if radio!.version.isV1 || radio!.version.isV2 {
 
-      // remove any panadapters & slices
       removeAllPanadapters(radio: radio!)
-      
-      // ask for a new panadapter
-      radio!.requestPanadapter(frequency: 7_250_000)
+      radio!.requestPanadapter(frequency: 15_000_000)
       sleep(1)
       
-      // verify panadapter added
+      // verify added
       XCTAssertNotEqual(radio!.panadapters.count, 0, "No Panadapter")
-      if let panadapter2 = radio!.panadapters[0] {
+      if let panadapter = radio!.panadapters[0] {
         
-        // check panadapter params
-        XCTAssertEqual(panadapter2.center, center, "Center incorrect")
-        XCTAssertEqual(panadapter2.bandwidth, bandwidth, "Bandwidth incorrect")
-        
-        // verify slice added
-        XCTAssertNotEqual(radio!.slices.count, 0, "No Slice")
+        // save params
+        let wnbLevel = panadapter.wnbLevel
+        let wnbUpdating = panadapter.wnbUpdating
+        let bandZoomEnabled = panadapter.bandZoomEnabled
+        let segmentZoomEnabled = panadapter.segmentZoomEnabled
+        let xPixels = panadapter.xPixels
+        let yPixels = panadapter.yPixels
+        let center = panadapter.center
+        let bandwidth = panadapter.bandwidth
+        let minDbm = panadapter.minDbm
+        let maxDbm = panadapter.maxDbm
+        let fps = panadapter.fps
+        let average = panadapter.average
+        let weightedAverageEnabled = panadapter.weightedAverageEnabled
+        let rfGain = panadapter.rfGain
+        let rxAnt = panadapter.rxAnt
+        let wide = panadapter.wide
+        let loopAEnabled = panadapter.loopAEnabled
+        let loopBEnabled = panadapter.loopBEnabled
+        let band = panadapter.band
+        let daxIqChannel = panadapter.daxIqChannel
+        let waterfallId = panadapter.waterfallId
+        let minBw = panadapter.minBw
+        let maxBw = panadapter.maxBw
+        let antList = panadapter.antList
 
-        // check slice params
-        XCTAssertEqual(radio!.slices[0]!.frequency, sliceFrequency, "Slice frequency incorrect")
+        removeAllPanadapters(radio: radio!)
+        
+        // ask for newm
+        radio!.requestPanadapter(frequency: 15_000_000)
+        sleep(1)
+        
+        // verify added
+        XCTAssertNotEqual(radio!.panadapters.count, 0, "No Panadapter")
+        if let panadapter = radio!.panadapters[0] {
+          
+          // check params
+          XCTAssertEqual(panadapter.wnbLevel, wnbLevel)
+          XCTAssertEqual(panadapter.wnbUpdating, wnbUpdating)
+          XCTAssertEqual(panadapter.bandZoomEnabled, bandZoomEnabled)
+          XCTAssertEqual(panadapter.segmentZoomEnabled, segmentZoomEnabled)
+          XCTAssertEqual(panadapter.xPixels, xPixels)
+          XCTAssertEqual(panadapter.yPixels, yPixels)
+          XCTAssertEqual(panadapter.center, center)
+          XCTAssertEqual(panadapter.bandwidth, bandwidth)
+          XCTAssertEqual(panadapter.minDbm, minDbm)
+          XCTAssertEqual(panadapter.maxDbm, maxDbm)
+          XCTAssertEqual(panadapter.fps, fps)
+          XCTAssertEqual(panadapter.average, average)
+          XCTAssertEqual(panadapter.weightedAverageEnabled, weightedAverageEnabled)
+          XCTAssertEqual(panadapter.rfGain, rfGain)
+          XCTAssertEqual(panadapter.rxAnt, rxAnt)
+          XCTAssertEqual(panadapter.wide, wide)
+          XCTAssertEqual(panadapter.loopAEnabled, loopAEnabled)
+          XCTAssertEqual(panadapter.loopBEnabled, loopBEnabled)
+          XCTAssertEqual(panadapter.band, band)
+          XCTAssertEqual(panadapter.daxIqChannel, daxIqChannel)
+          XCTAssertEqual(panadapter.waterfallId, waterfallId)
+          XCTAssertEqual(panadapter.minBw, minBw)
+          XCTAssertEqual(panadapter.maxBw, maxBw)
+          XCTAssertEqual(panadapter.antList, antList)
+        }
       }
-    }
-    // remove any panadapters & slices
-    removeAllPanadapters(radio: radio!)
+      removeAllPanadapters(radio: radio!)
     
+    } else if radio!.version.isV3 {
+      removeAllPanadapters(radio: radio!)
+      radio!.requestPanadapter(frequency: 15_000_000)
+      sleep(1)
+      
+      // verify added
+      XCTAssertNotEqual(radio!.panadapters.count, 0, "No Panadapter")
+      if let panadapter = radio!.panadapters[0] {
+        
+        // save params
+        let clientHandle = panadapter.clientHandle
+        let wnbLevel = panadapter.wnbLevel
+        let wnbUpdating = panadapter.wnbUpdating
+        let bandZoomEnabled = panadapter.bandZoomEnabled
+        let segmentZoomEnabled = panadapter.segmentZoomEnabled
+        let xPixels = panadapter.xPixels
+        let yPixels = panadapter.yPixels
+        let center = panadapter.center
+        let bandwidth = panadapter.bandwidth
+        let minDbm = panadapter.minDbm
+        let maxDbm = panadapter.maxDbm
+        let fps = panadapter.fps
+        let average = panadapter.average
+        let weightedAverageEnabled = panadapter.weightedAverageEnabled
+        let rfGain = panadapter.rfGain
+        let rxAnt = panadapter.rxAnt
+        let wide = panadapter.wide
+        let loopAEnabled = panadapter.loopAEnabled
+        let loopBEnabled = panadapter.loopBEnabled
+        let band = panadapter.band
+        let daxIqChannel = panadapter.daxIqChannel
+        let waterfallId = panadapter.waterfallId
+        let minBw = panadapter.minBw
+        let maxBw = panadapter.maxBw
+        let antList = panadapter.antList
+        
+        removeAllPanadapters(radio: radio!)
+        
+        // ask for newm
+        radio!.requestPanadapter(frequency: 15_000_000)
+        sleep(1)
+        
+        // verify added
+        XCTAssertNotEqual(radio!.panadapters.count, 0, "No Panadapter")
+        if let panadapter = radio!.panadapters[0] {
+          
+          // check params
+          XCTAssertEqual(panadapter.clientHandle, clientHandle)
+          XCTAssertEqual(panadapter.wnbLevel, wnbLevel)
+          XCTAssertEqual(panadapter.wnbUpdating, wnbUpdating)
+          XCTAssertEqual(panadapter.bandZoomEnabled, bandZoomEnabled)
+          XCTAssertEqual(panadapter.segmentZoomEnabled, segmentZoomEnabled)
+          XCTAssertEqual(panadapter.xPixels, xPixels)
+          XCTAssertEqual(panadapter.yPixels, yPixels)
+          XCTAssertEqual(panadapter.center, center)
+          XCTAssertEqual(panadapter.bandwidth, bandwidth)
+          XCTAssertEqual(panadapter.minDbm, minDbm)
+          XCTAssertEqual(panadapter.maxDbm, maxDbm)
+          XCTAssertEqual(panadapter.fps, fps)
+          XCTAssertEqual(panadapter.average, average)
+          XCTAssertEqual(panadapter.weightedAverageEnabled, weightedAverageEnabled)
+          XCTAssertEqual(panadapter.rfGain, rfGain)
+          XCTAssertEqual(panadapter.rxAnt, rxAnt)
+          XCTAssertEqual(panadapter.wide, wide)
+          XCTAssertEqual(panadapter.loopAEnabled, loopAEnabled)
+          XCTAssertEqual(panadapter.loopBEnabled, loopBEnabled)
+          XCTAssertEqual(panadapter.band, band)
+          XCTAssertEqual(panadapter.daxIqChannel, daxIqChannel)
+          XCTAssertEqual(panadapter.waterfallId, waterfallId)
+          XCTAssertEqual(panadapter.minBw, minBw)
+          XCTAssertEqual(panadapter.maxBw, maxBw)
+          XCTAssertEqual(panadapter.antList, antList)
+        }
+      }
+      removeAllPanadapters(radio: radio!)
+    }
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
+
+//  func testPanadapterCreateRemove() {
+//    // find a radio & connect
+//    let radio = discoverRadio()
+//    guard radio != nil else { return }
+//
+//    // remove any panadapters & slices
+//    removeAllPanadapters(radio: radio!)
+//
+//    // ask for a new panadapter
+//    radio!.requestPanadapter(frequency: 7_250_000)
+//    sleep(1)
+//
+//    // verify panadapter added
+//    XCTAssertNotEqual(radio!.panadapters.count, 0, "No Panadapter")
+//    if let panadapter = radio!.panadapters[0] {
+//
+//      // save panadapter params
+//      let center = panadapter.center
+//      let bandwidth = panadapter.bandwidth
+//
+//      // verify slice added
+//      XCTAssertNotEqual(radio!.slices.count, 0, "No Slice")
+//
+//      // save slice params
+//      let sliceFrequency = radio!.slices[0]!.frequency
+//
+//      // remove any panadapters & slices
+//      removeAllPanadapters(radio: radio!)
+//
+//      // ask for a new panadapter
+//      radio!.requestPanadapter(frequency: 7_250_000)
+//      sleep(1)
+//
+//      // verify panadapter added
+//      XCTAssertNotEqual(radio!.panadapters.count, 0, "No Panadapter")
+//      if let panadapter2 = radio!.panadapters[0] {
+//
+//        // check panadapter params
+//        XCTAssertEqual(panadapter2.center, center, "Center incorrect")
+//        XCTAssertEqual(panadapter2.bandwidth, bandwidth, "Bandwidth incorrect")
+//
+//        // verify slice added
+//        XCTAssertNotEqual(radio!.slices.count, 0, "No Slice")
+//
+//        // check slice params
+//        XCTAssertEqual(radio!.slices[0]!.frequency, sliceFrequency, "Slice frequency incorrect")
+//      }
+//    }
+//    // remove any panadapters & slices
+//    removeAllPanadapters(radio: radio!)
+//
+//    // disconnect the radio
+//    Api.sharedInstance.disconnect()
+//  }
 
   // MARK: ---- Tnf ----
    
