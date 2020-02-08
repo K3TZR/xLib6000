@@ -109,7 +109,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
     // get the Id
-    if let id =  keyValues[0].key.streamId {
+    if let id = keyValues[0].key.streamId {
       
       // is the object in use?
       if inUse {
@@ -117,10 +117,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
         // YES, does it exist?
         if radio.audioStreams[id] == nil {
           
-          // NO, is it for this client?
-          if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
-          
-          // create a new object & add it to the collection
+          // No, create a new object & add it to the collection
           radio.audioStreams[id] = AudioStream(radio: radio, id: id)
         }
         // pass the remaining key values for parsing
@@ -134,7 +131,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
           // YES, remove it
           radio.audioStreams[id] = nil
           
-          Log.sharedInstance.logMessage("AudioStream removed: id = \(id)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("AudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
 
           // notify all observers
           NC.post(.audioStreamHasBeenRemoved, object: id as Any?)

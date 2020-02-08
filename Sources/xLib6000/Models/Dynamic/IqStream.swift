@@ -128,9 +128,6 @@ public final class IqStream : NSObject, DynamicModelWithStream {
         // YES, does it exist?
         if radio.iqStreams[id] == nil {
           
-          // NO, is it for this client?
-          if !isForThisClient(keyValues) { return }
-          
           // create a new object & add it to the collection
           radio.iqStreams[id] = IqStream(radio: radio, id: id)
         }
@@ -145,7 +142,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
           // YES, remove the object
           radio.iqStreams[id] = nil
           
-          Log.sharedInstance.logMessage("IqStream removed: id = \(id)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("IqStream removed: id = \(id.hex)", .debug, #function, #file, #line)
 
           // notify all observers
           NC.post(.iqStreamHasBeenRemoved, object: id as Any?)
