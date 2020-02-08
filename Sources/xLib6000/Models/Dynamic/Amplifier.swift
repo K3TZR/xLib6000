@@ -198,7 +198,7 @@ public final class Amplifier  : NSObject, DynamicModel {
     
     // TODO: DOES NOT WORK
     
-    // tell the Radio to remove a Stream
+    // tell the Radio to remove the Amplifier
     _radio.sendCommand("amplifier remove " + "\(id)", replyTo: callback)
     
     // notify all observers
