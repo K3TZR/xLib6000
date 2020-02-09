@@ -1223,10 +1223,14 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   
     switch keyValues[1].value {
       
-    case "dax_rx":  DaxRxAudioStream.parseStatus(radio, keyValues, inUse)
-    case "dax_tx":  DaxTxAudioStream.parseStatus(radio, keyValues, inUse)
-      
-    default:            _log("Unknown Stream type: \(keyValues[2].key)", .warning, #function, #file, #line)
+    case "dax_rx":            DaxRxAudioStream.parseStatus(radio, keyValues, inUse)
+    case "dax_tx":            DaxTxAudioStream.parseStatus(radio, keyValues, inUse)
+    case "dax_iq":            DaxIqStream.parseStatus(radio, keyValues, inUse)
+    case "dax_mic":           DaxMicAudioStream.parseStatus(radio, keyValues, inUse)
+    case "remote_audio_rx":   RemoteRxAudioStream.parseStatus(radio, keyValues, inUse)
+    case "remote_audio_tx":   RemoteTxAudioStream.parseStatus(radio, keyValues, inUse)
+
+    default:            _log("Unknown Stream type: \(keyValues[1].value)", .warning, #function, #file, #line)
     }
   }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
