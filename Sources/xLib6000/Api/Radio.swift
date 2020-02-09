@@ -627,6 +627,14 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case forced
     case wanValidationFailed   = "wan_validation_failed"
   }
+  enum StreamType : String {
+    case daxIq            = "dax_iq"
+    case daxMic           = "dax_mic"
+    case daxRx            = "dax_rx"
+    case daxTx            = "dax_tx"
+    case remoteRx         = "remote_audio_rx"
+    case remoteTx         = "remote_audio_tx"
+  }
 
   
   // ----------------------------------------------------------------------------
@@ -1221,16 +1229,52 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///
   private func parseStream(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
   
-    switch keyValues[1].value {
+    func notify(_ id: StreamId, _ type: StreamType) {
+      var notify : NotificationType
+      var streamName : String
       
-    case "dax_rx":            DaxRxAudioStream.parseStatus(radio, keyValues, inUse)
-    case "dax_tx":            DaxTxAudioStream.parseStatus(radio, keyValues, inUse)
-    case "dax_iq":            DaxIqStream.parseStatus(radio, keyValues, inUse)
-    case "dax_mic":           DaxMicAudioStream.parseStatus(radio, keyValues, inUse)
-    case "remote_audio_rx":   RemoteRxAudioStream.parseStatus(radio, keyValues, inUse)
-    case "remote_audio_tx":   RemoteTxAudioStream.parseStatus(radio, keyValues, inUse)
+      switch type {
+        case .daxIq:      notify = .daxIqStreamHasBeenRemoved         ; streamName = "DaxIqStreaam"
+        case .daxMic:     notify = .daxMicAudioStreamHasBeenRemoved   ; streamName = "DaxMicAudioStream"
+        case .daxRx:      notify = .daxRxAudioStreamHasBeenRemoved    ; streamName = "DaxRxAudioStream"
+        case .daxTx:      notify = .daxTxAudioStreamHasBeenRemoved    ; streamName = "DaxTxAudioStream"
+        case .remoteRx:   notify = .remoteRxAudioStreamHasBeenRemoved ; streamName = "RemoteRxAudioStream"
+        case .remoteTx:   notify = .remoteTxAudioStreamHasBeenRemoved ; streamName = "RemoteTxAudioStream"
+      }
+      _log(streamName + " removed: id = \(id.hex)", .debug, #function, #file, #line)
 
-    default:            _log("Unknown Stream type: \(keyValues[1].value)", .warning, #function, #file, #line)
+      // notify all observers
+      NC.post(notify, object: id as Any?)
+    }
+    
+    if !inUse {
+      if let id = keyValues[0].key.streamId {
+        
+        // does it exist?
+        if radio.daxIqStreams[id] != nil          { radio.daxIqStreams[id] = nil          ; notify(id, .daxIq)    ; return }
+        if radio.daxMicAudioStreams[id] != nil    { radio.daxMicAudioStreams[id] = nil    ; notify(id, .daxMic)   ; return }
+        if radio.daxRxAudioStreams[id] != nil     { radio.daxRxAudioStreams[id] = nil     ; notify(id, .daxRx)    ; return }
+        if radio.daxTxAudioStreams[id] != nil     { radio.daxTxAudioStreams[id] = nil     ; notify(id, .daxTx)    ; return }
+        if radio.remoteRxAudioStreams[id] != nil  { radio.remoteRxAudioStreams[id] = nil  ; notify(id, .remoteRx) ; return }
+        if radio.remoteTxAudioStreams[id] != nil  { radio.remoteTxAudioStreams[id] = nil  ; notify(id, .remoteTx) ; return }
+      }
+      return
+    }
+    
+    // check for unknown Keys
+    guard let token = StreamType(rawValue: keyValues[1].value) else {
+      // log it and ignore the Key
+      _log("Unknown Stream type: \(keyValues[1].value)", .warning, #function, #file, #line)
+      return
+    }
+    switch token {
+      
+    case .daxRx:      DaxRxAudioStream.parseStatus(radio, keyValues)
+    case .daxTx:      DaxTxAudioStream.parseStatus(radio, keyValues)
+    case .daxIq:      DaxIqStream.parseStatus(radio, keyValues)
+    case .daxMic:     DaxMicAudioStream.parseStatus(radio, keyValues)
+    case .remoteRx:   RemoteRxAudioStream.parseStatus(radio, keyValues)
+    case .remoteTx:   RemoteTxAudioStream.parseStatus(radio, keyValues)
     }
   }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
