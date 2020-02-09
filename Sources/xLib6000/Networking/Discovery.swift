@@ -105,10 +105,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
               
               // YES, add to the delete list
               deleteList.append(i)
-              
-            } else {
-              // NO, update the timestamp
-              self.discoveredRadios[i].lastSeen = Date()
             }
           }
           // are there any deletions?
@@ -194,7 +190,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     // VITA encoded Discovery packet?
     guard let vita = Vita.decodeFrom(data: data) else { return }
     
-    // parse the packet to obtain a RadioParameters (updates the timestamp)
+    // parse the packet to obtain a RadioParameters
     guard let discoveredRadio = Vita.parseDiscovery(vita) else { return }
     
     // is it already in the availableRadios array?
@@ -204,6 +200,9 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       
       // YES, update the existing entry
       discoveredRadios[i] = discoveredRadio
+      
+      // update the timestamp
+      self.discoveredRadios[i].lastSeen = Date()
       
       // indicate it was a known radio
       knownRadio = true
