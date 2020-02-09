@@ -160,7 +160,7 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _log("Unknown MicAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown DaxMicAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
