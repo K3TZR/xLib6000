@@ -163,7 +163,8 @@ final class xLib6000Tests: XCTestCase {
     XCTAssertTrue(radio.audioStreams.count == 0, "AudioStream(s) NOT removed")
   }
 
- // MARK: ---- Amplifier ----
+ // ------------------------------------------------------------------------------
+ // MARK: - Amplifier
   
   ///   Format:  <Id, > <"ant", ant> <"ip", ip> <"model", model> <"port", port> <"serial_num", serialNumber>
 //  private var amplifierStatus = "0x12345678 ant=ANT1 ip=10.0.1.106 model=PGXL port=4123 serial_num=1234-5678-9012 state=STANDBY"
@@ -215,7 +216,8 @@ final class xLib6000Tests: XCTestCase {
 //    Api.sharedInstance.disconnect()
 //  }
 
-  // MARK: ---- AudioStream ----
+  // ------------------------------------------------------------------------------
+  // MARK: - AudioStream
    
   ///   Format:  <streamId, > <"dax", channel> <"in_use", 1|0> <"slice", number> <"ip", ip> <"port", port>
   private var audioStreamStatus = "0x23456789 dax=3 slice=0 ip=10.0.1.107 port=4124"
@@ -271,7 +273,7 @@ final class xLib6000Tests: XCTestCase {
     let radio = discoverRadio()
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isV1 || radio!.version.isV2 {     // v1 and v2 ONLY
       
       // remove any AudioStreams
       for (_, stream) in radio!.audioStreams { stream.remove() }
@@ -315,38 +317,21 @@ final class xLib6000Tests: XCTestCase {
                 
                 } else {
                   XCTAssert(true, "AudioStream 0 NOT found")
-                  for (_, stream) in radio!.audioStreams { stream.remove() }
-                  return
                 }
-              
               } else {
                 XCTAssert(true, "AudioStream(s) NOT added")
-                for (_, stream) in radio!.audioStreams { stream.remove() }
-                return
               }
-            
             } else {
-              for (_, stream) in radio!.audioStreams { stream.remove() }
               XCTAssert(true, "AudioStream(s) NOT removed")
-              return
             }
-            
           } else {
             XCTAssert(true, "AudioStream 0 NOT found")
-            for (_, stream) in radio!.audioStreams { stream.remove() }
-            return
           }
-        
         } else {
           XCTAssert(true, "AudioStream(s) NOT added")
-          for (_, stream) in radio!.audioStreams { stream.remove() }
-          return
         }
-      
       } else {
-        for (_, stream) in radio!.audioStreams { stream.remove() }
         XCTAssert(true, "AudioStream(s) NOT removed")
-        return
       }
       // remove any AudioStreams
       for (_, stream) in radio!.audioStreams { stream.remove() }
@@ -354,12 +339,97 @@ final class xLib6000Tests: XCTestCase {
     } else {
       Swift.print("***** Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****")
     }
-    
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
   
-  // MARK: ---- DaxRxAudioStream ----
+  // ------------------------------------------------------------------------------
+  // MARK: - DaxIqStream
+  
+    func testDaxIqStream() {
+      // find a radio & connect
+      let radio = discoverRadio()
+      guard radio != nil else { return }
+      
+      if radio!.version.isV3 {
+        
+        // remove all
+        for (_, stream) in radio!.iqStreams { stream.remove() }
+        sleep(1)
+        if radio!.iqStreams.count == 0 {
+          
+          // get new
+          radio!.requestIqStream("3")
+          sleep(1)
+          
+          // verify added
+          if radio!.iqStreams.count == 1 {
+            
+            if let stream = radio!.iqStreams[0] {
+              
+              // save params
+              let available     = stream.available
+              let capacity      = stream.capacity
+              let ip            = stream.ip
+              let pan           = stream.pan
+              let port          = stream.port
+              let rate          = stream.rate
+              let streaming     = stream.streaming
+
+              // remove all
+              for (_, stream) in radio!.iqStreams { stream.remove() }
+              sleep(1)
+              if radio!.iqStreams.count == 0 {
+                
+                // get new
+                radio!.requestIqStream("3")
+                sleep(1)
+                
+                // verify added
+                if radio!.iqStreams.count == 1 {
+                  if let stream = radio!.iqStreams[0] {
+                    
+                    // check params
+                    XCTAssertEqual(stream.available, available)
+                    XCTAssertEqual(stream.capacity, capacity)
+                    XCTAssertEqual(stream.daxIqChannel, 3)
+                    XCTAssertEqual(stream.inUse, true)
+                    XCTAssertEqual(stream.ip, ip)
+                    XCTAssertEqual(stream.pan, pan)
+                    XCTAssertEqual(stream.port, port)
+                    XCTAssertEqual(stream.rate, rate)
+                    XCTAssertEqual(stream.streaming, streaming)
+
+                  } else {
+                    XCTAssert(true, "IqStream 0 NOT found")
+                  }
+                } else {
+                  XCTAssert(true, "IqStream NOT added")
+                }
+              } else {
+                XCTAssert(true, "IqStream NOT removed")
+              }
+            } else {
+              XCTAssert(true, "IqStream 0 NOT found")
+            }
+          } else {
+            XCTAssert(true, "IqStream NOT added")
+          }
+        } else {
+          XCTAssert(true, "DaxTxAudioStream(s) NOT removed")
+        }
+        // remove any DaxTxAudioStream
+        for (_, stream) in radio!.iqStreams { stream.remove() }
+      
+      } else {
+        Swift.print("***** IqStream Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****")
+      }
+      // disconnect the radio
+      Api.sharedInstance.disconnect()
+    }
+
+  // ------------------------------------------------------------------------------
+  // MARK: - DaxRxAudioStream
    
   func testDaxRxAudioStream() {
     // find a radio & connect
@@ -409,38 +479,21 @@ final class xLib6000Tests: XCTestCase {
                 
                 } else {
                   XCTAssert(true, "DaxRxAudioStream 0 NOT found")
-                  for (_, stream) in radio!.daxRxAudioStreams { stream.remove() }
-                  return
                 }
-              
               } else {
-                XCTAssert(true, "DaxRxAudioStream(s) NOT added")
-                for (_, stream) in radio!.daxRxAudioStreams { stream.remove() }
-                return
+                XCTAssert(true, "DaxRxAudioStream NOT added")
               }
-            
             } else {
-              for (_, stream) in radio!.daxRxAudioStreams { stream.remove() }
-              XCTAssert(true, "DaxRxAudioStream(s) NOT removed")
-              return
+              XCTAssert(true, "DaxRxAudioStream NOT removed")
             }
-            
           } else {
             XCTAssert(true, "DaxRxAudioStream 0 NOT found")
-            for (_, stream) in radio!.daxRxAudioStreams { stream.remove() }
-            return
           }
-        
         } else {
-          XCTAssert(true, "DaxRxAudioStream(s) NOT added")
-          for (_, stream) in radio!.daxRxAudioStreams { stream.remove() }
-          return
+          XCTAssert(true, "DaxRxAudioStream NOT added")
         }
-      
       } else {
-        for (_, stream) in radio!.daxRxAudioStreams { stream.remove() }
-        XCTAssert(true, "DaxRxAudioStream(s) NOT removed")
-        return
+        XCTAssert(true, "DaxRxAudioStream NOT removed")
       }
       // remove any DaxRxAudioStream
       for (_, stream) in radio!.daxRxAudioStreams { stream.remove() }
@@ -448,12 +501,12 @@ final class xLib6000Tests: XCTestCase {
     } else {
       Swift.print("***** DaxRxAudioStream Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****")
     }
-    
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
 
-  // MARK: ---- DaxTxAudioStream ----
+  // ------------------------------------------------------------------------------
+  // MARK: - DaxTxAudioStream
   
   func testDaxTxAudioStream() {
     // find a radio & connect
@@ -499,38 +552,21 @@ final class xLib6000Tests: XCTestCase {
                 
                 } else {
                   XCTAssert(true, "DaxTxAudioStream 0 NOT found")
-                  for (_, stream) in radio!.daxTxAudioStreams { stream.remove() }
-                  return
                 }
-              
               } else {
-                XCTAssert(true, "DaxTxAudioStream(s) NOT added")
-                for (_, stream) in radio!.daxTxAudioStreams { stream.remove() }
-                return
+                XCTAssert(true, "DaxTxAudioStream NOT added")
               }
-            
             } else {
-              for (_, stream) in radio!.daxTxAudioStreams { stream.remove() }
-              XCTAssert(true, "DaxTxAudioStream(s) NOT removed")
-              return
+              XCTAssert(true, "DaxTxAudioStream NOT removed")
             }
-            
           } else {
             XCTAssert(true, "DaxTxAudioStream 0 NOT found")
-            for (_, stream) in radio!.daxTxAudioStreams { stream.remove() }
-            return
           }
-        
         } else {
-          XCTAssert(true, "DaxTxAudioStream(s) NOT added")
-          for (_, stream) in radio!.daxTxAudioStreams { stream.remove() }
-          return
+          XCTAssert(true, "DaxTxAudioStream NOT added")
         }
-      
       } else {
-        for (_, stream) in radio!.daxTxAudioStreams { stream.remove() }
-        XCTAssert(true, "DaxTxAudioStream(s) NOT removed")
-        return
+        XCTAssert(true, "DaxTxAudioStream NOT removed")
       }
       // remove any DaxTxAudioStream
       for (_, stream) in radio!.daxTxAudioStreams { stream.remove() }
@@ -538,68 +574,195 @@ final class xLib6000Tests: XCTestCase {
     } else {
       Swift.print("***** DaxTxAudioStream Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****")
     }
-    
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
 
-  // MARK: ---- Rx Equalizer ----
+  // ------------------------------------------------------------------------------
+  // MARK: - Equalizer
    
   private var equalizerRxStatus = "rxsc mode=0 63Hz=0 125Hz=10 250Hz=20 500Hz=30 1000Hz=-10 2000Hz=-20 4000Hz=-30 8000Hz=-40"
-  func testEqualizerRxParse() {
+  
+  func testEqualizerRx() {
+    equalizer(.rxsc)
+  }
+  func testEqualizerTx() {
+    equalizer(.txsc)
+  }
+
+  func equalizer(_ type: Equalizer.EqType) {
     
     let radio = discoverRadio()
     guard radio != nil else { return }
     
-    let eqType = Equalizer.EqType(rawValue:equalizerRxStatus.keyValuesArray()[0].key)!
+    if let eq = radio!.equalizers[type] {
+      // save params
+      let eqEnabled   = eq.eqEnabled
+      let level63Hz   = eq.level63Hz
+      let level125Hz  = eq.level125Hz
+      let level250Hz  = eq.level250Hz
+      let level500Hz  = eq.level500Hz
+      let level1000Hz = eq.level1000Hz
+      let level2000Hz = eq.level2000Hz
+      let level4000Hz = eq.level4000Hz
+      let level8000Hz = eq.level8000Hz
+      
+      // change params
+      eq.eqEnabled = !eqEnabled
+      eq.level63Hz    = 10
+      eq.level125Hz   = -10
+      eq.level250Hz   = 20
+      eq.level500Hz   = -20
+      eq.level1000Hz  = 30
+      eq.level2000Hz  = -30
+      eq.level4000Hz  = 40
+      eq.level8000Hz  = -40
 
-    Equalizer.parseStatus(radio!, equalizerRxStatus.keyValuesArray(), true)
+      // check params
+      XCTAssertEqual(eq.eqEnabled, !eqEnabled)
+      XCTAssertEqual(eq.level63Hz, 10)
+      XCTAssertEqual(eq.level125Hz, -10)
+      XCTAssertEqual(eq.level250Hz, 20)
+      XCTAssertEqual(eq.level500Hz, -20)
+      XCTAssertEqual(eq.level1000Hz, 30)
+      XCTAssertEqual(eq.level2000Hz, -30)
+      XCTAssertEqual(eq.level4000Hz, 40)
+      XCTAssertEqual(eq.level8000Hz, -40)
+      
+      // restore params
+      eq.eqEnabled    = eqEnabled
+      eq.level63Hz    = level63Hz
+      eq.level125Hz   = level125Hz
+      eq.level250Hz   = level250Hz
+      eq.level500Hz   = level500Hz
+      eq.level1000Hz  = level1000Hz
+      eq.level2000Hz  = level2000Hz
+      eq.level4000Hz  = level4000Hz
+      eq.level8000Hz  = level8000Hz
 
-    let eqRx = radio!.equalizers[eqType]
-    XCTAssertNotNil(eqRx, "Failed to create Rx Equalizer")
-    XCTAssertEqual(eqRx?.eqEnabled, false)
-    XCTAssertEqual(eqRx?.level63Hz, 0)
-    XCTAssertEqual(eqRx?.level125Hz, 10)
-    XCTAssertEqual(eqRx?.level250Hz, 20)
-    XCTAssertEqual(eqRx?.level500Hz, 30)
-    XCTAssertEqual(eqRx?.level1000Hz, -10)
-    XCTAssertEqual(eqRx?.level2000Hz, -20)
-    XCTAssertEqual(eqRx?.level4000Hz, -30)
-    XCTAssertEqual(eqRx?.level8000Hz, -40)
+      // check params
+      XCTAssertEqual(eq.eqEnabled, eqEnabled)
+      XCTAssertEqual(eq.level63Hz, level63Hz)
+      XCTAssertEqual(eq.level125Hz, level125Hz)
+      XCTAssertEqual(eq.level250Hz, level250Hz)
+      XCTAssertEqual(eq.level500Hz, level500Hz)
+      XCTAssertEqual(eq.level1000Hz, level1000Hz)
+      XCTAssertEqual(eq.level2000Hz, level2000Hz)
+      XCTAssertEqual(eq.level4000Hz, level4000Hz)
+      XCTAssertEqual(eq.level8000Hz, level8000Hz)
     
+    } else {
+      XCTAssert(true, "\(type.rawValue) Equalizer NOT found")
+    }
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
 
-  // MARK: ---- Tx Equalizer ----
-   
-  private var equalizerTxStatus = "txsc mode=1 63Hz=-40 125Hz=-30 250Hz=-20 500Hz=-10 1000Hz=30 2000Hz=20 4000Hz=10 8000Hz=0"
-  func testEqualizerTxParse() {
-    
+  // ------------------------------------------------------------------------------
+  // MARK: - IqStream
+  
+  func testIqStream() {
+    // find a radio & connect
     let radio = discoverRadio()
     guard radio != nil else { return }
     
-    let eqType = Equalizer.EqType(rawValue:equalizerTxStatus.keyValuesArray()[0].key)!
+    if radio!.version.isV1 || radio!.version.isV2 {
+      
+      // remove all
+      for (_, stream) in radio!.iqStreams { stream.remove() }
+      sleep(1)
+      if radio!.iqStreams.count == 0 {
+        
+        // get new
+        radio!.requestIqStream("3")
+        sleep(1)
+        
+        // verify added
+        if radio!.iqStreams.count == 1 {
+          
+          if let stream = radio!.iqStreams[0] {
+            
+            // save params
+            let available     = stream.available
+            let capacity      = stream.capacity
+//            let daxIqChannel  = stream.daxIqChannel
+//            let inUse         = stream.inUse
+            let ip            = stream.ip
+            let pan           = stream.pan
+            let port          = stream.port
+            let rate          = stream.rate
+            let streaming     = stream.streaming
 
-    Equalizer.parseStatus(radio!, equalizerTxStatus.keyValuesArray(), true)
+            // remove all
+            for (_, stream) in radio!.iqStreams { stream.remove() }
+            sleep(1)
+            if radio!.iqStreams.count == 0 {
+              
+              // get new
+              radio!.requestIqStream("3")
+              sleep(1)
+              
+              // verify added
+              if radio!.iqStreams.count == 1 {
+                if let stream = radio!.iqStreams[0] {
+                  
+                  // check params
+                  XCTAssertEqual(stream.available, available)
+                  XCTAssertEqual(stream.capacity, capacity)
+                  XCTAssertEqual(stream.daxIqChannel, 3)
+                  XCTAssertEqual(stream.inUse, true)
+                  XCTAssertEqual(stream.ip, ip)
+                  XCTAssertEqual(stream.pan, pan)
+                  XCTAssertEqual(stream.port, port)
+                  XCTAssertEqual(stream.rate, rate)
+                  XCTAssertEqual(stream.streaming, streaming)
 
-    let eqTx = radio!.equalizers[eqType]
-    XCTAssertNotNil(eqTx, "Failed to create Tx Equalizer")
-    XCTAssertEqual(eqTx?.eqEnabled, true)
-    XCTAssertEqual(eqTx?.level63Hz, -40)
-    XCTAssertEqual(eqTx?.level125Hz, -30)
-    XCTAssertEqual(eqTx?.level250Hz, -20)
-    XCTAssertEqual(eqTx?.level500Hz, -10)
-    XCTAssertEqual(eqTx?.level1000Hz, 30)
-    XCTAssertEqual(eqTx?.level2000Hz, 20)
-    XCTAssertEqual(eqTx?.level4000Hz, 10)
-    XCTAssertEqual(eqTx?.level8000Hz, 0)
+                } else {
+                  XCTAssert(true, "IqStream 0 NOT found")
+                }
+              } else {
+                XCTAssert(true, "IqStream NOT added")
+              }
+            } else {
+              XCTAssert(true, "IqStream NOT removed")
+            }
+          } else {
+            XCTAssert(true, "IqStream 0 NOT found")
+          }
+        } else {
+          XCTAssert(true, "IqStream NOT added")
+        }
+      } else {
+        XCTAssert(true, "DaxTxAudioStream(s) NOT removed")
+      }
+      // remove any DaxTxAudioStream
+      for (_, stream) in radio!.iqStreams { stream.remove() }
     
+    } else {
+      Swift.print("***** IqStream Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****")
+    }
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Memory
+  
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Meter
+  
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - MicAudioStream
+  
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Opus
+  
 
-  // MARK: ---- Panadapter ----
+  // ------------------------------------------------------------------------------
+  // MARK: - Panadapter
    
   private let panadapterStatus = "pan 0x40000000 wnb=0 wnb_level=92 wnb_updating=0 band_zoom=0 segment_zoom=0 x_pixels=50 y_pixels=100 center=14.100000 bandwidth=0.200000 min_dbm=-125.00 max_dbm=-40.00 fps=25 average=23 weighted_average=0 rfgain=50 rxant=ANT1 wide=0 loopa=0 loopb=1 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 waterfall=42000000 min_bw=0.004920 max_bw=14.745601 xvtr= pre= ant_list=ANT1,ANT2,RX_A,XVTR"
   func testPanadapterParse() {
@@ -858,8 +1021,21 @@ final class xLib6000Tests: XCTestCase {
 //    // disconnect the radio
 //    Api.sharedInstance.disconnect()
 //  }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - RemoteRxAudioStream
+  
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - RemoteTxAudioStream
+  
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Slice
+  
 
-  // MARK: ---- Tnf ----
+  // ------------------------------------------------------------------------------
+  // MARK: - Tnf
    
   private var tnfStatus = "1 freq=14.26 depth=2 width=0.000100 permanent=1"
   func testTnfParse() {
@@ -883,8 +1059,17 @@ final class xLib6000Tests: XCTestCase {
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - TxAudioStream
+  
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - UsbCable
+  
 
-  // MARK: ---- Waterfall ----
+  // ------------------------------------------------------------------------------
+  // MARK: - Waterfall
      
   private var waterfallStatus = "waterfall 0x42000000 x_pixels=50 center=14.100000 bandwidth=0.200000 band_zoom=0 segment_zoom=0 line_duration=100 rfgain=0 rxant=ANT1 wide=0 loopa=0 loopb=0 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 panadapter=40000000 color_gain=50 auto_black=1 black_level=20 gradient_index=1 xvtr="
   func testWaterfallParse() {
@@ -910,9 +1095,10 @@ final class xLib6000Tests: XCTestCase {
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Xvtr
 
-  // MARK: ---- Xvtr ----
-   
   private var xvtrStatus = "0 name=220 rf_freq=220 if_freq=28 lo_error=0 max_power=10 rx_gain=0 order=0 rx_only=1 is_valid=1 preferred=1 two_meter_int=0"
   private var xvtrStatusLongName = "0 name=12345678 rf_freq=220 if_freq=28 lo_error=0 max_power=10 rx_gain=0 order=0 rx_only=1 is_valid=1 preferred=1 two_meter_int=0"
 
