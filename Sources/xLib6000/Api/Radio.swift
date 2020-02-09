@@ -1068,7 +1068,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .profile:        Profile.parseStatus(self, remainder.keyValuesArray(delimiter: "="))
     case .radio:          parseProperties(self, remainder.keyValuesArray())
     case .slice:          xLib6000.Slice.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
-    case .stream:         DaxIqStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
+    case .stream:         parseStream(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .tnf:            Tnf.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .transmit:       transmit.parseProperties(self, remainder.keyValuesArray())
     case .turf:           _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
@@ -1206,6 +1206,27 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case DisplayToken.waterfall.rawValue:   Waterfall.parseStatus(radio, keyValues, inUse)
       
     default:            _log("Unknown Display type: \(keyValues[0].key)", .warning, #function, #file, #line)
+    }
+  }
+  /// Parse a Stream status message
+  ///   Format:
+  ///
+  ///   executed on the parseQ
+  ///
+  /// - Parameters:
+  ///   - keyValues:      a KeyValuesArray
+  ///   - radio:          the current Radio class
+  ///   - queue:          a parse Queue for the object
+  ///   - inUse:          false = "to be deleted"
+  ///
+  private func parseStream(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+  
+    switch keyValues[1].value {
+      
+    case "dax_rx":  DaxRxAudioStream.parseStatus(radio, keyValues, inUse)
+    case "dax_tx":  DaxTxAudioStream.parseStatus(radio, keyValues, inUse)
+      
+    default:            _log("Unknown Stream type: \(keyValues[2].key)", .warning, #function, #file, #line)
     }
   }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
