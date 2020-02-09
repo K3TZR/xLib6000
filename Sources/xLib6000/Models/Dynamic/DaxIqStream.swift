@@ -30,6 +30,9 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
+  @objc dynamic public var ip : String {
+    get { _ip  }
+    set { if _ip != newValue { _ip = newValue }}}
   @objc dynamic public  var rate        : Int {
     get { _rate }
     set {
@@ -58,6 +61,9 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
     set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+  var _ip : String {
+    get { Api.objectQ.sync { __ip } }
+    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
   var _pan : PanadapterStreamId {
     get { Api.objectQ.sync { __pan } }
     set { Api.objectQ.sync(flags: .barrier) {__pan = newValue }}}
@@ -69,11 +75,13 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
     set { Api.objectQ.sync(flags: .barrier) {__isActive = newValue }}}
 
   enum Token: String {
-    case clientHandle                       = "client_handle"
     case channel                            = "daxiq_channel"
+    case clientHandle                       = "client_handle"
+    case ip
+    case isActive                           = "active"
     case pan
     case rate                               = "daxiq_rate"
-    case isActive                           = "active"
+    case type
   }
   
   // ------------------------------------------------------------------------------
@@ -169,7 +177,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _log("Unknown IqStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown DaxIqStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -177,9 +185,11 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
         
       case .clientHandle:   update(self, &_clientHandle,  to: property.value.handle ?? 0,   signal: \.clientHandle)
       case .channel:        update(self, &_channel,       to: property.value.iValue,        signal: \.channel)
+      case .ip:             update(self, &_ip,            to: property.value,               signal: \.ip)
       case .isActive:       update(self, &_isActive,      to: property.value.bValue,        signal: \.isActive)
       case .pan:            update(self, &_pan,           to: property.value.streamId ?? 0, signal: \.pan)
       case .rate:           update(self, &_rate,          to: property.value.iValue,        signal: \.rate)
+      case .type:           break  // included to inhibit unknown token warnings
       }
     }
     // is the Stream initialized?
@@ -188,7 +198,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Stream
       _initialized = true
 
-      _log("DaxIqStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("DaxIqStream added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.daxIqStreamHasBeenAdded, object: self as Any?)
@@ -288,8 +298,10 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
 
   private var __channel       = 0
   private var __clientHandle  : Handle = 0
+  private var __ip            = ""
+  private var __isActive      = false
   private var __pan           : PanadapterStreamId = 0
   private var __rate          = 0
-  private var __isActive      = false
+
 }
 
