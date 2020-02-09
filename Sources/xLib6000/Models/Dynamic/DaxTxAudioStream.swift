@@ -25,6 +25,9 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   
   public let id                               : DaxTxStreamId
 
+  @objc dynamic public var ip : String {
+    get { _ip  }
+    set { if _ip != newValue { _ip = newValue }}}
   @objc dynamic public var isTransmitChannel  : Bool {
     get { _isTransmitChannel  }
     set { if _isTransmitChannel != newValue { _isTransmitChannel = newValue ; txAudioCmd( newValue.as1or0) } } }
@@ -55,6 +58,9 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
     set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+  var _ip : String {
+    get { Api.objectQ.sync { __ip } }
+    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
   var _isTransmitChannel : Bool {
     get { Api.objectQ.sync { __isTransmitChannel } }
     set { Api.objectQ.sync(flags: .barrier) {__isTransmitChannel = newValue }}}
@@ -67,7 +73,9 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
 
   enum Token: String {
     case clientHandle         = "client_handle"
-    case isTransmitChannel    = "dax_tx"
+    case ip
+    case isTransmitChannel    = "tx"
+    case type
   }
 
   // ------------------------------------------------------------------------------
@@ -120,7 +128,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
             // YES, remove it
             radio.daxTxAudioStreams[id] = nil
             
-            Log.sharedInstance.logMessage("DaxTxAudioStream removed: id = \(id)", .debug, #function, #file, #line)
+            Log.sharedInstance.logMessage("DaxTxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
             
             // notify all observers
             NC.post(.daxTxAudioStreamHasBeenRemoved, object: id as Any?)
@@ -169,7 +177,9 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       switch token {
         
       case .clientHandle:       update(self, &_clientHandle,      to: property.value.handle ?? 0, signal: \.clientHandle)
+      case .ip:                 update(self, &_ip,            to: property.value,             signal: \.ip)
       case .isTransmitChannel:  update(self, &_isTransmitChannel, to: property.value.bValue,      signal: \.isTransmitChannel)
+      case .type:               break  // included to inhibit unknown token warnings
       }
     }
     // is the AudioStream acknowledged by the radio?
@@ -294,6 +304,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   // *** Hidden properties (Do NOT use) ***
   
   private var __clientHandle        : Handle = 0
+  private var __ip            = ""
   private var __isTransmitChannel   = false
   private var __txGain              = 50
   private var __txGainScalar        : Float = 1.0
