@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias AmplifierId = String
+public typealias AmplifierId = Handle
 
 /// Amplifier Class implementation
 ///
@@ -33,15 +33,15 @@ public final class Amplifier  : NSObject, DynamicModel {
   @objc dynamic public var model: String {
     get { _model }
     set { if _model != newValue { _model = newValue ; amplifierCmd(.model, newValue) }}}
-  @objc dynamic public var mode: String {
-    get { _mode }
-    set { if _mode != newValue { _mode = newValue ; amplifierCmd(.mode, newValue) }}}
   @objc dynamic public var port: Int {
     get { _port }
     set { if _port != newValue { _port = newValue ; amplifierCmd( .port, newValue) }}}
   @objc dynamic public var serialNumber: String {
     get { _serialNumber }
     set { if _serialNumber != newValue { _serialNumber = newValue ; amplifierCmd( .serialNumber, newValue) } } }
+  @objc dynamic public var state: String {
+    get { _state }
+    set { if _state != newValue { _state = newValue } } }
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -55,23 +55,33 @@ public final class Amplifier  : NSObject, DynamicModel {
   var _model : String {
     get { Api.objectQ.sync { __model } }
     set { Api.objectQ.sync(flags: .barrier) {__model = newValue }}}
-  var _mode : String {
-    get { Api.objectQ.sync { __mode } }
-    set { Api.objectQ.sync(flags: .barrier) {__mode = newValue }}}
   var _port : Int {
     get { Api.objectQ.sync { __port } }
     set { Api.objectQ.sync(flags: .barrier) {__port = newValue }}}
   var _serialNumber : String {
     get { Api.objectQ.sync { __serialNumber } }
     set { Api.objectQ.sync(flags: .barrier) {__serialNumber = newValue }}}
+  var _state : String {
+    get { Api.objectQ.sync { __state } }
+    set { Api.objectQ.sync(flags: .barrier) {__state = newValue }}}
 
   enum Token : String {
     case ant
     case ip
     case model
-    case mode        // never received from Radio (values = KOperate or kStandby)
     case port
-    case serialNumber                       = "serial_num"
+    case serialNumber = "serial_num"
+    case state
+  }
+  
+  enum State : String {
+    case fault      = "FAULT"
+    case idle       = "IDLE"
+    case powerUp    = "POWERUP"
+    case selfCheck  = "SELFCHECK"
+    case standby    = "STANDBY"
+    case transmitA  = "TRANSMIT_A"
+    case transmitB  = "TRANSMIT_B"
   }
   
   // ----------------------------------------------------------------------------
@@ -100,33 +110,34 @@ public final class Amplifier  : NSObject, DynamicModel {
     
     // TODO: verify
         
-    // get the Id
-    let id = String(keyValues[0].key.dropFirst(2))
-    
-    // is the object in use
-    if inUse {
+    // get the handle
+    if let id = keyValues[0].key.handle {
       
-      // YES, does it exist?
-      if radio.amplifiers[id] == nil {
+      // is the object in use
+      if inUse {
         
-        // NO, create a new Amplifier & add it to the Amplifiers collection
-        radio.amplifiers[id] = Amplifier(radio: radio, id: id)
-      }
-      // pass the remaining key values to the Amplifier for parsing
-      radio.amplifiers[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
-      
-    } else {
-      
-      // does it exist?
-      if radio.amplifiers[id] != nil {
+        // YES, does it exist?
+        if radio.amplifiers[id] == nil {
+          
+          // NO, create a new Amplifier & add it to the Amplifiers collection
+          radio.amplifiers[id] = Amplifier(radio: radio, id: id)
+        }
+        // pass the remaining key values to the Amplifier for parsing
+        radio.amplifiers[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
-        // YES, remove it
-        radio.amplifiers[id] = nil
+      } else {
         
-        Log.sharedInstance.logMessage("Amplifier removed: id = \(id)", .debug, #function, #file, #line)
-        
-        // notify all observers
-        NC.post(.amplifierHasBeenRemoved, object: id as Any?)
+        // does it exist?
+        if radio.amplifiers[id] != nil {
+          
+          // YES, remove it
+          radio.amplifiers[id] = nil
+          
+          Log.sharedInstance.logMessage("Amplifier removed: id = \(id.hex)", .debug, #function, #file, #line)
+          
+          // notify all observers
+          NC.post(.amplifierHasBeenRemoved, object: id as Any?)
+        }
       }
     }
   }
@@ -170,12 +181,12 @@ public final class Amplifier  : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
-      case .ant:          update(self, &_ant,           to: property.value,         signal: \.ant)
-      case .ip:           update(self, &_ip,            to: property.value,         signal: \.ip)
-      case .model:        update(self, &_model,         to: property.value,         signal: \.model)
-      case .port:         update(self, &_port,          to: property.value.iValue,  signal: \.port)
-      case .serialNumber: update(self, &_serialNumber,  to: property.value,         signal: \.serialNumber)
-      case .mode:         break     // never received from Radio
+      case .ant:          update(self, &_ant,           to: property.value,             signal: \.ant)
+      case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
+      case .model:        update(self, &_model,         to: property.value,             signal: \.model)
+      case .port:         update(self, &_port,          to: property.value.iValue,      signal: \.port)
+      case .serialNumber: update(self, &_serialNumber,  to: property.value,             signal: \.serialNumber)
+      case .state:        update(self, &_state,         to: property.value,             signal: \.state)
       }
     }
     // is the Amplifier initialized?
@@ -184,7 +195,7 @@ public final class Amplifier  : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Amplifier
       _initialized = true
                   
-      _log("Amplifier added: id = \(id)", .debug, #function, #file, #line)
+      _log("Amplifier added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.amplifierHasBeenAdded, object: self as Any?)
@@ -199,7 +210,7 @@ public final class Amplifier  : NSObject, DynamicModel {
     // TODO: DOES NOT WORK
     
     // tell the Radio to remove the Amplifier
-    _radio.sendCommand("amplifier remove " + "\(id)", replyTo: callback)
+    _radio.sendCommand("amplifier remove " + "\(id.hex)", replyTo: callback)
     
     // notify all observers
     NC.post(.amplifierWillBeRemoved, object: self as Any?)
@@ -225,10 +236,7 @@ public final class Amplifier  : NSObject, DynamicModel {
   ///   - value:      the new value
   ///
   private func amplifierCmd(_ token: Token, _ value: Any) {
-    _radio.sendCommand("amplifier set " + "\(id) " + token.rawValue + "=\(value)")
-    
-    // notify all observers
-    NC.post(.amplifierWillBeRemoved, object: self as Any?)
+    _radio.sendCommand("amplifier set " + "\(id.hex) " + token.rawValue + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------
@@ -237,8 +245,8 @@ public final class Amplifier  : NSObject, DynamicModel {
   private var __ant           = ""
   private var __ip            = ""
   private var __model         = ""
-  private var __mode          = ""
   private var __port          = 0
   private var __serialNumber  = ""
+  private var __state         = ""
 }
 
