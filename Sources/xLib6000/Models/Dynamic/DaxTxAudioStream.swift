@@ -102,40 +102,22 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_tx"> <"client_handle", handle> <"dax_tx", isTransmitChannel>
     
-      // get the Id
-      if let id =  properties[0].key.streamId {
+    // get the Id
+    if let id =  properties[0].key.streamId {
+      
+      // YES, does it exist?
+      if radio.daxTxAudioStreams[id] == nil {
         
-        // is the object in use?
-        if inUse {
-          
-          // YES, does it exist?
-          if radio.daxTxAudioStreams[id] == nil {
-            
-            // NO, is it for this client?
-            if radio.version.isV3 { if !isForThisClient(properties) { return } }
-            
-            // create a new object & add it to the collection
-            radio.daxTxAudioStreams[id] = DaxTxAudioStream(radio: radio, id: id)
-          }
-          // pass the remaining key values for parsing
-          radio.daxTxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
-          
-        } else {
-          
-          // does it exist?
-          if radio.daxTxAudioStreams[id] != nil {
-            
-            // YES, remove it
-            radio.daxTxAudioStreams[id] = nil
-            
-            Log.sharedInstance.logMessage("DaxTxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
-            
-            // notify all observers
-            NC.post(.daxTxAudioStreamHasBeenRemoved, object: id as Any?)
-          }
-        }
+        // NO, is it for this client?
+        if radio.version.isV3 { if !isForThisClient(properties) { return } }
+        
+        // create a new object & add it to the collection
+        radio.daxTxAudioStreams[id] = DaxTxAudioStream(radio: radio, id: id)
       }
+      // pass the remaining key values for parsing
+      radio.daxTxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
     }
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization

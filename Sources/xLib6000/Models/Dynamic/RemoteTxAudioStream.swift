@@ -101,35 +101,17 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
     // get the Id
     if let id =  properties[0].key.streamId {
       
-      // is the object in use?
-      if inUse {
+      // YES, does it exist?
+      if radio.remoteTxAudioStreams[id] == nil {
         
-        // YES, does it exist?
-        if radio.remoteTxAudioStreams[id] == nil {
-          
-          // NO, is it for this client?
-          if radio.version.isV3 { if !isForThisClient(properties) { return } }
-          
-          // create a new object & add it to the collection
-          radio.remoteTxAudioStreams[id] = RemoteTxAudioStream(radio: radio, id: id)
-        }
-        // pass the remaining key values for parsing (dropping the Id)
-        radio.remoteTxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
+        // NO, is it for this client?
+        if radio.version.isV3 { if !isForThisClient(properties) { return } }
         
-      } else {
-        
-        // does it exist?
-        if radio.remoteTxAudioStreams[id] != nil {
-          
-          // YES, remove it
-          radio.remoteTxAudioStreams[id] = nil
-          
-          Log.sharedInstance.logMessage("RemoteTxAudioStream removed: id = \(id)", .debug, #function, #file, #line)
-          
-          // notify all observers
-          NC.post(.remoteTxAudioStreamHasBeenRemoved, object: id as Any?)
-        }
+        // create a new object & add it to the collection
+        radio.remoteTxAudioStreams[id] = RemoteTxAudioStream(radio: radio, id: id)
       }
+      // pass the remaining key values for parsing (dropping the Id)
+      radio.remoteTxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
     }
   }
 
