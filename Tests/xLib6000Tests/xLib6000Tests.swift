@@ -159,60 +159,59 @@ final class xLib6000Tests: XCTestCase {
   ///   Format:  <Id, > <"ant", ant> <"ip", ip> <"model", model> <"port", port> <"serial_num", serialNumber>
   private var amplifierStatus = "0x12345678 ant=ANT1 ip=10.0.1.106 model=PGXL port=4123 serial_num=1234-5678-9012 state=STANDBY"
   func testAmplifierParse() {
-//
-//    let radio = discoverRadio()
-//    guard radio != nil else { return }
-//
-//    Amplifier.parseStatus(radio!, amplifierStatus.keyValuesArray(), true)
-//
-//    if let amplifier = radio!.amplifiers["0x12345678".streamId!] {
-//      // verify properties
-//      XCTAssertNotNil(amplifier, "Failed to create Amplifier")
-//      XCTAssertEqual(amplifier.id, "0x12345678".handle!)
-//      XCTAssertEqual(amplifier.ant, "ANT1")
-//      XCTAssertEqual(amplifier.ip, "10.0.1.106")
-//      XCTAssertEqual(amplifier.model, "PGXL")
-//      XCTAssertEqual(amplifier.port, 4123)
-//      XCTAssertEqual(amplifier.serialNumber, "1234-5678-9012")
-//      XCTAssertEqual(amplifier.state, "STANDBY")
-//
-//      // change properties
-//      amplifier.ant = "ANT2"
-//      amplifier.ip = "11.1.217"
-//      amplifier.model = "QIYM"
-//      amplifier.port = 3214
-//      amplifier.serialNumber = "2109-8765-4321"
-//      amplifier.state = "IDLE"
-//
-//      // re-verify properties
-//      XCTAssertEqual(amplifier.id, "0x12345678".handle!)
-//      XCTAssertEqual(amplifier.ant, "ANT2")
-//      XCTAssertEqual(amplifier.ip, "11.1.217")
-//      XCTAssertEqual(amplifier.model, "QIYM")
-//      XCTAssertEqual(amplifier.port, 3214)
-//      XCTAssertEqual(amplifier.serialNumber, "2109-8765-4321")
-//      XCTAssertEqual(amplifier.state, "IDLE")
-//
-//      // remove
-//      amplifier.remove()
-//      sleep(1)
-//      XCTAssert(radio!.amplifiers["0x12345678".streamId!] == nil, "Failed to remove Amplifier")
-//
-//    } else {
-//      XCTAssertTrue(false, "Failed to create Amplifier")
-//    }
-//
-//    // disconnect the radio
-//    Api.sharedInstance.disconnect()
-    Swift.print("\n***** Test NOT performed, NEED MORE INFORMATION ****\n")
+
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+
+    Amplifier.parseStatus(radio!, amplifierStatus.keyValuesArray(), true)
+
+    if let amplifier = radio!.amplifiers["0x12345678".streamId!] {
+      // verify properties
+      XCTAssertNotNil(amplifier, "Failed to create Amplifier")
+      XCTAssertEqual(amplifier.id, "0x12345678".handle!)
+      XCTAssertEqual(amplifier.ant, "ANT1")
+      XCTAssertEqual(amplifier.ip, "10.0.1.106")
+      XCTAssertEqual(amplifier.model, "PGXL")
+      XCTAssertEqual(amplifier.port, 4123)
+      XCTAssertEqual(amplifier.serialNumber, "1234-5678-9012")
+      XCTAssertEqual(amplifier.state, "STANDBY")
+
+      // change properties
+      amplifier.ant = "ANT2"
+      amplifier.ip = "11.1.217"
+      amplifier.model = "QIYM"
+      amplifier.port = 3214
+      amplifier.serialNumber = "2109-8765-4321"
+      amplifier.state = "IDLE"
+
+      // re-verify properties
+      XCTAssertEqual(amplifier.id, "0x12345678".handle!)
+      XCTAssertEqual(amplifier.ant, "ANT2")
+      XCTAssertEqual(amplifier.ip, "11.1.217")
+      XCTAssertEqual(amplifier.model, "QIYM")
+      XCTAssertEqual(amplifier.port, 3214)
+      XCTAssertEqual(amplifier.serialNumber, "2109-8765-4321")
+      XCTAssertEqual(amplifier.state, "IDLE")
+
+    } else {
+      XCTAssertTrue(false, "Failed to create Amplifier")
+    }
+
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
   }
 
+  func testAmplifier() {
+    
+    Swift.print("\n***** \(#function) NOT implemented, NEED MORE INFORMATION ****\n")
+  }
+  
   // ------------------------------------------------------------------------------
   // MARK: - AudioStream
    
   ///   Format:  <streamId, > <"dax", channel> <"in_use", 1|0> <"slice", number> <"ip", ip> <"port", port>
   private var audioStreamStatus = "0x23456789 dax=3 slice=0 ip=10.0.1.107 port=4124"
-  func testAudioParse() {
+  func testAudioStreamParse() {
 
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -253,7 +252,7 @@ final class xLib6000Tests: XCTestCase {
       }
 
     } else {
-      Swift.print("\n***** Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****\n")
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
     Api.sharedInstance.disconnect()
@@ -341,14 +340,66 @@ final class xLib6000Tests: XCTestCase {
       for (_, stream) in radio!.audioStreams { stream.remove() }
     
     } else {
-      Swift.print("\n***** Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****\n")
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - DaxIq
+  // MARK: - BandSetting
+  
+  private var bandSettingStatus = "band 999 band_name=21 acc_txreq_enable=1 rca_txreq_enable=0 acc_tx_enabled=1 tx1_enabled=0 tx2_enabled=1 tx3_enabled=0"
+  func testBandSettingParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+
+      // remove (if present)
+      radio!.bandSettings["999".objectId!] = nil
+      
+      BandSetting.parseStatus(radio!, bandSettingStatus.keyValuesArray(), true)
+
+      if let bandSettingObject = radio!.bandSettings["999".objectId!] {
+        // verify properties
+        XCTAssertEqual(bandSettingObject.bandName, "21")
+        XCTAssertEqual(bandSettingObject.accTxReqEnabled, true)
+        XCTAssertEqual(bandSettingObject.rcaTxReqEnabled, false)
+        XCTAssertEqual(bandSettingObject.accTxEnabled, true)
+        XCTAssertEqual(bandSettingObject.tx1Enabled, false)
+        XCTAssertEqual(bandSettingObject.tx2Enabled, true)
+        XCTAssertEqual(bandSettingObject.tx3Enabled, false)
+
+      } else {
+        XCTAssertTrue(false, "\n***** Failed to create BandSetting *****\n")
+      }
+
+    }  else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testBandSetting() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  // ------------------------------------------------------------------------------
+  // MARK: - DaxIqStream
   
     // Format:  <streamId, > <"type", "dax_iq"> <"daxiq_channel", channel> <"pan", panStreamId> <"daxiq_rate", rate> <"client_handle", handle>
     private var daxIqStatus = "0x20000000 type=dax_iq daxiq_channel=3 pan=0x40000000 ip=10.0.1.107 daxiq_rate=48"
@@ -379,13 +430,13 @@ final class xLib6000Tests: XCTestCase {
         }
 
       } else {
-        Swift.print("\n***** DaxIqStatus Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****\n")
+        Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
       }
       // disconnect the radio
       Api.sharedInstance.disconnect()
     }
 
-  func testDaxIqStream() {
+  func testDaxIq() {
       // find a radio & connect
       let radio = discoverRadio()
       guard radio != nil else { return }
@@ -461,16 +512,64 @@ final class xLib6000Tests: XCTestCase {
           XCTAssertFalse(true, "\n***** DaxIqStream NOT removed *****\n")
         }
       } else {
-        Swift.print("\n***** DaxIqStream Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****\n")
+        Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
       }
       // disconnect the radio
       Api.sharedInstance.disconnect()
     }
 
   // ------------------------------------------------------------------------------
+  // MARK: - DaxMicAudioStream
+  
+  func testDaxMicParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testDaxMic() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  // ------------------------------------------------------------------------------
   // MARK: - DaxRxAudioStream
-   
-  func testDaxRxAudioStream() {
+  
+  func testDaxRxParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+  
+  func testDaxRx() {
     // find a radio & connect
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -538,7 +637,7 @@ final class xLib6000Tests: XCTestCase {
       for (_, stream) in radio!.daxRxAudioStreams { stream.remove() }
     
     } else {
-      Swift.print("\n***** DaxRxAudioStream Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****\n")
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
     Api.sharedInstance.disconnect()
@@ -547,7 +646,22 @@ final class xLib6000Tests: XCTestCase {
   // ------------------------------------------------------------------------------
   // MARK: - DaxTxAudioStream
   
-  func testDaxTxAudioStream() {
+  func testDaxTxParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+  
+  func testDaxTx() {
     // find a radio & connect
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -611,7 +725,7 @@ final class xLib6000Tests: XCTestCase {
       for (_, stream) in radio!.daxTxAudioStreams { stream.remove() }
     
     } else {
-      Swift.print("\n***** DaxTxAudioStream Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****\n")
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
     Api.sharedInstance.disconnect()
@@ -700,8 +814,23 @@ final class xLib6000Tests: XCTestCase {
   // ------------------------------------------------------------------------------
   // MARK: - IqStream
   
-  func testIqStream() {
-    // find a radio & connect
+  func testIqParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testIq() {
+
     let radio = discoverRadio()
     guard radio != nil else { return }
     
@@ -778,7 +907,7 @@ final class xLib6000Tests: XCTestCase {
       for (_, stream) in radio!.iqStreams { stream.remove() }
     
     } else {
-      Swift.print("\n***** IqStream Test NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor) ****\n")
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
     Api.sharedInstance.disconnect()
@@ -787,18 +916,135 @@ final class xLib6000Tests: XCTestCase {
   // ------------------------------------------------------------------------------
   // MARK: - Memory
   
-  
+  func testMemoryParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testMemory() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - Meter
   
+  func testMeterParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testMeter() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
   
   // ------------------------------------------------------------------------------
   // MARK: - MicAudioStream
   
+  func testMicParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testMic() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
   
   // ------------------------------------------------------------------------------
   // MARK: - Opus
   
+  func testOpusParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testOpus() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
 
   // ------------------------------------------------------------------------------
   // MARK: - Panadapter
@@ -860,7 +1106,7 @@ final class xLib6000Tests: XCTestCase {
     Api.sharedInstance.disconnect()
   }
 
-  func testPanadapterCreateRemove() {
+  func testPanadapter() {
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -1019,73 +1265,105 @@ final class xLib6000Tests: XCTestCase {
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
-
-//  func testPanadapterCreateRemove() {
-//    // find a radio & connect
-//    let radio = discoverRadio()
-//    guard radio != nil else { return }
-//
-//    // remove any panadapters & slices
-//    removeAllPanadapters(radio: radio!)
-//
-//    // ask for a new panadapter
-//    radio!.requestPanadapter(frequency: 7_250_000)
-//    sleep(1)
-//
-//    // verify panadapter added
-//    XCTAssertNotEqual(radio!.panadapters.count, 0, "No Panadapter")
-//    if let panadapter = radio!.panadapters[0] {
-//
-//      // save panadapter params
-//      let center = panadapter.center
-//      let bandwidth = panadapter.bandwidth
-//
-//      // verify slice added
-//      XCTAssertNotEqual(radio!.slices.count, 0, "No Slice")
-//
-//      // save slice params
-//      let sliceFrequency = radio!.slices[0]!.frequency
-//
-//      // remove any panadapters & slices
-//      removeAllPanadapters(radio: radio!)
-//
-//      // ask for a new panadapter
-//      radio!.requestPanadapter(frequency: 7_250_000)
-//      sleep(1)
-//
-//      // verify panadapter added
-//      XCTAssertNotEqual(radio!.panadapters.count, 0, "No Panadapter")
-//      if let panadapter2 = radio!.panadapters[0] {
-//
-//        // check panadapter params
-//        XCTAssertEqual(panadapter2.center, center, "Center incorrect")
-//        XCTAssertEqual(panadapter2.bandwidth, bandwidth, "Bandwidth incorrect")
-//
-//        // verify slice added
-//        XCTAssertNotEqual(radio!.slices.count, 0, "No Slice")
-//
-//        // check slice params
-//        XCTAssertEqual(radio!.slices[0]!.frequency, sliceFrequency, "Slice frequency incorrect")
-//      }
-//    }
-//    // remove any panadapters & slices
-//    removeAllPanadapters(radio: radio!)
-//
-//    // disconnect the radio
-//    Api.sharedInstance.disconnect()
-//  }
   
   // ------------------------------------------------------------------------------
   // MARK: - RemoteRxAudioStream
   
-  
+  func testRemoteRxParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testRemoteRx() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - RemoteTxAudioStream
   
-  
+  func testRemoteTxParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testRemoteTx() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - Slice
   
+  func testSliceParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testSlice() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
 
   // ------------------------------------------------------------------------------
   // MARK: - Tnf
@@ -1112,14 +1390,87 @@ final class xLib6000Tests: XCTestCase {
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
-  
+
+  func testTnf() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - TxAudioStream
   
-  
+  func testTxParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testTx() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - UsbCable
   
+  func testUsbCableParse() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
+  func testUsbCable() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
 
   // ------------------------------------------------------------------------------
   // MARK: - Waterfall
@@ -1148,7 +1499,22 @@ final class xLib6000Tests: XCTestCase {
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
-  
+
+  func testWaterfall() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - Xvtr
 
@@ -1189,7 +1555,22 @@ final class xLib6000Tests: XCTestCase {
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
-  
+
+  func testXvtr() {
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    Api.sharedInstance.disconnect()
+  }
+
 //  static var allTests = [
 //    ("testApi", testApi),
 //    ("testLog", testLog),
