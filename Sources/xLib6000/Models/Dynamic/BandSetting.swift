@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias BandId = Int
+public typealias BandId = ObjectId
 
 /// BandSetting Class implementation
 ///
@@ -156,7 +156,7 @@ public final class BandSetting                : NSObject, DynamicModel {
     //          <band, > <bandId, > <"band_name", name> <"acc_txreq_enabled", 0/1> <"rca_txreq_enabled", 0/1> <"acc_tx_enabled", 0/1> <"tx1_enabled", 0/1> <"tx2_enabled", 0/1> <"tx3_enabled", 0/1>
 
     // get the Id
-    if let id = Int(keyValues[0].key) {
+    if let id = keyValues[1].key.objectId {
       
       // is the object in use?
       if inUse {
@@ -168,7 +168,7 @@ public final class BandSetting                : NSObject, DynamicModel {
           radio.bandSettings[id] = BandSetting(radio: radio, id: id)
         }
         // pass the remaining key values to the BandSetting for parsing
-        radio.bandSettings[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+        radio.bandSettings[id]!.parseProperties(radio, Array(keyValues.dropFirst(2)) )
       
       } else {
 
@@ -260,7 +260,7 @@ public final class BandSetting                : NSObject, DynamicModel {
     // TODO: test this
     
     // tell the Radio to remove a Stream
-    _radio.sendCommand("band setting remove " + "\(id)", replyTo: callback)
+    _radio.sendCommand("band remove " + "\(id)", replyTo: callback)
     
     // notify all observers
     NC.post(.bandSettingWillBeRemoved, object: self as Any?)
