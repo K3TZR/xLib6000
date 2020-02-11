@@ -6,7 +6,7 @@
 //  Copyright © 2017 Douglas Adams. All rights reserved.
 //
 
-public typealias XvtrId = String
+public typealias XvtrId = ObjectId
 
 import Foundation
 
@@ -149,40 +149,41 @@ public final class Xvtr : NSObject, DynamicModel {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true ) {
-    // Format:  <name, > <"rf_freq", value> <"if_freq", value> <"lo_error", value> <"max_power", value>
+    // Format:  <id, > <name, > <"rf_freq", value> <"if_freq", value> <"lo_error", value> <"max_power", value>
     //              <"rx_gain",value> <"order", value> <"rx_only", 1|0> <"is_valid", 1|0> <"preferred", 1|0>
     //              <"two_meter_int", value>
     //      OR
-    // Format: <index, > <"in_use", 0>
+    // Format: <id, > <"in_use", 0>
     
     // get the id
-    let id = keyValues[0].key
-    
-    // isthe Xvtr in use?
-    if inUse {
+    if let id = keyValues[0].key.objectId {
       
-      // YES, does the object exist?
-      if radio.xvtrs[id] == nil {
+      // isthe Xvtr in use?
+      if inUse {
         
-        // NO, create a new Xvtr & add it to the Xvtrs collection
-        radio.xvtrs[id] = Xvtr(radio: radio, id: id)
-      }
-      // pass the remaining key values to the Xvtr for parsing
-      radio.xvtrs[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
-      
-    } else {
-      
-      // does it exist?
-      if radio.xvtrs[id] != nil {
+        // YES, does the object exist?
+        if radio.xvtrs[id] == nil {
+          
+          // NO, create a new Xvtr & add it to the Xvtrs collection
+          radio.xvtrs[id] = Xvtr(radio: radio, id: id)
+        }
+        // pass the remaining key values to the Xvtr for parsing
+        radio.xvtrs[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
-        // remove it
-        radio.xvtrs[id] = nil
+      } else {
         
-        Log.sharedInstance.logMessage("Xvtr removed: id = \(id)", .debug, #function, #file, #line)
-        
-        // notify all observers
-        NC.post(.xvtrHasBeenRemoved, object: id as Any?)
-        
+        // does it exist?
+        if radio.xvtrs[id] != nil {
+          
+          // remove it
+          radio.xvtrs[id] = nil
+          
+          Log.sharedInstance.logMessage("Xvtr removed: id = \(id)", .debug, #function, #file, #line)
+          
+          // notify all observers
+          NC.post(.xvtrHasBeenRemoved, object: id as Any?)
+          
+        }
       }
     }
   }
