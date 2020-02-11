@@ -1,7 +1,7 @@
 import XCTest
 @testable import xLib6000
 
-final class xLib6000Tests: XCTestCase {
+final class ObjectTests: XCTestCase {
 
   // Helper function
   func discoverRadio() -> Radio? {
@@ -19,138 +19,6 @@ final class xLib6000Tests: XCTestCase {
       XCTAssertTrue(false, "\n***** No Radio(s) found *****\n")
       return nil
     }
-  }
-
- // ------------------------------------------------------------------------------
- // MARK: - Api
-  
-  func testApi() {
-    let api = Api.sharedInstance
-    XCTAssertNotNil(api, "\n***** Api singleton not present *****\n")
-    XCTAssertNotNil(api.tcp, "\n***** Failed to instantiate TcpManager *****\n")
-    XCTAssertNotNil(api.udp, "\n***** Failed to instantiate UdpManager *****\n")
-  }
-
-  // ------------------------------------------------------------------------------
-  // MARK: - Log
-   
-  func testLog() {
-    let log = Log.sharedInstance
-    XCTAssertNotNil(log, "\n***** Log singleton not present *****\n")
-  }
-
-  // ------------------------------------------------------------------------------
-  // MARK: - Discovery
-   
-  func testDiscovery() {
-    let discovery = Discovery.sharedInstance
-    sleep(2)
-    XCTAssertGreaterThan(discovery.discoveredRadios.count, 0, "\n***** No Radios discovered *****\n")
-  }
-
-  // ------------------------------------------------------------------------------
-  // MARK: - Objects
-   
-  func testObjectCreation() {
-    let discovery = Discovery.sharedInstance
-    sleep(2)
-    let radio = Radio(discovery.discoveredRadios[0], api: Api.sharedInstance)
-    XCTAssertNotNil(radio, "\n***** Failed to instantiate Radio *****\n")
-
-    XCTAssertNotNil(radio.atu, "\n***** Failed to instantiate Atu *****\n")
-    XCTAssertNotNil(radio.cwx, "\n***** Failed to instantiate Cwx *****\n")
-    XCTAssertNotNil(radio.gps, "\n***** Failed to instantiate Gps *****\n")
-    XCTAssertNotNil(radio.interlock, "\n***** Failed to instantiate Interlock *****\n")
-    XCTAssertNotNil(radio.transmit, "\n***** Failed to instantiate Transmit *****\n")
-    XCTAssertNotNil(radio.wan, "\n***** Failed to instantiate Wan *****\n")
-    XCTAssertNotNil(radio.waveform, "\n***** Failed to instantiate Waveform *****\n")
-    
-    let amplifier = Amplifier(radio: radio, id: "0x1234abcd".streamId!)
-    XCTAssertNotNil(amplifier, "\n***** Failed to instantiate Amplifier *****\n")
-
-    let audioStream = AudioStream(radio: radio, id: "0x41000000".streamId!)
-    XCTAssertNotNil(audioStream, "\n***** Failed to instantiate AudioStream *****\n")
-    
-    let daxIqStream = DaxIqStream(radio: radio, id: 1)
-    XCTAssertNotNil(daxIqStream, "\n***** Failed to instantiate DaxIqStream *****\n")
-
-    let daxMicAudioStream = DaxMicAudioStream(radio: radio, id: "0x42000000".streamId!)
-    XCTAssertNotNil(daxMicAudioStream, "\n***** Failed to instantiate DaxMicAudioStream *****\n")
-
-    let daxRxAudioStream = DaxRxAudioStream(radio: radio, id: "0x43000000".streamId!)
-    XCTAssertNotNil(daxRxAudioStream, "\n***** Failed to instantiate DaxRxAudioStream *****\n")
-
-    let daxTxAudioStream = DaxTxAudioStream(radio: radio, id: "0x44000000".streamId!)
-    XCTAssertNotNil(daxTxAudioStream, "\n***** Failed to instantiate DaxTxAudioStream *****\n")
-
-    let rxEqualizer = Equalizer(radio: radio, id: "rxsc")
-    XCTAssertNotNil(rxEqualizer, "\n***** Failed to instantiate Rx Equalizer *****\n")
-
-    let txEqualizer = Equalizer(radio: radio, id: "txsc")
-    XCTAssertNotNil(txEqualizer, "\n***** Failed to instantiate Tx Equalizer *****\n")
-
-    let iqStream = IqStream(radio: radio, id: 1)
-    XCTAssertNotNil(iqStream, "\n***** Failed to instantiate IqStream *****\n")
-
-    let memory = Memory(radio: radio, id: "0")
-    XCTAssertNotNil(memory, "\n***** Failed to instantiate Memory *****\n")
-
-    let meter = Meter(radio: radio, id: 1)
-    XCTAssertNotNil(meter, "\n***** Failed to instantiate Meter *****\n")
-
-    let micAudioStream = MicAudioStream(radio: radio, id: "0x45000000".streamId!)
-    XCTAssertNotNil(micAudioStream, "\n***** Failed to instantiate MicAudioStream *****\n")
-
-    let opus = Opus(radio: radio, id: "0x46000000".streamId!)
-    XCTAssertNotNil(opus, "\n***** Failed to instantiate Opus *****\n")
-
-    let pan = Panadapter(radio: radio, id: "0x40000000".streamId!)
-    XCTAssertNotNil(pan, "\n***** Failed to instantiate Panadapter *****\n")
-
-    let globalProfile = Profile(radio: radio, id: "global")
-    XCTAssertNotNil(globalProfile, "\n***** Failed to instantiate Global Profile *****\n")
-
-    let micProfile = Profile(radio: radio, id: "mic")
-    XCTAssertNotNil(micProfile, "\n***** Failed to instantiate Mic Profile *****\n")
-
-    let txProfile = Profile(radio: radio, id: "tx")
-    XCTAssertNotNil(txProfile, "\n***** Failed to instantiate Tx Profile *****\n")
-
-    let remoteRxAudioStream = RemoteRxAudioStream(radio: radio, id: "0x47000000".streamId!)
-    XCTAssertNotNil(remoteRxAudioStream, "\n***** Failed to instantiate RemoteRxAudioStream *****\n")
-
-    let remoteTxAudioStream = RemoteTxAudioStream(radio: radio, id: "0x48000000".streamId!)
-    XCTAssertNotNil(remoteTxAudioStream, "\n***** Failed to instantiate RemoteTxAudioStream *****\n")
-
-    let slice = Slice(radio: radio, id: "1".objectId!)
-    XCTAssertNotNil(slice, "\n***** Failed to instantiate Slice *****\n")
-
-    let tnf = Tnf(radio: radio, id: 1)
-    XCTAssertNotNil(tnf, "\n***** Failed to instantiate Tnf *****\n")
-
-    let txAudioStream = TxAudioStream(radio: radio, id: "0x49000000".streamId!)
-    XCTAssertNotNil(txAudioStream, "\n***** Failed to instantiate TxAudioStream *****\n")
-
-    let usbCableBcd = UsbCable(radio: radio, id: "abcd", cableType: .bcd)
-    XCTAssertNotNil(usbCableBcd, "\n***** Failed to instantiate BCD UsbCable *****\n")
-
-    let usbCableBit = UsbCable(radio: radio, id: "defg", cableType: .bit)
-    XCTAssertNotNil(usbCableBit, "\n***** Failed to instantiate BIT UsbCable *****\n")
-
-    let usbCableCat = UsbCable(radio: radio, id: "hijk", cableType: .cat)
-    XCTAssertNotNil(usbCableCat, "\n***** Failed to instantiate CAT UsbCable *****\n")
-
-    let usbCableDstar = UsbCable(radio: radio, id: "lmno", cableType: .dstar)
-    XCTAssertNotNil(usbCableDstar, "\n***** Failed to instantiate DSTAR UsbCable *****\n")
-
-    let usbCableLdpa = UsbCable(radio: radio, id: "pqrs", cableType: .ldpa)
-    XCTAssertNotNil(usbCableLdpa, "\n***** Failed to instantiate LDPA UsbCable *****\n")
-
-    let waterfall = Waterfall(radio: radio, id: "0x40000001".streamId!)
-    XCTAssertNotNil(waterfall, "\n***** Failed to instantiate Waterfall *****\n")
-
-    let xvtr = Xvtr(radio: radio, id: "abcd")
-    XCTAssertNotNil(xvtr, "\n***** Failed to instantiate Xvtr *****\n")
   }
 
  // ------------------------------------------------------------------------------
@@ -1483,18 +1351,19 @@ final class xLib6000Tests: XCTestCase {
     
     let id: StreamId = waterfallStatus.keyValuesArray()[1].key.streamId!
     Waterfall.parseStatus(radio!, waterfallStatus.keyValuesArray(), true)
-    let waterfall = radio!.waterfalls[id]
-
-    XCTAssertNotNil(waterfall, "\n***** Failed to create Waterfall *****\n")
-    XCTAssertEqual(waterfall?.autoBlackEnabled, true)
-    XCTAssertEqual(waterfall?.blackLevel, 20)
-    XCTAssertEqual(waterfall?.colorGain, 50)
-    XCTAssertEqual(waterfall?.gradientIndex, 1)
-    XCTAssertEqual(waterfall?.lineDuration, 100)
-    XCTAssertEqual(waterfall?.panadapterId, "0x40000000".streamId)
     
-//    waterfall?.remove()
-//    XCTAssertEqual(radio!.waterfalls[id], nil, "Failed to remove Waterfall")
+    if let waterfallObject = radio!.waterfalls[id] {
+      
+      XCTAssertEqual(waterfallObject.autoBlackEnabled, true)
+      XCTAssertEqual(waterfallObject.blackLevel, 20)
+      XCTAssertEqual(waterfallObject.colorGain, 50)
+      XCTAssertEqual(waterfallObject.gradientIndex, 1)
+      XCTAssertEqual(waterfallObject.lineDuration, 100)
+      XCTAssertEqual(waterfallObject.panadapterId, "0x40000000".streamId)
+
+    } else {
+        XCTAssertTrue(false, "\n***** Failed to create Waterfall *****\n")
+    }
     
     // disconnect the radio
     Api.sharedInstance.disconnect()
@@ -1508,6 +1377,9 @@ final class xLib6000Tests: XCTestCase {
     if radio!.version.isV3 {
       Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
       
+    } else if radio!.isV1 || radio!.isV2 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+
     } else {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
@@ -1535,23 +1407,28 @@ final class xLib6000Tests: XCTestCase {
     let radio = discoverRadio()
     guard radio != nil else { return }
     
-    let id: XvtrId = status.keyValuesArray()[0].key
+    let id: XvtrId = status.keyValuesArray()[0].key.objectId!
     Xvtr.parseStatus(radio!, status.keyValuesArray(), true)
-    let xvtr = radio!.xvtrs[id]
+    if let xvtrObject = radio!.xvtrs[id] {
+      
+      XCTAssertEqual(xvtrObject.ifFrequency, 28_000_000)
+      XCTAssertEqual(xvtrObject.isValid, true)
+      XCTAssertEqual(xvtrObject.loError, 0)
+      XCTAssertEqual(xvtrObject.name, expectedName)
+      XCTAssertEqual(xvtrObject.maxPower, 10)
+      XCTAssertEqual(xvtrObject.order, 0)
+      XCTAssertEqual(xvtrObject.preferred, true)
+      XCTAssertEqual(xvtrObject.rfFrequency, 220_000_000)
+      XCTAssertEqual(xvtrObject.rxGain, 0)
+      XCTAssertEqual(xvtrObject.rxOnly, true)
     
-    XCTAssertNotNil(xvtr, "\n***** Failed to create Xvtr *****\n")
-    XCTAssertEqual(xvtr?.ifFrequency, 28_000_000)
-    XCTAssertEqual(xvtr?.isValid, true)
-    XCTAssertEqual(xvtr?.loError, 0)
-    XCTAssertEqual(xvtr?.name, expectedName)
-    XCTAssertEqual(xvtr?.maxPower, 10)
-    XCTAssertEqual(xvtr?.order, 0)
-    XCTAssertEqual(xvtr?.preferred, true)
-    XCTAssertEqual(xvtr?.rfFrequency, 220_000_000)
-    XCTAssertEqual(xvtr?.rxGain, 0)
-    XCTAssertEqual(xvtr?.rxOnly, true)
-    XCTAssertEqual(xvtr?.twoMeterInt, 0)
-    
+      // FIXME: ??? what is this
+      //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
+
+    } else {
+      XCTAssertTrue(false, "\n***** Failed to create Xvtr *****\n")
+    }
+
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
@@ -1561,12 +1438,107 @@ final class xLib6000Tests: XCTestCase {
     let radio = discoverRadio()
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+    // remove all
+    for (_, xvtrObject) in radio!.xvtrs { xvtrObject.remove() }
+    sleep(1)
+    if radio!.xvtrs.count == 0 {
+            
+      Swift.print("\n***** Previous Xvtr(s) removed ****\n")
+
+      // ask for new
+      radio!.requestXvtr()
+      sleep(1)
       
+      // verify added
+      if radio!.xvtrs.count == 1 {
+        
+        if let xvtrObject = radio!.xvtrs["0".objectId!] {
+          
+          Swift.print("\n***** 1st Xvtr added ****\n")
+
+          // set properties
+          xvtrObject.ifFrequency = 28_000_000
+          xvtrObject.loError = 0
+          xvtrObject.name = "220"
+          xvtrObject.maxPower = 10
+          xvtrObject.order = 0
+          xvtrObject.rfFrequency = 220_000_000
+          xvtrObject.rxGain = 25
+          xvtrObject.rxOnly = true
+          
+          // check params
+          XCTAssertEqual(xvtrObject.isValid, false)
+          XCTAssertEqual(xvtrObject.preferred, false)
+
+          XCTAssertEqual(xvtrObject.ifFrequency, 28_000_000)
+          XCTAssertEqual(xvtrObject.loError, 0)
+          XCTAssertEqual(xvtrObject.name, "220")
+          XCTAssertEqual(xvtrObject.maxPower, 10)
+          XCTAssertEqual(xvtrObject.order, 0)
+          XCTAssertEqual(xvtrObject.rfFrequency, 220_000_000)
+          XCTAssertEqual(xvtrObject.rxGain, 25)
+          XCTAssertEqual(xvtrObject.rxOnly, true)
+          
+          // FIXME: ??? what is this
+          //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
+          
+          // ask for a new AudioStream
+          radio!.requestXvtr()
+          sleep(1)
+          
+          // verify added
+          if radio!.xvtrs.count == 2 {
+            
+            if let xvtrObject = radio!.xvtrs["1".objectId!] {
+              
+              Swift.print("\n***** 2nd Xvtr added ****\n")
+              
+              // set properties
+              xvtrObject.ifFrequency = 14_000_000
+              xvtrObject.loError = 1
+              xvtrObject.name = "144"
+              xvtrObject.maxPower = 20
+              xvtrObject.order = 1
+              xvtrObject.rfFrequency = 144_000_000
+              xvtrObject.rxGain = 50
+              xvtrObject.rxOnly = false
+              
+              // verify properties
+              XCTAssertEqual(xvtrObject.isValid, false)
+              XCTAssertEqual(xvtrObject.preferred, false)
+
+              XCTAssertEqual(xvtrObject.ifFrequency, 14_000_000)
+              XCTAssertEqual(xvtrObject.loError, 1)
+              XCTAssertEqual(xvtrObject.name, "144")
+              XCTAssertEqual(xvtrObject.maxPower, 20)
+              XCTAssertEqual(xvtrObject.order, 1)
+              XCTAssertEqual(xvtrObject.rfFrequency, 144_000_000)
+              XCTAssertEqual(xvtrObject.rxGain, 50)
+              XCTAssertEqual(xvtrObject.rxOnly, false)
+              
+              // FIXME: ??? what is this
+              //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
+            } else {
+              XCTAssertTrue(false, "\n***** Xvtr 1 NOT found *****\n")
+            }
+          } else {
+            XCTAssertTrue(false, "\n***** Xvtr 1 NOT added *****\n")
+          }
+          
+        } else {
+          XCTAssertTrue(false, "\n***** Xvtr 0 NOT found *****\n")
+        }
+      } else {
+        XCTAssertTrue(false, "\n***** Xvtr 0 NOT added *****\n")
+      }
     } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+      XCTAssertTrue(false, "\n***** Xvtr(s) NOT removed *****\n")
     }
+    // remove all
+    for (_, xvtrObject) in radio!.xvtrs { xvtrObject.remove() }
+          
+    Swift.print("\n***** Added Xvtr(s) removed ****\n")
+
     // disconnect the radio
     Api.sharedInstance.disconnect()
   }
