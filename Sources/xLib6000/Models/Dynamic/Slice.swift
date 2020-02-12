@@ -273,11 +273,11 @@ public final class Slice  : NSObject, DynamicModel {
   public enum AgcMode : String, CaseIterable {
     case off
     case slow
-    case medium
+    case med
     case fast
     
     static func names() -> [String] {
-      return [AgcMode.off.rawValue, AgcMode.slow.rawValue, AgcMode.medium.rawValue, AgcMode.fast.rawValue]
+      return [AgcMode.off.rawValue, AgcMode.slow.rawValue, AgcMode.med.rawValue, AgcMode.fast.rawValue]
     }
   }
   public enum Mode : String, CaseIterable {
