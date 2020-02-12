@@ -1819,20 +1819,23 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // Pass the stream to the appropriate object (checking for existence of the object first)
     switch (vitaPacket.classCode) {
-      
+    // DL3LSM changed all to v3 objects
     case .daxAudio:
-      // Dax Microphone Audio
-      if let daxAudio = audioStreams[vitaPacket.streamId] {
+      // Dax Slice Audio
+      if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
         daxAudio.vitaProcessor(vitaPacket)
       }
-      // Dax Slice Audio
-      if let daxMicAudio = micAudioStreams[vitaPacket.streamId] {
+      // Dax Microphone Audio
+      if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
         daxMicAudio.vitaProcessor(vitaPacket)
       }
-      
+    case .daxAudioReducedBw:
+      // Dax AudioWithReduced Bandwidth
+      // TODO: implement this
+      _log("VITA class code: \(vitaPacket.classCode.description()) not yet implemented", .error, #function, #file, #line)
     case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
       // Dax IQ
-      if let daxIq = iqStreams[vitaPacket.streamId] {
+      if let daxIq = daxIqStreams[vitaPacket.streamId] {
         daxIq.vitaProcessor(vitaPacket)
       }
       
@@ -1843,7 +1846,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .opus:
       // Opus
-      if let opus = opusStreams[vitaPacket.streamId] {
+      if let opus = remoteRxAudioStreams[vitaPacket.streamId] {
         
         if opus.isStreaming == false {
           opus.isStreaming = true

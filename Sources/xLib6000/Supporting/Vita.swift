@@ -646,6 +646,7 @@ extension Vita {
     case daxIq96                            = 0x02e5
     case daxIq192                           = 0x02e6
     case daxAudio                           = 0x03e3
+    case daxAudioReducedBw                  = 0x0123
     case discovery                          = 0xffff
     
     func description() -> String {
@@ -659,6 +660,7 @@ extension Vita {
       case .daxIq96:    return "DaxIq96"
       case .daxIq192:   return "DaxIq192"
       case .daxAudio:   return "DaxAudio"
+      case .daxAudioReducedBw: return "DaxAudioReducedBw"
       case .discovery:  return "Discovery"
       }
     }

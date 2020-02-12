@@ -46,6 +46,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public                var connectionHandleWan   = ""
   public                var isGui                 = true
   public                var isWan                 = false
+  public                var reducedDaxBw          = false
   public                var testerDelegate        : ApiDelegate?
   public                var testerModeEnabled     = false
   public                var pingerEnabled         = true
@@ -197,7 +198,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       clientId: String? = nil,
                       isGui: Bool = true,
                       isWan: Bool = false,
-                      wanHandle: String = "") -> Bool {
+                      wanHandle: String = "",
+                      reducedDaxBw: Bool = false) -> Bool {
 
     // must be in the Disconnected state to connect
     guard apiState == .disconnected else { return false }
@@ -216,6 +218,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _clientStation = clientStation
       self.isGui = isGui
       self.isWan = isWan
+      self.reducedDaxBw = reducedDaxBw
       connectionHandleWan = wanHandle
             
     } else {
@@ -373,7 +376,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       radio.requestDisplayProfile()
       radio.requestSubAll()
       if radio.version.isGreaterThan22  { radio.requestMtuLimit(1_500) }
-      if radio.version.isV3             { radio.requestDaxBandwidthLimit(true) }
+      if radio.version.isV3             { radio.requestDaxBandwidthLimit(self.reducedDaxBw) }
     }
   }
   /// Determine if the Radio Firmware version is compatable with the API version

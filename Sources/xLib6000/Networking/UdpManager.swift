@@ -241,42 +241,72 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
     
     _streamQ.async { [weak self] in
 
-      let vitaHeader : VitaHeader
+      // DL3LSM: using the "old" code here
+      if let vita = Vita.decodeFrom(data: data) {
+        
+        // TODO: Packet statistics - received, dropped
+        
+        // ensure the packet has our OUI
+        guard vita.oui == Vita.kFlexOui  else { return }
 
-      // map the packet to a VitaHeader struct
-      vitaHeader = (data as NSData).bytes.bindMemory(to: VitaHeader.self, capacity: 1).pointee
+        // we got a VITA packet which means registration was successful
+        self?._udpSuccessfulRegistration = true
 
-      // ensure the packet has our OUI
-      guard CFSwapInt32BigToHost(vitaHeader.oui) == Vita.kFlexOui else { return }
+        switch vita.packetType {
+          
+        case .ifDataWithStream, .extDataWithStream:
+          
+          // stream of data, pass it to the delegate
+          self?._delegate?.udpStreamHandler(vita)
 
-      // we got a VITA packet which means registration was successful
-      self?.udpSuccessfulRegistration = true
-
-      let packetType = (vitaHeader.packetDesc & 0xf0) >> 4
-
-      if packetType == Vita.PacketType.ifDataWithStream.rawValue || packetType == Vita.PacketType.extDataWithStream.rawValue {
-        // enqueue the data
-
-        let classCode = Vita.PacketClassCode( rawValue: UInt16(CFSwapInt32BigToHost(vitaHeader.classCodes) & 0xffff))
-
-        if classCode == Vita.PacketClassCode.panadapter || classCode == Vita.PacketClassCode.waterfall || classCode == Vita.PacketClassCode.meter {
-
-          if let vita = Vita.decodeFrom(data: data) {
-            self?._delegate?.udpStreamHandler(vita)
-          }
-
-        } else if classCode == Vita.PacketClassCode.opus {
-
-          if let vita = Vita.decodeFrom(data: data) {
-
-            self?._delegate?.udpStreamHandler(vita)
-          }
+        case .ifData, .extData, .ifContext, .extContext:
+          
+          // log the error
+          self?._log("Unexpected packetType - \(vita.packetType.rawValue)", .warning, #function, #file, #line)
         }
-
+        
       } else {
+        
         // log the error
-        self?._log("Invalid packetType - \(packetType)", .warning, #function, #file, #line)
+        self?._log("Unable to decode received packet", .warning, #function, #file, #line)
       }
+      
+//      let vitaHeader : VitaHeader
+//
+//      // map the packet to a VitaHeader struct
+//      vitaHeader = (data as NSData).bytes.bindMemory(to: VitaHeader.self, capacity: 1).pointee
+//
+//      // ensure the packet has our OUI
+//      guard CFSwapInt32BigToHost(vitaHeader.oui) == Vita.kFlexOui else { return }
+//
+//      // we got a VITA packet which means registration was successful
+//      self?.udpSuccessfulRegistration = true
+//
+//      let packetType = (vitaHeader.packetDesc & 0xf0) >> 4
+//
+//      if packetType == Vita.PacketType.ifDataWithStream.rawValue || packetType == Vita.PacketType.extDataWithStream.rawValue {
+//        // enqueue the data
+//
+//        let classCode = Vita.PacketClassCode( rawValue: UInt16(CFSwapInt32BigToHost(vitaHeader.classCodes) & 0xffff))
+//
+//        if classCode == Vita.PacketClassCode.panadapter || classCode == Vita.PacketClassCode.waterfall || classCode == Vita.PacketClassCode.meter {
+//
+//          if let vita = Vita.decodeFrom(data: data) {
+//            self?._delegate?.udpStreamHandler(vita)
+//          }
+//
+//        } else if classCode == Vita.PacketClassCode.opus {
+//
+//          if let vita = Vita.decodeFrom(data: data) {
+//
+//            self?._delegate?.udpStreamHandler(vita)
+//          }
+//        }
+//
+//      } else {
+//        // log the error
+//        self?._log("Invalid packetType - \(packetType)", .warning, #function, #file, #line)
+//      }
     }
   }
   
