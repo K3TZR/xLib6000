@@ -51,9 +51,6 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
     }
   }
   
-  @objc dynamic public var daxClients : Int {
-    get { _daxClients  }
-    set { if _daxClients != newValue { _daxClients = newValue }}}
   @objc dynamic public var ip : String {
     get { _ip  }
     set { if _ip != newValue { _ip = newValue }}}
@@ -72,9 +69,6 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   var _daxChannel : Int {
     get { Api.objectQ.sync { __daxChannel } }
     set { Api.objectQ.sync(flags: .barrier) {__daxChannel = newValue }}}
-  var _daxClients : Int {
-    get { Api.objectQ.sync { __daxClients } }
-    set { Api.objectQ.sync(flags: .barrier) {__daxClients = newValue }}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
     set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
@@ -88,7 +82,6 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   enum Token: String {
     case clientHandle                       = "client_handle"
     case daxChannel                         = "dax_channel"
-    case daxClients                         = "dax_clients"
     case ip
     case slice
     case type
@@ -116,7 +109,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-    // Format:  <streamId, > <"type", "dax_rx"> <"dax_channel", channel> <"slice", sliceNumber> <"dax_clients", number> <"client_handle", handle>
+    // Format:  <streamId, > <"type", "dax_rx"> <"dax_channel", channel> <"slice", sliceLetter>  <"client_handle", handle> <"ip", ipAddress
     
     // get the Id
     if let id =  properties[0].key.streamId {
@@ -176,15 +169,24 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
         
       case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
       case .daxChannel:   update(self, &_daxChannel,    to: property.value.iValue,      signal: \.daxChannel)
-      case .daxClients:   update(self, &_daxClients,    to: property.value.iValue,      signal: \.daxClients)
       case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
       case .slice:
-        if let sliceId = property.value.objectId {
-          update(self, &_slice, to: _radio.slices[sliceId], signal: \.slice)
+        
+        let oldSlice = _slice
+        let gui = _radio.findGuiClient(with: _radio.boundClientId ?? "")
+        // do we have a good reference to the GUI Client?
+        if gui == nil {
+          // no -- clear the Slice reference and carry on
+          update(self, &_slice, to: nil, signal: \.slice)
+          continue
         }
+        let slice = _radio.findSlice(letter: property.value, guiClientHandle: gui!.handle)
+        update(self, &_slice, to: slice, signal: \.slice)
+        
         let gain = _rxGain
         _rxGain = 0
         rxGain = gain
+        
       case .type:         break  // included to inhibit unknown token warnings
       }
     }    
@@ -299,7 +301,6 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
 
   private var __clientHandle  : Handle = 0
   private var __daxChannel    = 0
-  private var __daxClients    = 0
   private var __ip            = ""
   private var __rxGain        = 50
   private var __slice         : xLib6000.Slice? = nil

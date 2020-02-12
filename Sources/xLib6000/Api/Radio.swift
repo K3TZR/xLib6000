@@ -891,7 +891,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
   }
 
-  private func findGuiClient(with handle: Handle) -> GuiClient? {
+  // TODO: move this to the public section
+  public func findGuiClient(with handle: Handle) -> GuiClient? {
     
     // find an existing GuiClient
     for guiClient in discoveryPacket.guiClients {
@@ -904,8 +905,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     return nil
   }
   
-  
-  private func findGuiClient(with clientId: String) -> GuiClient? {
+  // TODO: move this to the public section
+  public func findGuiClient(with clientId: String) -> GuiClient? {
     
     // find an existing GuiClient
     for guiClient in discoveryPacket.guiClients where guiClient.clientId == clientId {
