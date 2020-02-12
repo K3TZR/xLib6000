@@ -826,6 +826,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // none found
     return false
   }
+  private func updateGuiClient(with handle: Handle, updatedGuiClient: GuiClient) {
+    
+    // find the GuiClient
+    for (i, guiClient) in discoveryPacket.guiClients.enumerated() {
+      if guiClient.handle == handle {
+        discoveryPacket.guiClients.remove(at: i)
+        discoveryPacket.guiClients.append(updatedGuiClient)
+        return
+      }
+    }
+  }
   private func parseV3Connection(properties: KeyValuesArray, handle: Handle) {
     var clientId : String?
     var program = ""
@@ -874,6 +885,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       guiClient!.isLocalPtt = isLocalPtt
       guiClient!.isThisClient = (_api.connectionHandle! == handle)
       
+      updateGuiClient(with: handle, updatedGuiClient: guiClient!)
+      
       // notify all observers
       NC.post(.guiClientHasBeenUpdated, object: guiClient as Any?)
     } else {
@@ -884,6 +897,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
                             station: station,
                             isLocalPtt: isLocalPtt,
                             isThisClient: (_api.connectionHandle! == handle))
+      
       discoveryPacket.guiClients.append(guiClient!)
 
       // notify all observers
