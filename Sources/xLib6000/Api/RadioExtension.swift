@@ -571,10 +571,10 @@ extension Radio {
   ///   - mode:               selected mode
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestSlice(frequency: Hz, antenna: String, mode: String, callback: ReplyHandler? = nil) {
+  public func requestSlice(frequency: Hz, rxAntenna: String, mode: String, callback: ReplyHandler? = nil) {
     if availableSlices > 0 {
       // tell the Radio to create a Slice
-      sendCommand("slice create " + "\(frequency.hzToMhz) \(antenna) \(mode)", replyTo: callback)
+      sendCommand("slice create " + "\(frequency.hzToMhz) \(rxAntenna) \(mode)", replyTo: callback)
     }
   }
   /// Create a new Slice
