@@ -39,16 +39,17 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
-  public                var apiState              : Api.State! {
+  public        var suppressNSLog           = false
+  public        var apiState                : Api.State! {
     didSet { _log("Api state = \(apiState.rawValue)", .debug, #function, #file, #line)}}
 
-  public                var connectionHandle      : Handle?
-  public                var connectionHandleWan   = ""
-  public                var isGui                 = true
-  public                var isWan                 = false
-  public                var testerDelegate        : ApiDelegate?
-  public                var testerModeEnabled     = false
-  public                var pingerEnabled         = true
+  public        var connectionHandle        : Handle?
+  public        var connectionHandleWan     = ""
+  public        var isGui                   = true
+  public        var isWan                   = false
+  public        var testerDelegate          : ApiDelegate?
+  public        var testerModeEnabled       = false
+  public        var pingerEnabled           = true
 
   public var radio        : Radio? {
     get { Api.objectQ.sync { _radio } }
@@ -197,8 +198,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       clientId: String? = nil,
                       isGui: Bool = true,
                       isWan: Bool = false,
-                      wanHandle: String = "") -> Bool {
+                      wanHandle: String = "",
+                      suppressNSLog: Bool = false) -> Bool {
 
+    self.suppressNSLog = suppressNSLog
+    
     // must be in the Disconnected state to connect
     guard apiState == .disconnected else { return false }
         
