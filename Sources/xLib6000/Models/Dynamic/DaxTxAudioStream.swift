@@ -30,7 +30,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
     set { if _ip != newValue { _ip = newValue }}}
   @objc dynamic public var isTransmitChannel  : Bool {
     get { _isTransmitChannel  }
-    set { if _isTransmitChannel != newValue { _isTransmitChannel = newValue ; txAudioCmd( newValue.as1or0) } } }
+    set { if _isTransmitChannel != newValue { _isTransmitChannel = newValue } } }
 
   @objc dynamic public var txGain: Int {
     get { _txGain  }
@@ -273,14 +273,6 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
 
-  /// Set a TxAudioStream property on the Radio
-  ///
-  /// - Parameters:
-  ///   - value:      the new value
-  ///
-  private func txAudioCmd(_ value: Any) {
-    _radio.sendCommand("dax tx" + " \(value)")
-  }
   
   // ----------------------------------------------------------------------------
   // *** Hidden properties (Do NOT use) ***
