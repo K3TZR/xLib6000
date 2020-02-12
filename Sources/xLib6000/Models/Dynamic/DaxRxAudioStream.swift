@@ -172,7 +172,6 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
       case .slice:
         
-        let oldSlice = _slice
         let gui = _radio.findGuiClient(with: _radio.boundClientId ?? "")
         // do we have a good reference to the GUI Client?
         if gui == nil {
