@@ -1819,15 +1819,27 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // Pass the stream to the appropriate object (checking for existence of the object first)
     switch (vitaPacket.classCode) {
-    // DL3LSM changed all to v3 objects
+    // DL3LSM added calls to v3 handlers
     case .daxAudio:
       // Dax Slice Audio
-      if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
-        daxAudio.vitaProcessor(vitaPacket)
+      if version.isV3 {
+        if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
+          daxAudio.vitaProcessor(vitaPacket)
+        }
+      } else {
+        if let daxAudio = audioStreams[vitaPacket.streamId] {
+          daxAudio.vitaProcessor(vitaPacket)
+        }
       }
       // Dax Microphone Audio
-      if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
-        daxMicAudio.vitaProcessor(vitaPacket)
+      if version.isV3 {
+        if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
+          daxMicAudio.vitaProcessor(vitaPacket)
+        }
+      } else {
+        if let daxMicAudio = micAudioStreams[vitaPacket.streamId] {
+          daxMicAudio.vitaProcessor(vitaPacket)
+        }
       }
     case .daxReducedBw:
       // Dax AudioWithReduced Bandwidth
@@ -1835,8 +1847,14 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       _log("VITA class code: \(vitaPacket.classCode.description()) not yet implemented", .error, #function, #file, #line)
     case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
       // Dax IQ
-      if let daxIq = daxIqStreams[vitaPacket.streamId] {
-        daxIq.vitaProcessor(vitaPacket)
+      if version.isV3 {
+        if let daxIq = daxIqStreams[vitaPacket.streamId] {
+          daxIq.vitaProcessor(vitaPacket)
+        }
+      } else {
+        if let daxIq = iqStreams[vitaPacket.streamId] {
+          daxIq.vitaProcessor(vitaPacket)
+        }
       }
       
     case .meter:
@@ -1846,14 +1864,26 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .opus:
       // Opus
-      if let opus = remoteRxAudioStreams[vitaPacket.streamId] {
-        
-        if opus.isStreaming == false {
-          opus.isStreaming = true
-          // log the start of the stream
-          _log("Opus Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+      if version.isV3 {
+        if let opus = remoteRxAudioStreams[vitaPacket.streamId] {
+          
+          if opus.isStreaming == false {
+            opus.isStreaming = true
+            // log the start of the stream
+            _log("Opus Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+          }
+          opus.vitaProcessor( vitaPacket )
         }
-        opus.vitaProcessor( vitaPacket )
+      } else {
+        if let opus = opusStreams[vitaPacket.streamId] {
+          
+          if opus.isStreaming == false {
+            opus.isStreaming = true
+            // log the start of the stream
+            _log("Opus Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+          }
+          opus.vitaProcessor( vitaPacket )
+        }
       }
       
     case .panadapter:

@@ -233,36 +233,78 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   ///
   func vitaProcessor(_ vita: Vita) {
     
+    var dataFrame: AudioStreamFrame?
+    
     // if there is a delegate, process the Panadapter stream
     if let delegate = delegate {
       
       let payloadPtr = UnsafeRawPointer(vita.payloadData)
       
       // initialize a data frame
-      var dataFrame = AudioStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
-      
-      dataFrame.daxChannel = self.daxChannel
-      
-      // get a pointer to the data in the payload
-      let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: dataFrame.samples * 2)
-      
-      // allocate temporary data arrays
-      var dataLeft = [UInt32](repeating: 0, count: dataFrame.samples)
-      var dataRight = [UInt32](repeating: 0, count: dataFrame.samples)
-      
-      // swap endianess on the bytes
-      // for each sample if we are dealing with DAX audio
-      
-      // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
-      for i in 0..<dataFrame.samples {
+      //var dataFrame = AudioStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
+      if vita.classCode == .daxReducedBw {
         
-        dataLeft[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+0).pointee)
-        dataRight[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+1).pointee)
+        let samples = vita.payloadSize / 2    // payload is Int16 mono
+        dataFrame = AudioStreamFrame(payload: payloadPtr, numberOfSamples: samples)
+      } else {          // .daxAudio
+        
+        let samples = vita.payloadSize / (4 * 2)   // payload is Float (4 Byte) stereo
+        dataFrame = AudioStreamFrame(payload: payloadPtr, numberOfSamples: samples)
       }
-      // copy the data as is -- it is already floating point
-      memcpy(&(dataFrame.leftAudio), &dataLeft, dataFrame.samples * 4)
-      memcpy(&(dataFrame.rightAudio), &dataRight, dataFrame.samples * 4)
       
+
+      if dataFrame == nil { return }
+      
+      dataFrame!.daxChannel = self.daxChannel
+      
+      if vita.classCode == .daxReducedBw {
+        
+        //Int16 Mono Samples
+        let oneOverMax: Float = 1.0 / Float(Int16.max)
+        
+        // get a pointer to the data in the payload
+        let wordsPtr = payloadPtr.bindMemory(to: Int16.self, capacity: dataFrame!.samples)
+        
+        // allocate temporary data arrays
+        var dataLeft = [Float](repeating: 0, count: dataFrame!.samples)
+        var dataRight = [Float](repeating: 0, count: dataFrame!.samples)
+        
+        // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
+        for i in 0..<dataFrame!.samples {
+          
+          let intVal = CFSwapInt16BigToHost(UInt16(wordsPtr.advanced(by: i).pointee))
+          
+          let floatVal = Float(intVal) * oneOverMax
+          
+          dataLeft[i] = floatVal
+          dataRight[i] = floatVal
+        }
+        
+        // copy the data as is -- it is already floating point
+        memcpy(&(dataFrame!.leftAudio), &dataLeft, dataFrame!.samples * 4)
+        memcpy(&(dataFrame!.rightAudio), &dataRight, dataFrame!.samples * 4)
+      } else {          // .daxAudio
+        
+        // 32-bit Float stereo samples
+        // get a pointer to the data in the payload
+        let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: dataFrame!.samples * 2)
+        
+        // allocate temporary data arrays
+        var dataLeft = [UInt32](repeating: 0, count: dataFrame!.samples)
+        var dataRight = [UInt32](repeating: 0, count: dataFrame!.samples)
+        
+        // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
+        for i in 0..<dataFrame!.samples {
+          
+          dataLeft[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+0).pointee)
+          dataRight[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+1).pointee)
+        }
+        
+        // copy the data as is -- it is already floating point
+        memcpy(&(dataFrame!.leftAudio), &dataLeft, dataFrame!.samples * 4)
+        memcpy(&(dataFrame!.rightAudio), &dataRight, dataFrame!.samples * 4)
+      }
+ 
       // Pass the data frame to this AudioSream's delegate
       delegate.streamHandler(dataFrame)
     }
