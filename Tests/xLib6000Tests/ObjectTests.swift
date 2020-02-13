@@ -461,7 +461,7 @@ final class ObjectTests: XCTestCase {
             // save params
             let clientHandle = stream.clientHandle
             let daxChannel = stream.daxChannel
-            let daxClients = stream.daxClients
+            //let daxClients = stream.daxClients
             let slice = stream.slice
             
             // remove any DaxRxAudioStreams
@@ -1377,7 +1377,7 @@ final class ObjectTests: XCTestCase {
     if radio!.version.isV3 {
       Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
       
-    } else if radio!.isV1 || radio!.isV2 {
+    } else if radio!.version.isV1 || radio!.version.isV2 {
       Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
 
     } else {
