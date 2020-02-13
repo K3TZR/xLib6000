@@ -1829,7 +1829,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
         daxMicAudio.vitaProcessor(vitaPacket)
       }
-    case .daxAudioReducedBw:
+    case .daxReducedBw:
       // Dax AudioWithReduced Bandwidth
       // TODO: implement this
       _log("VITA class code: \(vitaPacket.classCode.description()) not yet implemented", .error, #function, #file, #line)

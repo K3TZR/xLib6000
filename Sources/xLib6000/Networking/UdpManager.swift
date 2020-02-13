@@ -241,7 +241,8 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
     
     _streamQ.async { [weak self] in
 
-      // DL3LSM: using the "old" code here
+      // DL3LSM: using the "old" code here as the if clause (in the new code) leaves out all the
+      //         DAX streams and calls the same delegate handler anyway
       if let vita = Vita.decodeFrom(data: data) {
         
         // TODO: Packet statistics - received, dropped
