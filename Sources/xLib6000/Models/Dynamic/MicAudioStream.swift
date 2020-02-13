@@ -177,14 +177,9 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .inUse:
-        update(self, &_inUse, to: property.value.bValue, signal: \.inUse)
-
-      case .ip:
-        update(self, &_ip, to: property.value, signal: \.ip)
-
-      case .port:
-        update(self, &_port, to: property.value.iValue, signal: \.port)
+      case .inUse:  update(self, &_inUse, to: property.value.bValue,  signal: \.inUse)
+      case .ip:     update(self, &_ip,    to: property.value,         signal: \.ip)
+      case .port:   update(self, &_port,  to: property.value.iValue,  signal: \.port)
       }
     }
     // is the AudioStream acknowledged by the radio?
