@@ -424,7 +424,7 @@ final class DaxTests: XCTestCase {
     if radio!.version.isV3 {
       Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
       
-    } else {
+      } else if radio!.version.isV1 || radio!.version.isV2 {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
@@ -439,7 +439,7 @@ final class DaxTests: XCTestCase {
     if radio!.version.isV3 {
       Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
       
-    } else {
+    } else if radio!.version.isV1 || radio!.version.isV2 {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio

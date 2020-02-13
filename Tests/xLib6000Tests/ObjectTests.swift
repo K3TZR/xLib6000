@@ -676,11 +676,177 @@ final class ObjectTests: XCTestCase {
             sliceObject.rxAnt = "ANT2"
             sliceObject.mode = "CWU"
             
+            sliceObject.active = false
+            sliceObject.agcMode = Slice.AgcMode.fast.rawValue
+            sliceObject.agcOffLevel = 20
+            sliceObject.agcThreshold = 65
+            sliceObject.anfEnabled = true
+
+            sliceObject.anfLevel = 10
+            sliceObject.apfEnabled = true
+            sliceObject.apfLevel = 30
+            sliceObject.audioGain = 40
+            sliceObject.audioLevel = 70
+
+            sliceObject.audioMute = true
+            sliceObject.audioPan = 20
+            sliceObject.autoPan = true
+            sliceObject.daxChannel = 1
+
+            sliceObject.daxClients = 1
+            sliceObject.daxTxEnabled = true
+            sliceObject.detached = true
+            sliceObject.dfmPreDeEmphasisEnabled = true
+            sliceObject.digitalLowerOffset = 3320
+
+            sliceObject.digitalUpperOffset = 2611
+            sliceObject.diversityChild = true
+            sliceObject.diversityEnabled = true
+            sliceObject.diversityIndex = 1
+            sliceObject.diversityParent = true
+
+            sliceObject.filterHigh = 3911
+            sliceObject.filterLow = 2111
+            sliceObject.fmDeviation = 4999
+            sliceObject.fmRepeaterOffset = 100.0
+            sliceObject.fmToneBurstEnabled = true
+
+            sliceObject.fmToneFreq = 78.1
+            sliceObject.fmToneMode = "CTSS"
+            sliceObject.locked = true
+            sliceObject.loopAEnabled = true
+            sliceObject.loopBEnabled = true
+
+            sliceObject.modeList = ["RTTY", "LSB", "USB", "AM", "CW", "DIGL", "DIGU", "SAM", "FM", "NFM", "DFM"]
+            sliceObject.nbEnabled = true
+            sliceObject.nbLevel = 35
+            sliceObject.nrEnabled = true
+            sliceObject.nrLevel = 10
+
+            sliceObject.nr2 = 5
+            sliceObject.owner = 1
+            sliceObject.playbackEnabled = true
+            sliceObject.postDemodBypassEnabled = true
+
+            sliceObject.postDemodHigh = 4411
+            sliceObject.postDemodLow = 212
+            sliceObject.qskEnabled = true
+            sliceObject.recordEnabled = true
+            sliceObject.recordLength = 10.9
+
+            sliceObject.repeaterOffsetDirection = Slice.Offset.up.rawValue.uppercased()
+            sliceObject.rfGain = 4
+            sliceObject.ritEnabled = true
+            sliceObject.ritOffset = 20
+            sliceObject.rttyMark = 5
+
+            sliceObject.rttyShift = 281
+            sliceObject.rxAntList = ["XVTR", "ANT1", "ANT2", "RX_A"]
+//            sliceObject.sliceLetter = "B"
+            sliceObject.step = 213
+            sliceObject.squelchEnabled = false
+
+            sliceObject.squelchLevel = 19
+            sliceObject.stepList = "3000,1,10,50,100,500,1000,2000"
+            sliceObject.txAnt = "ANT2"
+            sliceObject.txAntList = ["XVTR", "ANT1", "ANT2"]
+            sliceObject.txEnabled = false
+
+            sliceObject.txOffsetFreq = 5.0
+            sliceObject.wide = false
+            sliceObject.wnbEnabled = true
+            sliceObject.wnbLevel = 2
+            sliceObject.xitEnabled = true
+            sliceObject.xitOffset = 7
+            
             // check params
             XCTAssertEqual(sliceObject.frequency, 7_100_000, "Frequency")
             XCTAssertEqual(sliceObject.rxAnt,  "ANT2", "RxAntenna")
             XCTAssertEqual(sliceObject.mode, "CWU", "Mode")
                                               
+            XCTAssertEqual(sliceObject.active, false, "Active")
+            XCTAssertEqual(sliceObject.agcMode, Slice.AgcMode.fast.rawValue, "AgcMode")
+            XCTAssertEqual(sliceObject.agcOffLevel, 20, "AgcOffLevel")
+            XCTAssertEqual(sliceObject.agcThreshold, 65, "AgcThreshold")
+            XCTAssertEqual(sliceObject.anfEnabled, true, "AnfEnabled")
+
+            XCTAssertEqual(sliceObject.anfLevel, 10, "AnfLevel")
+            XCTAssertEqual(sliceObject.apfEnabled, true, "ApfEnabled")
+            XCTAssertEqual(sliceObject.apfLevel, 30, "ApfLevel")
+            XCTAssertEqual(sliceObject.audioGain, 40, "AudioGain")
+            XCTAssertEqual(sliceObject.audioLevel, 70, "AudioLevel")
+
+            XCTAssertEqual(sliceObject.audioMute, true, "AudioMute")
+            XCTAssertEqual(sliceObject.audioPan, 20, "AudioPan")
+            XCTAssertEqual(sliceObject.autoPan, true, "AutoPan")
+            XCTAssertEqual(sliceObject.daxChannel, 1, "DaxChannel")
+
+            XCTAssertEqual(sliceObject.daxClients, 1, "DaxClients")
+            XCTAssertEqual(sliceObject.daxTxEnabled, true, "DaxTxEnabled")
+            XCTAssertEqual(sliceObject.detached, true, "Detached")
+            XCTAssertEqual(sliceObject.dfmPreDeEmphasisEnabled, true, "DfmPreDeEmphasisEnabled")
+            XCTAssertEqual(sliceObject.digitalLowerOffset, 3320, "DigitalLowerOffset")
+
+            XCTAssertEqual(sliceObject.digitalUpperOffset, 2611, "DigitalUpperOffset")
+            XCTAssertEqual(sliceObject.diversityChild, false, "DiversityChild")
+            XCTAssertEqual(sliceObject.diversityEnabled, true, "DiversityEnabled")
+            XCTAssertEqual(sliceObject.diversityIndex, 0, "DiversityIndex")
+            XCTAssertEqual(sliceObject.diversityParent, false, "DiversityParent")
+
+            XCTAssertEqual(sliceObject.filterHigh, 3911, "FilterHigh")
+            XCTAssertEqual(sliceObject.filterLow, 2111, "FilterLow")
+            XCTAssertEqual(sliceObject.fmDeviation, 4999, "FmDeviation")
+            XCTAssertEqual(sliceObject.fmRepeaterOffset, 100.0, "FmRepeaterOffset")
+            XCTAssertEqual(sliceObject.fmToneBurstEnabled, true, "FmToneBurstEnabled")
+
+              XCTAssertEqual(sliceObject.fmToneFreq, 78.1, "FmToneFreq")
+            XCTAssertEqual(sliceObject.fmToneMode, "CTSS", "FmToneMode")
+            XCTAssertEqual(sliceObject.locked, true, "Locked")
+            XCTAssertEqual(sliceObject.loopAEnabled, true, "LoopAEnabled")
+            XCTAssertEqual(sliceObject.loopBEnabled, true, "LoopBEnabled")
+
+            XCTAssertEqual(sliceObject.modeList, ["RTTY", "LSB", "USB", "AM", "CW", "DIGL", "DIGU", "SAM", "FM", "NFM", "DFM"], "ModeList")
+            XCTAssertEqual(sliceObject.nbEnabled, true, "NbEnabled")
+            XCTAssertEqual(sliceObject.nbLevel, 35, "NbLevel")
+            XCTAssertEqual(sliceObject.nrEnabled, true, "NrEnabled")
+            XCTAssertEqual(sliceObject.nrLevel, 10, "NrLevel")
+
+            XCTAssertEqual(sliceObject.nr2, 5, "Nr2")
+            XCTAssertEqual(sliceObject.owner, 1, "Owner")
+            XCTAssertEqual(sliceObject.playbackEnabled, true, "PlaybackEnabled")
+            XCTAssertEqual(sliceObject.postDemodBypassEnabled, true, "PostDemodBypassEnabled")
+
+            XCTAssertEqual(sliceObject.postDemodHigh, 4411, "PostDemodHigh")
+            XCTAssertEqual(sliceObject.postDemodLow, 212, "PostDemodLow")
+            XCTAssertEqual(sliceObject.qskEnabled, true, "QskEnabled")
+            XCTAssertEqual(sliceObject.recordEnabled, true, "RecordEnabled")
+            XCTAssertEqual(sliceObject.recordLength, 10.9, "RecordLength")
+
+            XCTAssertEqual(sliceObject.repeaterOffsetDirection, Slice.Offset.up.rawValue.uppercased(), "RepeaterOffsetDirection")
+            XCTAssertEqual(sliceObject.rfGain, 4, "RfGain")
+            XCTAssertEqual(sliceObject.ritEnabled, true, "RitEnabled")
+            XCTAssertEqual(sliceObject.ritOffset, 20, "RitOffset")
+            XCTAssertEqual(sliceObject.rttyMark, 5, "RttyMark")
+
+            XCTAssertEqual(sliceObject.rttyShift, 281, "RttyShift")
+            XCTAssertEqual(sliceObject.rxAntList, ["XVTR", "ANT1", "ANT2", "RX_A"], "RxAntList")
+            XCTAssertEqual(sliceObject.sliceLetter, "A", "SliceLetter")
+            XCTAssertEqual(sliceObject.step, 213, "Step")
+            XCTAssertEqual(sliceObject.squelchEnabled, false, "SquelchEnabled")
+
+            XCTAssertEqual(sliceObject.squelchLevel, 19, "SquelchLevel")
+            XCTAssertEqual(sliceObject.stepList, "3000,1,10,50,100,500,1000,2000", "StepList")
+            XCTAssertEqual(sliceObject.txAnt, "ANT2", "TxAnt")
+            XCTAssertEqual(sliceObject.txAntList, ["XVTR", "ANT1", "ANT2"], "TxAntList")
+            XCTAssertEqual(sliceObject.txEnabled, false, "TxEnabled")
+
+            XCTAssertEqual(sliceObject.txOffsetFreq, 5.0, "TxOffsetFreq")
+            XCTAssertEqual(sliceObject.wide, false, "Wide")
+            XCTAssertEqual(sliceObject.wnbEnabled, true, "WnbEnabled")
+            XCTAssertEqual(sliceObject.wnbLevel, 2, "WnbLevel")
+            XCTAssertEqual(sliceObject.xitEnabled, true, "XitEnabled")
+            XCTAssertEqual(sliceObject.xitOffset, 7, "XitOffset")
+
             Swift.print("***** Modified Slice params checked")
             
             sliceObject.remove()
