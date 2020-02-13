@@ -60,7 +60,7 @@ public struct IqStreamFrame {
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
-  /// Initialize an IqtreamFrame
+  /// Initialize an IqStreamFrame
   ///
   /// - Parameters:
   ///   - payload:        pointer to a Vita packet payload
