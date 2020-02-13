@@ -722,20 +722,39 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     //      NOTE: order is important
     
     // notify all observers, then remove
+    // TODO: Differentiate between v3 and earlier? For now remove all - DL3LSM
     audioStreams.forEach( { NC.post(.audioStreamWillBeRemoved, object: $0.value as Any?) } )
     audioStreams.removeAll()
+    
+    daxRxAudioStreams.forEach( { NC.post(.daxRxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    daxRxAudioStreams.removeAll()
     
     iqStreams.forEach( { NC.post(.iqStreamWillBeRemoved, object: $0.value as Any?) } )
     iqStreams.removeAll()
     
+    daxIqStreams.forEach( { NC.post(.daxIqStreamWillBeRemoved, object: $0.value as Any?) } )
+    daxIqStreams.removeAll()
+    
     micAudioStreams.forEach( {NC.post(.micAudioStreamWillBeRemoved, object: $0.value as Any?)} )
     micAudioStreams.removeAll()
+    
+    daxMicAudioStreams.forEach( {NC.post(.daxMicAudioStreamWillBeRemoved, object: $0.value as Any?)} )
+    daxMicAudioStreams.removeAll()
     
     txAudioStreams.forEach( { NC.post(.txAudioStreamWillBeRemoved, object: $0.value as Any?) } )
     txAudioStreams.removeAll()
     
+    daxTxAudioStreams.forEach( { NC.post(.daxTxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    daxTxAudioStreams.removeAll()
+    
     opusStreams.forEach( { NC.post(.opusRxWillBeRemoved, object: $0.value as Any?) } )
     opusStreams.removeAll()
+    
+    remoteRxAudioStreams.forEach( { NC.post(.remoteRxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    remoteRxAudioStreams.removeAll()
+    
+    remoteTxAudioStreams.forEach( { NC.post(.remoteTxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    remoteTxAudioStreams.removeAll()
     
     tnfs.forEach( { NC.post(.tnfWillBeRemoved, object: $0.value as Any?) } )
     tnfs.removeAll()
