@@ -637,31 +637,31 @@ extension Vita {
   /// Class codes
   ///
   public enum PacketClassCode : UInt16 {    // Packet Class Codes
-    case meter                              = 0x8002
-    case panadapter                         = 0x8003
-    case waterfall                          = 0x8004
-    case opus                               = 0x8005
-    case daxIq24                            = 0x02e3
-    case daxIq48                            = 0x02e4
-    case daxIq96                            = 0x02e5
-    case daxIq192                           = 0x02e6
-    case daxAudio                           = 0x03e3
-    case daxAudioReducedBw                  = 0x0123
-    case discovery                          = 0xffff
+    case meter          = 0x8002
+    case panadapter     = 0x8003
+    case waterfall      = 0x8004
+    case opus           = 0x8005
+    case daxReducedBw   = 0x0123
+    case daxIq24        = 0x02e3
+    case daxIq48        = 0x02e4
+    case daxIq96        = 0x02e5
+    case daxIq192       = 0x02e6
+    case daxAudio       = 0x03e3
+    case discovery      = 0xffff
     
     func description() -> String {
       switch self {
-      case .meter:      return "Meter"
-      case .panadapter: return "Panadapter"
-      case .waterfall:  return "Waterfall"
-      case .opus:       return "Opus"
-      case .daxIq24:    return "DaxIq24"
-      case .daxIq48:    return "DaxIq48"
-      case .daxIq96:    return "DaxIq96"
-      case .daxIq192:   return "DaxIq192"
-      case .daxAudio:   return "DaxAudio"
-      case .daxAudioReducedBw: return "DaxAudioReducedBw"
-      case .discovery:  return "Discovery"
+      case .meter:        return "Meter"
+      case .panadapter:   return "Panadapter"
+      case .waterfall:    return "Waterfall"
+      case .opus:         return "Opus"
+      case .daxReducedBw: return "DaxReducedBw"
+      case .daxIq24:      return "DaxIq24"
+      case .daxIq48:      return "DaxIq48"
+      case .daxIq96:      return "DaxIq96"
+      case .daxIq192:     return "DaxIq192"
+      case .daxAudio:     return "DaxAudio"
+      case .discovery:    return "Discovery"
       }
     }
   }
