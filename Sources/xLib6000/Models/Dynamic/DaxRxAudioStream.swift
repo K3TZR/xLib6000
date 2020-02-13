@@ -252,7 +252,6 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
         dataFrame = AudioStreamFrame(payload: payloadPtr, numberOfSamples: samples)
       }
       
-
       if dataFrame == nil { return }
       
       dataFrame!.daxChannel = self.daxChannel
@@ -272,7 +271,8 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
         // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
         for i in 0..<dataFrame!.samples {
           
-          let intVal = CFSwapInt16BigToHost(UInt16(wordsPtr.advanced(by: i).pointee))
+          let uIntVal = CFSwapInt16BigToHost(UInt16(bitPattern: wordsPtr.advanced(by: i).pointee))
+          let intVal = Int16(bitPattern: uIntVal)
           
           let floatVal = Float(intVal) * oneOverMax
           

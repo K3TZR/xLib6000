@@ -1842,9 +1842,26 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         }
       }
     case .daxReducedBw:
-      // Dax AudioWithReduced Bandwidth
-      // TODO: implement this
-      _log("VITA class code: \(vitaPacket.classCode.description()) not yet implemented", .error, #function, #file, #line)
+      // Dax Audio with reduced bandwidth
+      if version.isV3 {
+        if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
+          daxAudio.vitaProcessor(vitaPacket)
+        }
+      } else {
+        if let daxAudio = audioStreams[vitaPacket.streamId] {
+          daxAudio.vitaProcessor(vitaPacket)
+        }
+      }
+      // Dax Microphone Audio with reduced bandwidth
+      if version.isV3 {
+        if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
+          daxMicAudio.vitaProcessor(vitaPacket)
+        }
+      } else {
+        if let daxMicAudio = micAudioStreams[vitaPacket.streamId] {
+          daxMicAudio.vitaProcessor(vitaPacket)
+        }
+      }
     case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
       // Dax IQ
       if version.isV3 {
