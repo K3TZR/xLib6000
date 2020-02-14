@@ -106,7 +106,7 @@ public struct MicAudioStreamFrame {
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
-  /// Initialize a AudioStreamFrame
+  /// Initialize a MicAudioStreamFrame
   ///
   /// - Parameters:
   ///   - payload:        pointer to a Vita packet payload
@@ -116,6 +116,21 @@ public struct MicAudioStreamFrame {
     
     // 4 byte each for left and right sample (4 * 2)
     self.samples = numberOfBytes / (4 * 2)
+    
+    // allocate the samples arrays
+    self.leftAudio = [Float](repeating: 0, count: samples)
+    self.rightAudio = [Float](repeating: 0, count: samples)
+  }
+  /// Initialize an MicAudioStreamFrame
+  ///
+  /// - Parameters:
+  ///   - payload:          pointer to a Vita packet payload
+  ///   - numberOfSamples:  number of samples (L/R) needed
+  ///
+  public init(payload: UnsafeRawPointer, numberOfSamples: Int) {
+    
+    // 4 byte each for left and right sample (4 * 2)
+    self.samples = numberOfSamples
     
     // allocate the samples arrays
     self.leftAudio = [Float](repeating: 0, count: samples)
