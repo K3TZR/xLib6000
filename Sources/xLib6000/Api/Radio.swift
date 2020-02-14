@@ -1146,11 +1146,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///
   private func parseClient(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     
-    guard properties.count >= 3 else {
-      _log("Invalid client status", .warning, #function, #file, #line)
-      return
-    }
-    
     // is there a valid handle"
     if let handle = properties[0].key.handle {
       
