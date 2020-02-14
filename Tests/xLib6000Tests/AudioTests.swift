@@ -242,7 +242,7 @@ final class DaxTests: XCTestCase {
             // save params
             let clientHandle = stream.clientHandle
             let daxChannel = stream.daxChannel
-            let daxClients = stream.daxClients
+//            let daxClients = stream.daxClients
             let slice = stream.slice
             
             // remove any DaxRxAudioStreams
@@ -261,7 +261,7 @@ final class DaxTests: XCTestCase {
                   // check params
                   XCTAssertEqual(stream.clientHandle, clientHandle)
                   XCTAssertEqual(stream.daxChannel, daxChannel)
-                  XCTAssertEqual(stream.daxClients, daxClients)
+//                  XCTAssertEqual(stream.daxClients, daxClients)
                   XCTAssertEqual(stream.slice, slice)
                   
                 } else {
