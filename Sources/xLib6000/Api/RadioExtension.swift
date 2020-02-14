@@ -704,7 +704,7 @@ extension Radio {
   ///   - callback:           ReplyHandler (optional)
   /// - Returns:              success / failure
   ///
-  public func requestRxAudioStream(compression: String, callback: ReplyHandler? = nil) {
+  public func requestRemoteRxAudioStream(compression: String, callback: ReplyHandler? = nil) {
     
     // tell the Radio to enable Opus Rx
     sendCommand("stream create type=remote_audio_rx compression=\(compression)", replyTo: callback)
@@ -720,12 +720,12 @@ extension Radio {
   ///   - callback:           ReplyHandler (optional)
   /// - Returns:              success / failure
   ///
-  public func requestTxAudioStream(compression: String, callback: ReplyHandler? = nil) {
+  public func requestRemoteTxAudioStream(compression: String, callback: ReplyHandler? = nil) {
     
     // tell the Radio to enable RemoteTxAudioStream
     sendCommand("stream create type=remote_audio_tx compression=\(compression)", replyTo: callback)
   }
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Tnf methods
   
@@ -763,12 +763,11 @@ extension Radio {
   /// Create a Tx Audio Stream
   ///
   /// - Parameter callback:   ReplyHandler (optional)
-  /// - Returns:              Success / Failure
   ///
   public func requestTxAudioStream(callback: ReplyHandler? = nil) {
     
     // tell the Radio to create a Stream
-    sendCommand("stream create " + "daxtx", replyTo: callback)
+    sendCommand("dax tx 1", replyTo: callback)
   }
   
   // ----------------------------------------------------------------------------
