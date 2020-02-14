@@ -3,17 +3,15 @@ import XCTest
 
 final class ObjectTests: XCTestCase {
 
-  static let kSuppressLogging = true
-    
   // Helper functions
-  func discoverRadio() -> Radio? {
+  func discoverRadio(logState: Api.NSLogState = (false, "")) -> Radio? {
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
       
       Swift.print("\n***** Radio found")
       
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "ObjectTests", suppressNSLog: ObjectTests.kSuppressLogging) {
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "ObjectTests", logState: logState) {
         sleep(1)
         
         Swift.print("***** Connected")

@@ -39,18 +39,20 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
-  public        var suppressNSLog           = false
+  public typealias  NSLogState              = (suppressed: Bool, file: String)
+  
+  public        var nsLogState              : NSLogState = (false, "")
   public        var apiState                : Api.State! {
     didSet { _log("Api state = \(apiState.rawValue)", .debug, #function, #file, #line)}}
 
-  public        var connectionHandle      : Handle?
-  public        var connectionHandleWan   = ""
-  public        var isGui                 = true
-  public        var isWan                 = false
-  public        var reducedDaxBw          = false
-  public        var testerDelegate        : ApiDelegate?
-  public        var testerModeEnabled     = false
-  public        var pingerEnabled         = true
+  public        var connectionHandle        : Handle?
+  public        var connectionHandleWan     = ""
+  public        var isGui                   = true
+  public        var isWan                   = false
+  public        var reducedDaxBw            = false
+  public        var testerDelegate          : ApiDelegate?
+  public        var testerModeEnabled       = false
+  public        var pingerEnabled           = true
 
   public var radio        : Radio? {
     get { Api.objectQ.sync { _radio } }
@@ -191,6 +193,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     - isGui:                whether this is a GUI connection
   ///     - isWan:                whether this is a Wan connection
   ///     - wanHandle:            Wan Handle (if any)
+  ///     - reducedDaxBw:         Use reduced bandwidth for Dax
+  ///     - suppressNSLog:        Suppress NSLogs when no Log delegate
   /// - Returns:                  Success / Failure
   ///
   public func connect(_ discoveryPacket: DiscoveryStruct,
@@ -201,9 +205,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       isWan: Bool = false,
                       wanHandle: String = "",
                       reducedDaxBw: Bool = false,
-                      suppressNSLog: Bool = false) -> Bool {
+                      logState: NSLogState = (false, "")) -> Bool {
 
-    self.suppressNSLog = suppressNSLog
+    self.nsLogState = logState
     
     // must be in the Disconnected state to connect
     guard apiState == .disconnected else { return false }

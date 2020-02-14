@@ -54,7 +54,13 @@ public final class Log {
       delegate!.logMessage(msg, level, function, file, line, Api.kName)
     
     } else {
-      if !Api.sharedInstance.suppressNSLog { NSLog(Api.kName.prefix(4) + ": " + msg) }
+      let state = Api.sharedInstance.nsLogState
+      
+      if state.suppressed {
+        if URL(fileURLWithPath: file.description).lastPathComponent == state.file { NSLog(Api.kName.prefix(4) + ": " + msg) }
+      } else {
+        NSLog(Api.kName.prefix(4) + ": " + msg)
+      }
     }
   }
 }

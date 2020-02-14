@@ -9,14 +9,12 @@ import XCTest
 
 final class IqTests: XCTestCase {
   
-  static let kSuppressLogging = true
-
   // Helper function
-  func discoverRadio() -> Radio? {
+  func discoverRadio(logState: Api.NSLogState = (false, "")) -> Radio? {
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "IqTests", suppressNSLog: ObjectTests.kSuppressLogging) {
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "IqTests", logState: logState) {
         sleep(1)
         return Api.sharedInstance.radio
       } else {
