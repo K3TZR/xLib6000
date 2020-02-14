@@ -431,15 +431,18 @@ public class Vita {
   /// - Parameters:
   ///   - type:           the type of Vita
   ///   - streamId:       a StreamId
+  ///   - reducedBW:      is for reduced bandwidth
   ///
-  convenience init(type: VitaType, streamId: UInt32) {
+  convenience init(type: VitaType, streamId: UInt32, reducedBW: Bool = false) {
     
     switch type {
     case .opusTx:
       self.init(packetType: .extDataWithStream, classCode: .daxAudio, streamId: streamId, tsi: .other, tsf: .sampleCount)
       
     case .txAudio:
-      self.init(packetType: .ifDataWithStream, classCode: .daxAudio, streamId: streamId, tsi: .other, tsf: .sampleCount)
+      var classCode = PacketClassCode.daxAudio
+      if reducedBW { classCode = PacketClassCode.daxReducedBw }
+      self.init(packetType: .ifDataWithStream, classCode: classCode, streamId: streamId, tsi: .other, tsf: .sampleCount)
     }
   }
   /// Initialize a Vita struct as a dataWithStream (Ext or If)

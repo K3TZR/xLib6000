@@ -43,13 +43,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public        var apiState                : Api.State! {
     didSet { _log("Api state = \(apiState.rawValue)", .debug, #function, #file, #line)}}
 
-  public        var connectionHandle        : Handle?
-  public        var connectionHandleWan     = ""
-  public        var isGui                   = true
-  public        var isWan                   = false
-  public        var testerDelegate          : ApiDelegate?
-  public        var testerModeEnabled       = false
-  public        var pingerEnabled           = true
+  public        var connectionHandle      : Handle?
+  public        var connectionHandleWan   = ""
+  public        var isGui                 = true
+  public        var isWan                 = false
+  public        var reducedDaxBw          = false
+  public        var testerDelegate        : ApiDelegate?
+  public        var testerModeEnabled     = false
+  public        var pingerEnabled         = true
 
   public var radio        : Radio? {
     get { Api.objectQ.sync { _radio } }
@@ -199,6 +200,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       isGui: Bool = true,
                       isWan: Bool = false,
                       wanHandle: String = "",
+                      reducedDaxBw: Bool = false) -> Bool {
                       suppressNSLog: Bool = false) -> Bool {
 
     self.suppressNSLog = suppressNSLog
@@ -220,6 +222,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _clientStation = clientStation
       self.isGui = isGui
       self.isWan = isWan
+      self.reducedDaxBw = reducedDaxBw
       connectionHandleWan = wanHandle
             
     } else {
@@ -377,7 +380,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       radio.requestDisplayProfile()
       radio.requestSubAll()
       if radio.version.isGreaterThan22  { radio.requestMtuLimit(1_500) }
-      if radio.version.isV3             { radio.requestDaxBandwidthLimit(true) }
+      if radio.version.isV3             { radio.requestDaxBandwidthLimit(self.reducedDaxBw) }
     }
   }
   /// Determine if the Radio Firmware version is compatable with the API version

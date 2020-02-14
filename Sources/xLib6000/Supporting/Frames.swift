@@ -41,6 +41,21 @@ public struct AudioStreamFrame {
     self.leftAudio = [Float](repeating: 0, count: samples)
     self.rightAudio = [Float](repeating: 0, count: samples)
   }
+  /// Initialize an AudioStreamFrame
+  ///
+  /// - Parameters:
+  ///   - payload:          pointer to a Vita packet payload
+  ///   - numberOfSamples:  number of samples (L/R) needed
+  ///
+  public init(payload: UnsafeRawPointer, numberOfSamples: Int) {
+    
+    // 4 byte each for left and right sample (4 * 2)
+    self.samples = numberOfSamples
+    
+    // allocate the samples arrays
+    self.leftAudio = [Float](repeating: 0, count: samples)
+    self.rightAudio = [Float](repeating: 0, count: samples)
+  }
 }
 
 /// Struct containing IQ Stream data

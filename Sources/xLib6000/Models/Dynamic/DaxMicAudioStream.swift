@@ -35,8 +35,12 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   @objc dynamic public var micGain      : Int {
     get { _micGain  }
     set {
-      if _micGain != newValue {
-        _micGain = newValue
+      var newGain = newValue
+      // check limits
+      if newGain > 100 { newGain = 100 }
+      if newGain < 0 { newGain = 0 }
+      if _micGain != newGain {
+        _micGain = newGain
         if _micGain == 0 {
           _micGainScalar = 0.0
           return

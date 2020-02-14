@@ -722,20 +722,39 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     //      NOTE: order is important
     
     // notify all observers, then remove
+    // TODO: Differentiate between v3 and earlier? For now remove all - DL3LSM
     audioStreams.forEach( { NC.post(.audioStreamWillBeRemoved, object: $0.value as Any?) } )
     audioStreams.removeAll()
+    
+    daxRxAudioStreams.forEach( { NC.post(.daxRxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    daxRxAudioStreams.removeAll()
     
     iqStreams.forEach( { NC.post(.iqStreamWillBeRemoved, object: $0.value as Any?) } )
     iqStreams.removeAll()
     
+    daxIqStreams.forEach( { NC.post(.daxIqStreamWillBeRemoved, object: $0.value as Any?) } )
+    daxIqStreams.removeAll()
+    
     micAudioStreams.forEach( {NC.post(.micAudioStreamWillBeRemoved, object: $0.value as Any?)} )
     micAudioStreams.removeAll()
+    
+    daxMicAudioStreams.forEach( {NC.post(.daxMicAudioStreamWillBeRemoved, object: $0.value as Any?)} )
+    daxMicAudioStreams.removeAll()
     
     txAudioStreams.forEach( { NC.post(.txAudioStreamWillBeRemoved, object: $0.value as Any?) } )
     txAudioStreams.removeAll()
     
+    daxTxAudioStreams.forEach( { NC.post(.daxTxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    daxTxAudioStreams.removeAll()
+    
     opusStreams.forEach( { NC.post(.opusRxWillBeRemoved, object: $0.value as Any?) } )
     opusStreams.removeAll()
+    
+    remoteRxAudioStreams.forEach( { NC.post(.remoteRxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    remoteRxAudioStreams.removeAll()
+    
+    remoteTxAudioStreams.forEach( { NC.post(.remoteTxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    remoteTxAudioStreams.removeAll()
     
     tnfs.forEach( { NC.post(.tnfWillBeRemoved, object: $0.value as Any?) } )
     tnfs.removeAll()
@@ -826,6 +845,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // none found
     return false
   }
+  private func updateGuiClient(with handle: Handle, updatedGuiClient: GuiClient) {
+    
+    // find the GuiClient
+    for (i, guiClient) in discoveryPacket.guiClients.enumerated() {
+      if guiClient.handle == handle {
+        discoveryPacket.guiClients.remove(at: i)
+        discoveryPacket.guiClients.append(updatedGuiClient)
+        return
+      }
+    }
+  }
   private func parseV3Connection(properties: KeyValuesArray, handle: Handle) {
     var clientId : String?
     var program = ""
@@ -874,6 +904,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       guiClient!.isLocalPtt = isLocalPtt
       guiClient!.isThisClient = (_api.connectionHandle! == handle)
       
+      updateGuiClient(with: handle, updatedGuiClient: guiClient!)
+      
       // notify all observers
       NC.post(.guiClientHasBeenUpdated, object: guiClient as Any?)
     } else {
@@ -884,6 +916,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
                             station: station,
                             isLocalPtt: isLocalPtt,
                             isThisClient: (_api.connectionHandle! == handle))
+      
       discoveryPacket.guiClients.append(guiClient!)
 
       // notify all observers
@@ -891,7 +924,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
   }
 
-  private func findGuiClient(with handle: Handle) -> GuiClient? {
+  // TODO: move this to the public section
+  public func findGuiClient(with handle: Handle) -> GuiClient? {
     
     // find an existing GuiClient
     for guiClient in discoveryPacket.guiClients {
@@ -904,8 +938,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     return nil
   }
   
-  
-  private func findGuiClient(with clientId: String) -> GuiClient? {
+  // TODO: move this to the public section
+  public func findGuiClient(with clientId: String) -> GuiClient? {
     
     // find an existing GuiClient
     for guiClient in discoveryPacket.guiClients where guiClient.clientId == clientId {
@@ -1804,21 +1838,59 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // Pass the stream to the appropriate object (checking for existence of the object first)
     switch (vitaPacket.classCode) {
-      
+    // DL3LSM added calls to v3 handlers
     case .daxAudio:
-      // Dax Microphone Audio
-      if let daxAudio = audioStreams[vitaPacket.streamId] {
-        daxAudio.vitaProcessor(vitaPacket)
-      }
       // Dax Slice Audio
-      if let daxMicAudio = micAudioStreams[vitaPacket.streamId] {
-        daxMicAudio.vitaProcessor(vitaPacket)
+      if version.isV3 {
+        if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
+          daxAudio.vitaProcessor(vitaPacket)
+        }
+      } else {
+        if let daxAudio = audioStreams[vitaPacket.streamId] {
+          daxAudio.vitaProcessor(vitaPacket)
+        }
       }
-      
+      // Dax Microphone Audio
+      if version.isV3 {
+        if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
+          daxMicAudio.vitaProcessor(vitaPacket)
+        }
+      } else {
+        if let daxMicAudio = micAudioStreams[vitaPacket.streamId] {
+          daxMicAudio.vitaProcessor(vitaPacket)
+        }
+      }
+    case .daxReducedBw:
+      // Dax Audio with reduced bandwidth
+      if version.isV3 {
+        if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
+          daxAudio.vitaProcessor(vitaPacket)
+        }
+      } else {
+        if let daxAudio = audioStreams[vitaPacket.streamId] {
+          daxAudio.vitaProcessor(vitaPacket)
+        }
+      }
+      // Dax Microphone Audio with reduced bandwidth
+      if version.isV3 {
+        if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
+          daxMicAudio.vitaProcessor(vitaPacket)
+        }
+      } else {
+        if let daxMicAudio = micAudioStreams[vitaPacket.streamId] {
+          daxMicAudio.vitaProcessor(vitaPacket)
+        }
+      }
     case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
       // Dax IQ
-      if let daxIq = iqStreams[vitaPacket.streamId] {
-        daxIq.vitaProcessor(vitaPacket)
+      if version.isV3 {
+        if let daxIq = daxIqStreams[vitaPacket.streamId] {
+          daxIq.vitaProcessor(vitaPacket)
+        }
+      } else {
+        if let daxIq = iqStreams[vitaPacket.streamId] {
+          daxIq.vitaProcessor(vitaPacket)
+        }
       }
       
     case .meter:
@@ -1828,14 +1900,26 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .opus:
       // Opus
-      if let opus = opusStreams[vitaPacket.streamId] {
-        
-        if opus.isStreaming == false {
-          opus.isStreaming = true
-          // log the start of the stream
-          _log("Opus Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+      if version.isV3 {
+        if let opus = remoteRxAudioStreams[vitaPacket.streamId] {
+          
+          if opus.isStreaming == false {
+            opus.isStreaming = true
+            // log the start of the stream
+            _log("Opus Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+          }
+          opus.vitaProcessor( vitaPacket )
         }
-        opus.vitaProcessor( vitaPacket )
+      } else {
+        if let opus = opusStreams[vitaPacket.streamId] {
+          
+          if opus.isStreaming == false {
+            opus.isStreaming = true
+            // log the start of the stream
+            _log("Opus Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
+          }
+          opus.vitaProcessor( vitaPacket )
+        }
       }
       
     case .panadapter:
