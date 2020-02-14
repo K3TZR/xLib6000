@@ -4,7 +4,7 @@ import XCTest
 final class ObjectTests: XCTestCase {
 
   // Helper functions
-  func discoverRadio(logState: Api.NSLogState = (false, "")) -> Radio? {
+  func discoverRadio(logState: Api.NSLogging = .normal) -> Radio? {
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count > 0 {

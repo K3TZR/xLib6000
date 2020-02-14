@@ -10,7 +10,7 @@ import XCTest
 final class AudioTests: XCTestCase {
       
   // Helper functions
-  func discoverRadio(logState: Api.NSLogState = (false, "")) -> Radio? {
+  func discoverRadio(logState: Api.NSLogging = .normal) -> Radio? {
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
@@ -48,7 +48,7 @@ final class AudioTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: (true, "AudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "AudioStream.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -107,7 +107,7 @@ final class AudioTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: (true, "AudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "AudioStream.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {     // v1 and v2 ONLY
@@ -219,7 +219,7 @@ final class AudioTests: XCTestCase {
             
         Swift.print("\n***** \(#function)")
         
-        let radio = discoverRadio(logState: (true, "DaxMicAudioStream.swift"))
+        let radio = discoverRadio(logState: .limited(to: "DaxMicAudioStream.swift"))
         guard radio != nil else { return }
 
         if radio!.version.isV3 {
@@ -271,7 +271,7 @@ final class AudioTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: (true, "DaxMicAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "DaxMicAudioStream.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
@@ -365,7 +365,7 @@ final class AudioTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: (true, "DaxRxAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "DaxRxAudioStream.swift"))
     guard radio != nil else { return }
 
     if radio!.version.isV3 {
@@ -423,7 +423,7 @@ final class AudioTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: (true, "DaxRxAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "DaxRxAudioStream.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
@@ -521,7 +521,7 @@ final class AudioTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: (true, "DaxTxAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "DaxTxAudioStream.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
@@ -572,7 +572,7 @@ final class AudioTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: (true, "DaxTxAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "DaxTxAudioStream.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
@@ -665,7 +665,7 @@ final class AudioTests: XCTestCase {
             
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: (true, "MicAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "MicAudioStream.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -682,7 +682,7 @@ final class AudioTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: (true, "MicAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "MicAudioStream.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -702,7 +702,7 @@ final class AudioTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: (true, "TxAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "TxAudioStream.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -719,7 +719,7 @@ final class AudioTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: (true, "TxAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "TxAudioStream.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {

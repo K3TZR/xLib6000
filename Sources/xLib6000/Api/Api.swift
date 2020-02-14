@@ -39,12 +39,15 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
-  public typealias  NSLogState              = (suppressed: Bool, file: String)
+  public enum NSLogging {
+    case normal
+    case limited (to: String)
+    case none
+  }
+  public        var nsLogState              : NSLogging = .normal
   
-  public        var nsLogState              : NSLogState = (false, "")
   public        var apiState                : Api.State! {
     didSet { _log("Api state = \(apiState.rawValue)", .debug, #function, #file, #line)}}
-
   public        var connectionHandle        : Handle?
   public        var connectionHandleWan     = ""
   public        var isGui                   = true
@@ -205,7 +208,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       isWan: Bool = false,
                       wanHandle: String = "",
                       reducedDaxBw: Bool = false,
-                      logState: NSLogState = (false, "")) -> Bool {
+                      logState: NSLogging = .normal) -> Bool {
 
     self.nsLogState = logState
     

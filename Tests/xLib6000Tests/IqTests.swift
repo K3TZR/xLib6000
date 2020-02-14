@@ -10,7 +10,7 @@ import XCTest
 final class IqTests: XCTestCase {
   
   // Helper function
-  func discoverRadio(logState: Api.NSLogState = (false, "")) -> Radio? {
+  func discoverRadio(logState: Api.NSLogging = .normal) -> Radio? {
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count > 0 {

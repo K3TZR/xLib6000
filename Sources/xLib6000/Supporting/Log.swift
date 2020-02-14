@@ -56,10 +56,13 @@ public final class Log {
     } else {
       let state = Api.sharedInstance.nsLogState
       
-      if state.suppressed {
-        if URL(fileURLWithPath: file.description).lastPathComponent == state.file { NSLog(Api.kName.prefix(4) + ": " + msg) }
-      } else {
+      switch state {
+      case .normal:
         NSLog(Api.kName.prefix(4) + ": " + msg)
+      case .limited (let exception):
+        if URL(fileURLWithPath: file.description).lastPathComponent == exception { NSLog(Api.kName.prefix(4) + ": " + msg) }
+      case .none:
+        break
       }
     }
   }
