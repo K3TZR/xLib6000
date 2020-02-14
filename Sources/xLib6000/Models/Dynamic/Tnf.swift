@@ -22,11 +22,12 @@ public final class Tnf : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kWidthMin  : Hz = 5
-  static let kWidthMax  : Hz = 6_000
+  static let kWidthMin      : Hz = 5
+  static let kWidthDefault  : Hz = 100
+  static let kWidthMax      : Hz = 6_000
   
-  static let kNormal    = Depth.normal.rawValue
-  static let kVeryDeep  = Depth.veryDeep.rawValue
+//  static let kNormal    = Depth.normal.rawValue
+//  static let kVeryDeep  = Depth.veryDeep.rawValue
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -46,6 +47,7 @@ public final class Tnf : NSObject, DynamicModel {
   @objc dynamic public var width: Hz {
     get { _width  }
     set { if _width != newValue { _width = newValue ; tnfCmd( .width, newValue.hzToMhz) }}}
+  
   public enum Depth : UInt {
     case normal         = 1
     case deep           = 2
@@ -300,8 +302,8 @@ public final class Tnf : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // *** Hidden properties (Do NOT use) ***
   
-  private var __depth      : UInt = kNormal
+  private var __depth      : UInt = Depth.normal.rawValue
   private var __frequency  : Hz = 0
   private var __permanent  = false
-  private var __width      : Hz = 0
+  private var __width      : Hz = kWidthDefault
 }

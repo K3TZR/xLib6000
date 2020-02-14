@@ -652,6 +652,7 @@ extension Vita {
     case daxAudio       = 0x03e3
     case discovery      = 0xffff
     
+
     func description() -> String {
       switch self {
       case .meter:        return "Meter"

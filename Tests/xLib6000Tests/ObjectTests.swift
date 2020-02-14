@@ -3,22 +3,37 @@ import XCTest
 
 final class ObjectTests: XCTestCase {
 
-  // Helper function
+  static let kSuppressLogging = true
+  
+  
+  // Helper functions
   func discoverRadio() -> Radio? {
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "xLib6000Tests") {
+      
+      Swift.print("\n***** Radio found")
+      
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "xLib6000Tests", suppressNSLog: ObjectTests.kSuppressLogging) {
         sleep(1)
+        
+        Swift.print("***** Connected")
+        
         return Api.sharedInstance.radio
       } else {
-        XCTAssertTrue(false, "\n***** Failed to connect to Radio *****\n")
+        XCTAssertTrue(false, "***** Failed to connect to Radio")
         return nil
       }
     } else {
-      XCTAssertTrue(false, "\n***** No Radio(s) found *****\n")
+      XCTAssertTrue(false, "***** No Radio(s) found")
       return nil
     }
+  }
+  
+  func disconnect() {
+    Api.sharedInstance.disconnect()
+    
+    Swift.print("***** Disconnected\n")
   }
 
  // ------------------------------------------------------------------------------
@@ -66,152 +81,12 @@ final class ObjectTests: XCTestCase {
     }
 
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   func testAmplifier() {
     
     Swift.print("\n***** \(#function) NOT implemented, NEED MORE INFORMATION ****\n")
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - AudioStream
-   
-  ///   Format:  <streamId, > <"dax", channel> <"in_use", 1|0> <"slice", number> <"ip", ip> <"port", port>
-  private var audioStreamStatus = "0x23456789 dax=3 slice=0 ip=10.0.1.107 port=4124"
-  func testAudioStreamParse() {
-
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-
-    if radio!.version.isV1 || radio!.version.isV2 {
-
-      radio!.requestAudioStream("2")
-      sleep(1)
-
-      if let audioStream = radio!.audioStreams["0x23456789".streamId!] {
-        // verify properties
-        XCTAssertEqual(audioStream.id, "0x23456789".streamId)
-        XCTAssertEqual(audioStream.daxChannel, 3)
-        XCTAssertEqual(audioStream.ip, "10.0.1.107")
-        XCTAssertEqual(audioStream.port, 4124)
-        XCTAssertEqual(audioStream.slice, radio!.slices["0".objectId!])
-
-        // change properties
-        audioStream.daxChannel = 4
-        audioStream.ip = "12.2.3.218"
-        audioStream.port = 4214
-        audioStream.slice = radio!.slices["0".objectId!]
-
-        // re-verify properties
-        XCTAssertEqual(audioStream.id, "0x23456789".streamId)
-        XCTAssertEqual(audioStream.daxChannel, 4)
-        XCTAssertEqual(audioStream.ip, "12.2.3.218")
-        XCTAssertEqual(audioStream.port, 4214)
-        XCTAssertEqual(audioStream.slice, radio!.slices["0".objectId!])
-
-        // remove
-        audioStream.remove()
-        sleep(1)
-        XCTAssert(radio!.audioStreams["0x23456789".streamId!] == nil, "\n***** Failed to remove AudioStream *****\n")
-
-      } else {
-        XCTAssertTrue(false, "\n***** Failed to create AudioStream *****\n")
-      }
-
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  func testAudioStream() {
-    // find a radio & connect
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV1 || radio!.version.isV2 {     // v1 and v2 ONLY
-      
-      // remove any AudioStreams
-      for (_, stream) in radio!.audioStreams { stream.remove() }
-      sleep(1)
-      if radio!.audioStreams.count == 0 {
-        
-        // ask for a new AudioStream
-        radio!.requestAudioStream( "2")
-        sleep(1)
-        
-        // verify AudioStream added
-        if radio!.audioStreams.count == 1 {
-          
-          if let stream = radio!.audioStreams[0] {
-            
-            // save params
-            let daxChannel = stream.daxChannel
-            let ip = stream.ip
-            let port = stream.port
-            let slice = stream.slice
-            
-            // remove any AudioStreams
-            for (_, stream) in radio!.audioStreams { stream.remove() }
-            sleep(1)
-            if radio!.audioStreams.count == 0 {
-              
-              // ask for a new AudioStream
-              radio!.requestAudioStream( "2")
-              sleep(1)
-              
-              // verify AudioStream added
-              if radio!.audioStreams.count == 1 {
-                if let audioStreamObject = radio!.audioStreams[0] {
-                  
-                  // check params
-                  XCTAssertEqual(audioStreamObject.id, "0x23456789".streamId)
-                  XCTAssertEqual(audioStreamObject.daxChannel, daxChannel)
-                  XCTAssertEqual(audioStreamObject.ip, ip)
-                  XCTAssertEqual(audioStreamObject.port, port)
-                  XCTAssertEqual(audioStreamObject.slice, slice)
-                  
-                  // change properties
-                  audioStreamObject.daxChannel = 4
-                  audioStreamObject.ip = "12.2.3.218"
-                  audioStreamObject.port = 4214
-                  audioStreamObject.slice = radio!.slices["0".objectId!]
-
-                  // re-verify properties
-                  XCTAssertEqual(audioStreamObject.id, "0x23456789".streamId)
-                  XCTAssertEqual(audioStreamObject.daxChannel, 4)
-                  XCTAssertEqual(audioStreamObject.ip, "12.2.3.218")
-                  XCTAssertEqual(audioStreamObject.port, 4214)
-                  XCTAssertEqual(audioStreamObject.slice, radio!.slices["0".objectId!])
-
-                } else {
-                  XCTAssert(true, "\n***** AudioStream 0 NOT found *****\n")
-                }
-              } else {
-                XCTAssert(true, "\n***** AudioStream(s) NOT added *****\n")
-              }
-            } else {
-              XCTAssert(true, "\n***** AudioStream(s) NOT removed *****\n")
-            }
-          } else {
-            XCTAssert(true, "\n***** AudioStream 0 NOT found *****\n")
-          }
-        } else {
-          XCTAssert(true, "\n***** AudioStream(s) NOT added *****\n")
-        }
-      } else {
-        XCTAssert(true, "\n***** AudioStream(s) NOT removed *****\n")
-      }
-      // remove any AudioStreams
-      for (_, stream) in radio!.audioStreams { stream.remove() }
-    
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
   }
   
   // ------------------------------------------------------------------------------
@@ -248,7 +123,7 @@ final class ObjectTests: XCTestCase {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   func testBandSetting() {
@@ -263,7 +138,7 @@ final class ObjectTests: XCTestCase {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   // ------------------------------------------------------------------------------
@@ -596,7 +471,7 @@ final class ObjectTests: XCTestCase {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   // ------------------------------------------------------------------------------
@@ -676,109 +551,7 @@ final class ObjectTests: XCTestCase {
       XCTAssert(true, "\n***** \(type.rawValue) Equalizer NOT found *****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  // ------------------------------------------------------------------------------
-  // MARK: - IqStream
-  
-  func testIqParse() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  func testIq() {
-
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV1 || radio!.version.isV2 {
-      
-      // remove all
-      for (_, stream) in radio!.iqStreams { stream.remove() }
-      sleep(1)
-      if radio!.iqStreams.count == 0 {
-        
-        // get new
-        radio!.requestIqStream("3")
-        sleep(1)
-        
-        // verify added
-        if radio!.iqStreams.count == 1 {
-          
-          if let stream = radio!.iqStreams[0] {
-            
-            // save params
-            let available     = stream.available
-            let capacity      = stream.capacity
-//            let daxIqChannel  = stream.daxIqChannel
-//            let inUse         = stream.inUse
-            let ip            = stream.ip
-            let pan           = stream.pan
-            let port          = stream.port
-            let rate          = stream.rate
-            let streaming     = stream.streaming
-
-            // remove all
-            for (_, stream) in radio!.iqStreams { stream.remove() }
-            sleep(1)
-            if radio!.iqStreams.count == 0 {
-              
-              // get new
-              radio!.requestIqStream("3")
-              sleep(1)
-              
-              // verify added
-              if radio!.iqStreams.count == 1 {
-                if let stream = radio!.iqStreams[0] {
-                  
-                  // check params
-                  XCTAssertEqual(stream.available, available)
-                  XCTAssertEqual(stream.capacity, capacity)
-                  XCTAssertEqual(stream.daxIqChannel, 3)
-                  XCTAssertEqual(stream.inUse, true)
-                  XCTAssertEqual(stream.ip, ip)
-                  XCTAssertEqual(stream.pan, pan)
-                  XCTAssertEqual(stream.port, port)
-                  XCTAssertEqual(stream.rate, rate)
-                  XCTAssertEqual(stream.streaming, streaming)
-
-                } else {
-                  XCTAssert(true, "\n***** IqStream 0 NOT found *****\n")
-                }
-              } else {
-                XCTAssert(true, "\n***** IqStream NOT added *****\n")
-              }
-            } else {
-              XCTAssert(true, "\n***** IqStream NOT removed *****\n")
-            }
-          } else {
-            XCTAssert(true, "\n***** IqStream 0 NOT found *****\n")
-          }
-        } else {
-          XCTAssert(true, "\n***** IqStream NOT added *****\n")
-        }
-      } else {
-        XCTAssert(true, "\n***** DaxTxAudioStream(s) NOT removed *****\n")
-      }
-      // remove any DaxTxAudioStream
-      for (_, stream) in radio!.iqStreams { stream.remove() }
-    
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
   
   // ------------------------------------------------------------------------------
@@ -811,7 +584,7 @@ final class ObjectTests: XCTestCase {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   // ------------------------------------------------------------------------------
@@ -829,7 +602,7 @@ final class ObjectTests: XCTestCase {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   func testMeter() {
@@ -844,74 +617,7 @@ final class ObjectTests: XCTestCase {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - MicAudioStream
-  
-  func testMicParse() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  func testMic() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Opus
-  
-  func testOpusParse() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  func testOpus() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   // ------------------------------------------------------------------------------
@@ -971,7 +677,7 @@ final class ObjectTests: XCTestCase {
     removeAllPanadapters(radio: radio!)
 
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   func testPanadapter() {
@@ -1131,91 +837,56 @@ final class ObjectTests: XCTestCase {
       removeAllPanadapters(radio: radio!)
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - RemoteRxAudioStream
-  
-  func testRemoteRxParse() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  func testRemoteRx() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  // ------------------------------------------------------------------------------
-  // MARK: - RemoteTxAudioStream
-  
-  func testRemoteTxParse() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  func testRemoteTx() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   // ------------------------------------------------------------------------------
   // MARK: - Slice
   
+  private let sliceStatus = "0 mode=USB filter_lo=100 filter_hi=2800 agc_mode=med agc_threshold=65 agc_off_level=10 qsk=1 step=100 step_list=1,10,50,100,500,1000,2000,3000 anf=1 anf_level=33 nr=0 nr_level=25 nb=1 nb_level=50 wnb=0 wnb_level=42 apf=1 apf_level=76 squelch=1 squelch_level=22"
   func testSliceParse() {
     
     let radio = discoverRadio()
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
+    let id: ObjectId = sliceStatus.keyValuesArray()[0].key.objectId!
+    Slice.parseStatus(radio!, sliceStatus.keyValuesArray(), true)
+    sleep(1)
+    
+    if let sliceObject = radio!.slices[id] {
+                              
+      Swift.print("***** Slice added")
+
+      // check params
+      XCTAssertEqual(sliceObject.mode, "USB", "Mode")
+      XCTAssertEqual(sliceObject.filterLow, 100, "FilterLow")
+      XCTAssertEqual(sliceObject.filterHigh, 2_800, "FilterHigh")
+      XCTAssertEqual(sliceObject.agcMode, "med", "AgcMode")
+      XCTAssertEqual(sliceObject.agcThreshold, 65, "AgcThreshold")
+      XCTAssertEqual(sliceObject.agcOffLevel, 10, "AgcOffLevel")
+      XCTAssertEqual(sliceObject.qskEnabled, true, "QskEnabled")
+      XCTAssertEqual(sliceObject.step, 100, "Step")
+      XCTAssertEqual(sliceObject.stepList, "1,10,50,100,500,1000,2000,3000", "StepList")
+      XCTAssertEqual(sliceObject.anfEnabled, true, "AnfEnabled")
+      XCTAssertEqual(sliceObject.anfLevel, 33, "AnfLevel")
+      XCTAssertEqual(sliceObject.nrEnabled, false, "NrEnabled")
+      XCTAssertEqual(sliceObject.nrLevel, 25, "NrLevel")
+      XCTAssertEqual(sliceObject.nbEnabled, true, "NbEnabled")
+      XCTAssertEqual(sliceObject.nbLevel, 50, "NbLevel")
+      XCTAssertEqual(sliceObject.wnbEnabled, false, "WnbEnabled")
+      XCTAssertEqual(sliceObject.wnbLevel, 42, "WnbLevel")
+      XCTAssertEqual(sliceObject.apfEnabled, true, "ApfEnabled")
+      XCTAssertEqual(sliceObject.apfLevel, 76, "ApfLevel")
+      XCTAssertEqual(sliceObject.squelchEnabled, true, "SquelchEnabled")
+      XCTAssertEqual(sliceObject.squelchLevel, 22, "SquelchLevel")
+
+      Swift.print("***** Added Slice params checked")
+
     } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+      XCTAssertTrue(false, "***** Failed to add Slice")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   func testSlice() {
@@ -1224,13 +895,319 @@ final class ObjectTests: XCTestCase {
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+
+      // remove all
+      radio!.slices.forEach( {$0.value.remove() } )
+      sleep(1)
+      if radio!.slices.count == 0 {
+        
+        // get new
+        radio!.requestSlice(frequency: 7_225_000, rxAntenna: "ANT2", mode: "USB")
+        sleep(1)
+        
+        // verify added
+        if radio!.slices.count == 1 {
+                        
+          Swift.print("***** Previous Slice(s) removed")
+
+          if let sliceObject = radio!.slices.first?.value {
+                                    
+            Swift.print("***** Slice added, id=\(sliceObject.id), handle=\(sliceObject.clientHandle.hex), panadapterId=\(sliceObject.panadapterId.hex) ")
+
+            // check params
+            XCTAssertEqual(sliceObject.frequency, 7_225_000, "Frequency")
+            XCTAssertEqual(sliceObject.rxAnt, "ANT2", "RxAntenna")
+            XCTAssertEqual(sliceObject.mode, "USB", "Mode")
+            
+            XCTAssertEqual(sliceObject.active, true, "Active")
+            XCTAssertEqual(sliceObject.agcMode, Slice.AgcMode.med.rawValue, "AgcMode")
+            XCTAssertEqual(sliceObject.agcOffLevel, 10, "AgcOffLevel")
+            XCTAssertEqual(sliceObject.agcThreshold, 55, "AgcThreshold")
+            XCTAssertEqual(sliceObject.anfEnabled, false, "AnfEnabled")
+
+            XCTAssertEqual(sliceObject.anfLevel, 0, "AnfLevel")
+            XCTAssertEqual(sliceObject.apfEnabled, false, "ApfEnabled")
+            XCTAssertEqual(sliceObject.apfLevel, 0, "ApfLevel")
+            XCTAssertEqual(sliceObject.audioGain, 0, "AudioGain")
+            XCTAssertEqual(sliceObject.audioLevel, 50, "AudioLevel")
+
+            XCTAssertEqual(sliceObject.audioMute, false, "AudioMute")
+            XCTAssertEqual(sliceObject.audioPan, 50, "AudioPan")
+            XCTAssertEqual(sliceObject.autoPan, false, "AutoPan")
+            XCTAssertEqual(sliceObject.daxChannel, 0, "DaxChannel")
+
+            XCTAssertEqual(sliceObject.daxClients, 0, "DaxClients")
+            XCTAssertEqual(sliceObject.daxTxEnabled, false, "DaxTxEnabled")
+            XCTAssertEqual(sliceObject.detached, false, "Detached")
+            XCTAssertEqual(sliceObject.dfmPreDeEmphasisEnabled, false, "DfmPreDeEmphasisEnabled")
+            XCTAssertEqual(sliceObject.digitalLowerOffset, 2210, "DigitalLowerOffset")
+
+            XCTAssertEqual(sliceObject.digitalUpperOffset, 1500, "DigitalUpperOffset")
+            XCTAssertEqual(sliceObject.diversityChild, false, "DiversityChild")
+            XCTAssertEqual(sliceObject.diversityEnabled, false, "DiversityEnabled")
+            XCTAssertEqual(sliceObject.diversityIndex, 0, "DiversityIndex")
+            XCTAssertEqual(sliceObject.diversityParent, false, "DiversityParent")
+
+            XCTAssertEqual(sliceObject.filterHigh, 2800, "FilterHigh")
+            XCTAssertEqual(sliceObject.filterLow, 100, "FilterLow")
+            XCTAssertEqual(sliceObject.fmDeviation, 5000, "FmDeviation")
+            XCTAssertEqual(sliceObject.fmRepeaterOffset, 0.0, "FmRepeaterOffset")
+            XCTAssertEqual(sliceObject.fmToneBurstEnabled, false, "FmToneBurstEnabled")
+
+            XCTAssertEqual(sliceObject.fmToneFreq, 67.0, "FmToneFreq")
+            XCTAssertEqual(sliceObject.fmToneMode, "OFF", "FmToneMode")
+            XCTAssertEqual(sliceObject.locked, false, "Locked")
+            XCTAssertEqual(sliceObject.loopAEnabled, false, "LoopAEnabled")
+            XCTAssertEqual(sliceObject.loopBEnabled, false, "LoopBEnabled")
+
+            XCTAssertEqual(sliceObject.modeList, ["LSB", "USB", "AM", "CW", "DIGL", "DIGU", "SAM", "FM", "NFM", "DFM", "RTTY"], "ModeList")
+            XCTAssertEqual(sliceObject.nbEnabled, false, "NbEnabled")
+            XCTAssertEqual(sliceObject.nbLevel, 50, "NbLevel")
+            XCTAssertEqual(sliceObject.nrEnabled, false, "NrEnabled")
+            XCTAssertEqual(sliceObject.nrLevel, 0, "NrLevel")
+
+            XCTAssertEqual(sliceObject.nr2, 0, "Nr2")
+            XCTAssertEqual(sliceObject.owner, 0, "Owner")
+            XCTAssertEqual(sliceObject.playbackEnabled, false, "PlaybackEnabled")
+            XCTAssertEqual(sliceObject.postDemodBypassEnabled, false, "PostDemodBypassEnabled")
+
+            XCTAssertEqual(sliceObject.postDemodHigh, 3300, "PostDemodHigh")
+            XCTAssertEqual(sliceObject.postDemodLow, 300, "PostDemodLow")
+            XCTAssertEqual(sliceObject.qskEnabled, false, "QskEnabled")
+            XCTAssertEqual(sliceObject.recordEnabled, false, "RecordEnabled")
+            XCTAssertEqual(sliceObject.recordLength, 0.0, "RecordLength")
+
+            XCTAssertEqual(sliceObject.repeaterOffsetDirection, Slice.Offset.simplex.rawValue.uppercased(), "RepeaterOffsetDirection")
+            XCTAssertEqual(sliceObject.rfGain, 0, "RfGain")
+            XCTAssertEqual(sliceObject.ritEnabled, false, "RitEnabled")
+            XCTAssertEqual(sliceObject.ritOffset, 0, "RitOffset")
+            XCTAssertEqual(sliceObject.rttyMark, 2, "RttyMark")
+
+            XCTAssertEqual(sliceObject.rttyShift, 170, "RttyShift")
+            XCTAssertEqual(sliceObject.rxAntList, ["ANT1", "ANT2", "RX_A", "XVTR"], "RxAntList")
+            XCTAssertEqual(sliceObject.sliceLetter, "A", "SliceLetter")
+            XCTAssertEqual(sliceObject.step, 100, "Step")
+            XCTAssertEqual(sliceObject.squelchEnabled, true, "SquelchEnabled")
+
+            XCTAssertEqual(sliceObject.squelchLevel, 20, "SquelchLevel")
+            XCTAssertEqual(sliceObject.stepList, "1,10,50,100,500,1000,2000,3000", "StepList")
+            XCTAssertEqual(sliceObject.txAnt, "ANT1", "TxAnt")
+            XCTAssertEqual(sliceObject.txAntList, ["ANT1", "ANT2", "XVTR"], "TxAntList")
+            XCTAssertEqual(sliceObject.txEnabled, true, "TxEnabled")
+
+            XCTAssertEqual(sliceObject.txOffsetFreq, 0.0, "TxOffsetFreq")
+            XCTAssertEqual(sliceObject.wide, true, "Wide")
+            XCTAssertEqual(sliceObject.wnbEnabled, false, "WnbEnabled")
+            XCTAssertEqual(sliceObject.wnbLevel, 0, "WnbLevel")
+            XCTAssertEqual(sliceObject.xitEnabled, false, "XitEnabled")
+            XCTAssertEqual(sliceObject.xitOffset, 0, "XitOffset")
+
+            Swift.print("***** Added Slice params checked")
+
+            // change params
+            sliceObject.frequency = 7_100_000
+            sliceObject.rxAnt = "ANT2"
+            sliceObject.mode = "CWU"
+            
+            sliceObject.active = false
+            sliceObject.agcMode = Slice.AgcMode.fast.rawValue
+            sliceObject.agcOffLevel = 20
+            sliceObject.agcThreshold = 65
+            sliceObject.anfEnabled = true
+
+            sliceObject.anfLevel = 10
+            sliceObject.apfEnabled = true
+            sliceObject.apfLevel = 30
+            sliceObject.audioGain = 40
+            sliceObject.audioLevel = 70
+
+            sliceObject.audioMute = true
+            sliceObject.audioPan = 20
+            sliceObject.autoPan = true
+            sliceObject.daxChannel = 1
+
+            sliceObject.daxClients = 1
+            sliceObject.daxTxEnabled = true
+            sliceObject.detached = true
+            sliceObject.dfmPreDeEmphasisEnabled = true
+            sliceObject.digitalLowerOffset = 3320
+
+            sliceObject.digitalUpperOffset = 2611
+            sliceObject.diversityChild = true
+            sliceObject.diversityEnabled = true
+            sliceObject.diversityIndex = 1
+            sliceObject.diversityParent = true
+
+            sliceObject.filterHigh = 3911
+            sliceObject.filterLow = 2111
+            sliceObject.fmDeviation = 4999
+            sliceObject.fmRepeaterOffset = 100.0
+            sliceObject.fmToneBurstEnabled = true
+
+            sliceObject.fmToneFreq = 78.1
+            sliceObject.fmToneMode = "CTSS"
+            sliceObject.locked = true
+            sliceObject.loopAEnabled = true
+            sliceObject.loopBEnabled = true
+
+            sliceObject.modeList = ["RTTY", "LSB", "USB", "AM", "CW", "DIGL", "DIGU", "SAM", "FM", "NFM", "DFM"]
+            sliceObject.nbEnabled = true
+            sliceObject.nbLevel = 35
+            sliceObject.nrEnabled = true
+            sliceObject.nrLevel = 10
+
+            sliceObject.nr2 = 5
+            sliceObject.owner = 1
+            sliceObject.playbackEnabled = true
+            sliceObject.postDemodBypassEnabled = true
+
+            sliceObject.postDemodHigh = 4411
+            sliceObject.postDemodLow = 212
+            sliceObject.qskEnabled = true
+            sliceObject.recordEnabled = true
+            sliceObject.recordLength = 10.9
+
+            sliceObject.repeaterOffsetDirection = Slice.Offset.up.rawValue.uppercased()
+            sliceObject.rfGain = 4
+            sliceObject.ritEnabled = true
+            sliceObject.ritOffset = 20
+            sliceObject.rttyMark = 5
+
+            sliceObject.rttyShift = 281
+            sliceObject.rxAntList = ["XVTR", "ANT1", "ANT2", "RX_A"]
+//            sliceObject.sliceLetter = "B"
+            sliceObject.step = 213
+            sliceObject.squelchEnabled = false
+
+            sliceObject.squelchLevel = 19
+            sliceObject.stepList = "3000,1,10,50,100,500,1000,2000"
+            sliceObject.txAnt = "ANT2"
+            sliceObject.txAntList = ["XVTR", "ANT1", "ANT2"]
+            sliceObject.txEnabled = false
+
+            sliceObject.txOffsetFreq = 5.0
+            sliceObject.wide = false
+            sliceObject.wnbEnabled = true
+            sliceObject.wnbLevel = 2
+            sliceObject.xitEnabled = true
+            sliceObject.xitOffset = 7
+            
+            // check params
+            XCTAssertEqual(sliceObject.frequency, 7_100_000, "Frequency")
+            XCTAssertEqual(sliceObject.rxAnt,  "ANT2", "RxAntenna")
+            XCTAssertEqual(sliceObject.mode, "CWU", "Mode")
+                                              
+            XCTAssertEqual(sliceObject.active, false, "Active")
+            XCTAssertEqual(sliceObject.agcMode, Slice.AgcMode.fast.rawValue, "AgcMode")
+            XCTAssertEqual(sliceObject.agcOffLevel, 20, "AgcOffLevel")
+            XCTAssertEqual(sliceObject.agcThreshold, 65, "AgcThreshold")
+            XCTAssertEqual(sliceObject.anfEnabled, true, "AnfEnabled")
+
+            XCTAssertEqual(sliceObject.anfLevel, 10, "AnfLevel")
+            XCTAssertEqual(sliceObject.apfEnabled, true, "ApfEnabled")
+            XCTAssertEqual(sliceObject.apfLevel, 30, "ApfLevel")
+            XCTAssertEqual(sliceObject.audioGain, 40, "AudioGain")
+            XCTAssertEqual(sliceObject.audioLevel, 70, "AudioLevel")
+
+            XCTAssertEqual(sliceObject.audioMute, true, "AudioMute")
+            XCTAssertEqual(sliceObject.audioPan, 20, "AudioPan")
+            XCTAssertEqual(sliceObject.autoPan, true, "AutoPan")
+            XCTAssertEqual(sliceObject.daxChannel, 1, "DaxChannel")
+
+            XCTAssertEqual(sliceObject.daxClients, 1, "DaxClients")
+            XCTAssertEqual(sliceObject.daxTxEnabled, true, "DaxTxEnabled")
+            XCTAssertEqual(sliceObject.detached, true, "Detached")
+            XCTAssertEqual(sliceObject.dfmPreDeEmphasisEnabled, true, "DfmPreDeEmphasisEnabled")
+            XCTAssertEqual(sliceObject.digitalLowerOffset, 3320, "DigitalLowerOffset")
+
+            XCTAssertEqual(sliceObject.digitalUpperOffset, 2611, "DigitalUpperOffset")
+            XCTAssertEqual(sliceObject.diversityChild, false, "DiversityChild")
+            XCTAssertEqual(sliceObject.diversityEnabled, true, "DiversityEnabled")
+            XCTAssertEqual(sliceObject.diversityIndex, 0, "DiversityIndex")
+            XCTAssertEqual(sliceObject.diversityParent, false, "DiversityParent")
+
+            XCTAssertEqual(sliceObject.filterHigh, 3911, "FilterHigh")
+            XCTAssertEqual(sliceObject.filterLow, 2111, "FilterLow")
+            XCTAssertEqual(sliceObject.fmDeviation, 4999, "FmDeviation")
+            XCTAssertEqual(sliceObject.fmRepeaterOffset, 100.0, "FmRepeaterOffset")
+            XCTAssertEqual(sliceObject.fmToneBurstEnabled, true, "FmToneBurstEnabled")
+
+              XCTAssertEqual(sliceObject.fmToneFreq, 78.1, "FmToneFreq")
+            XCTAssertEqual(sliceObject.fmToneMode, "CTSS", "FmToneMode")
+            XCTAssertEqual(sliceObject.locked, true, "Locked")
+            XCTAssertEqual(sliceObject.loopAEnabled, true, "LoopAEnabled")
+            XCTAssertEqual(sliceObject.loopBEnabled, true, "LoopBEnabled")
+
+            XCTAssertEqual(sliceObject.modeList, ["RTTY", "LSB", "USB", "AM", "CW", "DIGL", "DIGU", "SAM", "FM", "NFM", "DFM"], "ModeList")
+            XCTAssertEqual(sliceObject.nbEnabled, true, "NbEnabled")
+            XCTAssertEqual(sliceObject.nbLevel, 35, "NbLevel")
+            XCTAssertEqual(sliceObject.nrEnabled, true, "NrEnabled")
+            XCTAssertEqual(sliceObject.nrLevel, 10, "NrLevel")
+
+            XCTAssertEqual(sliceObject.nr2, 5, "Nr2")
+            XCTAssertEqual(sliceObject.owner, 1, "Owner")
+            XCTAssertEqual(sliceObject.playbackEnabled, true, "PlaybackEnabled")
+            XCTAssertEqual(sliceObject.postDemodBypassEnabled, true, "PostDemodBypassEnabled")
+
+            XCTAssertEqual(sliceObject.postDemodHigh, 4411, "PostDemodHigh")
+            XCTAssertEqual(sliceObject.postDemodLow, 212, "PostDemodLow")
+            XCTAssertEqual(sliceObject.qskEnabled, true, "QskEnabled")
+            XCTAssertEqual(sliceObject.recordEnabled, true, "RecordEnabled")
+            XCTAssertEqual(sliceObject.recordLength, 10.9, "RecordLength")
+
+            XCTAssertEqual(sliceObject.repeaterOffsetDirection, Slice.Offset.up.rawValue.uppercased(), "RepeaterOffsetDirection")
+            XCTAssertEqual(sliceObject.rfGain, 4, "RfGain")
+            XCTAssertEqual(sliceObject.ritEnabled, true, "RitEnabled")
+            XCTAssertEqual(sliceObject.ritOffset, 20, "RitOffset")
+            XCTAssertEqual(sliceObject.rttyMark, 5, "RttyMark")
+
+            XCTAssertEqual(sliceObject.rttyShift, 281, "RttyShift")
+            XCTAssertEqual(sliceObject.rxAntList, ["XVTR", "ANT1", "ANT2", "RX_A"], "RxAntList")
+            XCTAssertEqual(sliceObject.sliceLetter, "A", "SliceLetter")
+            XCTAssertEqual(sliceObject.step, 213, "Step")
+            XCTAssertEqual(sliceObject.squelchEnabled, false, "SquelchEnabled")
+
+            XCTAssertEqual(sliceObject.squelchLevel, 19, "SquelchLevel")
+            XCTAssertEqual(sliceObject.stepList, "3000,1,10,50,100,500,1000,2000", "StepList")
+            XCTAssertEqual(sliceObject.txAnt, "ANT2", "TxAnt")
+            XCTAssertEqual(sliceObject.txAntList, ["XVTR", "ANT1", "ANT2"], "TxAntList")
+            XCTAssertEqual(sliceObject.txEnabled, false, "TxEnabled")
+
+            XCTAssertEqual(sliceObject.txOffsetFreq, 5.0, "TxOffsetFreq")
+            XCTAssertEqual(sliceObject.wide, false, "Wide")
+            XCTAssertEqual(sliceObject.wnbEnabled, true, "WnbEnabled")
+            XCTAssertEqual(sliceObject.wnbLevel, 2, "WnbLevel")
+            XCTAssertEqual(sliceObject.xitEnabled, true, "XitEnabled")
+            XCTAssertEqual(sliceObject.xitOffset, 7, "XitOffset")
+
+            Swift.print("***** Modified Slice params checked")
+            
+            sliceObject.remove()
+            sleep(1)
+            XCTAssertEqual(radio!.slices.count, 0, "***** Failed to remove Slice")
+          
+          } else {
+            XCTAssert(true, "***** Slice NOT found")
+          }
+        } else {
+          XCTAssert(true, "***** Slice NOT added")
+        }
+      } else {
+        XCTAssert(true, "***** Previous Slice(s) NOT removed")
+      }
+
+    } else if radio!.version.isV1 || radio!.version.isV2 {
       
-    } else {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    
     }
+    // remove all
+    radio!.slices.forEach( {$0.value.remove() } )
+          
+    Swift.print("***** Added Slice(s) removed")
+
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   // ------------------------------------------------------------------------------
@@ -1245,18 +1222,22 @@ final class ObjectTests: XCTestCase {
     let id: ObjectId = tnfStatus.keyValuesArray()[0].key.objectId!
     Tnf.parseStatus(radio!, tnfStatus.keyValuesArray(), true)
 
-    let tnf = radio!.tnfs[id]
-    XCTAssertNotNil(tnf, "\n***** Failed to create Tnf")
-    XCTAssertEqual(tnf?.depth, 2)
-    XCTAssertEqual(tnf?.frequency, 14_260_000)
-    XCTAssertEqual(tnf?.permanent, true)
-    XCTAssertEqual(tnf?.width, 100)
-    
-    tnf?.remove()
-    XCTAssertEqual(radio!.tnfs[id], nil, "\n***** Failed to remove Tnf *****\n")
-    
+    if let tnf = radio!.tnfs[id] {
+                              
+      Swift.print("***** Tnf added")
+
+      XCTAssertEqual(tnf.depth, 2, "Depth")
+      XCTAssertEqual(tnf.frequency, 14_260_000, "Frequency")
+      XCTAssertEqual(tnf.permanent, true, "Permanent")
+      XCTAssertEqual(tnf.width, 100, "Width")
+                              
+      Swift.print("***** Added Tnf params checked")
+
+    } else {
+      XCTAssertTrue(false, "***** Failed to create Tnf")
+    }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   func testTnf() {
@@ -1264,47 +1245,66 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio()
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+    // remove all
+    radio!.tnfs.forEach( {$0.value.remove() } )
+    sleep(1)
+    if radio!.tnfs.count == 0 {
       
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
+      // get new
+      radio!.requestTnf(at: 14_260_000)
+      sleep(1)
+      
+      // verify added
+      if radio!.tnfs.count == 1 {
+                      
+        Swift.print("***** Previous Tnf(s) removed")
 
-  // ------------------------------------------------------------------------------
-  // MARK: - TxAudioStream
-  
-  func testTxParse() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
+        if let tnfObject = radio!.tnfs.first?.value {
+                                  
+          Swift.print("***** Tnf added")
 
-  func testTx() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
+          // check params
+          XCTAssertEqual(tnfObject.depth, Tnf.Depth.normal.rawValue, "Depth")
+          XCTAssertEqual(tnfObject.frequency, 14_260_000, "Frequency")
+          XCTAssertEqual(tnfObject.permanent, false, "Permanent")
+          XCTAssertEqual(tnfObject.width, Tnf.kWidthDefault, "Width")
+                                  
+          Swift.print("***** Added Tnf params checked")
+
+          // change params
+          tnfObject.depth = Tnf.Depth.veryDeep.rawValue
+          tnfObject.frequency = 14_270_000
+          tnfObject.permanent = true
+          tnfObject.width = Tnf.kWidthMax
+
+          // check params
+          XCTAssertEqual(tnfObject.depth, Tnf.Depth.veryDeep.rawValue, "Depth")
+          XCTAssertEqual(tnfObject.frequency,  14_270_000, "Frequency")
+          XCTAssertEqual(tnfObject.permanent, true, "Permanent")
+          XCTAssertEqual(tnfObject.width, Tnf.kWidthMax, "Width")
+                                            
+          Swift.print("***** Modified Tnf params checked")
+          
+          tnfObject.remove()
+          sleep(1)
+          XCTAssertEqual(radio!.tnfs.count, 0, "***** Failed to remove Tnf")
+        
+        } else {
+          XCTAssert(true, "***** Tnf NOT found")
+        }
+      } else {
+        XCTAssert(true, "***** Tnf NOT added")
+      }
     } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+      XCTAssert(true, "***** Previous Tnf(s) NOT removed")
     }
+    // remove all
+    radio!.tnfs.forEach( {$0.value.remove() } )
+          
+    Swift.print("***** Added Tnf(s) removed")
+
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   // ------------------------------------------------------------------------------
@@ -1337,7 +1337,7 @@ final class ObjectTests: XCTestCase {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   // ------------------------------------------------------------------------------
@@ -1353,20 +1353,24 @@ final class ObjectTests: XCTestCase {
     Waterfall.parseStatus(radio!, waterfallStatus.keyValuesArray(), true)
     
     if let waterfallObject = radio!.waterfalls[id] {
-      
-      XCTAssertEqual(waterfallObject.autoBlackEnabled, true)
-      XCTAssertEqual(waterfallObject.blackLevel, 20)
-      XCTAssertEqual(waterfallObject.colorGain, 50)
-      XCTAssertEqual(waterfallObject.gradientIndex, 1)
-      XCTAssertEqual(waterfallObject.lineDuration, 100)
-      XCTAssertEqual(waterfallObject.panadapterId, "0x40000000".streamId)
+                              
+      Swift.print("***** Waterfall added")
+
+      XCTAssertEqual(waterfallObject.autoBlackEnabled, true, "AutoBlackEnabled")
+      XCTAssertEqual(waterfallObject.blackLevel, 20, "BlackLevel")
+      XCTAssertEqual(waterfallObject.colorGain, 50, "ColorGain")
+      XCTAssertEqual(waterfallObject.gradientIndex, 1, "GradientIndex")
+      XCTAssertEqual(waterfallObject.lineDuration, 100, "LineDuration")
+      XCTAssertEqual(waterfallObject.panadapterId, "0x40000000".streamId, "Panadapter Id")
+                                  
+      Swift.print("***** Added Waterfall params checked")
 
     } else {
-        XCTAssertTrue(false, "\n***** Failed to create Waterfall *****\n")
+        XCTAssertTrue(false, "***** Failed to create Waterfall")
     }
     
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   func testWaterfall() {
@@ -1384,7 +1388,7 @@ final class ObjectTests: XCTestCase {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   // ------------------------------------------------------------------------------
@@ -1409,28 +1413,33 @@ final class ObjectTests: XCTestCase {
     
     let id: XvtrId = status.keyValuesArray()[0].key.objectId!
     Xvtr.parseStatus(radio!, status.keyValuesArray(), true)
+
     if let xvtrObject = radio!.xvtrs[id] {
-      
-      XCTAssertEqual(xvtrObject.ifFrequency, 28_000_000)
-      XCTAssertEqual(xvtrObject.isValid, true)
-      XCTAssertEqual(xvtrObject.loError, 0)
-      XCTAssertEqual(xvtrObject.name, expectedName)
-      XCTAssertEqual(xvtrObject.maxPower, 10)
-      XCTAssertEqual(xvtrObject.order, 0)
-      XCTAssertEqual(xvtrObject.preferred, true)
-      XCTAssertEqual(xvtrObject.rfFrequency, 220_000_000)
-      XCTAssertEqual(xvtrObject.rxGain, 0)
-      XCTAssertEqual(xvtrObject.rxOnly, true)
-    
+                              
+      Swift.print("***** Xvtr addedn")
+
+      XCTAssertEqual(xvtrObject.ifFrequency, 28_000_000, "IfFrequency")
+      XCTAssertEqual(xvtrObject.isValid, true, "IsValid")
+      XCTAssertEqual(xvtrObject.loError, 0, "LoError")
+      XCTAssertEqual(xvtrObject.name, expectedName, "Name")
+      XCTAssertEqual(xvtrObject.maxPower, 10, "MaxPower")
+      XCTAssertEqual(xvtrObject.order, 0, "Order")
+      XCTAssertEqual(xvtrObject.preferred, true, "Preferred")
+      XCTAssertEqual(xvtrObject.rfFrequency, 220_000_000, "RfFrequency")
+      XCTAssertEqual(xvtrObject.rxGain, 0, "RxGain")
+      XCTAssertEqual(xvtrObject.rxOnly, true, "RxOnly")
+                                  
+      Swift.print("***** Added Xvtr params checked")
+
       // FIXME: ??? what is this
       //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
 
     } else {
-      XCTAssertTrue(false, "\n***** Failed to create Xvtr *****\n")
+      XCTAssertTrue(false, "***** Failed to create Xvtr")
     }
 
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
   func testXvtr() {
@@ -1443,7 +1452,7 @@ final class ObjectTests: XCTestCase {
     sleep(1)
     if radio!.xvtrs.count == 0 {
             
-      Swift.print("\n***** Previous Xvtr(s) removed ****\n")
+      Swift.print("***** Previous Xvtr(s) removed")
 
       // ask for new
       radio!.requestXvtr()
@@ -1454,7 +1463,7 @@ final class ObjectTests: XCTestCase {
         
         if let xvtrObject = radio!.xvtrs["0".objectId!] {
           
-          Swift.print("\n***** 1st Xvtr added ****\n")
+          Swift.print("***** 1st Xvtr added")
 
           // set properties
           xvtrObject.ifFrequency = 28_000_000
@@ -1467,17 +1476,17 @@ final class ObjectTests: XCTestCase {
           xvtrObject.rxOnly = true
           
           // check params
-          XCTAssertEqual(xvtrObject.isValid, false)
-          XCTAssertEqual(xvtrObject.preferred, false)
+          XCTAssertEqual(xvtrObject.isValid, false, "isValid")
+          XCTAssertEqual(xvtrObject.preferred, false, "Preferred")
 
-          XCTAssertEqual(xvtrObject.ifFrequency, 28_000_000)
-          XCTAssertEqual(xvtrObject.loError, 0)
-          XCTAssertEqual(xvtrObject.name, "220")
-          XCTAssertEqual(xvtrObject.maxPower, 10)
-          XCTAssertEqual(xvtrObject.order, 0)
-          XCTAssertEqual(xvtrObject.rfFrequency, 220_000_000)
-          XCTAssertEqual(xvtrObject.rxGain, 25)
-          XCTAssertEqual(xvtrObject.rxOnly, true)
+          XCTAssertEqual(xvtrObject.ifFrequency, 28_000_000, "IfFrequency")
+          XCTAssertEqual(xvtrObject.loError, 0, "LoError")
+          XCTAssertEqual(xvtrObject.name, "220", "Name")
+          XCTAssertEqual(xvtrObject.maxPower, 10, "MaxPower")
+          XCTAssertEqual(xvtrObject.order, 0, "Order")
+          XCTAssertEqual(xvtrObject.rfFrequency, 220_000_000, "RfFrequency")
+          XCTAssertEqual(xvtrObject.rxGain, 25, "RxGain")
+          XCTAssertEqual(xvtrObject.rxOnly, true, "RxOnly")
           
           // FIXME: ??? what is this
           //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
@@ -1491,7 +1500,7 @@ final class ObjectTests: XCTestCase {
             
             if let xvtrObject = radio!.xvtrs["1".objectId!] {
               
-              Swift.print("\n***** 2nd Xvtr added ****\n")
+              Swift.print("***** 2nd Xvtr added")
               
               // set properties
               xvtrObject.ifFrequency = 14_000_000
@@ -1504,43 +1513,43 @@ final class ObjectTests: XCTestCase {
               xvtrObject.rxOnly = false
               
               // verify properties
-              XCTAssertEqual(xvtrObject.isValid, false)
-              XCTAssertEqual(xvtrObject.preferred, false)
+              XCTAssertEqual(xvtrObject.isValid, false, "isValid")
+              XCTAssertEqual(xvtrObject.preferred, false, "Preferred")
 
-              XCTAssertEqual(xvtrObject.ifFrequency, 14_000_000)
-              XCTAssertEqual(xvtrObject.loError, 1)
-              XCTAssertEqual(xvtrObject.name, "144")
-              XCTAssertEqual(xvtrObject.maxPower, 20)
-              XCTAssertEqual(xvtrObject.order, 1)
-              XCTAssertEqual(xvtrObject.rfFrequency, 144_000_000)
-              XCTAssertEqual(xvtrObject.rxGain, 50)
-              XCTAssertEqual(xvtrObject.rxOnly, false)
+              XCTAssertEqual(xvtrObject.ifFrequency, 14_000_000, "IfFrequency")
+              XCTAssertEqual(xvtrObject.loError, 1, "LoError")
+              XCTAssertEqual(xvtrObject.name, "144", "Name")
+              XCTAssertEqual(xvtrObject.maxPower, 20, "MaxPower")
+              XCTAssertEqual(xvtrObject.order, 1, "Order")
+              XCTAssertEqual(xvtrObject.rfFrequency, 144_000_000, "RfFrequency")
+              XCTAssertEqual(xvtrObject.rxGain, 50, "RxGain")
+              XCTAssertEqual(xvtrObject.rxOnly, false, "RxOnly")
               
               // FIXME: ??? what is this
               //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
             } else {
-              XCTAssertTrue(false, "\n***** Xvtr 1 NOT found *****\n")
+              XCTAssertTrue(false, "***** Xvtr 1 NOT found*")
             }
           } else {
-            XCTAssertTrue(false, "\n***** Xvtr 1 NOT added *****\n")
+            XCTAssertTrue(false, "***** Xvtr 1 NOT added")
           }
           
         } else {
-          XCTAssertTrue(false, "\n***** Xvtr 0 NOT found *****\n")
+          XCTAssertTrue(false, "***** Xvtr 0 NOT found")
         }
       } else {
-        XCTAssertTrue(false, "\n***** Xvtr 0 NOT added *****\n")
+        XCTAssertTrue(false, "***** Xvtr 0 NOT added")
       }
     } else {
-      XCTAssertTrue(false, "\n***** Xvtr(s) NOT removed *****\n")
+      XCTAssertTrue(false, "***** Xvtr(s) NOT removed")
     }
     // remove all
     for (_, xvtrObject) in radio!.xvtrs { xvtrObject.remove() }
           
-    Swift.print("\n***** Added Xvtr(s) removed ****\n")
+    Swift.print("***** Added Xvtr(s) removed")
 
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
 //  static var allTests = [

@@ -22,8 +22,8 @@ public final class Log {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public weak var delegate: LogHandler?
-  
+  public weak var delegate          : LogHandler?
+
   // ----------------------------------------------------------------------------
   // MARK: - Singleton
   
@@ -52,8 +52,9 @@ public final class Log {
     // pass the entry to the delegate (if any)
     if delegate != nil {
       delegate!.logMessage(msg, level, function, file, line, Api.kName)
+    
     } else {
-      NSLog(Api.kName.prefix(4) + ": " + msg)
+      if !Api.sharedInstance.suppressNSLog { NSLog(Api.kName.prefix(4) + ": " + msg) }
     }
   }
 }
