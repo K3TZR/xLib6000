@@ -4,8 +4,7 @@ import XCTest
 final class ObjectTests: XCTestCase {
 
   static let kSuppressLogging = true
-  
-  
+    
   // Helper functions
   func discoverRadio() -> Radio? {
     let discovery = Discovery.sharedInstance
@@ -14,7 +13,7 @@ final class ObjectTests: XCTestCase {
       
       Swift.print("\n***** Radio found")
       
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "xLib6000Tests", suppressNSLog: ObjectTests.kSuppressLogging) {
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "ObjectTests", suppressNSLog: ObjectTests.kSuppressLogging) {
         sleep(1)
         
         Swift.print("***** Connected")
@@ -42,32 +41,37 @@ final class ObjectTests: XCTestCase {
   ///   Format:  <Id, > <"ant", ant> <"ip", ip> <"model", model> <"port", port> <"serial_num", serialNumber>
   private var amplifierStatus = "0x12345678 ant=ANT1 ip=10.0.1.106 model=PGXL port=4123 serial_num=1234-5678-9012 state=STANDBY"
   func testAmplifierParse() {
-
+        
+    Swift.print("\n***** \(#function)")
+    
     let radio = discoverRadio()
     guard radio != nil else { return }
 
     Amplifier.parseStatus(radio!, amplifierStatus.keyValuesArray(), true)
 
     if let amplifier = radio!.amplifiers["0x12345678".streamId!] {
-      // verify properties
-      XCTAssertNotNil(amplifier, "Failed to create Amplifier")
+      
+      Swift.print("***** Object created")
+      
       XCTAssertEqual(amplifier.id, "0x12345678".handle!)
-      XCTAssertEqual(amplifier.ant, "ANT1")
+      XCTAssertEqual(amplifier.ant, "ANT1", "ant")
       XCTAssertEqual(amplifier.ip, "10.0.1.106")
       XCTAssertEqual(amplifier.model, "PGXL")
       XCTAssertEqual(amplifier.port, 4123)
       XCTAssertEqual(amplifier.serialNumber, "1234-5678-9012")
       XCTAssertEqual(amplifier.state, "STANDBY")
-
-      // change properties
+      
+      Swift.print("***** Parameters verified")
+      
       amplifier.ant = "ANT2"
       amplifier.ip = "11.1.217"
       amplifier.model = "QIYM"
       amplifier.port = 3214
       amplifier.serialNumber = "2109-8765-4321"
       amplifier.state = "IDLE"
-
-      // re-verify properties
+      
+      Swift.print("***** Parameters modified")
+      
       XCTAssertEqual(amplifier.id, "0x12345678".handle!)
       XCTAssertEqual(amplifier.ant, "ANT2")
       XCTAssertEqual(amplifier.ip, "11.1.217")
@@ -75,7 +79,9 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(amplifier.port, 3214)
       XCTAssertEqual(amplifier.serialNumber, "2109-8765-4321")
       XCTAssertEqual(amplifier.state, "IDLE")
-
+      
+      Swift.print("***** Modified parameters verified")
+      
     } else {
       XCTAssertTrue(false, "Failed to create Amplifier")
     }
@@ -94,6 +100,8 @@ final class ObjectTests: XCTestCase {
   
   private var bandSettingStatus = "band 999 band_name=21 acc_txreq_enable=1 rca_txreq_enable=0 acc_tx_enabled=1 tx1_enabled=0 tx2_enabled=1 tx3_enabled=0"
   func testBandSettingParse() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -127,6 +135,8 @@ final class ObjectTests: XCTestCase {
   }
 
   func testBandSetting() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -134,339 +144,6 @@ final class ObjectTests: XCTestCase {
     if radio!.version.isV3 {
       Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
 
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    disconnect()
-  }
-
-  // ------------------------------------------------------------------------------
-  // MARK: - DaxIqStream
-  
-    // Format:  <streamId, > <"type", "dax_iq"> <"daxiq_channel", channel> <"pan", panStreamId> <"daxiq_rate", rate> <"client_handle", handle>
-    private var daxIqStatus = "0x20000000 type=dax_iq daxiq_channel=3 pan=0x40000000 ip=10.0.1.107 daxiq_rate=48"
-    func testDaxIqParse() {
-
-      let radio = discoverRadio()
-      guard radio != nil else { return }
-
-      if radio!.version.isV3 {
-        
-        daxIqStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
-
-        DaxIqStream.parseStatus(radio!, daxIqStatus.keyValuesArray(), true)
-
-        if radio!.daxIqStreams.count == 1 {
-          let daxIqStreamObject = radio!.daxIqStreams.first!.value
-          // verify properties
-          XCTAssertEqual(daxIqStreamObject.id, "0x20000000".streamId!)
-          XCTAssertEqual(daxIqStreamObject.clientHandle, Api.sharedInstance.connectionHandle!)
-          XCTAssertEqual(daxIqStreamObject.channel, 3)
-          XCTAssertEqual(daxIqStreamObject.ip, "10.0.1.107")
-          XCTAssertEqual(daxIqStreamObject.isActive, false)
-          XCTAssertEqual(daxIqStreamObject.pan, "0x40000000".streamId)
-          XCTAssertEqual(daxIqStreamObject.rate, 48)
-
-        } else {
-          XCTAssertTrue(false, "\n***** Failed to create DaxIqStream *****\n")
-        }
-
-      } else {
-        Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-      }
-      // disconnect the radio
-      Api.sharedInstance.disconnect()
-    }
-
-  func testDaxIq() {
-      // find a radio & connect
-      let radio = discoverRadio()
-      guard radio != nil else { return }
-      
-      if radio!.version.isV3 {
-        
-        // remove all
-        for (_, daxIqStreamObject) in radio!.iqStreams { daxIqStreamObject.remove() }
-        sleep(1)
-        if radio!.daxIqStreams.count == 0 {
-                    
-          // get new
-          radio!.requestIqStream("3")
-          sleep(1)
-                    
-          // verify added
-          if radio!.daxIqStreams.count == 1 {
-            
-            if let daxIqStreamObject = radio!.daxIqStreams.first?.value {
-              
-              // save params
-              let clientHandle  = daxIqStreamObject.clientHandle
-              let channel       = daxIqStreamObject.channel
-              let ip            = daxIqStreamObject.ip
-              let isActive      = daxIqStreamObject.isActive
-              let pan           = daxIqStreamObject.pan
-              let rate          = daxIqStreamObject.rate
-
-              // remove all
-              for (_, daxIqStreamObject) in radio!.daxIqStreams { daxIqStreamObject.remove() }
-              sleep(1)
-              if radio!.daxIqStreams.count == 0 {
-                
-                // get new
-                radio!.requestDaxIqStream("3")
-                sleep(1)
-                                
-                // verify added
-                if radio!.daxIqStreams.count == 1 {
-                  if let daxIqStreamObject = radio!.daxIqStreams.first?.value {
-                    
-                    // check params
-                    XCTAssertEqual(daxIqStreamObject.clientHandle, clientHandle)
-                    XCTAssertEqual(daxIqStreamObject.channel, channel)
-                    XCTAssertEqual(daxIqStreamObject.ip, ip)
-                    XCTAssertEqual(daxIqStreamObject.isActive, isActive)
-                    XCTAssertEqual(daxIqStreamObject.pan, pan)
-                    XCTAssertEqual(daxIqStreamObject.rate, rate)
- 
-                    // remove it
-                    daxIqStreamObject.remove()
-                    sleep(1)
-                    
-                    if radio!.daxIqStreams.count != 0 {
-                      XCTAssertFalse(true, "\n***** DaxIqStream NOT removed *****\n")
-                    }
-                  } else {
-                    XCTAssertFalse(true, "\n***** DaxIqStream 0 NOT found *****\n")
-                  }
-                } else {
-                  XCTAssertFalse(true, "\n***** DaxIqStream NOT added *****\n")
-                }
-              } else {
-                XCTAssertFalse(true, "\n***** DaxIqStream NOT removed *****\n")
-              }
-            } else {
-              XCTAssertFalse(true, "\n***** DaxIqStream 0 NOT found *****\n")
-            }
-          } else {
-            XCTAssertFalse(true, "\n***** DaxIqStream NOT added *****\n")
-          }
-        } else {
-          XCTAssertFalse(true, "\n***** DaxIqStream NOT removed *****\n")
-        }
-      } else {
-        Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-      }
-      // disconnect the radio
-      Api.sharedInstance.disconnect()
-    }
-
-  // ------------------------------------------------------------------------------
-  // MARK: - DaxMicAudioStream
-  
-  func testDaxMicParse() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  func testDaxMic() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  // ------------------------------------------------------------------------------
-  // MARK: - DaxRxAudioStream
-  
-  func testDaxRxParse() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-  
-  func testDaxRx() {
-    // find a radio & connect
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      
-      // remove any DaxRxAudioStreams
-      for (_, stream) in radio!.daxRxAudioStreams { stream.remove() }
-      sleep(1)
-      if radio!.daxRxAudioStreams.count == 0 {
-        
-        // ask for a new DaxRxAudioStream
-        radio!.requestDaxRxAudioStream( "2")
-        sleep(1)
-        
-        // verify DaxRxAudioStream added
-        if radio!.daxRxAudioStreams.count == 1 {
-          
-          if let stream = radio!.daxRxAudioStreams[0] {
-            
-            // save params
-            let clientHandle = stream.clientHandle
-            let daxChannel = stream.daxChannel
-            //let daxClients = stream.daxClients
-            let slice = stream.slice
-            
-            // remove any DaxRxAudioStreams
-            for (_, stream) in radio!.daxRxAudioStreams { stream.remove() }
-            sleep(1)
-            if radio!.audioStreams.count == 0 {
-              
-              // ask for a new DaxRxAudioStream
-              radio!.requestDaxRxAudioStream( "2")
-              sleep(1)
-              
-              // verify DaxRxAudioStream added
-              if radio!.daxRxAudioStreams.count == 1 {
-                if let stream = radio!.daxRxAudioStreams[0] {
-                  
-                  // check params
-                  XCTAssertEqual(stream.clientHandle, clientHandle)
-                  XCTAssertEqual(stream.daxChannel, daxChannel)
-                  //XCTAssertEqual(stream.daxClients, daxClients)
-                  XCTAssertEqual(stream.slice, slice)
-                
-                } else {
-                  XCTAssert(true, "\n***** DaxRxAudioStream 0 NOT found *****\n")
-                }
-              } else {
-                XCTAssert(true, "\n***** DaxRxAudioStream NOT added *****\n")
-              }
-            } else {
-              XCTAssert(true, "\n***** DaxRxAudioStream NOT removed *****\n")
-            }
-          } else {
-            XCTAssert(true, "\n***** DaxRxAudioStream 0 NOT found *****\n")
-          }
-        } else {
-          XCTAssert(true, "\n***** DaxRxAudioStream NOT added *****\n")
-        }
-      } else {
-        XCTAssert(true, "\n***** DaxRxAudioStream NOT removed *****\n")
-      }
-      // remove any DaxRxAudioStream
-      for (_, stream) in radio!.daxRxAudioStreams { stream.remove() }
-    
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-
-  // ------------------------------------------------------------------------------
-  // MARK: - DaxTxAudioStream
-  
-  func testDaxTxParse() {
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
-  }
-  
-  func testDaxTx() {
-    // find a radio & connect
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      
-      // remove all
-      for (_, stream) in radio!.daxTxAudioStreams { stream.remove() }
-      sleep(1)
-      if radio!.daxTxAudioStreams.count == 0 {
-        
-        // get new
-        radio!.requestDaxTxAudioStream()
-        sleep(1)
-        
-        // verify added
-        if radio!.daxTxAudioStreams.count == 1 {
-          
-          if let stream = radio!.daxTxAudioStreams[0] {
-            
-            // save params
-            let clientHandle = stream.clientHandle
-            let isTransmitChannel = stream.isTransmitChannel
-            
-            // remove all
-            for (_, stream) in radio!.daxTxAudioStreams { stream.remove() }
-            sleep(1)
-            if radio!.audioStreams.count == 0 {
-              
-              // get new
-              radio!.requestDaxTxAudioStream()
-              sleep(1)
-              
-              // verify added
-              if radio!.daxTxAudioStreams.count == 1 {
-                if let stream = radio!.daxTxAudioStreams[0] {
-                  
-                  // check params
-                  XCTAssertEqual(stream.clientHandle, clientHandle)
-                  XCTAssertEqual(stream.isTransmitChannel, isTransmitChannel)
-                
-                } else {
-                  XCTAssert(true, "\n***** DaxTxAudioStream 0 NOT found *****\n")
-                }
-              } else {
-                XCTAssert(true, "\n***** DaxTxAudioStream NOT added *****\n")
-              }
-            } else {
-              XCTAssert(true, "\n***** DaxTxAudioStream NOT removed *****\n")
-            }
-          } else {
-            XCTAssert(true, "\n***** DaxTxAudioStream 0 NOT found *****\n")
-          }
-        } else {
-          XCTAssert(true, "\n***** DaxTxAudioStream NOT added *****\n")
-        }
-      } else {
-        XCTAssert(true, "\n***** DaxTxAudioStream NOT removed *****\n")
-      }
-      // remove any DaxTxAudioStream
-      for (_, stream) in radio!.daxTxAudioStreams { stream.remove() }
-    
     } else {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
@@ -480,9 +157,15 @@ final class ObjectTests: XCTestCase {
   private var equalizerRxStatus = "rxsc mode=0 63Hz=0 125Hz=10 250Hz=20 500Hz=30 1000Hz=-10 2000Hz=-20 4000Hz=-30 8000Hz=-40"
   
   func testEqualizerRx() {
+        
+    Swift.print("\n***** \(#function)")
+    
     equalizer(.rxsc)
   }
   func testEqualizerTx() {
+        
+    Swift.print("\n***** \(#function)")
+    
     equalizer(.txsc)
   }
 
@@ -558,6 +241,8 @@ final class ObjectTests: XCTestCase {
   // MARK: - Memory
   
   func testMemoryParse() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -573,6 +258,8 @@ final class ObjectTests: XCTestCase {
   }
 
   func testMemory() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -591,6 +278,8 @@ final class ObjectTests: XCTestCase {
   // MARK: - Meter
   
   func testMeterParse() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -606,6 +295,8 @@ final class ObjectTests: XCTestCase {
   }
 
   func testMeter() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -639,6 +330,8 @@ final class ObjectTests: XCTestCase {
   }
 
   func testPanadapterParse() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -681,6 +374,8 @@ final class ObjectTests: XCTestCase {
   }
 
   func testPanadapter() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -845,6 +540,8 @@ final class ObjectTests: XCTestCase {
   
   private let sliceStatus = "0 mode=USB filter_lo=100 filter_hi=2800 agc_mode=med agc_threshold=65 agc_off_level=10 qsk=1 step=100 step_list=1,10,50,100,500,1000,2000,3000 anf=1 anf_level=33 nr=0 nr_level=25 nb=1 nb_level=50 wnb=0 wnb_level=42 apf=1 apf_level=76 squelch=1 squelch_level=22"
   func testSliceParse() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -890,6 +587,8 @@ final class ObjectTests: XCTestCase {
   }
 
   func testSlice() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -1215,6 +914,8 @@ final class ObjectTests: XCTestCase {
    
   private var tnfStatus = "1 freq=14.26 depth=2 width=0.000100 permanent=1"
   func testTnfParse() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -1241,6 +942,8 @@ final class ObjectTests: XCTestCase {
   }
 
   func testTnf() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -1311,6 +1014,8 @@ final class ObjectTests: XCTestCase {
   // MARK: - UsbCable
   
   func testUsbCableParse() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -1326,6 +1031,8 @@ final class ObjectTests: XCTestCase {
   }
 
   func testUsbCable() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -1345,6 +1052,8 @@ final class ObjectTests: XCTestCase {
      
   private var waterfallStatus = "waterfall 0x42000000 x_pixels=50 center=14.100000 bandwidth=0.200000 band_zoom=0 segment_zoom=0 line_duration=100 rfgain=0 rxant=ANT1 wide=0 loopa=0 loopb=0 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 panadapter=40000000 color_gain=50 auto_black=1 black_level=20 gradient_index=1 xvtr="
   func testWaterfallParse() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -1374,6 +1083,8 @@ final class ObjectTests: XCTestCase {
   }
 
   func testWaterfall() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -1398,10 +1109,16 @@ final class ObjectTests: XCTestCase {
   private var xvtrStatusLongName = "0 name=12345678 rf_freq=220 if_freq=28 lo_error=0 max_power=10 rx_gain=0 order=0 rx_only=1 is_valid=1 preferred=1 two_meter_int=0"
 
   func testXvtrParse() {
+        
+    Swift.print("\n***** \(#function)")
+    
     xvtrCheck(status: xvtrStatus, expectedName: "220")
   }
 
   func testXvtrName() {
+        
+    Swift.print("\n***** \(#function)")
+    
     // check that name is limited to 4 characters
     xvtrCheck(status: xvtrStatusLongName, expectedName: "1234")
   }
@@ -1443,6 +1160,8 @@ final class ObjectTests: XCTestCase {
   }
 
   func testXvtr() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }

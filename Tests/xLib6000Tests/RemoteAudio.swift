@@ -9,22 +9,36 @@ import XCTest
 
 final class RemoteAudioTests: XCTestCase {
   
-  // Helper function
+  static let kSuppressLogging = true
+    
+  // Helper functions
   func discoverRadio() -> Radio? {
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "xLib6000Tests") {
+      
+      Swift.print("\n***** Radio found")
+      
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "RemoteAudioTests", suppressNSLog: ObjectTests.kSuppressLogging) {
         sleep(1)
+        
+        Swift.print("***** Connected")
+        
         return Api.sharedInstance.radio
       } else {
-        XCTAssertTrue(false, "\n***** Failed to connect to Radio *****\n")
+        XCTAssertTrue(false, "***** Failed to connect to Radio")
         return nil
       }
     } else {
-      XCTAssertTrue(false, "\n***** No Radio(s) found *****\n")
+      XCTAssertTrue(false, "***** No Radio(s) found")
       return nil
     }
+  }
+  
+  func disconnect() {
+    Api.sharedInstance.disconnect()
+    
+    Swift.print("***** Disconnected\n")
   }
 
   // ------------------------------------------------------------------------------

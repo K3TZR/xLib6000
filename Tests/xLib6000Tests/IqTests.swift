@@ -9,28 +9,38 @@ import XCTest
 
 final class IqTests: XCTestCase {
   
+  static let kSuppressLogging = true
+
   // Helper function
   func discoverRadio() -> Radio? {
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "xLib6000Tests") {
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "IqTests", suppressNSLog: ObjectTests.kSuppressLogging) {
         sleep(1)
         return Api.sharedInstance.radio
       } else {
-        XCTAssertTrue(false, "\n***** Failed to connect to Radio *****\n")
+        XCTAssertTrue(false, "***** Failed to connect to Radio")
         return nil
       }
     } else {
-      XCTAssertTrue(false, "\n***** No Radio(s) found *****\n")
+      XCTAssertTrue(false, "***** No Radio(s) found")
       return nil
     }
   }
   
+  func disconnect() {
+    Api.sharedInstance.disconnect()
+    
+    Swift.print("***** Disconnected\n")
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - IqStream
   
   func testIqParse() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -42,10 +52,12 @@ final class IqTests: XCTestCase {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
   
   func testIq() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -126,7 +138,7 @@ final class IqTests: XCTestCase {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
   
   // ------------------------------------------------------------------------------
@@ -135,6 +147,8 @@ final class IqTests: XCTestCase {
   // Format:  <streamId, > <"type", "dax_iq"> <"daxiq_channel", channel> <"pan", panStreamId> <"daxiq_rate", rate> <"client_handle", handle>
   private var daxIqStatus = "0x20000000 type=dax_iq daxiq_channel=3 pan=0x40000000 ip=10.0.1.107 daxiq_rate=48"
   func testDaxIqParse() {
+        
+    Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio()
     guard radio != nil else { return }
@@ -164,11 +178,13 @@ final class IqTests: XCTestCase {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 
 func testDaxIq() {
-    // find a radio & connect
+        
+    Swift.print("\n***** \(#function)")
+    
     let radio = discoverRadio()
     guard radio != nil else { return }
     
@@ -246,6 +262,6 @@ func testDaxIq() {
       Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
     }
     // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
 }
