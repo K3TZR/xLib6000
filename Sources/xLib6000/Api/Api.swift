@@ -200,7 +200,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       isGui: Bool = true,
                       isWan: Bool = false,
                       wanHandle: String = "",
-                      reducedDaxBw: Bool = false) -> Bool {
+                      reducedDaxBw: Bool = false,
                       suppressNSLog: Bool = false) -> Bool {
 
     self.suppressNSLog = suppressNSLog
