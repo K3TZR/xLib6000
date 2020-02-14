@@ -235,13 +235,12 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
     
     var dataFrame: AudioStreamFrame?
     
-    // if there is a delegate, process the Panadapter stream
+    // if there is a delegate, process the RX Audio stream
     if let delegate = delegate {
       
       let payloadPtr = UnsafeRawPointer(vita.payloadData)
       
       // initialize a data frame
-      //var dataFrame = AudioStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
       if vita.classCode == .daxReducedBw {
         
         let samples = vita.payloadSize / 2    // payload is Int16 mono
