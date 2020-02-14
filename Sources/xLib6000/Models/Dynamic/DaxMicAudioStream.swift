@@ -32,6 +32,9 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   @objc dynamic public var clientHandle : Handle {
     get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue }}}
+  @objc dynamic public var ip : String {
+    get { _ip  }
+    set { if _ip != newValue { _ip = newValue }}}
   @objc dynamic public var micGain      : Int {
     get { _micGain  }
     set {
@@ -61,6 +64,9 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
     set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+  var _ip : String {
+    get { Api.objectQ.sync { __ip } }
+    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
   var _micGain : Int {
     get { Api.objectQ.sync { __micGain } }
     set { Api.objectQ.sync(flags: .barrier) {__micGain = newValue }}}
@@ -70,6 +76,7 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
 
   enum Token: String {
     case clientHandle      = "client_handle"
+    case ip
   }
   
   // ------------------------------------------------------------------------------
@@ -94,8 +101,8 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-    // Format:  <streamId, > <"type", "dax_mic"> <"client_handle", handle>
-    
+    // Format:  <streamId, > <"type", "dax_mic"> <"client_handle", handle> <"ip", ipAddress>
+
     // get the Id
     if let id =  properties[0].key.streamId {
       
@@ -153,6 +160,7 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
       switch token {
         
       case .clientHandle: update(self, &_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
+      case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
       }
     }
     // is the AudioStream acknowledged by the radio?
@@ -291,6 +299,7 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   private var _delegate         : StreamHandler? = nil
 
   private var __clientHandle    : Handle = 0
+  private var __ip              = ""
   private var __micGain         = 50
   private var __micGainScalar   : Float = 1.0
 }
