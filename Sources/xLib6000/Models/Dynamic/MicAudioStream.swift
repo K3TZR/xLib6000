@@ -112,9 +112,6 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
         // YES, does it exist?
         if radio.micAudioStreams[id] == nil {
           
-          // NO, is it for this client?
-          if !isForThisClient(keyValues) { return }
-          
           // create a new object & add it to the collection
           radio.micAudioStreams[id] = MicAudioStream(radio: radio, id: id)
         }

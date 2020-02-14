@@ -78,7 +78,6 @@ public final class TxAudioStream : NSObject, DynamicModel {
 
   enum Token: String {
     case daxTx      = "dax_tx"
-    case inUse      = "in_use"
     case ip
     case port
   }
@@ -116,9 +115,6 @@ public final class TxAudioStream : NSObject, DynamicModel {
         
         // YES, does it exist?
         if radio.txAudioStreams[id] == nil {
-          
-          // NO, is it for this client?
-          if !isForThisClient(keyValues) { return }
           
           // create a new object & add it to the collection
           radio.txAudioStreams[id] = TxAudioStream(radio: radio, id: id)
@@ -183,13 +179,12 @@ public final class TxAudioStream : NSObject, DynamicModel {
       switch token {
         
       case .daxTx:  update(self, &_transmit,  to: property.value.bValue,  signal: \.transmit)
-      case .inUse:  update(self, &_inUse,     to: property.value.bValue,  signal: \.inUse)
       case .ip:     update(self, &_ip,        to: property.value,         signal: \.ip)
       case .port:   update(self, &_port,      to: property.value.iValue,  signal: \.port)
       }
     }
     // is the AudioStream acknowledged by the radio?
-    if !_initialized && _inUse && _ip != "" {
+    if !_initialized && _ip != "" {
       
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true

@@ -210,7 +210,7 @@ public final class Memory                   : NSObject, DynamicModel {
       if radio.memories[id] == nil {
         
         // NO, is it for this client?
-        if !isForThisClient(keyValues) { return }
+        if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
         
         // create a new object & add it to the collection
         radio.memories[id] = Memory(radio: radio, id: id)
