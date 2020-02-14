@@ -77,6 +77,7 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   enum Token: String {
     case clientHandle      = "client_handle"
     case ip
+    case type
   }
   
   // ------------------------------------------------------------------------------
@@ -159,8 +160,9 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .clientHandle: update(self, &_clientHandle, to: property.value.handle ?? 0, signal: \.clientHandle)
+      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
       case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
+      case .type:         break  // included to inhibit unknown token warnings
       }
     }
     // is the AudioStream acknowledged by the radio?
@@ -169,7 +171,7 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
-      _log("DaxMicAudioStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("DaxMicAudioStream added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.daxMicAudioStreamHasBeenAdded, object: self as Any?)
