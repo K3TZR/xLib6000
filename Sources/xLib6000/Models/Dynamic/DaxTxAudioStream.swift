@@ -100,7 +100,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-    // Format:  <streamId, > <"type", "dax_tx"> <"client_handle", handle> <"dax_tx", isTransmitChannel>
+    // Format:  <streamId, > <"type", "dax_tx"> <"client_handle", handle> <"tx", isTransmitChannel>
     
     // get the Id
     if let id =  properties[0].key.streamId {
@@ -159,7 +159,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       switch token {
         
       case .clientHandle:       update(self, &_clientHandle,      to: property.value.handle ?? 0, signal: \.clientHandle)
-      case .ip:                 update(self, &_ip,            to: property.value,             signal: \.ip)
+      case .ip:                 update(self, &_ip,                to: property.value,             signal: \.ip)
       case .isTransmitChannel:  update(self, &_isTransmitChannel, to: property.value.bValue,      signal: \.isTransmitChannel)
       case .type:               break  // included to inhibit unknown token warnings
       }
