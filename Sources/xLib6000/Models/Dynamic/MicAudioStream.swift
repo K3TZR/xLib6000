@@ -26,9 +26,8 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
+  @objc dynamic public var clientHandle: Handle {
+    return _clientHandle }
   @objc dynamic public var ip: String {
     get { _ip }
     set { if _ip != newValue { _ip = newValue }}}
@@ -57,9 +56,9 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  var _inUse : Bool {
-    get { Api.objectQ.sync { __inUse } }
-    set { Api.objectQ.sync(flags: .barrier) {__inUse = newValue }}}
+  var _clientHandle : Handle {
+    get { Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
     set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
@@ -74,7 +73,8 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
     set { Api.objectQ.sync(flags: .barrier) {__micGainScalar = newValue }}}
 
   enum Token: String {
-    case inUse      = "in_use"
+    case clientHandle = "client_handle"
+    case inUse        = "in_use"
     case ip
     case port
   }
@@ -126,7 +126,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
           // YES, remove it
           radio.micAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage("MicAudioStream removed: id = \(id)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("MicAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
 
           // notify all observers
           NC.post(.micAudioStreamHasBeenRemoved, object: id as Any?)
@@ -174,18 +174,19 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .inUse:  update(self, &_inUse, to: property.value.bValue,  signal: \.inUse)
-      case .ip:     update(self, &_ip,    to: property.value,         signal: \.ip)
-      case .port:   update(self, &_port,  to: property.value.iValue,  signal: \.port)
+      case .clientHandle:   update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
+      case .inUse:          break   // included to inhibit unknown token warnings
+      case .ip:             update(self, &_ip,            to: property.value,             signal: \.ip)
+      case .port:           update(self, &_port,          to: property.value.iValue,      signal: \.port)
       }
     }
     // is the AudioStream acknowledged by the radio?
-    if !_initialized && _inUse && _ip != "" {
+    if !_initialized && _ip != "" {
       
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
-      _log("MicAudioStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("MicAudioStream added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.micAudioStreamHasBeenAdded, object: self as Any?)
@@ -281,7 +282,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   
   private var _delegate       : StreamHandler? = nil
     
-  private var __inUse         = false
+  private var __clientHandle  : Handle = 0
   private var __ip            = ""
   private var __port          = 0
   private var __micGain       = 50
