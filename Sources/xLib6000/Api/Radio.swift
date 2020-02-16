@@ -634,6 +634,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case daxTx            = "dax_tx"
     case remoteRx         = "remote_audio_rx"
     case remoteTx         = "remote_audio_tx"
+    
+    case txAudio
   }
 
   
@@ -1104,17 +1106,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .interlock:      interlock.parseProperties(self, remainder.keyValuesArray())
     case .memory:         Memory.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .meter:          Meter.parseStatus(self, remainder.keyValuesArray(delimiter: "#"), !remainder.contains(Api.kRemoved))
-    case .micAudioStream: MicAudioStream.parseStatus(self, remainder.keyValuesArray())
+    case .micAudioStream: MicAudioStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
     case .mixer:          _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
     case .opusStream:     Opus.parseStatus(self, remainder.keyValuesArray())
     case .profile:        Profile.parseStatus(self, remainder.keyValuesArray(delimiter: "="))
     case .radio:          parseProperties(self, remainder.keyValuesArray())
     case .slice:          xLib6000.Slice.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
-    case .stream:         parseStream(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
+    case .stream:         parseStream(self, remainder)
     case .tnf:            Tnf.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .transmit:       transmit.parseProperties(self, remainder.keyValuesArray())
     case .turf:           _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
-    case .txAudioStream:  TxAudioStream.parseStatus(self, remainder.keyValuesArray())
+    case .txAudioStream:  TxAudioStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .usbCable:       UsbCable.parseStatus(self, remainder.keyValuesArray())
     case .wan:            wan.parseProperties(self, remainder.keyValuesArray())
     case .waveform:       waveform.parseProperties(self, remainder.keyValuesArray())
@@ -1256,19 +1258,22 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  private func parseStream(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+  private func parseStream(_ radio: Radio, _ remainder: String) {
   
     func notify(_ id: StreamId, _ type: StreamType) {
       var notify : NotificationType
       var streamName : String
       
       switch type {
-        case .daxIq:      notify = .daxIqStreamHasBeenRemoved         ; streamName = "DaxIqStreaam"
-        case .daxMic:     notify = .daxMicAudioStreamHasBeenRemoved   ; streamName = "DaxMicAudioStream"
-        case .daxRx:      notify = .daxRxAudioStreamHasBeenRemoved    ; streamName = "DaxRxAudioStream"
-        case .daxTx:      notify = .daxTxAudioStreamHasBeenRemoved    ; streamName = "DaxTxAudioStream"
-        case .remoteRx:   notify = .remoteRxAudioStreamHasBeenRemoved ; streamName = "RemoteRxAudioStream"
-        case .remoteTx:   notify = .remoteTxAudioStreamHasBeenRemoved ; streamName = "RemoteTxAudioStream"
+        
+      case .daxIq:      notify = .daxIqStreamHasBeenRemoved         ; streamName = "DaxIqStreaam"
+      case .daxMic:     notify = .daxMicAudioStreamHasBeenRemoved   ; streamName = "DaxMicAudioStream"
+      case .daxRx:      notify = .daxRxAudioStreamHasBeenRemoved    ; streamName = "DaxRxAudioStream"
+      case .daxTx:      notify = .daxTxAudioStreamHasBeenRemoved    ; streamName = "DaxTxAudioStream"
+      case .remoteRx:   notify = .remoteRxAudioStreamHasBeenRemoved ; streamName = "RemoteRxAudioStream"
+      case .remoteTx:   notify = .remoteTxAudioStreamHasBeenRemoved ; streamName = "RemoteTxAudioStream"
+      
+      case .txAudio:    notify = .txAudioStreamHasBeenRemoved       ; streamName = "TxAudioStream"
       }
       _log(streamName + " removed: id = \(id.hex)", .debug, #function, #file, #line)
 
@@ -1276,20 +1281,28 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       NC.post(notify, object: id as Any?)
     }
     
-    if !inUse {
-      if let id = keyValues[0].key.streamId {
+    Swift.print("ParseStream remainder = " + remainder)
+    
+    let keyValues = remainder.keyValuesArray()
+    if let id = keyValues[0].key.streamId {
+      
+      if radio.version.isV3 && remainder.contains(Api.kRemoved) {
         
-        // does it exist?
         if radio.daxIqStreams[id] != nil          { radio.daxIqStreams[id] = nil          ; notify(id, .daxIq)    ; return }
         if radio.daxMicAudioStreams[id] != nil    { radio.daxMicAudioStreams[id] = nil    ; notify(id, .daxMic)   ; return }
         if radio.daxRxAudioStreams[id] != nil     { radio.daxRxAudioStreams[id] = nil     ; notify(id, .daxRx)    ; return }
         if radio.daxTxAudioStreams[id] != nil     { radio.daxTxAudioStreams[id] = nil     ; notify(id, .daxTx)    ; return }
         if radio.remoteRxAudioStreams[id] != nil  { radio.remoteRxAudioStreams[id] = nil  ; notify(id, .remoteRx) ; return }
         if radio.remoteTxAudioStreams[id] != nil  { radio.remoteTxAudioStreams[id] = nil  ; notify(id, .remoteTx) ; return }
+        return
+        
+      } else if (radio.version.isV2 || radio.version.isV1) && remainder.contains(Api.kNotInUse) {
+        
+        if radio.txAudioStreams[id] != nil        { radio.txAudioStreams[id] = nil        ; notify(id, .txAudio)    ; return }
+        return
       }
-      return
     }
-    
+      
     // check for unknown Keys
     guard let token = StreamType(rawValue: keyValues[1].value) else {
       // log it and ignore the Key
@@ -1298,12 +1311,14 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
     switch token {
       
-    case .daxRx:      DaxRxAudioStream.parseStatus(radio, keyValues)
-    case .daxTx:      DaxTxAudioStream.parseStatus(radio, keyValues)
     case .daxIq:      DaxIqStream.parseStatus(radio, keyValues)
     case .daxMic:     DaxMicAudioStream.parseStatus(radio, keyValues)
+    case .daxRx:      DaxRxAudioStream.parseStatus(radio, keyValues)
+    case .daxTx:      DaxTxAudioStream.parseStatus(radio, keyValues)
     case .remoteRx:   RemoteRxAudioStream.parseStatus(radio, keyValues)
     case .remoteTx:   RemoteTxAudioStream.parseStatus(radio, keyValues)
+      
+    case .txAudio:    break
     }
   }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
