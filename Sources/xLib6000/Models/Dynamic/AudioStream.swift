@@ -28,6 +28,8 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
+  @objc dynamic public var clientHandle: Handle {
+    return _clientHandle }
   @objc dynamic public var daxChannel: Int {
     get { _daxChannel }
     set { if _daxChannel != newValue { _daxChannel = newValue ; _slice = _radio.findSlice(using: _daxChannel) }}}
@@ -57,6 +59,9 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
     
+  var _clientHandle : Handle {
+    get { Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
   var _daxChannel : Int {
     get { Api.objectQ.sync { __daxChannel } }
     set { Api.objectQ.sync(flags: .barrier) {__daxChannel = newValue }}}
@@ -77,8 +82,10 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     set { Api.objectQ.sync(flags: .barrier) {__slice = newValue }}}
 
   internal enum Token: String {
-    case daxChannel                         = "dax"
-    case daxClients                         = "dax_clients"
+    case clientHandle = "client_handle"
+    case daxChannel   = "dax"
+    case daxClients   = "dax_clients"
+    case inUse        = "in_use"
     case ip
     case port
     case slice
@@ -178,11 +185,13 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       }
       // known keys, in alphabetical order
       switch token {
-        
-      case .daxChannel: update(self, &_daxChannel,  to: property.value.iValue,  signal: \.daxChannel)
-      case .daxClients: update(self, &_daxClients,  to: property.value.iValue,  signal: \.daxClients)
-      case .ip:         update(self, &_ip,          to: property.value,         signal: \.ip)
-      case .port:       update(self, &_port,        to: property.value.iValue,  signal: \.port)
+       
+      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
+      case .daxChannel:   update(self, &_daxChannel,    to: property.value.iValue,      signal: \.daxChannel)
+      case .daxClients:   update(self, &_daxClients,    to: property.value.iValue,      signal: \.daxClients)
+      case .inUse:        break   // included to inhibit unknown token warnings
+      case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
+      case .port:         update(self, &_port,          to: property.value.iValue,      signal: \.port)
       case .slice:
         if let sliceId = property.value.objectId {
           update(self, &_slice, to: _radio.slices[sliceId], signal: \.slice)
@@ -198,7 +207,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
             
-      _log("AudioStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("AudioStream added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.audioStreamHasBeenAdded, object: self as Any?)
@@ -300,6 +309,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   
   private var _delegate     : StreamHandler? = nil
 
+  private var __clientHandle  : Handle = 0
   private var __daxChannel  = 0
   private var __daxClients  = 0
   private var __ip          = ""
