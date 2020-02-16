@@ -211,6 +211,8 @@ public final class TxAudioStream : NSObject, DynamicModel {
     
     // notify all observers
     NC.post(.txAudioStreamWillBeRemoved, object: self as Any?)
+    
+    _radio.txAudioStreams[id] = nil
   }
   
   // ----------------------------------------------------------------------------
