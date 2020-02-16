@@ -309,11 +309,11 @@ extension Radio {
   ///   - value:              On/Off
   ///   - callback:           ReplyHandler (optional)
   ///
-  //  public func createOpus(callback: ReplyHandler? = nil) {
-  //
-  //    // tell the Radio to enable Opus Rx
-  //    Api.sharedInstance.send(Opus.kCmd + Opus.Token.remoteRxOn.rawValue + " \(value.asNumber)", replyTo: callback)
-  //  }
+  public func requestOpusStream(state: Bool, callback: ReplyHandler? = nil) {
+  
+      // Stream already exists, tell the Radio to enable Opus Rx
+    Api.sharedInstance.send("remote_audio rx_on \(state.as1or0)", replyTo: callback)
+    }
   
   // ----------------------------------------------------------------------------
   // MARK: - Panadapter methods
@@ -704,7 +704,7 @@ extension Radio {
   ///   - callback:           ReplyHandler (optional)
   /// - Returns:              success / failure
   ///
-  public func requestRemoteRxAudioStream(compression: String, callback: ReplyHandler? = nil) {
+  public func requestRemoteRxAudioStream(compression: String = RemoteRxAudioStream.kUncompressed, callback: ReplyHandler? = nil) {
     
     // tell the Radio to enable Opus Rx
     sendCommand("stream create type=remote_audio_rx compression=\(compression)", replyTo: callback)
@@ -720,7 +720,7 @@ extension Radio {
   ///   - callback:           ReplyHandler (optional)
   /// - Returns:              success / failure
   ///
-  public func requestRemoteTxAudioStream(compression: String, callback: ReplyHandler? = nil) {
+  public func requestRemoteTxAudioStream(compression: String = RemoteRxAudioStream.kUncompressed, callback: ReplyHandler? = nil) {
     
     // tell the Radio to enable RemoteTxAudioStream
     sendCommand("stream create type=remote_audio_tx compression=\(compression)", replyTo: callback)
