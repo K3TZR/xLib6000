@@ -767,7 +767,7 @@ extension Radio {
   public func requestTxAudioStream(callback: ReplyHandler? = nil) {
     
     // tell the Radio to create a Stream
-    sendCommand("dax tx 1", replyTo: callback)
+    sendCommand("stream create dax", replyTo: callback)
   }
   
   // ----------------------------------------------------------------------------
