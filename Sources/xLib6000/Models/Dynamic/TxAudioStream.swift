@@ -24,19 +24,18 @@ public final class TxAudioStream : NSObject, DynamicModel {
   
   public let id                             : TxStreamId
   
-  @objc dynamic public var transmit: Bool {
-    get { _transmit  }
-    set { if _transmit != newValue { _transmit = newValue ; txAudioCmd( newValue.as1or0) } } }
 
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
+  @objc dynamic public var clientHandle: Handle {
+    return _clientHandle }
   @objc dynamic public var ip: String {
     get { _ip }
     set { if _ip != newValue { _ip = newValue }}}
   @objc dynamic public var port: Int {
     get { _port  }
     set { if _port != newValue { _port = newValue }}}
+  @objc dynamic public var transmit: Bool {
+    get { _transmit  }
+    set { if _transmit != newValue { _transmit = newValue ; txAudioCmd( newValue.as1or0) } } }
   @objc dynamic public var txGain: Int {
     get { _txGain  }
     set {
@@ -57,9 +56,9 @@ public final class TxAudioStream : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  var _inUse : Bool {
-    get { Api.objectQ.sync { __inUse } }
-    set { Api.objectQ.sync(flags: .barrier) {__inUse = newValue }}}
+  var _clientHandle : Handle {
+    get { Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
     set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
@@ -77,9 +76,12 @@ public final class TxAudioStream : NSObject, DynamicModel {
     set { Api.objectQ.sync(flags: .barrier) {__txGainScalar = newValue }}}
 
   enum Token: String {
-    case daxTx      = "dax_tx"
+    case clientHandle   = "client_handle"
+    case daxTx          = "dax_tx"
+    case inUse          = "in_use"
     case ip
     case port
+
   }
 
   // ------------------------------------------------------------------------------
@@ -130,7 +132,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
           // YES, remove it
           radio.txAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage("TxAudioStream removed: id = \(id)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("TxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           
           // notify all observers
           NC.post(.txAudioStreamHasBeenRemoved, object: id as Any?)
@@ -178,9 +180,11 @@ public final class TxAudioStream : NSObject, DynamicModel {
       // known keys, in alphabetical order
       switch token {
         
-      case .daxTx:  update(self, &_transmit,  to: property.value.bValue,  signal: \.transmit)
-      case .ip:     update(self, &_ip,        to: property.value,         signal: \.ip)
-      case .port:   update(self, &_port,      to: property.value.iValue,  signal: \.port)
+      case .clientHandle:   update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
+      case .daxTx:          update(self, &_transmit,      to: property.value.bValue,      signal: \.transmit)
+      case .inUse:          break   // included to inhibit unknown token warnings
+      case .ip:             update(self, &_ip,            to: property.value,             signal: \.ip)
+      case .port:           update(self, &_port,          to: property.value.iValue,      signal: \.port)
       }
     }
     // is the AudioStream acknowledged by the radio?
@@ -189,7 +193,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
                   
-      _log("TxAudioStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("TxAudioStream added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)
@@ -203,7 +207,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
   public func remove(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove a Stream
-    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
+    _radio.sendCommand("dax tx 0", replyTo: callback)
     
     // notify all observers
     NC.post(.txAudioStreamWillBeRemoved, object: self as Any?)
@@ -306,6 +310,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // *** Hidden properties (Do NOT use) ***
   
+  private var __clientHandle  : Handle = 0
   private var __inUse         = false
   private var __ip            = ""
   private var __port          = 0
