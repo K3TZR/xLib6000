@@ -41,6 +41,62 @@ final class v3Tests: XCTestCase {
   }
   
   // ------------------------------------------------------------------------------
+  // MARK: - BandSetting
+  
+  private var bandSettingStatus = "band 999 band_name=21 acc_txreq_enable=1 rca_txreq_enable=0 acc_tx_enabled=1 tx1_enabled=0 tx2_enabled=1 tx3_enabled=0"
+  func testBandSettingParse() {
+    
+    Swift.print("\n***** \(#function), " + requiredVersion)
+    
+    let radio = discoverRadio(logState: .limited(to: "BandSetting.swift"))
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+
+      // remove (if present)
+      radio!.bandSettings["999".objectId!] = nil
+      
+      BandSetting.parseStatus(radio!, bandSettingStatus.keyValuesArray(), true)
+
+      if let bandSettingObject = radio!.bandSettings["999".objectId!] {
+        // verify properties
+        XCTAssertEqual(bandSettingObject.bandName, "21")
+        XCTAssertEqual(bandSettingObject.accTxReqEnabled, true)
+        XCTAssertEqual(bandSettingObject.rcaTxReqEnabled, false)
+        XCTAssertEqual(bandSettingObject.accTxEnabled, true)
+        XCTAssertEqual(bandSettingObject.tx1Enabled, false)
+        XCTAssertEqual(bandSettingObject.tx2Enabled, true)
+        XCTAssertEqual(bandSettingObject.tx3Enabled, false)
+
+      } else {
+        XCTFail("***** Failed to create BandSetting *****")
+      }
+
+    }  else {
+      Swift.print("SKIPPED: \(#function) requires \(requiredVersion): radio is v\(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch)")
+    }
+    // disconnect the radio
+    disconnect()
+  }
+
+  func testBandSetting() {
+        
+    Swift.print("\n***** \(#function)")
+    
+    let radio = discoverRadio()
+    guard radio != nil else { return }
+    
+    if radio!.version.isV3 {
+      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+
+    } else {
+      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+    }
+    // disconnect the radio
+    disconnect()
+  }
+
+  // ------------------------------------------------------------------------------
   // MARK: - DaxIqStream
   
   // Format:  <streamId, > <"type", "dax_iq"> <"daxiq_channel", channel> <"pan", panStreamId> <"daxiq_rate", rate> <"client_handle", handle>

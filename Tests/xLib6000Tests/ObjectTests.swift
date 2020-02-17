@@ -42,41 +42,41 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Amplifier.swift"))
     guard radio != nil else { return }
 
     Amplifier.parseStatus(radio!, amplifierStatus.keyValuesArray(), true)
 
-    if let amplifier = radio!.amplifiers["0x12345678".streamId!] {
+    if let object = radio!.amplifiers["0x12345678".streamId!] {
       
       Swift.print("***** Object created")
       
-      XCTAssertEqual(amplifier.id, "0x12345678".handle!)
-      XCTAssertEqual(amplifier.ant, "ANT1", "ant")
-      XCTAssertEqual(amplifier.ip, "10.0.1.106")
-      XCTAssertEqual(amplifier.model, "PGXL")
-      XCTAssertEqual(amplifier.port, 4123)
-      XCTAssertEqual(amplifier.serialNumber, "1234-5678-9012")
-      XCTAssertEqual(amplifier.state, "STANDBY")
+      XCTAssertEqual(object.id, "0x12345678".handle!)
+      XCTAssertEqual(object.ant, "ANT1", "ant")
+      XCTAssertEqual(object.ip, "10.0.1.106")
+      XCTAssertEqual(object.model, "PGXL")
+      XCTAssertEqual(object.port, 4123)
+      XCTAssertEqual(object.serialNumber, "1234-5678-9012")
+      XCTAssertEqual(object.state, "STANDBY")
       
       Swift.print("***** Parameters verified")
       
-      amplifier.ant = "ANT2"
-      amplifier.ip = "11.1.217"
-      amplifier.model = "QIYM"
-      amplifier.port = 3214
-      amplifier.serialNumber = "2109-8765-4321"
-      amplifier.state = "IDLE"
+      object.ant = "ANT2"
+      object.ip = "11.1.217"
+      object.model = "QIYM"
+      object.port = 3214
+      object.serialNumber = "2109-8765-4321"
+      object.state = "IDLE"
       
       Swift.print("***** Parameters modified")
       
-      XCTAssertEqual(amplifier.id, "0x12345678".handle!)
-      XCTAssertEqual(amplifier.ant, "ANT2")
-      XCTAssertEqual(amplifier.ip, "11.1.217")
-      XCTAssertEqual(amplifier.model, "QIYM")
-      XCTAssertEqual(amplifier.port, 3214)
-      XCTAssertEqual(amplifier.serialNumber, "2109-8765-4321")
-      XCTAssertEqual(amplifier.state, "IDLE")
+      XCTAssertEqual(object.id, "0x12345678".handle!)
+      XCTAssertEqual(object.ant, "ANT2")
+      XCTAssertEqual(object.ip, "11.1.217")
+      XCTAssertEqual(object.model, "QIYM")
+      XCTAssertEqual(object.port, 3214)
+      XCTAssertEqual(object.serialNumber, "2109-8765-4321")
+      XCTAssertEqual(object.state, "IDLE")
       
       Swift.print("***** Modified parameters verified")
       
@@ -91,62 +91,6 @@ final class ObjectTests: XCTestCase {
   func testAmplifier() {
     
     Swift.print("\n***** \(#function) NOT implemented, NEED MORE INFORMATION ****\n")
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - BandSetting
-  
-  private var bandSettingStatus = "band 999 band_name=21 acc_txreq_enable=1 rca_txreq_enable=0 acc_tx_enabled=1 tx1_enabled=0 tx2_enabled=1 tx3_enabled=0"
-  func testBandSettingParse() {
-        
-    Swift.print("\n***** \(#function)")
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-
-      // remove (if present)
-      radio!.bandSettings["999".objectId!] = nil
-      
-      BandSetting.parseStatus(radio!, bandSettingStatus.keyValuesArray(), true)
-
-      if let bandSettingObject = radio!.bandSettings["999".objectId!] {
-        // verify properties
-        XCTAssertEqual(bandSettingObject.bandName, "21")
-        XCTAssertEqual(bandSettingObject.accTxReqEnabled, true)
-        XCTAssertEqual(bandSettingObject.rcaTxReqEnabled, false)
-        XCTAssertEqual(bandSettingObject.accTxEnabled, true)
-        XCTAssertEqual(bandSettingObject.tx1Enabled, false)
-        XCTAssertEqual(bandSettingObject.tx2Enabled, true)
-        XCTAssertEqual(bandSettingObject.tx3Enabled, false)
-
-      } else {
-        XCTAssertTrue(false, "\n***** Failed to create BandSetting *****\n")
-      }
-
-    }  else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    disconnect()
-  }
-
-  func testBandSetting() {
-        
-    Swift.print("\n***** \(#function)")
-    
-    let radio = discoverRadio()
-    guard radio != nil else { return }
-    
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    disconnect()
   }
 
   // ------------------------------------------------------------------------------
@@ -169,7 +113,7 @@ final class ObjectTests: XCTestCase {
 
   func equalizer(_ type: Equalizer.EqType) {
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Equalizer.swift"))
     guard radio != nil else { return }
     
     if let eq = radio!.equalizers[type] {
@@ -237,37 +181,106 @@ final class ObjectTests: XCTestCase {
   
   // ------------------------------------------------------------------------------
   // MARK: - Memory
-  
+
+  private let memoryStatus = "1 owner=K3TZR group= freq=14.100000 name= mode=USB step=100 repeater=SIMPLEX repeater_offset=0.000000 tone_mode=OFF tone_value=67.0 power=100 rx_filter_low=100 rx_filter_high=2900 highlight=0 highlight_color=0x00000000 squelch=1 squelch_level=20 rtty_mark=2 rtty_shift=170 digl_offset=2210 digu_offset=1500"
+
   func testMemoryParse() {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Memory.swift"))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+    Memory.parseStatus(radio!, memoryStatus.keyValuesArray(), true)
+    
+    if let object = radio!.memories["1".objectId!] {
+      
+      Swift.print("***** Object created")
+      
+      XCTAssertEqual(object.owner, "K3TZR", "owner")
+      XCTAssertEqual(object.group, "", "Group")
+      XCTAssertEqual(object.frequency, 14_100_000, "frequency")
+      XCTAssertEqual(object.name, "", "name")
+      XCTAssertEqual(object.mode, "USB", "mode")
+      XCTAssertEqual(object.step, 100, "step")
+      XCTAssertEqual(object.offsetDirection, "SIMPLEX", "offsetDirection")
+      XCTAssertEqual(object.offset, 0, "offset")
+      XCTAssertEqual(object.toneMode, "OFF", "toneMode")
+      XCTAssertEqual(object.toneValue, 67.0, "toneValue")
+      XCTAssertEqual(object.filterLow, 100, "filterLow")
+      XCTAssertEqual(object.filterHigh, 2_900, "filterHigh")
+      XCTAssertEqual(object.highlight, false, "highlight")
+      XCTAssertEqual(object.highlightColor, "0x00000000".streamId, "highlightColor")
+      XCTAssertEqual(object.squelchEnabled, true, "squelchEnabled")
+      XCTAssertEqual(object.squelchLevel, 20, "squelchLevel")
+      XCTAssertEqual(object.rttyMark, 2, "rttyMark")
+      XCTAssertEqual(object.rttyShift, 170, "rttyShift")
+      XCTAssertEqual(object.digitalLowerOffset, 2210, "digitalLowerOffset")
+      XCTAssertEqual(object.digitalUpperOffset, 1500, "digitalUpperOffset")
+      
+      Swift.print("***** Parameters verified")
+      
+      object.owner = "DL3LSM"
+      object.group = "X"
+      object.frequency = 7_125_000
+      object.name = "40"
+      object.mode = "LSB"
+      object.step = 212
+      object.offsetDirection = "UP"
+      object.offset = 10
+      object.toneMode = "ON"
+      object.toneValue = 76.0
+      object.filterLow = 200
+      object.filterHigh = 3_000
+      object.highlight = true
+      object.highlightColor = "0x01010101".streamId!
+      object.squelchEnabled = false
+      object.squelchLevel = 19
+      object.rttyMark = 3
+      object.rttyShift = 269
+      object.digitalLowerOffset = 3321
+      object.digitalUpperOffset = 2612
+      
+      Swift.print("***** Parameters modified")
+      
+      XCTAssertEqual(object.owner, "DL3LSM", "owner")
+      XCTAssertEqual(object.group, "X", "group")
+      XCTAssertEqual(object.frequency, 7_125_000, "frequency")
+      XCTAssertEqual(object.name, "40", "name")
+      XCTAssertEqual(object.mode, "LSB", "mode")
+      XCTAssertEqual(object.step, 212, "step")
+      XCTAssertEqual(object.offsetDirection, "UP", "offsetDirection")
+      XCTAssertEqual(object.offset, 10, "offset")
+      XCTAssertEqual(object.toneMode, "ON", "toneMode")
+      XCTAssertEqual(object.toneValue, 76.0, "toneValue")
+      XCTAssertEqual(object.filterLow, 200, "filterLow")
+      XCTAssertEqual(object.filterHigh, 3_000, "filterHigh")
+      XCTAssertEqual(object.highlight, true, "highlight")
+      XCTAssertEqual(object.highlightColor, "0x01010101".streamId, "highlightColor")
+      XCTAssertEqual(object.squelchEnabled, false, "squelchEnabled")
+      XCTAssertEqual(object.squelchLevel, 19, "squelchLevel")
+      XCTAssertEqual(object.rttyMark, 3, "rttyMark")
+      XCTAssertEqual(object.rttyShift, 269, "rttyShift")
+      XCTAssertEqual(object.digitalLowerOffset, 3321, "digitalLowerOffset")
+      XCTAssertEqual(object.digitalUpperOffset, 2612, "digitalUpperOffset")
+
+      Swift.print("***** Modified parameters verified")
       
     } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+      XCTAssertTrue(false, "Failed to create object")
     }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
-
+  
   func testMemory() {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Memory.swift"))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
+    radio?.requestMemory()
+    
     // disconnect the radio
     disconnect()
   }
@@ -279,7 +292,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Meter.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
@@ -296,7 +309,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Meter.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
@@ -331,7 +344,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Panadapter.swift"))
     guard radio != nil else { return }
     
     removeAllPanadapters(radio: radio!)
@@ -375,7 +388,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Panadapter.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -541,7 +554,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Slice.swift"))
     guard radio != nil else { return }
     
     let id: ObjectId = sliceStatus.keyValuesArray()[0].key.objectId!
@@ -588,7 +601,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Slice.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
@@ -915,7 +928,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Tnf.swift"))
     guard radio != nil else { return }
     
     let id: ObjectId = tnfStatus.keyValuesArray()[0].key.objectId!
@@ -943,7 +956,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Tnf.swift"))
     guard radio != nil else { return }
     
     // remove all
@@ -1015,7 +1028,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "UsbCable.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
@@ -1032,7 +1045,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "UsbCable.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
@@ -1053,7 +1066,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Waterfall.swift"))
     guard radio != nil else { return }
     
     let id: StreamId = waterfallStatus.keyValuesArray()[1].key.streamId!
@@ -1084,7 +1097,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Waterfall.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
@@ -1123,7 +1136,7 @@ final class ObjectTests: XCTestCase {
 
   func xvtrCheck(status: String, expectedName: String) {
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Xvtr.swift"))
     guard radio != nil else { return }
     
     let id: XvtrId = status.keyValuesArray()[0].key.objectId!
@@ -1161,7 +1174,7 @@ final class ObjectTests: XCTestCase {
         
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio()
+    let radio = discoverRadio(logState: .limited(to: "Xvtr.swift"))
     guard radio != nil else { return }
     
     // remove all

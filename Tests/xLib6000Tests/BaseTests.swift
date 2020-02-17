@@ -80,7 +80,7 @@ final class BaseTests: XCTestCase {
     let iqStream = IqStream(radio: radio, id: 1)
     XCTAssertNotNil(iqStream, "\n***** Failed to instantiate IqStream *****\n")
     
-    let memory = Memory(radio: radio, id: "0")
+    let memory = Memory(radio: radio, id: "0".objectId!)
     XCTAssertNotNil(memory, "\n***** Failed to instantiate Memory *****\n")
     
     let meter = Meter(radio: radio, id: 1)

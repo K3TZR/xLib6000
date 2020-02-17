@@ -626,7 +626,6 @@ class v2Tests: XCTestCase {
                   Swift.print("***** Object re-created")
                   
                   // check params
-                  XCTAssertEqual(object.id, "0x23456789".streamId)
                   XCTAssertEqual(object.transmit, transmit)
                   XCTAssertEqual(object.ip, ip)
                   XCTAssertEqual(object.port, port)
@@ -643,7 +642,6 @@ class v2Tests: XCTestCase {
                   Swift.print("***** Parameters modified")
                   
                   // re-verify properties
-                  XCTAssertEqual(object.id, "0x23456789".streamId)
                   XCTAssertEqual(object.transmit, false)
                   XCTAssertEqual(object.ip, "12.2.3.218")
                   XCTAssertEqual(object.port, 4214)
