@@ -977,7 +977,7 @@ public final class Slice  : NSObject, DynamicModel {
   ///
   public func sliceTuneCmd(_ value: Any) {
     
-    _radio.sendCommand("slice tune " + "0x\(id) \(value) autopan=\(_autoPan.as1or0)")
+    _radio.sendCommand("slice tune " + "\(id) \(value) autopan=\(_autoPan.as1or0)")
   }
   /// Set a Slice Lock property on the Radio
   ///
@@ -986,7 +986,7 @@ public final class Slice  : NSObject, DynamicModel {
   ///
   public func sliceLock(_ value: String) {
     
-    _radio.sendCommand("slice " + value + " 0x\(id)")
+    _radio.sendCommand("slice " + value + " \(id)")
   }
   
   // ----------------------------------------------------------------------------
@@ -1000,7 +1000,7 @@ public final class Slice  : NSObject, DynamicModel {
   ///
   private func sliceCmd(_ token: Token, _ value: Any) {
     
-    _radio.sendCommand("slice set " + "0x\(id) " + token.rawValue + "=\(value)")
+    _radio.sendCommand("slice set " + "\(id) " + token.rawValue + "=\(value)")
   }
   /// Set an Audio property on the Radio
   ///
@@ -1009,7 +1009,7 @@ public final class Slice  : NSObject, DynamicModel {
   ///   - value:      the new value
   ///
   private func audioCmd(_ token: Token, value: Any) {
-    _radio.sendCommand("audio client 0 slice " + "0x\(id) " + token.rawValue + " \(value)")
+    _radio.sendCommand("audio client 0 slice " + "\(id) " + token.rawValue + " \(value)")
   }
   /// Set an Audio property on the Radio
   ///
@@ -1020,7 +1020,7 @@ public final class Slice  : NSObject, DynamicModel {
   private func audioCmd(_ token: String, value: Any) {
     // NOTE: commands use this format when the Token received does not match the Token sent
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    _radio.sendCommand("audio client 0 slice " + "0x\(id) " + token + " \(value)")
+    _radio.sendCommand("audio client 0 slice " + "\(id) " + token + " \(value)")
   }
   /// Set a Filter property on the Radio
   ///
@@ -1029,7 +1029,7 @@ public final class Slice  : NSObject, DynamicModel {
   ///
   private func filterCmd(low: Any, high: Any) {
     
-    _radio.sendCommand("filt " + "0x\(id)" + " \(low)" + " \(high)")
+    _radio.sendCommand("filt " + "\(id)" + " \(low)" + " \(high)")
   }
   
   // ----------------------------------------------------------------------------
