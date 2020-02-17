@@ -56,6 +56,20 @@ extension Radio {
     // return the first one
     return streams[0]
   }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - BandSetting methods
+  
+  /// Create an Audio Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public func requestBandSetting(_ channel: String, callback: ReplyHandler? = nil) {
+  
+    // FIXME: need information
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - DaxIqStream methods
