@@ -133,6 +133,7 @@ public extension String {
   var trimmed         : String          { self.trimmingCharacters(in: CharacterSet.whitespaces) }
   var tValue          : Bool            { self.lowercased() == "true" ? true : false }
   var uValue          : UInt            { UInt(self) ?? 0 }
+  var uValue32        : UInt32          { UInt32(self) ?? 0 }
 
   /// Replace spaces with a specified value
   ///
@@ -281,6 +282,17 @@ public extension Bool {
   var asYesNo     : String  { self ? "YES" : "NO" }
 }
 
+public extension Float {
+  /// Determine if a value is between two other values (inclusive)
+  ///
+  /// - Parameters:
+  ///   - value1:     low value (may be + or -)
+  ///   - value2:     high value (may be + or -)
+  /// - Returns:      true - self within two values
+  ///
+  func within(_ value1: Float, _ value2: Float) -> Bool { (self >= value1) && (self <= value2) }
+}
+
 public extension Int {
   
   var hzToMhz     : String { String(format: "%02.6f", Float(self) / 1_000_000.0) }
@@ -414,8 +426,8 @@ public struct Version {
   public init() {
     // only useful for Apps & Frameworks (which have a Bundle), not Packages
     let versions = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
-    let patch   = Bundle.main.infoDictionary![kCFBundleVersionKey as String] as! String
-    self.init(versions + "." + patch)
+    let build   = Bundle.main.infoDictionary![kCFBundleVersionKey as String] as! String
+    self.init(versions + ".\(build)")
    }
   
   public var longString       : String  { "\(major).\(minor).\(patch) (\(build))" }
