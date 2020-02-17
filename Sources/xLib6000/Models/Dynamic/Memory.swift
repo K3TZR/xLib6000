@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias MemoryId = String
+public typealias MemoryId = ObjectId
 
 /// Memory Class implementation
 ///
@@ -22,7 +22,7 @@ public final class Memory                   : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                             : MemoryId                  // Id that uniquely identifies this Memory
+  public let id                             : MemoryId
   
   @objc dynamic public var digitalLowerOffset: Int {
     get { _digitalLowerOffset }
@@ -42,6 +42,12 @@ public final class Memory                   : NSObject, DynamicModel {
   @objc dynamic public var group: String {
     get { _group }
     set { let value = newValue.replacingSpaces() ; if _group != value { _group = value ; memCmd( .group, newValue) }}}
+  @objc dynamic public var highlight: Bool {
+    get { _highlight }
+    set { if _highlight != newValue { _highlight = newValue }}}
+  @objc dynamic public var highlightColor: UInt32 {
+    get { _highlightColor }
+    set { if _highlightColor != newValue { _highlightColor = newValue }}}
   @objc dynamic public var mode: String {
     get { _mode }
     set { if _mode != newValue { _mode = newValue ; memCmd( .mode, newValue) }}}
@@ -78,7 +84,7 @@ public final class Memory                   : NSObject, DynamicModel {
   @objc dynamic public var toneMode: String {
     get { _toneMode }
     set { if _toneMode != newValue { _toneMode = newValue ; memCmd( .toneMode, newValue) }}}
-  @objc dynamic public var toneValue: Int {
+  @objc dynamic public var toneValue: Float {
     get { _toneValue }
     set { if _toneValue != newValue { _toneValue = newValue ; memCmd( .toneValue, newValue) } } }
 
@@ -113,6 +119,12 @@ public final class Memory                   : NSObject, DynamicModel {
   var _group: String {
     get { Api.objectQ.sync { __group } }
     set { Api.objectQ.sync(flags: .barrier) { __group = newValue }}}
+  var _highlight: Bool {
+    get { Api.objectQ.sync { __highlight } }
+    set { Api.objectQ.sync(flags: .barrier) { __highlight = newValue }}}
+  var _highlightColor: UInt32 {
+    get { Api.objectQ.sync { __highlightColor } }
+    set { Api.objectQ.sync(flags: .barrier) { __highlightColor = newValue }}}
   var _mode: String {
     get { Api.objectQ.sync { __mode } }
     set { Api.objectQ.sync(flags: .barrier) { __mode = newValue }}}
@@ -149,7 +161,7 @@ public final class Memory                   : NSObject, DynamicModel {
   var _toneMode: String {
     get { Api.objectQ.sync { __toneMode } }
     set { Api.objectQ.sync(flags: .barrier) { __toneMode = newValue }}}
-  var _toneValue: Int {
+  var _toneValue: Float {
     get {  Api.objectQ.sync { __toneValue } }
     set { Api.objectQ.sync(flags: .barrier) { __toneValue = newValue }}}
 
@@ -201,35 +213,36 @@ public final class Memory                   : NSObject, DynamicModel {
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     
     // get the Id
-    let id = keyValues[0].key
-    
-    // is the object in use?
-    if inUse {
+    if let id = keyValues[0].key.objectId {
       
-      // YES, does it exist?
-      if radio.memories[id] == nil {
+      // is the object in use?
+      if inUse {
         
-        // NO, is it for this client?
-        if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
+        // YES, does it exist?
+        if radio.memories[id] == nil {
+          
+          // NO, is it for this client?
+          if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
+          
+          // create a new object & add it to the collection
+          radio.memories[id] = Memory(radio: radio, id: id)
+        }
+        // pass the key values to the Memory for parsing
+        radio.memories[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
         
-        // create a new object & add it to the collection
-        radio.memories[id] = Memory(radio: radio, id: id)
-      }
-      // pass the key values to the Memory for parsing
-      radio.memories[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
-      
-    } else {
-      
-      // does it exist?
-      if radio.memories[id] != nil {
+      } else {
         
-        // YES, remove it
-        radio.memories[id] = nil
-        
-        Log.sharedInstance.logMessage("Memory removed: id = \(id)", .debug, #function, #file, #line)
-        
-        // NO, notify all observers
-        NC.post(.memoryHasBeenRemoved, object: radio.memories[id] as Any?)
+        // does it exist?
+        if radio.memories[id] != nil {
+          
+          // YES, remove it
+          radio.memories[id] = nil
+          
+          Log.sharedInstance.logMessage("Memory removed: id = \(id)", .debug, #function, #file, #line)
+          
+          // NO, notify all observers
+          NC.post(.memoryHasBeenRemoved, object: radio.memories[id] as Any?)
+        }
       }
     }
   }
@@ -261,7 +274,7 @@ public final class Memory                   : NSObject, DynamicModel {
   ///
   func filterHighLimits(_ value: Int) -> Int {
     
-    var newValue = (value < filterHigh + 10 ? filterHigh + 10 : value)
+    var newValue = (value < filterLow + 10 ? filterLow + 10 : value)
     
     if let modeType = xLib6000.Slice.Mode(rawValue: mode.lowercased()) {
       switch modeType {
@@ -323,9 +336,9 @@ public final class Memory                   : NSObject, DynamicModel {
   ///   - value:          a Tone Value
   /// - Returns:          true = Valid
   ///
-  func toneValueValid( _ value: Int) -> Bool {
+  func toneValueValid( _ value: Float) -> Bool {
     
-    return toneMode == ToneMode.ctcssTx.rawValue && toneValue.within(0, 301)
+    return toneMode == ToneMode.ctcssTx.rawValue && toneValue.within(0.0, 301.0)
   }
   /// Parse Memory key/value pairs
   ///
@@ -351,8 +364,8 @@ public final class Memory                   : NSObject, DynamicModel {
       case .digitalUpperOffset:       update(self, &_digitalUpperOffset,  to: property.value.iValue,                    signal: \.digitalUpperOffset)
       case .frequency:                update(self, &_frequency,           to: property.value.mhzToHz,                   signal: \.frequency)
       case .group:                    update(self, &_group,               to: property.value.replacingSpaces(),         signal: \.group)
-      case .highlight:                break // not implemented
-      case .highlightColor:           break // not implemented
+      case .highlight:                update(self, &_highlight,           to: property.value.bValue,                    signal: \.highlight)
+      case .highlightColor:           update(self, &_highlightColor,      to: property.value.uValue32,                  signal: \.highlightColor)
       case .mode:                     update(self, &_mode,                to: property.value.replacingSpaces(),         signal: \.mode)
       case .name:                     update(self, &_name,                to: property.value.replacingSpaces(),         signal: \.name)
       case .owner:                    update(self, &_owner,               to: property.value.replacingSpaces(),         signal: \.owner)
@@ -361,13 +374,13 @@ public final class Memory                   : NSObject, DynamicModel {
       case .rfPower:                  update(self, &_rfPower,             to: property.value.iValue,                    signal: \.rfPower)
       case .rttyMark:                 update(self, &_rttyMark,            to: property.value.iValue,                    signal: \.rttyMark)
       case .rttyShift:                update(self, &_rttyShift,           to: property.value.iValue,                    signal: \.rttyShift)
-      case .rxFilterHigh:             update(self, &_filterHigh,          to: filterHighLimits(property.value.iValue),  signal: \.filterHigh)
-      case .rxFilterLow:              update(self, &_filterLow,           to: filterLowLimits(property.value.iValue),   signal: \.filterLow)
+      case .rxFilterHigh:             update(self, &_filterHigh,          to: property.value.iValue,                    signal: \.filterHigh)
+      case .rxFilterLow:              update(self, &_filterLow,           to: property.value.iValue,                    signal: \.filterLow)
       case .squelchEnabled:           update(self, &_squelchEnabled,      to: property.value.bValue,                    signal: \.squelchEnabled)
       case .squelchLevel:             update(self, &_squelchLevel,        to: property.value.iValue,                    signal: \.squelchLevel)
       case .step:                     update(self, &_step,                to: property.value.iValue,                    signal: \.step)
       case .toneMode:                 update(self, &_toneMode,            to: property.value.replacingSpaces(),         signal: \.toneMode)
-      case .toneValue:                update(self, &_toneValue,           to: property.value.iValue,                    signal: \.toneValue)
+      case .toneValue:                update(self, &_toneValue,           to: property.value.fValue,                    signal: \.toneValue)
       }
     }
     // is the Memory initialized?
@@ -433,6 +446,8 @@ public final class Memory                   : NSObject, DynamicModel {
   private var __filterLow                   = 0
   private var __frequency                   : Hz = 0
   private var __group                       = ""
+  private var __highlight                   = false
+  private var __highlightColor              : UInt32 = 0
   private var __mode                        = ""
   private var __name                        = ""
   private var __offset                      : Hz = 0
@@ -445,5 +460,5 @@ public final class Memory                   : NSObject, DynamicModel {
   private var __squelchLevel                = 0
   private var __step                        = 0
   private var __toneMode                    = ""
-  private var __toneValue                   : Hz = 0
+  private var __toneValue                   : Float = 0
 }
