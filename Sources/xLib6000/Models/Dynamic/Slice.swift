@@ -639,8 +639,8 @@ public final class Slice  : NSObject, DynamicModel {
         // YES, does it exist?
         if radio.slices[id] == nil {
           
-          // NO, is it for this client?
-          if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
+//          // NO, is it for this client?
+//          if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
           
           // create a new Slice & add it to the Slices collection
           radio.slices[id] = xLib6000.Slice(radio: radio, id: id)
