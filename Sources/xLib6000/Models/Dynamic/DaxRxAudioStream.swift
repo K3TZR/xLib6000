@@ -180,11 +180,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
           continue
         }
         let slice = _radio.findSlice(letter: property.value, guiClientHandle: gui!.handle)
-        // somehow update does not seem to work when slice is nil
-        // update(self, &_slice, to: slice, signal: \.slice)
-        willChangeValue(forKey: "slice")
-        _slice = slice
-        didChangeValue(forKey: "slice")
+        update(self, &_slice, to: slice, signal: \.slice)
         
         let gain = _rxGain
         _rxGain = 0
