@@ -186,7 +186,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
         if radio.waterfalls[id] == nil {
           
           // NO, is it for this client?
-          if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
+//          if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
           
           // Create a Waterfall & add it to the Waterfalls collection
           radio.waterfalls[id] = Waterfall(radio: radio, id: id)

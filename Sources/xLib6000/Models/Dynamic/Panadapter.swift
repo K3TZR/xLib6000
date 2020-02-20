@@ -335,7 +335,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
         if radio.panadapters[id] == nil {
           
           // NO, is it for this client?
-          if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
+//          if radio.version.isV3 { if !isForThisClient(keyValues) { return } }
           
           // create a new object & add it to the collection
           radio.panadapters[id] = Panadapter(radio: radio, id: id)
