@@ -639,7 +639,7 @@ public final class Slice  : NSObject, DynamicModel {
         // YES, does it exist?
         if radio.slices[id] == nil {
           
-          // create a new Slice & add it to the Slices collection
+         // create a new Slice & add it to the Slices collection
           radio.slices[id] = xLib6000.Slice(radio: radio, id: id)
           
           //        // scan the meters
