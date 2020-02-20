@@ -17,8 +17,8 @@ class v2Tests: XCTestCase {
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
       
-      Swift.print("\n***** Radio found")
-      
+      Swift.print("\n***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))")
+
       if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "AudioTests", logState: logState) {
         sleep(1)
         
