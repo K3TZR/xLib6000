@@ -97,7 +97,8 @@ final class ObjectTests: XCTestCase {
   // MARK: - Equalizer
   
   private var equalizerRxStatus = "rxsc mode=0 63Hz=0 125Hz=10 250Hz=20 500Hz=30 1000Hz=-10 2000Hz=-20 4000Hz=-30 8000Hz=-40"
-  
+  private var equalizerTxStatus = "txsc mode=0 63Hz=0 125Hz=10 250Hz=20 500Hz=30 1000Hz=-10 2000Hz=-20 4000Hz=-30 8000Hz=-40"
+
   func testEqualizerRxParse() {
     
     Swift.print("\n***** \(#function)")
@@ -113,14 +114,20 @@ final class ObjectTests: XCTestCase {
   
   func equalizerParse(_ type: Equalizer.EqType) {
     
-    let radio = discoverRadio(logState: .limited(to: "Amplifier.swift"))
+    let radio = discoverRadio(logState: .limited(to: "Equalizer.swift"))
     guard radio != nil else { return }
     
-    Equalizer.parseStatus(radio!, equalizerRxStatus.keyValuesArray(), true)
+    switch type {
+    case .rxsc: Equalizer.parseStatus(radio!, equalizerRxStatus.keyValuesArray(), true)
+    case .txsc: Equalizer.parseStatus(radio!, equalizerTxStatus.keyValuesArray(), true)
+    default:
+      XCTFail("***** Invalid EQUALIZER type - \(type.rawValue)  *****")
+      return
+    }
     
     if let object = radio!.equalizers[type] {
       
-      Swift.print("***** EQUALIZER exists")
+      Swift.print("***** \(type.rawValue) EQUALIZER exists")
       
       XCTAssertEqual(object.eqEnabled, false, "eqEnabled")
       XCTAssertEqual(object.level63Hz, 0, "level63Hz")
@@ -132,11 +139,12 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.level4000Hz, -30, "level4000Hz")
       XCTAssertEqual(object.level8000Hz, -40, "level8000Hz")
       
-      Swift.print("***** Modified EQUALIZER parameters verified\n")
+      Swift.print("***** Modified \(type.rawValue) EQUALIZER parameters verified\n")
       
     } else {
       XCTFail("***** \(type.rawValue) EQUALIZER does NOT exist *****")
     }
+    disconnect()
   }
   
   func testEqualizerRx() {
@@ -212,7 +220,6 @@ final class ObjectTests: XCTestCase {
     } else {
       XCTFail("***** \(type.rawValue) EQUALIZER does NOT exist *****")
     }
-    // disconnect the radio
     disconnect()
   }
   
