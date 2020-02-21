@@ -313,7 +313,6 @@ public final class TxAudioStream : NSObject, DynamicModel {
   // *** Hidden properties (Do NOT use) ***
   
   private var __clientHandle  : Handle = 0
-  private var __inUse         = false
   private var __ip            = ""
   private var __port          = 0
   private var __transmit      = false
