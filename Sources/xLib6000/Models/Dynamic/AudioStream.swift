@@ -30,6 +30,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
 
   @objc dynamic public var clientHandle: Handle {
     return _clientHandle }
+  
   @objc dynamic public var daxChannel: Int {
     get { _daxChannel }
     set { if _daxChannel != newValue { _daxChannel = newValue ; _slice = _radio.findSlice(using: _daxChannel) }}}
