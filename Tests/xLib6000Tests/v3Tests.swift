@@ -16,7 +16,7 @@ final class v3Tests: XCTestCase {
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
       
-      Swift.print("\n***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))")
+      Swift.print("\n***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))\n")
 
       if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "AudioTests", logState: logState) {
         sleep(1)
@@ -37,7 +37,7 @@ final class v3Tests: XCTestCase {
   func disconnect() {
     Api.sharedInstance.disconnect()
     
-    Swift.print("***** Disconnected\n")
+    Swift.print("\n***** Disconnected\n")
   }
   
   // ------------------------------------------------------------------------------

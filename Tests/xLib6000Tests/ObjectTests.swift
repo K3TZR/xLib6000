@@ -9,7 +9,7 @@ final class ObjectTests: XCTestCase {
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
       
-      Swift.print("\n***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))")
+      Swift.print("\n***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))\n")
       
       if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "ObjectTests", logState: logState) {
         sleep(1)
@@ -30,7 +30,7 @@ final class ObjectTests: XCTestCase {
   func disconnect() {
     Api.sharedInstance.disconnect()
     
-    Swift.print("***** Disconnected\n")
+    Swift.print("\n***** Disconnected\n")
   }
   
   // ------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.serialNumber, "1234-5678-9012")
       XCTAssertEqual(object.state, "STANDBY")
       
-      Swift.print("***** Parameters verified")
+      Swift.print("***** AMPLIFIER Parameters verified")
       
       object.ant = "ANT2"
       object.ip = "11.1.217"
@@ -68,7 +68,7 @@ final class ObjectTests: XCTestCase {
       object.serialNumber = "2109-8765-4321"
       object.state = "IDLE"
       
-      Swift.print("***** Parameters modified")
+      Swift.print("***** AMPLIFIER Parameters modified")
       
       XCTAssertEqual(object.id, "0x12345678".handle!)
       XCTAssertEqual(object.ant, "ANT2")
@@ -78,7 +78,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.serialNumber, "2109-8765-4321")
       XCTAssertEqual(object.state, "IDLE")
       
-      Swift.print("***** Modified parameters verified")
+      Swift.print("***** Modified AMPLIFIER parameters verified")
       
     } else {
       XCTFail("***** AMPLIFIER NOT created *****")
@@ -118,7 +118,7 @@ final class ObjectTests: XCTestCase {
     
     Equalizer.parseStatus(radio!, equalizerRxStatus.keyValuesArray(), true)
     
-    if let object = radio!.equalizers[.rxsc] {
+    if let object = radio!.equalizers[type] {
       
       Swift.print("***** EQUALIZER exists")
       
@@ -132,10 +132,10 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.level4000Hz, -30, "level4000Hz")
       XCTAssertEqual(object.level8000Hz, -40, "level8000Hz")
       
-      Swift.print("***** Modified parameters verified\n")
+      Swift.print("***** Modified EQUALIZER parameters verified\n")
       
     } else {
-      XCTFail("***** .rxsc EQUALIZER does NOT exist *****")
+      XCTFail("***** \(type.rawValue) EQUALIZER does NOT exist *****")
     }
   }
   
@@ -171,7 +171,7 @@ final class ObjectTests: XCTestCase {
       object.level4000Hz  = 40
       object.level8000Hz  = -35
       
-      Swift.print("***** Parameters modified")
+      Swift.print("***** \(type.rawValue) EQUALIZER Parameters modified")
       
       XCTAssertEqual(object.eqEnabled, true, "eqEnabled")
       XCTAssertEqual(object.level63Hz, 10, "level63Hz")
@@ -183,7 +183,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.level4000Hz, 40, "level4000Hz")
       XCTAssertEqual(object.level8000Hz, -35, "level8000Hz")
       
-      Swift.print("***** Modified parameters verified")
+      Swift.print("***** Modified \(type.rawValue) EQUALIZER parameters verified")
       
       object.eqEnabled = false
       object.level63Hz    = 0
@@ -195,7 +195,7 @@ final class ObjectTests: XCTestCase {
       object.level4000Hz  = 0
       object.level8000Hz  = 0
       
-      Swift.print("***** Parameters zeroed")
+      Swift.print("***** \(type.rawValue) EQUALIZER Parameters zeroed")
       
       XCTAssertEqual(object.eqEnabled, false, "eqEnabled")
       XCTAssertEqual(object.level63Hz, 0, "level63Hz")
@@ -207,7 +207,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.level4000Hz, 0, "level4000Hz")
       XCTAssertEqual(object.level8000Hz, 0, "level8000Hz")
       
-      Swift.print("***** Zeroed parameters verified")
+      Swift.print("***** Zeroed \(type.rawValue) EQUALIZER parameters verified")
       
     } else {
       XCTFail("***** \(type.rawValue) EQUALIZER does NOT exist *****")
@@ -255,7 +255,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.digitalLowerOffset, 2210, "digitalLowerOffset")
       XCTAssertEqual(object.digitalUpperOffset, 1500, "digitalUpperOffset")
       
-      Swift.print("***** Parameters verified")
+      Swift.print("***** MEMORY Parameters verified")
       
       object.owner = "DL3LSM"
       object.group = "X"
@@ -278,7 +278,7 @@ final class ObjectTests: XCTestCase {
       object.digitalLowerOffset = 3321
       object.digitalUpperOffset = 2612
       
-      Swift.print("***** Parameters modified")
+      Swift.print("***** MEMORY Parameters modified")
       
       XCTAssertEqual(object.owner, "DL3LSM", "owner")
       XCTAssertEqual(object.group, "X", "group")
@@ -301,7 +301,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.digitalLowerOffset, 3321, "digitalLowerOffset")
       XCTAssertEqual(object.digitalUpperOffset, 2612, "digitalUpperOffset")
       
-      Swift.print("***** Modified parameters verified")
+      Swift.print("***** Modified MEMORY parameters verified")
       
     } else {
       XCTFail("***** MEMORY NOT created")
@@ -320,6 +320,8 @@ final class ObjectTests: XCTestCase {
     radio!.memories.forEach( {$0.value.remove() } )
     sleep(1)
     if radio!.memories.count == 0 {
+      
+      Swift.print("***** Existing MEMORY(s) removed")
       
       radio!.requestMemory()
       sleep(1)
@@ -472,7 +474,7 @@ final class ObjectTests: XCTestCase {
         XCTFail("***** 1st MEMORY NOT created ****")
       }      
     } else {
-      XCTFail("***** Existing MEMORIES NOT removed ****")
+      XCTFail("***** Existing MEMORY(s) NOT removed ****")
     }
     
     // disconnect the radio
@@ -504,7 +506,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.units, "dbfs", "units")
       XCTAssertEqual(object.fps, 40, "fps")
       
-      Swift.print("***** Parameters verified")
+      Swift.print("***** METER Parameters verified")
       
     } else {
       XCTFail("***** Meter NOT created ****")
@@ -536,8 +538,6 @@ final class ObjectTests: XCTestCase {
     
     let radio = discoverRadio(logState: .limited(to: "Panadapter.swift"))
     guard radio != nil else { return }
-    
-    removeAllPanadapters(radio: radio!)
     
     Panadapter.parseStatus(radio!, panadapterStatus.keyValuesArray(), true)
     
@@ -589,7 +589,7 @@ final class ObjectTests: XCTestCase {
     removeAllPanadapters(radio: radio!)
     if radio!.panadapters.count == 0 {
       
-      Swift.print("***** Existing PANADAPTERS removed")
+      Swift.print("***** Existing PANADAPTER(s) removed")
       
       radio!.requestPanadapter(frequency: 15_000_000)
       sleep(1)
@@ -732,7 +732,7 @@ final class ObjectTests: XCTestCase {
           XCTFail("***** 1st PANADAPTER NOT created *****")
         }
       } else {
-        XCTFail("***** Existing PANADAPTERS NOT removed *****")
+        XCTFail("***** Existing PANADAPTER(s) NOT removed *****")
       }
       removeAllPanadapters(radio: radio!)
     }
@@ -783,7 +783,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(sliceObject.squelchEnabled, true, "squelchEnabled")
       XCTAssertEqual(sliceObject.squelchLevel, 22, "squelchLevel")
       
-      Swift.print("***** Parameters verified")
+      Swift.print("***** SLICE Parameters verified")
       
     } else {
       XCTFail("***** SLICE NOT created *****")
@@ -804,7 +804,7 @@ final class ObjectTests: XCTestCase {
     sleep(1)
     if radio!.slices.count == 0 {
       
-      Swift.print("***** Existing SLICES removed")
+      Swift.print("***** Existing SLICE(s) removed")
       
       // get new
       radio!.requestSlice(frequency: 7_225_000, rxAntenna: "ANT2", mode: "USB")
@@ -1220,7 +1220,7 @@ final class ObjectTests: XCTestCase {
         XCTFail("***** 1st SLICE NOT created")
       }
     } else {
-      XCTFail("***** Existing SLICES NOT removed, count = \(radio!.slices.count)")
+      XCTFail("***** Existing SLICE(s) NOT removed")
     }
     disconnect()
   }
@@ -1264,23 +1264,23 @@ final class ObjectTests: XCTestCase {
     guard radio != nil else { return }
     
     // remove all
-    radio!.tnfs.forEach( {$0.value.remove() } )
+    radio!.tnfs.forEach { $0.value.remove() }
     sleep(1)
     if radio!.tnfs.count == 0 {
       
-      Swift.print("***** Existing TNF(s) removed")
+      Swift.print("***** Existing TNF object(s) removed")
       
       // get new
       radio!.requestTnf(at: 14_260_000)
       sleep(1)
       
-      Swift.print("***** 1st TNF requested")
+      Swift.print("***** 1st TNF object requested")
       
       // verify added
       if radio!.tnfs.count == 1 {
         if let object = radio!.tnfs.first?.value {
           
-          Swift.print("***** 1st TNF created")
+          Swift.print("***** 1st TNF object created")
           
           let id = object.id
           let depth = object.depth
@@ -1288,62 +1288,64 @@ final class ObjectTests: XCTestCase {
           let permanent = object.permanent
           let width = object.width
           
-          Swift.print("***** 1st TNF parameters saved")
+          Swift.print("***** 1st TNF object parameters saved")
           
           radio!.tnfs[id]!.remove()
           
           if radio!.tnfs.count == 0 {
             
+            Swift.print("***** 1st TNF object removed")
+            
             // ask for new
             radio!.requestTnf(at: 14_260_000)
             sleep(1)
             
-            Swift.print("***** 2nd TNF requested")
+            Swift.print("***** 2nd TNF object requested")
             
             // verify added
             if radio!.tnfs.count == 1 {
               if let object = radio!.tnfs.first?.value {
                 
-                Swift.print("***** 2nd TNF created")
+                Swift.print("***** 2nd TNF object created")
                 
                 XCTAssertEqual(object.depth, depth, "Depth")
                 XCTAssertEqual(object.frequency,  frequency, "Frequency")
                 XCTAssertEqual(object.permanent, permanent, "Permanent")
                 XCTAssertEqual(object.width, width, "Width")
                 
-                Swift.print("***** 2nd TNF parameters verified")
+                Swift.print("***** 2nd TNF object parameters verified")
                 
                 object.depth = Tnf.Depth.veryDeep.rawValue
                 object.frequency = 14_270_000
                 object.permanent = !permanent
                 object.width = Tnf.kWidthMax
                 
-                Swift.print("***** 2nd TNF parameters modified")
+                Swift.print("***** 2nd TNF object parameters modified")
                 
                 XCTAssertEqual(object.depth, Tnf.Depth.veryDeep.rawValue, "Depth")
                 XCTAssertEqual(object.frequency,  14_270_000, "Frequency")
                 XCTAssertEqual(object.permanent, !permanent, "Permanent")
                 XCTAssertEqual(object.width, Tnf.kWidthMax, "Width")
                 
-                Swift.print("***** 2nd TNF modified parameters verified")
+                Swift.print("***** 2nd TNF object modified parameters verified")
                 
               } else {
-                XCTFail("***** 2nd TNF NOT found *****")
+                XCTFail("***** 2nd TNF object NOT found *****")
               }
             } else {
-              XCTFail("***** 2nd TNF NOT created *****")
+              XCTFail("***** 2nd TNF object NOT created *****")
             }
           } else {
-            XCTFail("***** 1st TNF NOT removed *****")
+            XCTFail("***** 1st TNF object NOT removed *****")
           }
         } else {
-          XCTFail("***** 1st TNF NOT found *****")
+          XCTFail("***** 1st TNF object NOT found *****")
         }
       } else {
-        XCTFail("***** TNF NOT created *****")
+        XCTFail("***** 1st TNF object NOT created *****")
       }
     } else {
-      XCTFail("***** Existing TNF(s) NOT removed *****")
+      XCTFail("***** Existing TNF object(s) NOT removed *****")
     }
     // remove all
     radio!.tnfs.forEach( {$0.value.remove() } )
@@ -1361,14 +1363,9 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: "UsbCable.swift"))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+    Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
       
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
-    Api.sharedInstance.disconnect()
+    disconnect()
   }
   
   func testUsbCable() {
@@ -1378,13 +1375,8 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: "UsbCable.swift"))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
-      
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
-    }
-    // disconnect the radio
+    Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+
     disconnect()
   }
   
@@ -1392,6 +1384,20 @@ final class ObjectTests: XCTestCase {
   // MARK: - Waterfall
   
   private var waterfallStatus = "waterfall 0x42000000 x_pixels=50 center=14.100000 bandwidth=0.200000 band_zoom=0 segment_zoom=0 line_duration=100 rfgain=0 rxant=ANT1 wide=0 loopa=0 loopb=0 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 panadapter=40000000 color_gain=50 auto_black=1 black_level=20 gradient_index=1 xvtr="
+
+  func removeAllWaterfalls(radio: Radio) {
+    
+    for (_, panadapter) in radio.panadapters {
+      for (_, slice) in radio.slices where slice.panadapterId == panadapter.id {
+        slice.remove()
+      }
+      panadapter.remove()
+    }
+    sleep(1)
+    if radio.panadapters.count != 0 { XCTFail("***** Waterfall(s) NOT removed *****") }
+    if radio.slices.count != 0 { XCTFail("***** Slice(s) NOT removed *****") }
+  }
+
   func testWaterfallParse() {
     
     Swift.print("\n***** \(#function)")
@@ -1428,19 +1434,92 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: "Waterfall.swift"))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+    removeAllWaterfalls(radio: radio!)
+    if radio!.panadapters.count == 0 {
       
-    } else if radio!.version.isV1 || radio!.version.isV2 {
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****\n")
+      Swift.print("***** Existing PANADAPTER(s) & WATERFALL(s) removed")
       
-    } else {
-      Swift.print("\n***** \(#function) NOT performed, radio version is \(radio!.version.major).\(radio!.version.minor).\(radio!.version.patch) ****\n")
+      radio!.requestPanadapter(frequency: 15_000_000)
+      sleep(1)
+      
+      Swift.print("***** 1st PANADAPTER & WATERFALL requested")
+      
+      // verify added
+      if radio!.waterfalls.count == 1 {
+        if let object = radio!.waterfalls.first?.value {
+          
+          Swift.print("***** 1st PANADAPTER & WATERFALL created")
+          
+          let autoBlackEnabled = object.autoBlackEnabled
+          let blackLevel = object.blackLevel
+          let colorGain = object.colorGain
+          let gradientIndex = object.gradientIndex
+          let lineDuration = object.lineDuration
+          let panadapterId = object.panadapterId
+
+          Swift.print("***** 1st WATERFALL parameters saved")
+          
+          removeAllPanadapters(radio: radio!)
+          if radio!.panadapters.count == 0 {
+            
+            // ask for new
+            radio!.requestPanadapter(frequency: 15_000_000)
+            sleep(1)
+            
+            Swift.print("***** 2nd PANADAPTER & WATERFALL requested")
+            
+            // verify added
+            if radio!.waterfalls.count == 1 {
+              if let object = radio!.waterfalls.first?.value {
+                
+                Swift.print("***** 2nd PANADAPTER & WATERFALL created")
+                
+                XCTAssertEqual(object.autoBlackEnabled, autoBlackEnabled, "AutoBlackEnabled")
+                XCTAssertEqual(object.blackLevel, blackLevel, "BlackLevel")
+                XCTAssertEqual(object.colorGain, colorGain, "ColorGain")
+                XCTAssertEqual(object.gradientIndex, gradientIndex, "GradientIndex")
+                XCTAssertEqual(object.lineDuration, lineDuration, "LineDuration")
+                XCTAssertEqual(object.panadapterId, panadapterId, "Panadapter Id")
+
+                Swift.print("***** 2nd WATERFALL parameters verified")
+                
+                object.autoBlackEnabled = !autoBlackEnabled
+                object.blackLevel = blackLevel + 10
+                object.colorGain = colorGain + 20
+                object.gradientIndex = gradientIndex + 1
+                object.lineDuration = lineDuration - 10
+
+                Swift.print("***** 2nd WATERFALL parameters modified")
+                
+                XCTAssertEqual(object.autoBlackEnabled, !autoBlackEnabled, "AutoBlackEnabled")
+                XCTAssertEqual(object.blackLevel, blackLevel + 10, "BlackLevel")
+                XCTAssertEqual(object.colorGain, colorGain + 20, "ColorGain")
+                XCTAssertEqual(object.gradientIndex, gradientIndex + 1, "GradientIndex")
+                XCTAssertEqual(object.lineDuration, lineDuration - 10, "LineDuration")
+                XCTAssertEqual(object.panadapterId, panadapterId, "Panadapter Id")
+
+                Swift.print("***** 2nd WATERFALL modified parameters verified")
+                
+              } else {
+                XCTFail("***** 2nd WATERFALL NOT found *****")
+              }
+            } else {
+              XCTFail("***** 2nd WATERFALL NOT created *****")
+            }
+          } else {
+            XCTFail("***** 1st WATERFALL NOT removed *****")
+          }
+        } else {
+          XCTFail("***** 1st WATERFALL NOT created *****")
+        }
+      } else {
+        XCTFail("***** Existing PANADAPTER(s) & WATERFALL(s) NOT removed *****")
+      }
+      removeAllPanadapters(radio: radio!)
     }
-    // disconnect the radio
     disconnect()
   }
-  
+
   // ------------------------------------------------------------------------------
   // MARK: - Xvtr
   
@@ -1485,7 +1564,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(xvtrObject.rxGain, 0, "RxGain")
       XCTAssertEqual(xvtrObject.rxOnly, true, "RxOnly")
       
-      Swift.print("***** XVTR parameterss verified")
+      Swift.print("***** XVTR parameters verified")
       
       // FIXME: ??? what is this
       //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
@@ -1577,7 +1656,7 @@ final class ObjectTests: XCTestCase {
                 object.rxGain = rxGain + 5
                 object.rxOnly = !rxOnly
 
-                Swift.print("***** 2nd PANADAPTER parameters modified")
+                Swift.print("***** 2nd XVTR parameters modified")
 
                 XCTAssertEqual(object.isValid, false, "isValid")
                 XCTAssertEqual(object.preferred, false, "Preferred")
@@ -1609,7 +1688,7 @@ final class ObjectTests: XCTestCase {
           XCTFail("***** 1st XVTR NOT created *****")
         }
       } else {
-        XCTFail("***** Existing XVTR NOT removed *****")
+        XCTFail("***** Existing XVTR(s) NOT removed *****")
       }
       // remove all
       for (_, object) in radio!.xvtrs { object.remove() }

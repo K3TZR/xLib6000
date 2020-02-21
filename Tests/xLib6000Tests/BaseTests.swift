@@ -13,6 +13,9 @@ final class BaseTests: XCTestCase {
   // MARK: - Api
   
   func testApi() {
+    
+    Swift.print("\n***** \(#function)")
+    
     let api = Api.sharedInstance
     XCTAssertNotNil(api, "\n***** Api singleton not present *****\n")
     XCTAssertNotNil(api.tcp, "\n***** Failed to instantiate TcpManager *****\n")
@@ -23,6 +26,9 @@ final class BaseTests: XCTestCase {
   // MARK: - Log
   
   func testLog() {
+    
+    Swift.print("\n***** \(#function)")
+    
     let log = Log.sharedInstance
     XCTAssertNotNil(log, "\n***** Log singleton not present *****\n")
   }
@@ -31,6 +37,9 @@ final class BaseTests: XCTestCase {
   // MARK: - Discovery
   
   func testDiscovery() {
+    
+    Swift.print("\n***** \(#function)")
+    
     let discovery = Discovery.sharedInstance
     sleep(2)
     XCTAssertGreaterThan(discovery.discoveredRadios.count, 0, "\n***** No Radios discovered *****\n")
@@ -40,6 +49,9 @@ final class BaseTests: XCTestCase {
   // MARK: - Objects
   
   func testObjectCreation() {
+    
+    Swift.print("\n***** \(#function)")
+    
     let discovery = Discovery.sharedInstance
     sleep(2)
     let radio = Radio(discovery.discoveredRadios[0], api: Api.sharedInstance)
