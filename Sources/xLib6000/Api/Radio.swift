@@ -1117,7 +1117,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .slice:          xLib6000.Slice.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
     case .stream:         parseStream(self, remainder)
     case .tnf:            Tnf.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
-    case .transmit:       transmit.parseProperties(self, remainder.keyValuesArray())
+    case .transmit:       parseTransmit(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .turf:           _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
     case .txAudioStream:  TxAudioStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .usbCable:       UsbCable.parseStatus(self, remainder.keyValuesArray())
@@ -1336,6 +1336,22 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     }
   }
+
+  private func parseTransmit(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
+    
+    // is it a Band Setting?
+    if properties[0].key == "band" {
+      
+      // YES, drop the "band", pass it to BandSetting
+      BandSetting.parseStatus(self, Array(properties.dropFirst()), inUse )
+      
+    } else {
+      // NO, pass it to Transmit
+      transmit.parseProperties(self, properties)
+    }
+  }
+
+
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
   ///
   ///   executed on the parseQ
