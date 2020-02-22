@@ -373,6 +373,12 @@ public final class Transmit : NSObject, StaticModel {
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
 
+  // format:
+  // tx_rf_power_changes_allowed=1 tune=0 show_tx_in_waterfall=0 mon_available=1 max_power_level=100transmit tx_rf_power_changes_allowed=1 tune=0 show_tx_in_waterfall=0 mon_available=1 max_power_level=100
+  //      OR
+  // freq=14.100000 rfpower=100 tunepower=10 tx_slice_mode=USB hwalc_enabled=0 inhibit=0 dax=0 sb_monitor=0 mon_gain_sb=75 mon_pan_sb=50 met_in_rx=0 am_carrier_level=100 mic_selection=MIC mic_level=40 mic_boost=1 mic_bias=0 mic_acc=0 compander=1 compander_level=70 vox_enable=0 vox_level=50 vox_delay=2075607040 speech_processor_enable=1 speech_processor_level=0 lo=100 hi=2900 tx_filter_changes_allowed=1 tx_antenna=ANT1 pitch=600 speed=30 iambic=1 iambic_mode=1 swap_paddles=0 break_in=1 break_in_delay=41 cwl_enabled=0 sidetone=1 mon_gain_cw=80 mon_pan_cw=50 synccwx=1transmit freq=14.100000 rfpower=100 tunepower=10 tx_slice_mode=USB hwalc_enabled=0 inhibit=0 dax=0 sb_monitor=0 mon_gain_sb=75 mon_pan_sb=50 met_in_rx=0 am_carrier_level=100 mic_selection=MIC mic_level=40 mic_boost=1 mic_bias=0 mic_acc=0 compander=1 compander_level=70 vox_enable=0 vox_level=50 vox_delay=2075607040 speech_processor_enable=1 speech_processor_level=0 lo=100 hi=2900 tx_filter_changes_allowed=1 tx_antenna=ANT1 pitch=600 speed=30 iambic=1 iambic_mode=1 swap_paddles=0 break_in=1 break_in_delay=41 cwl_enabled=0 sidetone=1 mon_gain_cw=80 mon_pan_cw=50 synccwx=1
+
+  
   /// Parse a Transmit status message
   ///   format: <key=value> <key=value> ...<key=value>
   ///
@@ -382,82 +388,74 @@ public final class Transmit : NSObject, StaticModel {
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
     
-    // is it a Band Setting?
-    if properties[0].key == "band" {
+    
+    // NO, process each key/value pair, <key=value>
+    for property in properties {
       
-      // YES, drop the "band", parse in BandSetting model
-      BandSetting.parseStatus(radio, Array(properties.dropFirst()))
-      
-    } else {
-      
-      // NO, process each key/value pair, <key=value>
-      for property in properties {
-        
-        // Check for Unknown Keys
-        guard let token = Token(rawValue: property.key)  else {
-          // log it and ignore the Key
-          _log("Unknown Transmit token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
-          continue
-        }
-        // Known tokens, in alphabetical order
-        switch token {
-          
-        case .amCarrierLevel:         update(self, &_carrierLevel,            to: property.value.iValue,  signal: \.carrierLevel)
-        case .companderEnabled:       update(self, &_companderEnabled,        to: property.value.bValue,  signal: \.companderEnabled)
-        case .companderLevel:         update(self, &_companderLevel,          to: property.value.iValue,  signal: \.companderLevel)
-        case .cwBreakInEnabled:       update(self, &_cwBreakInEnabled,        to: property.value.bValue,  signal: \.cwBreakInEnabled)
-        case .cwBreakInDelay:         update(self, &_cwBreakInDelay,          to: property.value.iValue,  signal: \.cwBreakInDelay)
-        case .cwIambicEnabled:        update(self, &_cwIambicEnabled,         to: property.value.bValue,  signal: \.cwIambicEnabled)
-        case .cwIambicMode:           update(self, &_cwIambicMode,            to: property.value.iValue,  signal: \.cwIambicMode)
-        case .cwlEnabled:             update(self, &_cwlEnabled,              to: property.value.bValue,  signal: \.cwlEnabled)
-        case .cwPitch:                update(self, &_cwPitch,                 to: property.value.iValue,  signal: \.cwPitch)
-        case .cwSidetoneEnabled:      update(self, &_cwSidetoneEnabled,       to: property.value.bValue,  signal: \.cwSidetoneEnabled)
-        case .cwSpeed:                update(self, &_cwSpeed,                 to: property.value.iValue,  signal: \.cwSpeed)
-        case .cwSwapPaddles:          update(self, &_cwSwapPaddles,           to: property.value.bValue,  signal: \.cwSwapPaddles)
-        case .cwSyncCwxEnabled:       update(self, &_cwSyncCwxEnabled,        to: property.value.bValue,  signal: \.cwSyncCwxEnabled)
-        case .daxEnabled:             update(self, &_daxEnabled,              to: property.value.bValue,  signal: \.daxEnabled)
-        case .frequency:              update(self, &_frequency,               to: property.value.mhzToHz, signal: \.frequency)
-        case .hwAlcEnabled:           update(self, &_hwAlcEnabled,            to: property.value.bValue,  signal: \.hwAlcEnabled)
-        case .inhibit:                update(self, &_inhibit,                 to: property.value.bValue,  signal: \.inhibit)
-        case .maxPowerLevel:          update(self, &_maxPowerLevel,           to: property.value.iValue,  signal: \.maxPowerLevel)
-        case .metInRxEnabled:         update(self, &_metInRxEnabled,          to: property.value.bValue,  signal: \.metInRxEnabled)
-        case .micAccEnabled:          update(self, &_micAccEnabled,           to: property.value.bValue,  signal: \.micAccEnabled)
-        case .micBoostEnabled:        update(self, &_micBoostEnabled,         to: property.value.bValue,  signal: \.micBoostEnabled)
-        case .micBiasEnabled:         update(self, &micBiasEnabled,           to: property.value.bValue,  signal: \.micBiasEnabled)
-        case .micLevel:               update(self, &_micLevel,                to: property.value.iValue,  signal: \.micLevel)
-        case .micSelection:           update(self, &_micSelection,            to: property.value,         signal: \.micSelection)
-        case .rawIqEnabled:           update(self, &_rawIqEnabled,            to: property.value.bValue,  signal: \.rawIqEnabled)
-        case .rfPower:                update(self, &_rfPower,                 to: property.value.iValue,  signal: \.rfPower)
-        case .speechProcessorEnabled: update(self, &_speechProcessorEnabled,  to: property.value.bValue,  signal: \.speechProcessorEnabled)
-        case .speechProcessorLevel:   update(self, &_speechProcessorLevel,    to: property.value.iValue,  signal: \.speechProcessorLevel)
-        case .txAntenna:              update(self, &_txAntenna,               to: property.value,         signal: \.txAntenna)
-        case .txFilterChanges:        update(self, &_txFilterChanges,         to: property.value.bValue,  signal: \.txFilterChanges)
-        case .txFilterHigh:           update(self, &_txFilterHigh,            to: property.value.iValue,  signal: \.txFilterHigh)
-        case .txFilterLow:            update(self, &_txFilterLow,             to: property.value.iValue,  signal: \.txFilterLow)
-        case .txInWaterfallEnabled:   update(self, &_txInWaterfallEnabled,    to: property.value.bValue,  signal: \.txInWaterfallEnabled)
-        case .txMonitorAvailable:     update(self, &_txMonitorAvailable,      to: property.value.bValue,  signal: \.txMonitorAvailable)
-        case .txMonitorEnabled:       update(self, &_txMonitorEnabled,        to: property.value.bValue,  signal: \.txMonitorEnabled)
-        case .txMonitorGainCw:        update(self, &_txMonitorGainCw,         to: property.value.iValue,  signal: \.txMonitorGainCw)
-        case .txMonitorGainSb:        update(self, &_txMonitorGainSb,         to: property.value.iValue,  signal: \.txMonitorGainSb)
-        case .txMonitorPanCw:         update(self, &_txMonitorPanCw,          to: property.value.iValue,  signal: \.txMonitorPanCw)
-        case .txMonitorPanSb:         update(self, &_txMonitorPanSb,          to: property.value.iValue,  signal: \.txMonitorPanSb)
-        case .txRfPowerChanges:       update(self, &_txRfPowerChanges,        to: property.value.bValue,  signal: \.txRfPowerChanges)
-        case .txSliceMode:            update(self, &_txSliceMode,             to: property.value,         signal: \.txSliceMode)
-        case .tune:                   update(self, &_tune,                    to: property.value.bValue,  signal: \.tune)
-        case .tunePower:              update(self, &_tunePower,               to: property.value.iValue,  signal: \.tunePower)
-        case .voxEnabled:             update(self, &_voxEnabled,              to: property.value.bValue,  signal: \.voxEnabled)
-        case .voxDelay:               update(self, &_voxDelay,                to: property.value.iValue,  signal: \.voxDelay)
-        case .voxLevel:               update(self, &_voxLevel,                to: property.value.iValue,  signal: \.voxLevel)
-        }
+      // Check for Unknown Keys
+      guard let token = Token(rawValue: property.key)  else {
+        // log it and ignore the Key
+        _log("Unknown Transmit token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        continue
       }
-      // is Transmit initialized?
-      if !_initialized {
-        // NO, the Radio (hardware) has acknowledged this Transmit
-        _initialized = true
+      // Known tokens, in alphabetical order
+      switch token {
         
-        // notify all observers
-        NC.post(.transmitHasBeenAdded, object: self as Any?)
+      case .amCarrierLevel:         update(self, &_carrierLevel,            to: property.value.iValue,  signal: \.carrierLevel)
+      case .companderEnabled:       update(self, &_companderEnabled,        to: property.value.bValue,  signal: \.companderEnabled)
+      case .companderLevel:         update(self, &_companderLevel,          to: property.value.iValue,  signal: \.companderLevel)
+      case .cwBreakInEnabled:       update(self, &_cwBreakInEnabled,        to: property.value.bValue,  signal: \.cwBreakInEnabled)
+      case .cwBreakInDelay:         update(self, &_cwBreakInDelay,          to: property.value.iValue,  signal: \.cwBreakInDelay)
+      case .cwIambicEnabled:        update(self, &_cwIambicEnabled,         to: property.value.bValue,  signal: \.cwIambicEnabled)
+      case .cwIambicMode:           update(self, &_cwIambicMode,            to: property.value.iValue,  signal: \.cwIambicMode)
+      case .cwlEnabled:             update(self, &_cwlEnabled,              to: property.value.bValue,  signal: \.cwlEnabled)
+      case .cwPitch:                update(self, &_cwPitch,                 to: property.value.iValue,  signal: \.cwPitch)
+      case .cwSidetoneEnabled:      update(self, &_cwSidetoneEnabled,       to: property.value.bValue,  signal: \.cwSidetoneEnabled)
+      case .cwSpeed:                update(self, &_cwSpeed,                 to: property.value.iValue,  signal: \.cwSpeed)
+      case .cwSwapPaddles:          update(self, &_cwSwapPaddles,           to: property.value.bValue,  signal: \.cwSwapPaddles)
+      case .cwSyncCwxEnabled:       update(self, &_cwSyncCwxEnabled,        to: property.value.bValue,  signal: \.cwSyncCwxEnabled)
+      case .daxEnabled:             update(self, &_daxEnabled,              to: property.value.bValue,  signal: \.daxEnabled)
+      case .frequency:              update(self, &_frequency,               to: property.value.mhzToHz, signal: \.frequency)
+      case .hwAlcEnabled:           update(self, &_hwAlcEnabled,            to: property.value.bValue,  signal: \.hwAlcEnabled)
+      case .inhibit:                update(self, &_inhibit,                 to: property.value.bValue,  signal: \.inhibit)
+      case .maxPowerLevel:          update(self, &_maxPowerLevel,           to: property.value.iValue,  signal: \.maxPowerLevel)
+      case .metInRxEnabled:         update(self, &_metInRxEnabled,          to: property.value.bValue,  signal: \.metInRxEnabled)
+      case .micAccEnabled:          update(self, &_micAccEnabled,           to: property.value.bValue,  signal: \.micAccEnabled)
+      case .micBoostEnabled:        update(self, &_micBoostEnabled,         to: property.value.bValue,  signal: \.micBoostEnabled)
+      case .micBiasEnabled:         update(self, &micBiasEnabled,           to: property.value.bValue,  signal: \.micBiasEnabled)
+      case .micLevel:               update(self, &_micLevel,                to: property.value.iValue,  signal: \.micLevel)
+      case .micSelection:           update(self, &_micSelection,            to: property.value,         signal: \.micSelection)
+      case .rawIqEnabled:           update(self, &_rawIqEnabled,            to: property.value.bValue,  signal: \.rawIqEnabled)
+      case .rfPower:                update(self, &_rfPower,                 to: property.value.iValue,  signal: \.rfPower)
+      case .speechProcessorEnabled: update(self, &_speechProcessorEnabled,  to: property.value.bValue,  signal: \.speechProcessorEnabled)
+      case .speechProcessorLevel:   update(self, &_speechProcessorLevel,    to: property.value.iValue,  signal: \.speechProcessorLevel)
+      case .txAntenna:              update(self, &_txAntenna,               to: property.value,         signal: \.txAntenna)
+      case .txFilterChanges:        update(self, &_txFilterChanges,         to: property.value.bValue,  signal: \.txFilterChanges)
+      case .txFilterHigh:           update(self, &_txFilterHigh,            to: property.value.iValue,  signal: \.txFilterHigh)
+      case .txFilterLow:            update(self, &_txFilterLow,             to: property.value.iValue,  signal: \.txFilterLow)
+      case .txInWaterfallEnabled:   update(self, &_txInWaterfallEnabled,    to: property.value.bValue,  signal: \.txInWaterfallEnabled)
+      case .txMonitorAvailable:     update(self, &_txMonitorAvailable,      to: property.value.bValue,  signal: \.txMonitorAvailable)
+      case .txMonitorEnabled:       update(self, &_txMonitorEnabled,        to: property.value.bValue,  signal: \.txMonitorEnabled)
+      case .txMonitorGainCw:        update(self, &_txMonitorGainCw,         to: property.value.iValue,  signal: \.txMonitorGainCw)
+      case .txMonitorGainSb:        update(self, &_txMonitorGainSb,         to: property.value.iValue,  signal: \.txMonitorGainSb)
+      case .txMonitorPanCw:         update(self, &_txMonitorPanCw,          to: property.value.iValue,  signal: \.txMonitorPanCw)
+      case .txMonitorPanSb:         update(self, &_txMonitorPanSb,          to: property.value.iValue,  signal: \.txMonitorPanSb)
+      case .txRfPowerChanges:       update(self, &_txRfPowerChanges,        to: property.value.bValue,  signal: \.txRfPowerChanges)
+      case .txSliceMode:            update(self, &_txSliceMode,             to: property.value,         signal: \.txSliceMode)
+      case .tune:                   update(self, &_tune,                    to: property.value.bValue,  signal: \.tune)
+      case .tunePower:              update(self, &_tunePower,               to: property.value.iValue,  signal: \.tunePower)
+      case .voxEnabled:             update(self, &_voxEnabled,              to: property.value.bValue,  signal: \.voxEnabled)
+      case .voxDelay:               update(self, &_voxDelay,                to: property.value.iValue,  signal: \.voxDelay)
+      case .voxLevel:               update(self, &_voxLevel,                to: property.value.iValue,  signal: \.voxLevel)
       }
+    }
+    // is Transmit initialized?
+    if !_initialized {
+      // NO, the Radio (hardware) has acknowledged this Transmit
+      _initialized = true
+      
+      // notify all observers
+      NC.post(.transmitHasBeenAdded, object: self as Any?)
     }
   }
   
