@@ -10,6 +10,7 @@ import XCTest
 
 class v2Tests: XCTestCase {
   let requiredVersion = "v1 or v2"
+  let showInfoMessages = false
 
   // Helper functions
   func discoverRadio(logState: Api.NSLogging = .normal) -> Radio? {
@@ -17,7 +18,7 @@ class v2Tests: XCTestCase {
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
       
-      Swift.print("\n***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))\n")
+      Swift.print("***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))")
 
       if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "AudioTests", logState: logState) {
         sleep(1)
@@ -26,11 +27,11 @@ class v2Tests: XCTestCase {
         
         return Api.sharedInstance.radio
       } else {
-        XCTFail("\n***** Failed to connect to Radio *****\n")
+        XCTFail("***** Failed to connect to Radio *****\n")
         return nil
       }
     } else {
-      XCTFail("\n***** No Radio(s) found *****\n")
+      XCTFail("***** No Radio(s) found *****\n")
       return nil
     }
   }
@@ -38,7 +39,7 @@ class v2Tests: XCTestCase {
   func disconnect() {
     Api.sharedInstance.disconnect()
     
-    Swift.print("\n***** Disconnected\n")
+    Swift.print("***** Disconnected\n")
   }
   
   override func setUp() {
@@ -67,7 +68,7 @@ class v2Tests: XCTestCase {
       
       if let object = radio!.audioStreams["0x40000009".streamId!] {
         
-        Swift.print("***** AUDIOSTREAM object created")
+        if showInfoMessages { Swift.print("***** AUDIO STREAM object created") }
         
         XCTAssertEqual(object.id, "0x40000009".streamId!)
 
@@ -76,14 +77,14 @@ class v2Tests: XCTestCase {
         XCTAssertEqual(object.port, 4124)
         XCTAssertEqual(object.slice, radio!.slices["0".objectId!])
         
-        Swift.print("***** AUDIOSTREAM object parameters verified")
+        if showInfoMessages { Swift.print("***** AUDIO STREAM object parameters verified") }
         
       } else {
-        XCTFail("***** AUDIOSTREAM object NOT created *****")
+        XCTFail("***** AUDIO STREAM object NOT created *****")
       }
       
     } else {
-      Swift.print("***** \(#function) skipped, requires \(requiredVersion)")
+      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
     }
     disconnect()
   }
@@ -102,18 +103,18 @@ class v2Tests: XCTestCase {
       sleep(1)
       if radio!.audioStreams.count == 0 {
         
-        Swift.print("***** Existing AUDIOSTREAM object(s) removed")
+        if showInfoMessages { Swift.print("***** Existing AUDIO STREAM object(s) removed") }
         
         // ask for new
         radio!.requestAudioStream( "2")
         sleep(1)
         
-        Swift.print("***** 1st AUDIOSTREAM object requested")
+        if showInfoMessages { Swift.print("***** 1st AUDIO STREAM object requested") }
         
         // verify added
         if radio!.audioStreams.count == 1 {
           
-          Swift.print("***** 1st AUDIOSTREAM object created")
+          if showInfoMessages { Swift.print("***** 1st AUDIO STREAM object created") }
           
           if let object = radio!.audioStreams.first?.value {
             
@@ -124,26 +125,26 @@ class v2Tests: XCTestCase {
             let port = object.port
             let slice = object.slice
             
-            Swift.print("***** 1st AUDIOSTREAM object parameters saved")
+            if showInfoMessages { Swift.print("***** 1st AUDIO STREAM object parameters saved") }
             
             // remove it
             radio!.audioStreams[id]!.remove()
             sleep(1)
             if radio!.audioStreams.count == 0 {
               
-              Swift.print("***** 1st AUDIOSTREAM object removed")
+              if showInfoMessages { Swift.print("***** 1st AUDIO STREAM object removed") }
               
               // ask for new
               radio!.requestAudioStream( "2")
               sleep(1)
               
-              Swift.print("***** 2nd AUDIOSTREAM object requested")
+              if showInfoMessages { Swift.print("***** 2nd AUDIO STREAM object requested") }
               
               // verify added
               if radio!.audioStreams.count == 1 {
                 if let object = radio!.audioStreams.first?.value {
                   
-                  Swift.print("***** 2nd AUDIOSTREAM object created")
+                  if showInfoMessages { Swift.print("***** 2nd AUDIO STREAM object created") }
                   
                   XCTAssertEqual(object.clientHandle, clientHandle)
                   XCTAssertEqual(object.daxChannel, daxChannel)
@@ -151,14 +152,14 @@ class v2Tests: XCTestCase {
                   XCTAssertEqual(object.port, port)
                   XCTAssertEqual(object.slice, slice)
                   
-                  Swift.print("***** 2nd AUDIOSTREAM object parameters verified")
+                  if showInfoMessages { Swift.print("***** 2nd AUDIO STREAM object parameters verified") }
                   
                   object.daxChannel = 4
                   object.ip = "12.2.3.218"
                   object.port = 4214
                   object.slice = radio!.slices["0".objectId!]
                   
-                  Swift.print("***** 2nd AUDIOSTREAM object parameters modified")
+                  if showInfoMessages { Swift.print("***** 2nd AUDIO STREAM object parameters modified") }
                   
                   XCTAssertEqual(object.clientHandle, clientHandle)
                   XCTAssertEqual(object.daxChannel, 4)
@@ -166,31 +167,31 @@ class v2Tests: XCTestCase {
                   XCTAssertEqual(object.port, 4214)
                   XCTAssertEqual(object.slice, radio!.slices["0".objectId!])
                   
-                  Swift.print("***** 2nd AUDIOSTREAM object modified parameters verified")
+                  if showInfoMessages { Swift.print("***** 2nd AUDIO STREAM object modified parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd AUDIOSTREAM object NOT found *****")
+                  XCTFail("***** 2nd AUDIO STREAM object NOT found *****")
                 }
               } else {
-                XCTFail("***** 2nd AUDIOSTREAM object NOT created")
+                XCTFail("***** 2nd AUDIO STREAM object NOT created")
               }
             } else {
-              XCTFail("***** 1st AUDIOSTREAM object NOT removed")
+              XCTFail("***** 1st AUDIO STREAM object NOT removed")
             }
           } else {
-            XCTFail("***** 1st AUDIOSTREAM object NOT found")
+            XCTFail("***** 1st AUDIO STREAM object NOT found")
           }
         } else {
-          XCTFail("***** 1st AUDIOSTREAM object NOT created")
+          XCTFail("***** 1st AUDIO STREAM object NOT created")
         }
       } else {
-        XCTFail("***** Existing AUDIOSTREAM object(s) NOT removed")
+        XCTFail("***** Existing AUDIO STREAM object(s) NOT removed")
       }
       // remove all
       radio!.audioStreams.forEach( {$0.value.remove() } )
 
     } else {
-      Swift.print("***** \(#function) skipped, requires \(requiredVersion)")
+      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
     }
     disconnect()
   }
@@ -198,8 +199,8 @@ class v2Tests: XCTestCase {
   // ------------------------------------------------------------------------------
   // MARK: - IqStream
 
-  private var iqStreamStatus1 = "3 pan=0x0 rate=48000 capacity=16 available=16"
-  func testIqStreamParse1() {
+  private var iqStreamStatus_1 = "3 pan=0x0 rate=48000 capacity=16 available=16"
+  func testIqStreamParse_1() {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
@@ -208,12 +209,12 @@ class v2Tests: XCTestCase {
     
     if radio!.version.isV1 || radio!.version.isV2 {
 
-      IqStream.parseStatus(radio!, Array(iqStreamStatus1.keyValuesArray()), true)
+      IqStream.parseStatus(radio!, Array(iqStreamStatus_1.keyValuesArray()), true)
       sleep(1)
 
       if let object = radio!.iqStreams["3".streamId!] {
 
-        Swift.print("***** IQSTREAM object created")
+        if showInfoMessages { Swift.print("***** IQ STREAM object created") }
 
         XCTAssertEqual(object.id, "3".streamId!)
 
@@ -222,20 +223,20 @@ class v2Tests: XCTestCase {
         XCTAssertEqual(object.pan, "0x0".streamId!)
         XCTAssertEqual(object.rate, 48_000)
 
-        Swift.print("***** IQSTREAM object parameters verified")
+        if showInfoMessages { Swift.print("***** IQ STREAM object parameters verified") }
 
       } else {
-        XCTFail("***** IQSTREAM object NOT created *****")
+        XCTFail("***** IQ STREAM object NOT created *****")
       }
 
     } else {
-      Swift.print("***** \(#function) skipped, requires \(requiredVersion)")
+      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
     }
     disconnect()
   }
 
-  private var iqStreamStatus2 = "3 daxiq=4 pan=0x0 rate=48000 ip=10.0.1.100 port=4992 streaming=1 capacity=16 available=16"
-  func testIqStreamParse2() {
+  private var iqStreamStatus_2 = "3 daxiq=4 pan=0x0 rate=48000 ip=10.0.1.100 port=4992 streaming=1 capacity=16 available=16"
+  func testIqStreamParse_2() {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
@@ -244,12 +245,12 @@ class v2Tests: XCTestCase {
     
     if radio!.version.isV1 || radio!.version.isV2 {
 
-      IqStream.parseStatus(radio!, Array(iqStreamStatus2.keyValuesArray()), true)
+      IqStream.parseStatus(radio!, Array(iqStreamStatus_2.keyValuesArray()), true)
       sleep(1)
 
       if let object = radio!.iqStreams["3".streamId!] {
 
-        Swift.print("***** IQSTREAM object created")
+        if showInfoMessages { Swift.print("***** IQ STREAM object created") }
 
         XCTAssertEqual(object.id, "3".streamId!)
 
@@ -261,19 +262,19 @@ class v2Tests: XCTestCase {
         XCTAssertEqual(object.port, 4992)
         XCTAssertEqual(object.streaming, true)
 
-        Swift.print("***** IQSTREAM object parameters verified")
+        if showInfoMessages { Swift.print("***** IQ STREAM object parameters verified") }
 
       } else {
-        XCTFail("***** IQSTREAM object NOT created *****")
+        XCTFail("***** IQ STREAM object NOT created *****")
       }
 
     } else {
-      Swift.print("***** \(#function) skipped, requires \(requiredVersion)")
+      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
     }
     disconnect()
   }
 
-  private var iqStreamStatus3 = "3 daxiq=4 pan=0x0 daxiq_rate=48000 capacity=16 available=16"
+  private var iqStreamStatus_3 = "3 daxiq=4 pan=0x0 daxiq_rate=48000 capacity=16 available=16"
   func testIqStreamParse3() {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
@@ -283,12 +284,12 @@ class v2Tests: XCTestCase {
     
     if radio!.version.isV1 || radio!.version.isV2 {
 
-      IqStream.parseStatus(radio!, Array(iqStreamStatus3.keyValuesArray()), true)
+      IqStream.parseStatus(radio!, Array(iqStreamStatus_3.keyValuesArray()), true)
       sleep(1)
 
       if let object = radio!.iqStreams["3".streamId!] {
 
-        Swift.print("***** IQSTREAM object created")
+        if showInfoMessages { Swift.print("***** IQ STREAM object created") }
 
         XCTAssertEqual(object.id, "3".streamId!)
 
@@ -297,14 +298,14 @@ class v2Tests: XCTestCase {
         XCTAssertEqual(object.pan, "0x0".streamId!)
         XCTAssertEqual(object.rate, 48_000)
 
-        Swift.print("***** IQSTREAM object parameters verified")
+        if showInfoMessages { Swift.print("***** IQ STREAM object parameters verified") }
 
       } else {
-        XCTFail("***** IQSTREAM object NOT created *****")
+        XCTFail("***** IQ STREAM object NOT created *****")
       }
 
     } else {
-      Swift.print("***** \(#function) skipped, requires \(requiredVersion)")
+      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
     }
     disconnect()
   }
@@ -323,20 +324,20 @@ class v2Tests: XCTestCase {
       sleep(1)
       if radio!.iqStreams.count == 0 {
         
-        Swift.print("***** Existing IQSTREAM object(s) removed")
+        if showInfoMessages { Swift.print("***** Existing IQ STREAM object(s) removed") }
         
         // get new
         radio!.requestIqStream("3")
         sleep(1)
         
-        Swift.print("***** 1st IQSTREAM object requested")
+        if showInfoMessages { Swift.print("***** 1st IQ STREAM object requested") }
         
         // verify added
         if radio!.iqStreams.count == 1 {
           
           if let object = radio!.iqStreams.first?.value {
             
-            Swift.print("***** 1st IQSTREAM object created")
+            if showInfoMessages { Swift.print("***** 1st IQ STREAM object created") }
             
             let id            = object.id
             
@@ -345,7 +346,7 @@ class v2Tests: XCTestCase {
             let pan           = object.pan
             let rate          = object.rate
             
-            Swift.print("***** 1st IQSTREAM object parameters saved")
+            if showInfoMessages { Swift.print("***** 1st IQ STREAM object parameters saved") }
             
             // remove it
             radio!.iqStreams[id]!.remove()
@@ -353,61 +354,61 @@ class v2Tests: XCTestCase {
             
             if radio!.iqStreams.count == 0 {
               
-              Swift.print("***** 1st IQSTREAM object removed")
+              if showInfoMessages { Swift.print("***** 1st IQ STREAM object removed") }
               
               // get new
               radio!.requestIqStream("3")
               sleep(1)
               
-              Swift.print("***** 2nd IQSTREAM object requested")
+              if showInfoMessages { Swift.print("***** 2nd IQ STREAM object requested") }
               
               // verify added
               if radio!.iqStreams.count == 1 {
                 if let object = radio!.iqStreams.first?.value {
                   
-                  Swift.print("***** 2nd IQSTREAM object created")
+                  if showInfoMessages { Swift.print("***** 2nd IQ STREAM object created") }
                   
                   XCTAssertEqual(object.available, available)
                   XCTAssertEqual(object.capacity, capacity)
                   XCTAssertEqual(object.pan, pan)
                   XCTAssertEqual(object.rate, rate)
                   
-                  Swift.print("***** 2nd IQSTREAM object parameters verified")
+                  if showInfoMessages { Swift.print("***** 2nd IQ STREAM object parameters verified") }
                   
                   object.rate = rate * 2
                   
-                  Swift.print("***** 2nd IQSTREAM object parameters modified")
+                  if showInfoMessages { Swift.print("***** 2nd IQ STREAM object parameters modified") }
                   
                   XCTAssertEqual(object.available, available)
                   XCTAssertEqual(object.capacity, capacity)
                   XCTAssertEqual(object.pan, pan)
                   XCTAssertEqual(object.rate, rate * 2)
                   
-                  Swift.print("***** 2nd IQSTREAM object modified parameters verified")
+                  if showInfoMessages { Swift.print("***** 2nd IQ STREAM object modified parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd IQSTREAM object NOT found *****")
+                  XCTFail("***** 2nd IQ STREAM object NOT found *****")
                 }
               } else {
-                XCTFail("***** 2nd IQSTREAM object NOT added *****")
+                XCTFail("***** 2nd IQ STREAM object NOT added *****")
               }
             } else {
-              XCTFail("***** 1st IQSTREAM object NOT removed *****")
+              XCTFail("***** 1st IQ STREAM object NOT removed *****")
             }
           } else {
-            XCTFail("***** 1st IQSTREAM object NOT found *****")
+            XCTFail("***** 1st IQ STREAM object NOT found *****")
           }
         } else {
-          XCTFail("***** 1st IQSTREAM object NOT created *****")
+          XCTFail("***** 1st IQ STREAM object NOT created *****")
         }
       } else {
-        XCTFail("***** Existing IQSTREAM object(s) NOT removed *****")
+        XCTFail("***** Existing IQ STREAM object(s) NOT removed *****")
       }
       // remove all
       radio!.iqStreams.forEach { $0.value.remove() }
       
     } else {
-      Swift.print("***** \(#function) skipped, requires \(requiredVersion)")
+      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
     }
     disconnect()
   }
@@ -430,21 +431,21 @@ class v2Tests: XCTestCase {
       
       if let object = radio!.micAudioStreams["0x04000009".streamId!] {
         
-        Swift.print("***** MICAUDIOSTREAM object created")
+        if showInfoMessages { Swift.print("***** MIC AUDIO STREAM object created") }
         
         XCTAssertEqual(object.id, "0x04000009".streamId!)
 
         XCTAssertEqual(object.ip, "192.168.1.162")
         XCTAssertEqual(object.port, 4991)
         
-        Swift.print("***** MICAUDIOSTREAM object Properties verified")
+        if showInfoMessages { Swift.print("***** MIC AUDIO STREAM object Properties verified") }
         
       } else {
-        XCTAssertTrue(false, "***** MICAUDIOSTREAM object NOT created")
+        XCTAssertTrue(false, "***** MIC AUDIO STREAM object NOT created")
       }
       
     } else {
-      Swift.print("***** \(#function) skipped, requires \(requiredVersion)")
+      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
     }
     disconnect()
   }
@@ -463,18 +464,18 @@ class v2Tests: XCTestCase {
       sleep(1)
       if radio!.micAudioStreams.count == 0 {
         
-        Swift.print("***** Existing MICAUDIOSTREAM object(s) removed")
+        if showInfoMessages { Swift.print("***** Existing MIC AUDIO STREAM object(s) removed") }
         
         // ask new
         radio!.requestMicAudioStream()
         sleep(1)
         
-        Swift.print("***** 1st MICAUDIOSTREAM object requested")
+        if showInfoMessages { Swift.print("***** 1st MIC AUDIO STREAM object requested") }
         
         // verify added
         if radio!.micAudioStreams.count == 1 {
           
-          Swift.print("***** 1st MICAUDIOSTREAM object created")
+          if showInfoMessages { Swift.print("***** 1st MIC AUDIO STREAM object created") }
           
           if let object = radio!.micAudioStreams.first?.value {
             
@@ -483,7 +484,7 @@ class v2Tests: XCTestCase {
             let ip = object.ip
             let port = object.port
             
-            Swift.print("***** 1st MICAUDIOSTREAM object parameters saved")
+            if showInfoMessages { Swift.print("***** 1st MIC AUDIO STREAM object parameters saved") }
             
             // remove it
             radio!.micAudioStreams[id]!.remove()
@@ -491,58 +492,58 @@ class v2Tests: XCTestCase {
             
             if radio!.micAudioStreams.count == 0 {
               
-              Swift.print("***** 1st MICAUDIOSTREAM object removed")
+              if showInfoMessages { Swift.print("***** 1st MIC AUDIO STREAM object removed") }
               
               // ask new
               radio!.requestMicAudioStream()
               sleep(1)
               
-              Swift.print("***** 2nd MICAUDIOSTREAM object requested")
+              if showInfoMessages { Swift.print("***** 2nd MIC AUDIO STREAM object requested") }
               
               // verify added
               if radio!.micAudioStreams.count == 1 {
                 if let object = radio!.micAudioStreams.first?.value {
                   
-                  Swift.print("***** 2nd MICAUDIOSTREAM object created")
+                  if showInfoMessages { Swift.print("***** 2nd MIC AUDIO STREAM object created") }
                   
                   XCTAssertEqual(object.ip, ip)
                   XCTAssertEqual(object.port, port)
                   
-                  Swift.print("***** 2nd MICAUDIOSTREAM object parameters verified")
+                  if showInfoMessages { Swift.print("***** 2nd MIC AUDIO STREAM object parameters verified") }
                   
                   object.ip = "12.2.3.218"
                   object.port = 4214
                   
-                  Swift.print("***** 2nd MICAUDIOSTREAM object parameters modified")
+                  if showInfoMessages { Swift.print("***** 2nd MIC AUDIO STREAM object parameters modified") }
                   
                   XCTAssertEqual(object.ip, "12.2.3.218")
                   XCTAssertEqual(object.port, 4214)
                   
-                  Swift.print("***** 2nd MICAUDIOSTREAM object modified parameters verified")
+                  if showInfoMessages { Swift.print("***** 2nd MIC AUDIO STREAM object modified parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd MICAUDIOSTREAM object NOT removed *****")
+                  XCTFail("***** 2nd MIC AUDIO STREAM object NOT removed *****")
                 }
               } else {
-                XCTFail("***** 2nd MICAUDIOSTREAM object NOT added *****")
+                XCTFail("***** 2nd MIC AUDIO STREAM object NOT added *****")
               }
             } else {
-              XCTFail("***** 1st MICAUDIOSTREAM object NOT removed *****")
+              XCTFail("***** 1st MIC AUDIO STREAM object NOT removed *****")
             }
           } else {
-            XCTFail("***** 1st MICAUDIOSTREAM object NOT found *****")
+            XCTFail("***** 1st MIC AUDIO STREAM object NOT found *****")
           }
         } else {
-          XCTFail("***** 1st MICAUDIOSTREAM object NOT added *****")
+          XCTFail("***** 1st MIC AUDIO STREAM object NOT added *****")
         }
       } else {
-        XCTFail("***** Existing MICAUDIOSTREAM object(s) NOT removed *****")
+        XCTFail("***** Existing MIC AUDIO STREAM object(s) NOT removed *****")
       }
       // remove all
       radio!.iqStreams.forEach { $0.value.remove() }
       
     } else {
-      Swift.print("***** \(#function) skipped, requires \(requiredVersion)")
+      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
     }
     disconnect()
   }
@@ -566,16 +567,16 @@ class v2Tests: XCTestCase {
         
         if let object = radio!.txAudioStreams["0x84000000".streamId!] {
           
-          Swift.print("***** TXAUDIOSTREAM object created")
+          if showInfoMessages { Swift.print("***** TX AUDIO STREAM object created") }
           
           XCTAssertEqual(object.ip, "192.168.1.162")
           XCTAssertEqual(object.port, 4991)
           XCTAssertEqual(object.transmit, false)
           
-          Swift.print("***** TXAUDIOSTREAM object Properties verified")
+          if showInfoMessages { Swift.print("***** TX AUDIO STREAM object Properties verified") }
                     
         } else {
-          XCTFail("***** TXAUDIOSTREAM object NOT created *****")
+          XCTFail("***** TX AUDIO STREAM object NOT created *****")
         }
     } else {
       Swift.print("SKIPPED: \(#function) requires \(requiredVersion)")
@@ -597,18 +598,18 @@ class v2Tests: XCTestCase {
       sleep(1)
       if radio!.txAudioStreams.count == 0 {
         
-        Swift.print("***** Existing TXAUDIOSTREAM object(s) removed")
+        if showInfoMessages { Swift.print("***** Existing TX AUDIO STREAM object(s) removed") }
 
         // ask for a new AudioStream
         radio!.requestTxAudioStream()
         sleep(1)
         
-        Swift.print("***** 1st TXAUDIOSTREAM object requested")
+        if showInfoMessages { Swift.print("***** 1st TX AUDIO STREAM object requested") }
         
         // verify AudioStream added
         if radio!.txAudioStreams.count == 1 {
           
-          Swift.print("***** 1st TXAUDIOSTREAM object created")
+          if showInfoMessages { Swift.print("***** 1st TX AUDIO STREAM object created") }
           
           if let object = radio!.txAudioStreams.first?.value {
             
@@ -618,67 +619,65 @@ class v2Tests: XCTestCase {
             let ip = object.ip
             let port = object.port
             
-            Swift.print("***** 1st TXAUDIOSTREAM object parameters saved")
+            if showInfoMessages { Swift.print("***** 1st TX AUDIO STREAM object parameters saved") }
             
             // remove it
             radio!.txAudioStreams[id]!.remove()
             sleep(1)
             if radio!.txAudioStreams.count == 0 {
               
-              Swift.print("***** 1st TXAUDIOSTREAM object removed")
+              if showInfoMessages { Swift.print("***** 1st TX AUDIO STREAM object removed") }
               
               // ask new
               radio!.requestTxAudioStream()
               sleep(1)
               
-              Swift.print("***** 2nd TXAUDIOSTREAM object requested")
+              if showInfoMessages { Swift.print("***** 2nd TX AUDIO STREAM object requested") }
               
               // verify added
               if radio!.txAudioStreams.count == 1 {
                 
                 if let object = radio!.txAudioStreams.first?.value {
                   
-                  Swift.print("***** 2nd TXAUDIOSTREAM object created")
+                  if showInfoMessages { Swift.print("***** 2nd TX AUDIO STREAM object created") }
                   
                   XCTAssertEqual(object.transmit, transmit)
                   XCTAssertEqual(object.ip, ip)
                   XCTAssertEqual(object.port, port)
                   
-                  let id = object.id
-                  
-                  Swift.print("***** 2nd TXAUDIOSTREAM object parameters verified")
+                  if showInfoMessages { Swift.print("***** 2nd TX AUDIO STREAM object parameters verified") }
                   
                   // change properties
                   object.transmit = false
                   object.ip = "12.2.3.218"
                   object.port = 4214
                   
-                  Swift.print("***** 2nd TXAUDIOSTREAM object parameters modified")
+                  if showInfoMessages { Swift.print("***** 2nd TX AUDIO STREAM object parameters modified") }
                   
                   // re-verify properties
                   XCTAssertEqual(object.transmit, false)
                   XCTAssertEqual(object.ip, "12.2.3.218")
                   XCTAssertEqual(object.port, 4214)
                   
-                  Swift.print("***** 2nd TXAUDIOSTREAM object modified parameters verified")
+                  if showInfoMessages { Swift.print("***** 2nd TX AUDIO STREAM object modified parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd TXAUDIOSTREAM object NOT found *****")
+                  XCTFail("***** 2nd TX AUDIO STREAM object NOT found *****")
                 }
               } else {
-                XCTFail("***** 2nd TXAUDIOSTREAM object NOT added *****")
+                XCTFail("***** 2nd TX AUDIO STREAM object NOT added *****")
               }
             } else {
-              XCTFail("***** 1st TXAUDIOSTREAM object NOT removed *****")
+              XCTFail("***** 1st TX AUDIO STREAM object NOT removed *****")
             }
           } else {
-            XCTFail("***** 1st TXAUDIOSTREAM object NOT found *****")
+            XCTFail("***** 1st TX AUDIO STREAM object NOT found *****")
           }
         } else {
-          XCTFail("***** 1st TXAUDIOSTREAM object NOT created *****")
+          XCTFail("***** 1st TX AUDIO STREAM object NOT created *****")
         }
       } else {
-        XCTFail("***** Existing TXAUDIOSTREAM object(s) NOT removed *****")
+        XCTFail("***** Existing TX AUDIO STREAM object(s) NOT removed *****")
       }
       // remove all
       radio!.txAudioStreams.forEach { $0.value.remove() }
@@ -691,33 +690,93 @@ class v2Tests: XCTestCase {
   
   // ------------------------------------------------------------------------------
   // MARK: - Opus
-  
+ 
+  ///   Format:  <streamId, > <"ip", ip> <"port", port> <"opus_rx_stream_stopped", 1|0>  <"rx_on", 1|0> <"tx_on", 1|0>
+
+  private let opusStatus = "0x50000000 ip=10.0.1.100 port=4993 opus_rx_stream_stopped=0 rx_on=0 tx_on=0"
   func testOpusParse() {
+    Swift.print("\n***** \(#function), " + requiredVersion)
     
     let radio = discoverRadio(logState: .limited(to: "Opus.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
-      
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****")
-      
+
+      Opus.parseStatus(radio!, Array(opusStatus.keyValuesArray()), true)
+      sleep(1)
+
+      if let object = radio!.opusStreams["0x50000000".streamId!] {
+
+        if showInfoMessages { Swift.print("***** OPUS STREAM object created") }
+
+        XCTAssertEqual(object.id, "0x50000000".streamId!)
+
+        XCTAssertEqual(object.ip, "10.0.1.100")
+        XCTAssertEqual(object.port, 4993)
+        XCTAssertEqual(object.rxStopped, false)
+        XCTAssertEqual(object.rxEnabled, false)
+        XCTAssertEqual(object.txEnabled, false)
+
+        if showInfoMessages { Swift.print("***** OPUS STREAM object parameters verified") }
+
+      } else {
+        XCTFail("***** OPUS STREAM object NOT created *****")
+      }
+
     } else {
-      Swift.print("SKIPPED: \(#function) requires \(requiredVersion)")
+      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
     }
     disconnect()
+
   }
   
   func testOpus() {
     
+    Swift.print("\n***** \(#function), " + requiredVersion)
+    
     let radio = discoverRadio(logState: .limited(to: "Opus.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
       
-      Swift.print("\n***** \(#function) NOT performed, --- FIX ME --- ****")
+      // verify added
+      if radio!.opusStreams.count == 1 {
+        
+        if let object = radio!.opusStreams.first?.value {
+          
+          if showInfoMessages { Swift.print("***** OPUS STREAM object found") }
+          
+          let rxStopped = object.rxStopped
+          let rxEnabled = object.rxEnabled
+          let txEnabled = object.txEnabled
+
+          if showInfoMessages { Swift.print("***** OPUS STREAM object parameters saved") }
+          
+          object.ip = "10.0.1.100"
+          object.port = 5_000
+          object.rxStopped = !rxStopped
+          object.rxEnabled = !rxEnabled
+          object.txEnabled = !txEnabled
+          
+          if showInfoMessages { Swift.print("***** OPUS STREAM object parameters modified") }
+          
+          XCTAssertEqual(object.ip, "10.0.1.100", "ip")
+          XCTAssertEqual(object.port, 5_000, "port")
+          XCTAssertEqual(object.rxStopped, !rxStopped, "rxStopped")
+          XCTAssertEqual(object.rxEnabled, !rxEnabled, "rxEnabled")
+          XCTAssertEqual(object.txEnabled, !txEnabled, "txEnabled")
+
+          if showInfoMessages { Swift.print("***** OPUS STREAM object modified parameters verified") }
+          
+        } else {
+          XCTFail("***** OPUS STREAM object NOT found *****")
+        }
+      } else {
+        XCTFail("***** OPUS STREAM object does NOT exist *****")
+      }
       
     } else {
-      Swift.print("SKIPPED: \(#function) requires \(requiredVersion)")
+      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
     }
     disconnect()
   }

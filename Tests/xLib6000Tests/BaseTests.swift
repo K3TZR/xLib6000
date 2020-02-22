@@ -8,7 +8,8 @@ import XCTest
 @testable import xLib6000
 
 final class BaseTests: XCTestCase {
-  
+  let showInfoMessages = false
+
   // ------------------------------------------------------------------------------
   // MARK: - Api
   
