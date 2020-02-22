@@ -25,48 +25,48 @@ public final class BandSetting                : NSObject, DynamicModel {
   public let id : BandId
   
   @objc dynamic public var accTxEnabled: Bool {
-    get { return _accTxEnabled }
-    set { if _accTxEnabled != newValue { _accTxEnabled = newValue  } } }
+    get { _accTxEnabled }
+    set { if _accTxEnabled != newValue { _accTxEnabled = newValue ; interlockSet( .accTxEnabled, newValue.as1or0)  } } }
   
   @objc dynamic public var accTxReqEnabled: Bool {
-    get { return _accTxReqEnabled }
-    set { if _accTxReqEnabled != newValue { _accTxReqEnabled = newValue  } } }
+    get { _accTxReqEnabled }
+    set { if _accTxReqEnabled != newValue { _accTxReqEnabled = newValue ; interlockSet( .accTxReqEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var bandName: String {
-    get { return _bandName }
-    set { if _bandName != newValue { _bandName = newValue  } } }
+    get { _bandName }
+    set { if _bandName != newValue { _bandName = newValue } } }
   
   @objc dynamic public var hwAlcEnabled: Bool {
-    get { return _hwAlcEnabled }
-    set { if _hwAlcEnabled != newValue { _hwAlcEnabled = newValue  } } }
+    get { _hwAlcEnabled }
+    set { if _hwAlcEnabled != newValue { _hwAlcEnabled = newValue ; transmitSet( .hwAlcEnabled, newValue.as1or0)} } }
   
   @objc dynamic public var inhibit: Bool {
-    get { return _inhibit }
-    set { if _inhibit != newValue { _inhibit = newValue  } } }
+    get { _inhibit }
+    set { if _inhibit != newValue { _inhibit = newValue ; transmitSet( .inhibit, newValue.as1or0)  } } }
   
   @objc dynamic public var rcaTxReqEnabled: Bool {
-    get { return _rcaTxReqEnabled }
-    set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue  } } }
+    get {  _rcaTxReqEnabled }
+    set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue ; interlockSet( .rcaTxReqEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var rfPower: Int {
     get { return _rfPower }
-    set { if _rfPower != newValue { _rfPower = newValue  } } }
+    set { if _rfPower != newValue { _rfPower = newValue ; transmitSet( .rfPower, newValue) } } }
   
   @objc dynamic public var tunePower: Int {
     get { return _tunePower }
-    set { if _tunePower != newValue { _tunePower = newValue  } } }
+    set { if _tunePower != newValue { _tunePower = newValue ; transmitSet( .tunePower, newValue) } } }
 
   @objc dynamic public var tx1Enabled: Bool {
     get { return _tx1Enabled }
-    set { if _tx1Enabled != newValue { _tx1Enabled = newValue  } } }
+    set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; interlockSet( .tx1Enabled, newValue.as1or0)  } } }
   
   @objc dynamic public var tx2Enabled: Bool {
     get { return _tx2Enabled }
-    set { if _tx2Enabled != newValue { _tx2Enabled = newValue  } } }
+    set { if _tx2Enabled != newValue { _tx2Enabled = newValue ; interlockSet( .tx2Enabled, newValue.as1or0)  } } }
   
   @objc dynamic public var tx3Enabled: Bool {
     get { return _tx3Enabled }
-    set { if _tx3Enabled != newValue { _tx3Enabled = newValue  } } }
+    set { if _tx3Enabled != newValue { _tx3Enabled = newValue ; interlockSet( .tx3Enabled, newValue.as1or0) } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -157,9 +157,9 @@ public final class BandSetting                : NSObject, DynamicModel {
     //          <band, > <bandId, > <"band_name", name> <"acc_txreq_enabled", 0/1> <"rca_txreq_enabled", 0/1> <"acc_tx_enabled", 0/1> <"tx1_enabled", 0/1> <"tx2_enabled", 0/1> <"tx3_enabled", 0/1>
     //              OR
     //          <band, > <bandId, > <"removed", >
-    
+
     // get the Id
-    if let id = keyValues[1].key.objectId {
+    if let id = keyValues[0].key.objectId {
       
       // is the object in use?
       if inUse {
@@ -171,7 +171,7 @@ public final class BandSetting                : NSObject, DynamicModel {
           radio.bandSettings[id] = BandSetting(radio: radio, id: id)
         }
         // pass the remaining key values to the BandSetting for parsing
-        radio.bandSettings[id]!.parseProperties(radio, Array(keyValues.dropFirst(2)) )
+        radio.bandSettings[id]!.parseProperties(radio, Array(keyValues.dropFirst()) )
       
       } else {
 
@@ -268,8 +268,34 @@ public final class BandSetting                : NSObject, DynamicModel {
     // notify all observers
     NC.post(.bandSettingWillBeRemoved, object: self as Any?)
   }
-
-
+  
+  // ----------------------------------------------------------------------------
+  // Mark: - Private methods
+  
+  /// Set a Transmit property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func transmitSet(_ token: Token, _ value: Any) {
+    
+    _radio.sendCommand("transmit bandset \(id) " + token.rawValue + "=\(value)")
+  }
+  /// Set a nInterlock property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func interlockSet(_ token: Token, _ value: Any) {
+    
+    _radio.sendCommand("interlock bandset \(id) " + token.rawValue + "=\(value)")
+  }
+  
+  // ----------------------------------------------------------------------------
+  // *** Hidden properties (Do NOT use) ***
+  
   private var __accTxEnabled                = false
   private var __accTxReqEnabled             = false
   private var __bandName                    = ""
