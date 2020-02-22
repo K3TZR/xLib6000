@@ -73,6 +73,9 @@ public enum NotificationType : String {
   case micAudioStreamWillBeRemoved
   case micAudioStreamHasBeenRemoved
 
+  case opusHasBeenAdded
+  case opusWillBeRemoved
+
   case opusRxHasBeenAdded
   case opusRxWillBeRemoved
 
