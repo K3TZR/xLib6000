@@ -153,8 +153,11 @@ public final class BandSetting                : NSObject, DynamicModel {
   ///
   class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <band, > <bandId, > <"band_name", name> <"rfpower", power> <"tunepower", tunepower> <"hwalc_enabled", 0/1> <"inhinit", 0/1>
+    //              OR
     //          <band, > <bandId, > <"band_name", name> <"acc_txreq_enabled", 0/1> <"rca_txreq_enabled", 0/1> <"acc_tx_enabled", 0/1> <"tx1_enabled", 0/1> <"tx2_enabled", 0/1> <"tx3_enabled", 0/1>
-
+    //              OR
+    //          <band, > <bandId, > <"removed", >
+    
     // get the Id
     if let id = keyValues[1].key.objectId {
       
@@ -260,7 +263,7 @@ public final class BandSetting                : NSObject, DynamicModel {
     // TODO: test this
     
     // tell the Radio to remove a Stream
-    _radio.sendCommand("band remove " + "\(id)", replyTo: callback)
+    _radio.sendCommand("transmit band remove " + "\(id)", replyTo: callback)
     
     // notify all observers
     NC.post(.bandSettingWillBeRemoved, object: self as Any?)
