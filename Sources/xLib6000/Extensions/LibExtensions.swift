@@ -437,6 +437,7 @@ public struct Version {
   public var isGreaterThan22  : Bool    { major >= 2 && minor >= 2 }
   public var isV2             : Bool    { major == 2 && minor < 5 }
   public var isV1             : Bool    { major == 1 }
+  public var isV2orLess       : Bool    { major < 2 || (major == 2 && minor <= 4) }
 
   public var group            : Versions {
     if isV1 {
