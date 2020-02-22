@@ -234,10 +234,10 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Opus
       _initialized = true
       
-      _log("Opus added: id = \(id)", .debug, #function, #file, #line)
+      _log("Opus added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
-      NC.post(.opusRxHasBeenAdded, object: self as Any?)
+      NC.post(.opusHasBeenAdded, object: self as Any?)
     }
   }
   /// Receive Opus encoded RX audio
@@ -293,20 +293,6 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
-    /// Remove this Opus Stream
-    ///
-    /// - Parameters:
-    ///   - callback:           ReplyHandler (optional)
-    ///
-  //  public func remove(callback: ReplyHandler? = nil) {
-  //
-  //    // tell the Radio to remove the Stream
-  //    Api.sharedInstance.send(Opus.kStreamRemoveCmd + "0x\(id)", replyTo: callback)
-
-  // notify all observers
-  //  NC.post(.opusWillBeRemoved, object: self as Any?)
-  //  }
-
   /// Set an Opus property on the Radio
   ///
   /// - Parameters:
