@@ -314,20 +314,18 @@ extension Radio {
   
   // ----------------------------------------------------------------------------
   // MARK: - Opus methods
-  
-  // FIXME: - How should this work?
-  
+    
   /// Turn Opus Rx On/Off
   ///
   /// - Parameters:
   ///   - value:              On/Off
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestOpusStream(state: Bool, callback: ReplyHandler? = nil) {
-  
-      // Stream already exists, tell the Radio to enable Opus Rx
+  public func setOpusRx(state: Bool, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to enable Opus Rx
     Api.sharedInstance.send("remote_audio rx_on \(state.as1or0)", replyTo: callback)
-    }
+  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Panadapter methods
