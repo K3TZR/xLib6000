@@ -8,8 +8,9 @@ import XCTest
 @testable import xLib6000
 
 final class v3Tests: XCTestCase {
-  let requiredVersion = "v3"
-  let showInfoMessages = true
+  let requiredVersion   = "v3"
+  let showInfoMessages  = false
+  let minPause          : UInt32 = 30_000
 
   // Helper functions
   func discoverRadio(logState: Api.NSLogging = .normal) -> Radio? {
@@ -118,7 +119,7 @@ final class v3Tests: XCTestCase {
         XCTAssertEqual(object.hwAlcEnabled, true)
         XCTAssertEqual(object.inhibit, false)
         
-        if showInfoMessages { Swift.print("***** BAND SETTIN object parameters verified") }
+        if showInfoMessages { Swift.print("***** BAND SETTING object parameters verified") }
         
         BandSetting.parseStatus(radio!, bandSettingRemove_2.keyValuesArray(), false)
         
@@ -140,15 +141,154 @@ final class v3Tests: XCTestCase {
 
   func testBandSetting() {
     
+    struct Temp {
+      var id              : ObjectId
+      var bandName        : String
+      var accTxEnabled    : Bool
+      var accTxReqEnabled : Bool
+      var hwAlcEnabled    : Bool
+      var inhibit         : Bool
+      var rcaTxReqEnabled : Bool
+      var rfPower         : Int
+      var tunePower       : Int
+      var tx1Enabled      : Bool
+      var tx2Enabled      : Bool
+      var tx3Enabled      : Bool
+    }
+    var tempArray = [Temp]()
+    
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "IqStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: "BandSetting.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
+      for (id, object) in radio!.bandSettings {
+        
+        Swift.print("Saving band id = \(id), name = \(object.bandName)")
+        
+        tempArray.append( Temp(id: object.id,
+                               bandName: object.bandName,
+                               accTxEnabled: object.accTxEnabled,
+                               accTxReqEnabled: object.accTxReqEnabled,
+                               hwAlcEnabled: object.hwAlcEnabled,
+                               inhibit: object.inhibit,
+                               rcaTxReqEnabled: object.rcaTxReqEnabled,
+                               rfPower: object.rfPower,
+                               tunePower: object.tunePower,
+                               tx1Enabled: object.tx1Enabled,
+                               tx2Enabled: object.tx2Enabled,
+                               tx3Enabled: object.tx3Enabled
+                              )
+        )
+      }
       
-      XCTFail("NOT performed, --- FIX ME ---")
+      if showInfoMessages { Swift.print("***** BAND SETTING parameters saved") }
+      
+      for (_, object) in radio!.bandSettings {
+        let name = object.bandName
+        
+        object.accTxEnabled                = false
+        usleep(minPause)
+        object.accTxReqEnabled             = false
+        usleep(minPause)
+        object.hwAlcEnabled                = false
+        usleep(minPause)
+        object.inhibit                     = false
+        usleep(minPause)
+        object.rcaTxReqEnabled             = false
+        usleep(minPause)
+        object.rfPower                     = 0
+        usleep(minPause)
+        object.tunePower                   = 0
+        usleep(minPause)
+        object.tx1Enabled                  = false
+        usleep(minPause)
+        object.tx2Enabled                  = false
+        usleep(minPause)
+        object.tx3Enabled                  = false
+        usleep(minPause)
 
+        if showInfoMessages { Swift.print("***** BAND SETTING \(name) parameters modified") }
+        
+        XCTAssertEqual(object.accTxEnabled, false, "accTxEnabled")
+        XCTAssertEqual(object.accTxReqEnabled, false, "accTxReqEnabled")
+        XCTAssertEqual(object.hwAlcEnabled, false, "hwAlcEnabled")
+        XCTAssertEqual(object.inhibit, false, "inhibit")
+        XCTAssertEqual(object.rcaTxReqEnabled, false, "rcaTxReqEnabled")
+        XCTAssertEqual(object.rfPower, 0, "rfPower")
+        XCTAssertEqual(object.tunePower, 0, "tunePower")
+        XCTAssertEqual(object.tx1Enabled, false, "tx1Enabled")
+        XCTAssertEqual(object.tx2Enabled, false, "tx2Enabled")
+        XCTAssertEqual(object.tx3Enabled, false, "tx3Enabled")
+        
+        if showInfoMessages { Swift.print("***** BAND SETTING \(name) parameters verified") }
+        
+        object.accTxEnabled                = true
+        usleep(minPause)
+        object.accTxReqEnabled             = true
+        usleep(minPause)
+        object.hwAlcEnabled                = true
+        usleep(minPause)
+        object.inhibit                     = true
+        usleep(minPause)
+        object.rcaTxReqEnabled             = true
+        usleep(minPause)
+        object.rfPower                     = 50
+        usleep(minPause)
+        object.tunePower                   = 75
+        usleep(minPause)
+        object.tx1Enabled                  = true
+        usleep(minPause)
+        object.tx2Enabled                  = true
+        usleep(minPause)
+        object.tx3Enabled                  = true
+        usleep(minPause)
+
+        if showInfoMessages { Swift.print("***** BAND SETTING \(name) parameters modified") }
+        
+        XCTAssertEqual(object.accTxEnabled, true, "accTxEnabled")
+        XCTAssertEqual(object.accTxReqEnabled, true, "accTxReqEnabled")
+        XCTAssertEqual(object.hwAlcEnabled, true, "hwAlcEnabled")
+        XCTAssertEqual(object.inhibit, true, "inhibit")
+        XCTAssertEqual(object.rcaTxReqEnabled, true, "rcaTxReqEnabled")
+        XCTAssertEqual(object.rfPower, 50, "rfPower")
+        XCTAssertEqual(object.tunePower, 75, "tunePower")
+        XCTAssertEqual(object.tx1Enabled, true, "tx1Enabled")
+        XCTAssertEqual(object.tx2Enabled, true, "tx2Enabled")
+        XCTAssertEqual(object.tx3Enabled, true, "tx3Enabled")
+        
+        if showInfoMessages { Swift.print("***** BAND SETTING \(name) parameters verified") }
+      }
+      for (_, entry) in tempArray.enumerated() {
+        let id = entry.id
+
+        Swift.print("Restoring band id = \(id), name = \(entry.bandName)")
+                
+        radio!.bandSettings[id]!.accTxEnabled                = entry.accTxEnabled
+        usleep(minPause)
+        radio!.bandSettings[id]!.accTxReqEnabled             = entry.accTxReqEnabled
+        usleep(minPause)
+        radio!.bandSettings[id]!.hwAlcEnabled                = entry.hwAlcEnabled
+        usleep(minPause)
+        radio!.bandSettings[id]!.inhibit                     = entry.inhibit
+        usleep(minPause)
+        radio!.bandSettings[id]!.rcaTxReqEnabled             = entry.rcaTxReqEnabled
+        usleep(minPause)
+        radio!.bandSettings[id]!.rfPower                     = entry.rfPower
+        usleep(minPause)
+        radio!.bandSettings[id]!.tunePower                   = entry.tunePower
+        usleep(minPause)
+        radio!.bandSettings[id]!.tx1Enabled                  = entry.tx1Enabled
+        usleep(minPause)
+        radio!.bandSettings[id]!.tx2Enabled                  = entry.tx2Enabled
+        usleep(minPause)
+        radio!.bandSettings[id]!.tx3Enabled                  = entry.tx3Enabled
+        usleep(minPause)
+      }
+      
+      if showInfoMessages { Swift.print("***** Previous BAND SETTING parameters restored") }
+      
     } else {
       Swift.print("SKIPPED: \(#function) requires \(requiredVersion)")
     }
