@@ -1106,7 +1106,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .eq:             Equalizer.parseStatus(self, remainder.keyValuesArray())
     case .file:           _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
     case .gps:            gps.parseProperties(self, remainder.keyValuesArray(delimiter: "#") )
-    case .interlock:      interlock.parseProperties(self, remainder.keyValuesArray())
+    case .interlock:      parseInterlock(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .memory:         Memory.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .meter:          Meter.parseStatus(self, remainder.keyValuesArray(delimiter: "#"), !remainder.contains(Api.kRemoved))
     case .micAudioStream: MicAudioStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
@@ -1251,7 +1251,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
   }
   /// Parse a Stream status message
-  ///   Format:
   ///
   ///   executed on the parseQ
   ///
@@ -1336,7 +1335,37 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     }
   }
-
+  /// Parse an Interlock status message
+  ///
+  ///   executed on the parseQ
+  ///
+  /// - Parameters:
+  ///   - radio:          the current Radio class
+  ///   - properties:     a KeyValuesArray
+  ///   - inUse:          false = "to be deleted"
+  ///
+  private func parseInterlock(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
+    
+    // is it a Band Setting?
+    if properties[0].key == "band" {
+      
+      // YES, drop the "band", pass it to BandSetting
+      BandSetting.parseStatus(self, Array(properties.dropFirst()), inUse )
+      
+    } else {
+      // NO, pass it to Interlock
+      interlock.parseProperties(self, properties)
+    }
+  }
+  /// Parse a Transmit status message
+  ///
+  ///   executed on the parseQ
+  ///
+  /// - Parameters:
+  ///   - radio:          the current Radio class
+  ///   - properties:     a KeyValuesArray
+  ///   - inUse:          false = "to be deleted"
+  ///
   private func parseTransmit(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     
     // is it a Band Setting?
@@ -1350,8 +1379,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       transmit.parseProperties(self, properties)
     }
   }
-
-
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
   ///
   ///   executed on the parseQ
