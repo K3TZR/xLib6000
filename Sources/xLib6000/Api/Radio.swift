@@ -1320,9 +1320,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         // NOT a removal
         
         // check for unknown Keys
-        guard let token = StreamType(rawValue: keyValues[1].key) else {
+        guard let token = StreamType(rawValue: keyValues[1].value) else {
           // log it and ignore the Key
-          _log("Unknown Stream type: \(keyValues[1].key)", .warning, #function, #file, #line)
+          _log("Unknown Stream type: \(keyValues[1].value)", .warning, #function, #file, #line)
           return
         }
         
