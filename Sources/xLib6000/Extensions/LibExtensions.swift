@@ -486,23 +486,25 @@ public func hexDump(data: [UInt8], len: Int) -> String {
 
 /// Determine if status is for this client
 ///
-/// - Parameter properties:   a collectio of Key Values
-/// - Returns:                true if a match
+/// - Parameters:
+///   - properties:     a KeyValuesArray
+///   - clientHandle:   the handle of ???
+/// - Returns:          true if a mtch
 ///
-public func isForThisClient(_ properties: KeyValuesArray) -> Bool {
+public func isForThisClient(_ properties: KeyValuesArray, connectionHandle: Handle?) -> Bool {
+  var clientHandle : Handle = 0
+  
+  guard connectionHandle != nil else { return false }
   
   // allow a Tester app to see all Streams
-  guard Api.sharedInstance.testerModeEnabled == false else { return true }
-  
-  // make sure we have a connection
-  guard Api.sharedInstance.connectionHandle != nil else { return false }
+  guard Api.sharedInstance.testerModeEnabled == true else { return true }
   
   // find the handle property
-  for property in properties where property.key == DaxRxAudioStream.Token.clientHandle.rawValue {
-    // is it equal to mine?
-    return property.value.handle == Api.sharedInstance.connectionHandle
+  for property in properties.dropFirst(2) where property.key == "client_handle" {
+    
+    clientHandle = property.value.handle ?? 0
   }
-  return false
+  return clientHandle == connectionHandle
 }
 
 
