@@ -159,13 +159,15 @@ final class v3Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
+    Swift.print("\n***** Please Wait, this test takes longer than others *****\n")
+    
     let radio = discoverRadio(logState: .limited(to: "BandSetting.swift"))
     guard radio != nil else { return }
     
     if radio!.version.isV3 {
       for (id, object) in radio!.bandSettings {
         
-        Swift.print("Saving band id = \(id), name = \(object.bandName)")
+        if showInfoMessages { Swift.print("Saving band id = \(id), name = \(object.bandName)") }
         
         tempArray.append( Temp(id: object.id,
                                bandName: object.bandName,
@@ -263,7 +265,7 @@ final class v3Tests: XCTestCase {
       for (_, entry) in tempArray.enumerated() {
         let id = entry.id
 
-        Swift.print("Restoring band id = \(id), name = \(entry.bandName)")
+        if showInfoMessages { Swift.print("Restoring band id = \(id), name = \(entry.bandName)") }
                 
         radio!.bandSettings[id]!.accTxEnabled                = entry.accTxEnabled
         usleep(minPause)
