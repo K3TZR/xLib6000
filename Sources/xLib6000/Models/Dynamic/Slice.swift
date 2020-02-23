@@ -831,7 +831,11 @@ public final class Slice  : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
-      case .active:       update(self, &_active,        to: property.value.bValue,      signal: \.active)
+      case .active:
+        //update(self, &_active,        to: property.value.bValue,      signal: \.active)
+        willChangeValue(forKey: "active")
+        _active = property.value.bValue
+        didChangeValue(forKey: "active")
       case .agcMode:      update(self, &_agcMode,       to: property.value,             signal: \.agcMode)
       case .agcOffLevel:  update(self, &_agcOffLevel,   to: property.value.iValue,      signal: \.agcOffLevel)
       case .agcThreshold: update(self, &_agcThreshold,  to: property.value.iValue,      signal: \.agcThreshold)
@@ -864,20 +868,36 @@ public final class Slice  : NSObject, DynamicModel {
       case .diversityChild:   if _diversityIsAllowed {update(self, &_diversityChild,    to: property.value.bValue, signal: \.diversityChild)}
       case .diversityIndex:   if _diversityIsAllowed {update(self, &_diversityIndex,    to: property.value.iValue, signal: \.diversityIndex)}
         
-      case .filterHigh:               update(self, &_filterHigh,              to: property.value.iValue,  signal: \.filterHigh)
-      case .filterLow:                update(self, &_filterLow,               to: property.value.iValue,  signal: \.filterLow)
+      case .filterHigh:
+        //update(self, &_filterHigh,              to: property.value.iValue,  signal: \.filterHigh)
+        willChangeValue(forKey: "filterHigh")
+        _filterHigh = property.value.iValue
+        didChangeValue(forKey: "filterHigh")
+      case .filterLow:
+        //update(self, &_filterLow,               to: property.value.iValue,  signal: \.filterLow)
+        willChangeValue(forKey: "filterLow")
+        _filterLow = property.value.iValue
+        didChangeValue(forKey: "filterLow")
       case .fmDeviation:              update(self, &_fmDeviation,             to: property.value.iValue,  signal: \.fmDeviation)
       case .fmRepeaterOffset:         update(self, &_fmRepeaterOffset,        to: property.value.fValue,  signal: \.fmRepeaterOffset)
       case .fmToneBurstEnabled:       update(self, &_fmToneBurstEnabled,      to: property.value.bValue,  signal: \.fmToneBurstEnabled)
       case .fmToneMode:               update(self, &_fmToneMode,              to: property.value,         signal: \.fmToneMode)
       case .fmToneFreq:               update(self, &_fmToneFreq,              to: property.value.fValue,  signal: \.fmToneFreq)
-      case .frequency:                update(self, &_frequency,               to: property.value.mhzToHz, signal: \.frequency)
+      case .frequency:
+        //update(self, &_frequency,               to: property.value.mhzToHz, signal: \.frequency)
+        willChangeValue(forKey: "frequency")
+        _frequency = property.value.mhzToHz
+        didChangeValue(forKey: "frequency")
       case .ghost:                    _log("Unprocessed Slice property: \( property.key).\(property.value)", .warning, #function, #file, #line)
       case .inUse:                    update(self, &_inUse,                   to: property.value.bValue,  signal: \.inUse)
       case .locked:                   update(self, &_locked,                  to: property.value.bValue,  signal: \.locked)
       case .loopAEnabled:             update(self, &_loopAEnabled,            to: property.value.bValue,  signal: \.loopAEnabled)
       case .loopBEnabled:             update(self, &_loopBEnabled,            to: property.value.bValue,  signal: \.loopBEnabled)
-      case .mode:                     update(self, &_mode,                    to: property.value.uppercased(), signal: \.mode)
+      case .mode:
+        //update(self, &_mode,                    to: property.value.uppercased(), signal: \.mode)
+        willChangeValue(forKey: "mode")
+        _mode = property.value.uppercased()
+        didChangeValue(forKey: "mode")
       case .modeList:                 update(self, &_modeList,                to: property.value.list,    signal: \.modeList)
       case .nbEnabled:                update(self, &_nbEnabled,               to: property.value.bValue,  signal: \.nbEnabled)
       case .nbLevel:                  update(self, &_nbLevel,                 to: property.value.iValue,  signal: \.nbLevel)
@@ -894,8 +914,16 @@ public final class Slice  : NSObject, DynamicModel {
       case .recordEnabled:            update(self, &_recordEnabled,           to: property.value.bValue,  signal: \.recordEnabled)
       case .repeaterOffsetDirection:  update(self, &_repeaterOffsetDirection, to: property.value,         signal: \.repeaterOffsetDirection)
       case .rfGain:                   update(self, &_rfGain,                  to: property.value.iValue,  signal: \.rfGain)
-      case .ritOffset:                update(self, &_ritOffset,               to: property.value.iValue,  signal: \.ritOffset)
-      case .ritEnabled:               update(self, &_ritEnabled,              to: property.value.bValue,  signal: \.ritEnabled)
+      case .ritOffset:
+        //update(self, &_ritOffset,               to: property.value.iValue,  signal: \.ritOffset)
+        willChangeValue(forKey: "ritOffset")
+        _ritOffset = property.value.iValue
+        didChangeValue(forKey: "ritOffset")
+      case .ritEnabled:
+        //update(self, &_ritEnabled,              to: property.value.bValue,  signal: \.ritEnabled)
+        willChangeValue(forKey: "ritEnabled")
+        _ritEnabled = property.value.bValue
+        didChangeValue(forKey: "ritEnabled")
       case .rttyMark:                 update(self, &_rttyMark,                to: property.value.iValue,  signal: \.rttyMark)
       case .rttyShift:                update(self, &_rttyShift,               to: property.value.iValue,  signal: \.rttyShift)
       case .rxAnt:                    update(self, &_rxAnt,                   to: property.value,         signal: \.rxAnt)
@@ -905,15 +933,27 @@ public final class Slice  : NSObject, DynamicModel {
       case .squelchLevel:             update(self, &_squelchLevel,            to: property.value.iValue,  signal: \.squelchLevel)
       case .step:                     update(self, &_step,                    to: property.value.iValue,  signal: \.step)
       case .stepList:                 update(self, &_stepList,                to: property.value,         signal: \.stepList)
-      case .txEnabled:                update(self, &_txEnabled,               to: property.value.bValue,  signal: \.txEnabled)
+      case .txEnabled:
+        //update(self, &_txEnabled,               to: property.value.bValue,  signal: \.txEnabled)
+        willChangeValue(forKey: "txEnabled")
+        _txEnabled = property.value.bValue
+        didChangeValue(forKey: "txEnabled")
       case .txAnt:                    update(self, &_txAnt,                   to: property.value,         signal: \.txAnt)
       case .txAntList:                update(self, &_txAntList,               to: property.value.list,    signal: \.txAntList)
       case .txOffsetFreq:             update(self, &_txOffsetFreq,            to: property.value.fValue,  signal: \.txOffsetFreq)
       case .wide:                     update(self, &_wide,                    to: property.value.bValue,  signal: \.wide)
       case .wnbEnabled:               update(self, &_wnbEnabled,              to: property.value.bValue,  signal: \.wnbEnabled)
       case .wnbLevel:                 update(self, &_wnbLevel,                to: property.value.iValue,  signal: \.wnbLevel)
-      case .xitOffset:                update(self, &_xitOffset,               to: property.value.iValue,  signal: \.xitOffset)
-      case .xitEnabled:               update(self, &_xitEnabled,              to: property.value.bValue,  signal: \.xitEnabled)
+      case .xitOffset:
+        //update(self, &_xitOffset,               to: property.value.iValue,  signal: \.xitOffset)
+        willChangeValue(forKey: "xitOffset")
+        _xitOffset = property.value.iValue
+        didChangeValue(forKey: "xitOffset")
+      case .xitEnabled:
+        //update(self, &_xitEnabled,              to: property.value.bValue,  signal: \.xitEnabled)
+        willChangeValue(forKey: "xitEnabled")
+        _xitEnabled = property.value.bValue
+        didChangeValue(forKey: "xitEnabled")
 
       case .daxClients, .diversityParent, .recordTime: break // ignored
       }
