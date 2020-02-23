@@ -414,7 +414,11 @@ public final class Transmit : NSObject, StaticModel {
       case .cwSpeed:                update(self, &_cwSpeed,                 to: property.value.iValue,  signal: \.cwSpeed)
       case .cwSwapPaddles:          update(self, &_cwSwapPaddles,           to: property.value.bValue,  signal: \.cwSwapPaddles)
       case .cwSyncCwxEnabled:       update(self, &_cwSyncCwxEnabled,        to: property.value.bValue,  signal: \.cwSyncCwxEnabled)
-      case .daxEnabled:             update(self, &_daxEnabled,              to: property.value.bValue,  signal: \.daxEnabled)
+      case .daxEnabled:
+        //update(self, &_daxEnabled,              to: property.value.bValue,  signal: \.daxEnabled)
+        willChangeValue(forKey: "daxEnabled")
+        _daxEnabled = property.value.bValue
+        didChangeValue(forKey: "daxEnabled")
       case .frequency:              update(self, &_frequency,               to: property.value.mhzToHz, signal: \.frequency)
       case .hwAlcEnabled:           update(self, &_hwAlcEnabled,            to: property.value.bValue,  signal: \.hwAlcEnabled)
       case .inhibit:                update(self, &_inhibit,                 to: property.value.bValue,  signal: \.inhibit)
