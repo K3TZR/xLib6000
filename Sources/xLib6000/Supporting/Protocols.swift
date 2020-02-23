@@ -55,7 +55,7 @@ protocol DynamicModel                       : StaticModel {
   ///   - radio:                the current Radio object
   ///   - inUse:                a flag indicating whether the object in the status message is active
   ///
-  static func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool)
+  static func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool)
 }
 
 /// Dynamic models which have an accompanying UDP Stream

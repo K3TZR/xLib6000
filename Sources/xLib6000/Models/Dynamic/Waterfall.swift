@@ -164,7 +164,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format: <"waterfall", ""> <streamId, ""> <"x_pixels", value> <"center", value> <"bandwidth", value> <"line_duration", value>
     //          <"rfgain", value> <"rxant", value> <"wide", 1|0> <"loopa", 1|0> <"loopb", 1|0> <"band", value> <"daxiq", value>
     //          <"daxiq_rate", value> <"capacity", value> <"available", value> <"panadapter", streamId>=40000000 <"color_gain", value>
@@ -177,7 +177,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     // Format: <"waterfall", ""> <streamId, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
     
     // get the Id
-    if let id = keyValues[1].key.streamId {
+    if let id = properties[1].key.streamId {
       
       // is the object in use?
       if inUse {
@@ -189,7 +189,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
           radio.waterfalls[id] = Waterfall(radio: radio, id: id)
         }
         // pass the key values to the Waterfall for parsing (dropping the Type and Id)
-        radio.waterfalls[id]!.parseProperties(radio, Array(keyValues.dropFirst(2)))
+        radio.waterfalls[id]!.parseProperties(radio, Array(properties.dropFirst(2)))
         
       } else {
         

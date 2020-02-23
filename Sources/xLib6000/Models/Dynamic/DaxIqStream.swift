@@ -116,9 +116,6 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       // YES, does it exist?
       if radio.daxIqStreams[id] == nil {
         
-        // NO, is it for this client?
-        if radio.version.isV3 { if !isForThisClient(properties) { return } }
-        
         // create a new object & add it to the collection
         radio.daxIqStreams[id] = DaxIqStream(radio: radio, id: id)
       }

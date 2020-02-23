@@ -90,10 +90,10 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private      var _initialized     = false
-  private      let _log             = Log.sharedInstance.logMessage
-  private      let _radio           : Radio
-  private      var _rxSeq           : Int?
+  private var _initialized  = false
+  private let _log          = Log.sharedInstance.logMessage
+  private let _radio        : Radio
+  private var _rxSeq        : Int?
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -116,10 +116,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       
       // YES, does it exist?
       if radio.daxRxAudioStreams[id] == nil {
-        
-        // NO, is it for this client?
-        if radio.version.isV3 { if !isForThisClient(properties) { return } }
-        
+                
         // create a new object & add it to the collection
         radio.daxRxAudioStreams[id] = DaxRxAudioStream(radio: radio, id: id)
       }

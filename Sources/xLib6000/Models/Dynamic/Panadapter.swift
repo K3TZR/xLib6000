@@ -308,7 +308,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format: <"pan", ""> <streamId, ""> <"wnb", 1|0> <"wnb_level", value> <"wnb_updating", 1|0> <"x_pixels", value> <"y_pixels", value>
     //          <"center", value>, <"bandwidth", value> <"min_dbm", value> <"max_dbm", value> <"fps", value> <"average", value>
     //          <"weighted_average", 1|0> <"rfgain", value> <"rxant", value> <"wide", 1|0> <"loopa", 1|0> <"loopb", 1|0>
@@ -326,7 +326,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // Format: <"pan", ""> <streamId, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
     
     //get the Id
-    if let id =  keyValues[1].key.streamId {
+    if let id =  properties[1].key.streamId {
       
       // is the object in use?
       if inUse {
@@ -338,7 +338,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
           radio.panadapters[id] = Panadapter(radio: radio, id: id)
         }
         // pass the remaining key values for parsing
-        radio.panadapters[id]!.parseProperties(radio, Array(keyValues.dropFirst(2)) )
+        radio.panadapters[id]!.parseProperties(radio, Array(properties.dropFirst(2)) )
       
       } else {
         

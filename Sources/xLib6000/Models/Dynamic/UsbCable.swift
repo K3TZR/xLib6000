@@ -187,7 +187,7 @@ public final class UsbCable : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // TYPE: CAT
     //      <id, > <type, > <enable, > <pluggedIn, > <name, > <source, > <sourceTxAnt, > <sourceRxAnt, > <sourceSLice, >
     //      <autoReport, > <preamp, > <polarity, > <log, > <speed, > <dataBits, > <stopBits, > <parity, > <flowControl, >
@@ -196,7 +196,7 @@ public final class UsbCable : NSObject, DynamicModel {
     // FIXME: Need other formats
     
     // get the Id
-    let id = keyValues[0].key
+    let id = properties[0].key
     
     // is the object in use?
     if inUse {
@@ -204,7 +204,7 @@ public final class UsbCable : NSObject, DynamicModel {
       // YES, does it exist?
       if radio.usbCables[id] == nil {
         // NO, is it a valid cable type?
-        if let cableType = UsbCable.UsbCableType(rawValue: keyValues[1].value) {
+        if let cableType = UsbCable.UsbCableType(rawValue: properties[1].value) {
           
           // YES, create a new UsbCable & add it to the UsbCables collection
           radio.usbCables[id] = UsbCable(radio: radio, id: id, cableType: cableType)
@@ -212,12 +212,12 @@ public final class UsbCable : NSObject, DynamicModel {
         } else {
           
           // NO, log the error and ignore it
-          Log.sharedInstance.logMessage("Invalid UsbCable Type: \(keyValues[1].value)", .warning, #function, #file, #line)
+          Log.sharedInstance.logMessage("Invalid UsbCable Type: \(properties[1].value)", .warning, #function, #file, #line)
           return
         }
       }
       // pass the remaining key values to the Usb Cable for parsing
-      radio.usbCables[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+      radio.usbCables[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
       
     } else {
       

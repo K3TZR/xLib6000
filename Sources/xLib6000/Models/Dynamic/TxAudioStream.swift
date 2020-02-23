@@ -87,6 +87,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance
   private var _initialized                  = false
   private var _log                          = Log.sharedInstance.logMessage
   private let _radio                        : Radio
@@ -101,16 +102,16 @@ public final class TxAudioStream : NSObject, DynamicModel {
   ///   StatusParser protocol method, executes on the parseQ
   ///
   /// - Parameters:
-  ///   - keyValues:      a KeyValuesArray
+  ///   - properties:     a KeyValuesArray
   ///   - radio:          the current Radio class
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"dax_tx", channel> <"in_use", 1|0> <"ip", ip> <"port", port>
     
     // get the Id
-    if let id =  keyValues[0].key.streamId {
+    if let id =  properties[0].key.streamId {
       
       // is the object in use?
       if inUse {
@@ -118,11 +119,14 @@ public final class TxAudioStream : NSObject, DynamicModel {
         // YES, does it exist?
         if radio.txAudioStreams[id] == nil {
           
+          // NO, is it for this client?
+          if !isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) { return }
+
           // create a new object & add it to the collection
           radio.txAudioStreams[id] = TxAudioStream(radio: radio, id: id)
         }
         // pass the remaining key values for parsing
-        radio.txAudioStreams[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+        radio.txAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
         
       } else {
         

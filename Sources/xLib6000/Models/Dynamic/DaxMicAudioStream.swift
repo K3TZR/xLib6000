@@ -111,8 +111,8 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
       if radio.daxMicAudioStreams[id] == nil {
         
         // NO, is it for this client?
-        if radio.version.isV3 { if !isForThisClient(properties) { return } }
-        
+        if !isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) { return }
+
         // create a new object & add it to the collection
         radio.daxMicAudioStreams[id] = DaxMicAudioStream(radio: radio, id: id)
       }

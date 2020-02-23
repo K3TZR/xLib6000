@@ -83,9 +83,9 @@ public final class Profile                  : NSObject, StaticModel {
   ///   - queue:              a parse Queue for the object
   ///   - inUse:              false = "to be deleted"
   ///
-  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
 
-    let components = keyValues[0].key.split(separator: " ")
+    let components = properties[0].key.split(separator: " ")
     
     // get the Id
     let id = String(components[0])
@@ -97,8 +97,8 @@ public final class Profile                  : NSObject, StaticModel {
       return
     }
     // remove the Id from the KeyValues
-    var adjustedKeyValues = keyValues
-    adjustedKeyValues[0].key = String(components[1])
+    var adjustedProperties = properties
+    adjustedProperties[0].key = String(components[1])
     
     // does the object exist?
     if  radio.profiles[id] == nil {
@@ -107,7 +107,7 @@ public final class Profile                  : NSObject, StaticModel {
       radio.profiles[id] = Profile(radio: radio, id: id)
     }
     // pass the remaining values to Profile for parsing
-    radio.profiles[id]!.parseProperties(radio, adjustedKeyValues )
+    radio.profiles[id]!.parseProperties(radio, adjustedProperties )
   }
 
   // ------------------------------------------------------------------------------

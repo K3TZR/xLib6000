@@ -126,10 +126,10 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   ///   - queue:              a parse Queue for the object
   ///   - inUse:              false = "to be deleted"
   ///
-  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     
     // get the Id
-    if let id =  keyValues[0].key.streamId {
+    if let id =  properties[0].key.streamId {
       
       // does the object exist?
       if  radio.opusStreams[id] == nil {
@@ -138,7 +138,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
         radio.opusStreams[id] = Opus(radio: radio, id: id)
       }
       // pass the remaining values to Opus for parsing
-      radio.opusStreams[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+      radio.opusStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
     }
   }
 

@@ -240,13 +240,13 @@ public final class Meter : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     
     // is the object in use?
     if inUse {
       
       // YES, extract the Meter Number from the first KeyValues entry
-      let components = keyValues[0].key.components(separatedBy: ".")
+      let components = properties[0].key.components(separatedBy: ".")
       if components.count != 2 {return }
       
       // the Meter Number is the 0th item
@@ -260,13 +260,13 @@ public final class Meter : NSObject, DynamicModel {
         }
         
         // pass the key values to the Meter for parsing
-        radio.meters[id]!.parseProperties(radio, keyValues )
+        radio.meters[id]!.parseProperties(radio, properties )
       }
       
     } else {
       
       // NO, extract the Id
-      if let id = keyValues[0].key.components(separatedBy: " ")[0].objectId {
+      if let id = properties[0].key.components(separatedBy: " ")[0].objectId {
         
         // does it exist?
         if radio.meters[id] != nil {

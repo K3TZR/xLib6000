@@ -105,13 +105,13 @@ public final class Amplifier  : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     ///   Format:  <Id, > <"ant", ant> <"ip", ip> <"model", model> <"port", port> <"serial_num", serialNumber>
     
     // TODO: verify
         
     // get the handle
-    if let id = keyValues[0].key.handle {
+    if let id = properties[0].key.handle {
       
       // is the object in use
       if inUse {
@@ -123,7 +123,7 @@ public final class Amplifier  : NSObject, DynamicModel {
           radio.amplifiers[id] = Amplifier(radio: radio, id: id)
         }
         // pass the remaining key values to the Amplifier for parsing
-        radio.amplifiers[id]!.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+        radio.amplifiers[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
         
       } else {
         

@@ -107,9 +107,6 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       // YES, does it exist?
       if radio.remoteRxAudioStreams[id] == nil {
         
-        // NO, is it for this client?
-        if radio.version.isV3 { if !isForThisClient(properties) { return } }
-        
         // create a new object & add it to the collection
         radio.remoteRxAudioStreams[id] = RemoteRxAudioStream(radio: radio, id: id)
       }

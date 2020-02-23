@@ -127,11 +127,11 @@ public final class Equalizer : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
+  class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     var equalizer: Equalizer?
     
     // get the Type
-    let type = keyValues[0].key
+    let type = properties[0].key
     
     // determine the type of Equalizer
     switch type {
@@ -156,7 +156,7 @@ public final class Equalizer : NSObject, DynamicModel {
     if let equalizer = equalizer {
       
       // pass the key values to the Equalizer for parsing (dropping the Type)
-      equalizer.parseProperties(radio, Array(keyValues.dropFirst(1)) )
+      equalizer.parseProperties(radio, Array(properties.dropFirst(1)) )
     }
   }
   
