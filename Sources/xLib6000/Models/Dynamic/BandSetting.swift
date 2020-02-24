@@ -159,7 +159,7 @@ public final class BandSetting                : NSObject, DynamicModel {
     //          <band, > <bandId, > <"removed", >
 
     // get the Id
-    if let id = properties[1].key.objectId {
+    if let id = properties[0].key.objectId {
       
       // is the object in use?
       if inUse {
@@ -171,7 +171,7 @@ public final class BandSetting                : NSObject, DynamicModel {
           radio.bandSettings[id] = BandSetting(radio: radio, id: id)
         }
         // pass the remaining key values to the BandSetting for parsing
-        radio.bandSettings[id]!.parseProperties(radio, Array(properties.dropFirst(2)) )
+        radio.bandSettings[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
       
       } else {
 
