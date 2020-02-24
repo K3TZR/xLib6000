@@ -20,7 +20,7 @@ class v2Tests: XCTestCase {
       
       Swift.print("***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))")
 
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "AudioTests", logState: logState) {
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "v2Tests", logState: logState) {
         sleep(1)
         
         Swift.print("***** Connected")
