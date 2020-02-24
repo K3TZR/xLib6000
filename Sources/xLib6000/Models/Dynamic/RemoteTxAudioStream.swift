@@ -108,7 +108,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
         radio.remoteTxAudioStreams[id] = RemoteTxAudioStream(radio: radio, id: id)
       }
       // pass the remaining key values for parsing (dropping the Id)
-      radio.remoteTxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
+      radio.remoteTxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(2)) )
     }
   }
 
