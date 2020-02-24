@@ -227,7 +227,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   private var _delegate      : StreamHandler? = nil
 
   private var __clientHandle : Handle = 0
-  private var __compression  : String = RemoteRxAudioStream.kUncompressed
+  private var __compression  : String = RemoteRxAudioStream.Compression.none.rawValue
   private var __ip           = ""
 }
 

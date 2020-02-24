@@ -30,9 +30,14 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   public static let isInterleaved           = true
   public static let application             = 2049
   
-  public static let kOpus                   = "opus"
-  public static let kUncompressed           = "none"
+//  public static let kOpus                   = "opus"
+//  public static let kUncompressed           = "none"
 
+  public enum Compression : String {
+    case opus
+    case none
+  }
+  
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
@@ -245,7 +250,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   private var _delegate      : StreamHandler? = nil
 
   private var __clientHandle : Handle = 0
-  private var __compression  : String = RemoteRxAudioStream.kUncompressed
+  private var __compression  : String = RemoteRxAudioStream.Compression.none.rawValue
   private var __ip           = ""
 }
 
