@@ -893,6 +893,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     }
     
+    // TODO: logging added by DL3LSM for finding some bug
+    _log("GUI Client connected: station = \(station), program = \(program), handle = \(handle.hex), ID = \(clientId ?? "unknown")", .verbose, #function, #file, #line)
+    
     if clientId == nil || clientId == "" {
       return
     }
