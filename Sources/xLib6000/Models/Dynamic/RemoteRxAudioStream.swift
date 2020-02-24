@@ -102,8 +102,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
     
     // get the Id
     if let id =  properties[0].key.streamId {
-      
-      
+            
       // YES, does it exist?
       if radio.remoteRxAudioStreams[id] == nil {
         
@@ -111,7 +110,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
         radio.remoteRxAudioStreams[id] = RemoteRxAudioStream(radio: radio, id: id)
       }
       // pass the remaining key values for parsing (dropping the Id)
-      radio.remoteRxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
+      radio.remoteRxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(2)) )
     }
   }
 
@@ -167,7 +166,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this RxRemoteAudioStream
       _initialized = true
                   
-      _log("RemoteRxAudioStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("RemoteRxAudioStream added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.remoteRxAudioStreamHasBeenAdded, object: self as Any?)
