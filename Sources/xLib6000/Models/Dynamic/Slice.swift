@@ -661,7 +661,10 @@ public final class Slice  : NSObject, DynamicModel {
         // does it exist?
         if radio.slices[id] != nil {
           
-          // YES, remove it
+          // YES, notify all observers
+          NC.post(.sliceWillBeRemoved, object: radio.slices[id] as Any?)
+          
+          // and remove it
           radio.slices[id] = nil
           
           Log.sharedInstance.logMessage("Slice removed: id = \(id)", .debug, #function, #file, #line)
