@@ -178,12 +178,13 @@ public final class BandSetting                : NSObject, DynamicModel {
         // does it exist?
         if radio.bandSettings[id] != nil {
           
-          // YES, remove it
+          // YES, remove it, notify observers
+          NC.post(.bandSettingWillBeRemoved, object: radio.bandSettings[id] as Any?)
+          
           radio.bandSettings[id] = nil
           
           Log.sharedInstance.logMessage("BandSetting removed: id = \(id)", .debug, #function, #file, #line)
           
-          // notify all observers
           NC.post(.bandSettingHasBeenRemoved, object: id as Any?)
         }
       }

@@ -137,12 +137,13 @@ public final class Tnf : NSObject, DynamicModel {
         // does it exist?
         if radio.tnfs[id] != nil {
           
-          // YES, remove it
+          // YES, remove it, notify observers
+          NC.post(.tnfWillBeRemoved, object: radio.tnfs[id] as Any?)
+
           radio.tnfs[id]  = nil
           
           Log.sharedInstance.logMessage("Tnf removed: id = \(id)", .debug, #function, #file, #line)
 
-          // YES, notify all observers
           NC.post(.tnfHasBeenRemoved, object: id as Any?)
         }
       }

@@ -139,12 +139,13 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
         // does it exist?
         if radio.audioStreams[id] != nil {
           
-          // YES, remove it
+          // YES, remove it, notify observers
+          NC.post(.audioStreamWillBeRemoved, object: radio.audioStreams[id] as Any?)
+
           radio.audioStreams[id] = nil
           
           Log.sharedInstance.logMessage("AudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
 
-          // notify all observers
           NC.post(.audioStreamHasBeenRemoved, object: id as Any?)
         }
       }

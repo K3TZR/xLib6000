@@ -271,12 +271,13 @@ public final class Meter : NSObject, DynamicModel {
         // does it exist?
         if radio.meters[id] != nil {
           
-          // YES, remove it
+          // YES, remove it, notify observers
+          NC.post(.meterWillBeRemoved, object: radio.meters[id] as Any?)
+          
           radio.meters[id] = nil
           
           Log.sharedInstance.logMessage("Meter removed: id = \(id)", .debug, #function, #file, #line)
 
-          // notify all observers
           NC.post(.meterHasBeenRemoved, object: id as Any?)
         }
       }
