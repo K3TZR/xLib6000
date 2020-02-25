@@ -660,7 +660,7 @@ public class PanadapterFrame {
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
-    if version.isGreaterThan22 {
+    if version.isGreaterThanV22 {
       // 2.3.x or greater
       // Bins are just beyond the payload
       _byteOffsetToBins = MemoryLayout<PayloadHeader>.size

@@ -398,7 +398,7 @@ public class WaterfallFrame {
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
-    if version.isGreaterThan22 {
+    if version.isGreaterThanV22 {
       // 2.3.x or greater
       // map the payload to the New Payload struct
       let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
