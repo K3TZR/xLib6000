@@ -43,7 +43,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Amplifier.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Amplifier.swift"]))
     guard radio != nil else { return }
     
     Amplifier.parseStatus(radio!, amplifierStatus.keyValuesArray(), true)
@@ -115,7 +115,7 @@ final class ObjectTests: XCTestCase {
   
   func equalizerParse(_ type: Equalizer.EqType) {
     
-    let radio = discoverRadio(logState: .limited(to: "Equalizer.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Equalizer.swift"]))
     guard radio != nil else { return }
     
     switch type {
@@ -163,7 +163,7 @@ final class ObjectTests: XCTestCase {
   
   func equalizer(_ type: Equalizer.EqType) {
     
-    let radio = discoverRadio(logState: .limited(to: "Equalizer.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Equalizer.swift"]))
     guard radio != nil else { return }
     
     if let object = radio!.equalizers[type] {
@@ -233,7 +233,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Memory.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Memory.swift"]))
     guard radio != nil else { return }
     
     Memory.parseStatus(radio!, memoryStatus.keyValuesArray(), true)
@@ -321,7 +321,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Memory.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Memory.swift"]))
     guard radio != nil else { return }
     
     // remove all
@@ -495,7 +495,7 @@ final class ObjectTests: XCTestCase {
   func testMeterParse() {
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Memory.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Memory.swift"]))
     guard radio != nil else { return }
     
     Meter.parseStatus(radio!, meterStatus.keyValuesArray(), true)
@@ -522,93 +522,108 @@ final class ObjectTests: XCTestCase {
   
   // ------------------------------------------------------------------------------
   // MARK: - Panadapter
-  
-  private let panadapterStatus = "pan 0x40000000 wnb=0 wnb_level=92 wnb_updating=0 band_zoom=0 segment_zoom=0 x_pixels=50 y_pixels=100 center=14.100000 bandwidth=0.200000 min_dbm=-125.00 max_dbm=-40.00 fps=25 average=23 weighted_average=0 rfgain=50 rxant=ANT1 wide=0 loopa=0 loopb=1 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 waterfall=42000000 min_bw=0.004920 max_bw=14.745601 xvtr= pre= ant_list=ANT1,ANT2,RX_A,XVTR"
-  
+    
   func removeAllPanadapters(radio: Radio) {
     
+    // find the Panadapters
     for (_, panadapter) in radio.panadapters {
+      // remove any Slices on this panadapter
       for (_, slice) in radio.slices where slice.panadapterId == panadapter.id {
         slice.remove()
+        sleep(1)
       }
+      // remove the Panadapter (which removes the Waterfall)
       panadapter.remove()
+      sleep(1)
     }
     sleep(1)
-    if radio.panadapters.count != 0 { XCTFail("***** Panadapter(s) NOT removed *****") }
-    if radio.slices.count != 0 { XCTFail("***** Slice(s) NOT removed *****") }
+    if radio.panadapters.count != 0 {
+      
+      radio.panadapters.forEach { Swift.print("Remaining Panadapter id = \($0.value.id.hex)") }
+      
+      XCTFail("***** Panadapter object(s) NOT removed *****")
+    }
+    if radio.slices.count != 0 { XCTFail("***** Slice object(s) NOT removed *****") }
   }
-  
+  private let panadapterStatus = "pan 0x40000001 wnb=0 wnb_level=92 wnb_updating=0 band_zoom=0 segment_zoom=0 x_pixels=50 y_pixels=100 center=14.100000 bandwidth=0.200000 min_dbm=-125.00 max_dbm=-40.00 fps=25 average=23 weighted_average=0 rfgain=50 rxant=ANT1 wide=0 loopa=0 loopb=1 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 waterfall=42000000 min_bw=0.004920 max_bw=14.745601 xvtr= pre= ant_list=ANT1,ANT2,RX_A,XVTR"
+
   func testPanadapterParse() {
-    
+    let type = "Panadapter"
+    let id = panadapterStatus.components(separatedBy: " ")[1].streamId!
+
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Panadapter.swift"))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Waterfall.swift"]))
     guard radio != nil else { return }
+    
+    if showInfoMessages { Swift.print("***** \(type) created") }
     
     Panadapter.parseStatus(radio!, panadapterStatus.keyValuesArray(), true)
     
-    if let panadapter = radio!.panadapters["0x40000000".streamId!] {
+    if let panadapter = radio!.panadapters[id] {
+
+      XCTAssertEqual(panadapter.wnbLevel, 92, file: #function)
+      XCTAssertEqual(panadapter.wnbUpdating, false, file: #function)
+      XCTAssertEqual(panadapter.bandZoomEnabled, false, file: #function)
+      XCTAssertEqual(panadapter.segmentZoomEnabled, false, file: #function)
+      XCTAssertEqual(panadapter.xPixels, 0, file: #function)
+      XCTAssertEqual(panadapter.yPixels, 0, file: #function)
+      XCTAssertEqual(panadapter.center, 14_100_000, file: #function)
+      XCTAssertEqual(panadapter.bandwidth, 200_000, file: #function)
+      XCTAssertEqual(panadapter.minDbm, -125.00, file: #function)
+      XCTAssertEqual(panadapter.maxDbm, -40.00, file: #function)
+      XCTAssertEqual(panadapter.fps, 25, file: #function)
+      XCTAssertEqual(panadapter.average, 23, file: #function)
+      XCTAssertEqual(panadapter.weightedAverageEnabled, false, file: #function)
+      XCTAssertEqual(panadapter.rfGain, 50, file: #function)
+      XCTAssertEqual(panadapter.rxAnt, "ANT1", file: #function)
+      XCTAssertEqual(panadapter.wide, false, file: #function)
+      XCTAssertEqual(panadapter.loopAEnabled, false, file: #function)
+      XCTAssertEqual(panadapter.loopBEnabled, true, file: #function)
+      XCTAssertEqual(panadapter.band, "20", file: #function)
+      XCTAssertEqual(panadapter.daxIqChannel, 0, file: #function)
+      XCTAssertEqual(panadapter.waterfallId, "0x42000000".streamId!, file: #function)
+      XCTAssertEqual(panadapter.minBw, 4_920, file: #function)
+      XCTAssertEqual(panadapter.maxBw, 14_745_601, file: #function)
+      XCTAssertEqual(panadapter.antList, ["ANT1","ANT2","RX_A","XVTR"], file: #function)
       
-      if showInfoMessages { Swift.print("***** PANADAPTER created") }
-      
-      XCTAssertEqual(panadapter.wnbLevel, 92)
-      XCTAssertEqual(panadapter.wnbUpdating, false)
-      XCTAssertEqual(panadapter.bandZoomEnabled, false)
-      XCTAssertEqual(panadapter.segmentZoomEnabled, false)
-      XCTAssertEqual(panadapter.xPixels, 0)
-      XCTAssertEqual(panadapter.yPixels, 0)
-      XCTAssertEqual(panadapter.center, 14_100_000)
-      XCTAssertEqual(panadapter.bandwidth, 200_000)
-      XCTAssertEqual(panadapter.minDbm, -125.00)
-      XCTAssertEqual(panadapter.maxDbm, -40.00)
-      XCTAssertEqual(panadapter.fps, 25)
-      XCTAssertEqual(panadapter.average, 23)
-      XCTAssertEqual(panadapter.weightedAverageEnabled, false)
-      XCTAssertEqual(panadapter.rfGain, 50)
-      XCTAssertEqual(panadapter.rxAnt, "ANT1")
-      XCTAssertEqual(panadapter.wide, false)
-      XCTAssertEqual(panadapter.loopAEnabled, false)
-      XCTAssertEqual(panadapter.loopBEnabled, true)
-      XCTAssertEqual(panadapter.band, "20")
-      XCTAssertEqual(panadapter.daxIqChannel, 0)
-      XCTAssertEqual(panadapter.waterfallId, "0x42000000".streamId!)
-      XCTAssertEqual(panadapter.minBw, 4_920)
-      XCTAssertEqual(panadapter.maxBw, 14_745_601)
-      XCTAssertEqual(panadapter.antList, ["ANT1","ANT2","RX_A","XVTR"])
-      
-      if showInfoMessages { Swift.print("***** PANADAPTER Parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) Parameters verified") }
       
     } else {
-      XCTFail("***** PANADAPTER NOT created *****")
+      XCTFail("***** \(type) NOT created *****", file: #function)
     }
     disconnect()
   }
   
   func testPanadapter() {
+    let type = "Panadapter"
     var clientHandle : Handle = 0
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Panadapter.swift"))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Waterfall.swift"]))
     guard radio != nil else { return }
     
+    if showInfoMessages { Swift.print("***** Remove existing \(type)(s)") }
+          
     removeAllPanadapters(radio: radio!)
     if radio!.panadapters.count == 0 {
       
-      if showInfoMessages { Swift.print("***** Existing PANADAPTER(s) removed") }
+      if showInfoMessages { Swift.print("***** Existing \(type)(s) removal confirmed") }
+            
+      if showInfoMessages { Swift.print("***** Request 1st \(type)") }
       
       radio!.requestPanadapter(frequency: 15_000_000)
       sleep(1)
-      
-      if showInfoMessages { Swift.print("***** 1st PANADAPTER requested") }
-      
       // verify added
       if radio!.panadapters.count == 1 {
         if let object = radio!.panadapters.first?.value {
           
-          if showInfoMessages { Swift.print("***** 1st PANADAPTER created") }
+          if showInfoMessages { Swift.print("***** 1st \(type) created") }
           
-          if radio!.version.isV3 { clientHandle = object.clientHandle }
+          let id = object.id
+          
+          if radio!.version.isV3Api { clientHandle = object.clientHandle }
           let wnbLevel = object.wnbLevel
           let bandZoomEnabled = object.bandZoomEnabled
           let segmentZoomEnabled = object.segmentZoomEnabled
@@ -633,49 +648,58 @@ final class ObjectTests: XCTestCase {
           let maxBw = object.maxBw
           let antList = object.antList
           
-          if showInfoMessages { Swift.print("***** 1st PANADAPTER parameters saved") }
+          if showInfoMessages { Swift.print("***** 1st \(type) parameters saved") }
           
-          removeAllPanadapters(radio: radio!)
+          if showInfoMessages { Swift.print("***** Remove 1st \(type)") }
+          
+          radio!.panadapters[id]!.remove()
+          sleep(1)
           if radio!.panadapters.count == 0 {
             
+            if showInfoMessages { Swift.print("***** 1st \(type) removal confirmed") }
+            
+            if showInfoMessages { Swift.print("***** Request 2nd \(type)") }
+                        
             // ask for new
             radio!.requestPanadapter(frequency: 15_000_000)
             sleep(1)
-            
-            if showInfoMessages { Swift.print("***** 2nd PANADAPTER requested") }
+
+            if showInfoMessages { Swift.print("***** 2nd \(type) created") }
             
             // verify added
             if radio!.panadapters.count == 1 {
+              
               if let object = radio!.panadapters.first?.value {
                 
-                if showInfoMessages { Swift.print("***** 2nd PANADAPTER created") }
+                if radio!.version.isV3Api { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function) }
                 
-                if radio!.version.isV3 { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle") }
-                XCTAssertEqual(object.wnbLevel, wnbLevel, "wnbLevel")
-                XCTAssertEqual(object.bandZoomEnabled, bandZoomEnabled, "bandZoomEnabled")
-                XCTAssertEqual(object.segmentZoomEnabled, segmentZoomEnabled, "segmentZoomEnabled")
-                XCTAssertEqual(object.xPixels, xPixels, "xPixels")
-                XCTAssertEqual(object.yPixels, yPixels, "yPixels")
-                XCTAssertEqual(object.center, center, "center")
-                XCTAssertEqual(object.bandwidth, bandwidth, "bandwidth")
-                XCTAssertEqual(object.minDbm, minDbm, "minDbm")
-                XCTAssertEqual(object.maxDbm, maxDbm, "maxDbm")
-                XCTAssertEqual(object.fps, fps, "fps")
-                XCTAssertEqual(object.average, average, "average")
-                XCTAssertEqual(object.weightedAverageEnabled, weightedAverageEnabled, "weightedAverageEnabled")
-                XCTAssertEqual(object.rfGain, rfGain, "rfGain")
-                XCTAssertEqual(object.rxAnt, rxAnt, "rxAnt")
-                XCTAssertEqual(object.wide, wide, "wide")
-                XCTAssertEqual(object.loopAEnabled, loopAEnabled, "loopAEnabled")
-                XCTAssertEqual(object.loopBEnabled, loopBEnabled, "loopBEnabled")
-                XCTAssertEqual(object.band, band, "band")
-                XCTAssertEqual(object.daxIqChannel, daxIqChannel, "daxIqChannel")
-                XCTAssertEqual(object.waterfallId, waterfallId, "waterfallId")
-                XCTAssertEqual(object.minBw, minBw, "minBw")
-                XCTAssertEqual(object.maxBw, maxBw, "maxBw")
-                XCTAssertEqual(object.antList, antList, "antList")
+                XCTAssertEqual(object.wnbLevel, wnbLevel, "wnbLevel", file: #function)
+                XCTAssertEqual(object.bandZoomEnabled, bandZoomEnabled, "bandZoomEnabled", file: #function)
+                XCTAssertEqual(object.segmentZoomEnabled, segmentZoomEnabled, "segmentZoomEnabled", file: #function)
+                XCTAssertEqual(object.xPixels, xPixels, "xPixels", file: #function)
+                XCTAssertEqual(object.yPixels, yPixels, "yPixels", file: #function)
+                XCTAssertEqual(object.center, center, "center", file: #function)
+                XCTAssertEqual(object.bandwidth, bandwidth, "bandwidth", file: #function)
+                XCTAssertEqual(object.minDbm, minDbm, "minDbm", file: #function)
+                XCTAssertEqual(object.maxDbm, maxDbm, "maxDbm", file: #function)
+                XCTAssertEqual(object.fps, fps, "fps", file: #function)
+                XCTAssertEqual(object.average, average, "average", file: #function)
+                XCTAssertEqual(object.weightedAverageEnabled, weightedAverageEnabled, "weightedAverageEnabled", file: #function)
+                XCTAssertEqual(object.rfGain, rfGain, "rfGain", file: #function)
+                XCTAssertEqual(object.rxAnt, rxAnt, "rxAnt", file: #function)
+                XCTAssertEqual(object.wide, wide, "wide", file: #function)
+                XCTAssertEqual(object.loopAEnabled, loopAEnabled, "loopAEnabled", file: #function)
+                XCTAssertEqual(object.loopBEnabled, loopBEnabled, "loopBEnabled", file: #function)
+                XCTAssertEqual(object.band, band, "band", file: #function)
+                XCTAssertEqual(object.daxIqChannel, daxIqChannel, "daxIqChannel", file: #function)
+                XCTAssertEqual(object.waterfallId, waterfallId, "waterfallId", file: #function)
+                XCTAssertEqual(object.minBw, minBw, "minBw", file: #function)
+                XCTAssertEqual(object.maxBw, maxBw, "maxBw", file: #function)
+                XCTAssertEqual(object.antList, antList, "antList", file: #function)
                 
-                if showInfoMessages { Swift.print("***** 2nd PANADAPTER parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) parameters verified") }
+                
+                let id = object.id
                 
                 object.wnbLevel = wnbLevel+1
                 object.bandZoomEnabled = !bandZoomEnabled
@@ -696,52 +720,65 @@ final class ObjectTests: XCTestCase {
                 object.band = "WWV2"
                 object.daxIqChannel = daxIqChannel+1
                 
-                if showInfoMessages { Swift.print("***** 2nd PANADAPTER parameters modified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) parameters modified") }
                 
-                if radio!.version.isV3 { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle") }
-                XCTAssertEqual(object.wnbLevel, wnbLevel + 1, "wnbLevel")
-                XCTAssertEqual(object.bandZoomEnabled, !bandZoomEnabled, "bandZoomEnabled")
-                XCTAssertEqual(object.segmentZoomEnabled, !segmentZoomEnabled, "segmentZoomEnabled")
-                XCTAssertEqual(object.xPixels, 250, "xPixels")
-                XCTAssertEqual(object.yPixels, 125, "yPixels")
-                XCTAssertEqual(object.center, 15_250_000, "center")
-                XCTAssertEqual(object.bandwidth, 200_000, "bandwidth")
-                XCTAssertEqual(object.minDbm, -150, "minDbm")
-                XCTAssertEqual(object.maxDbm, 20, "maxDbm")
-                XCTAssertEqual(object.fps, 10, "fps")
-                XCTAssertEqual(object.average, average + 5, "average")
-                XCTAssertEqual(object.weightedAverageEnabled, !weightedAverageEnabled, "weightedAverageEnabled")
-                XCTAssertEqual(object.rfGain, 10, "rfGain")
-                XCTAssertEqual(object.rxAnt, "ANT2", "rxAnt")
-                XCTAssertEqual(object.wide, wide, "wide")
-                XCTAssertEqual(object.loopAEnabled, !loopAEnabled, "loopAEnabled")
-                XCTAssertEqual(object.loopBEnabled, !loopBEnabled, "loopBEnabled")
-                XCTAssertEqual(object.band, "WWV2", "band")
-                XCTAssertEqual(object.daxIqChannel, daxIqChannel+1, "daxIqChannel")
-                XCTAssertEqual(object.waterfallId, waterfallId, "waterfallId")
-                XCTAssertEqual(object.minBw, minBw, "minBw")
-                XCTAssertEqual(object.maxBw, maxBw, "maxBw")
-                XCTAssertEqual(object.antList, antList, "antList")
+                if radio!.version.isV3Api { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function) }
+                XCTAssertEqual(object.wnbLevel, wnbLevel + 1, "wnbLevel", file: #function)
+                XCTAssertEqual(object.bandZoomEnabled, !bandZoomEnabled, "bandZoomEnabled", file: #function)
+                XCTAssertEqual(object.segmentZoomEnabled, !segmentZoomEnabled, "segmentZoomEnabled", file: #function)
+                XCTAssertEqual(object.xPixels, 250, "xPixels", file: #function)
+                XCTAssertEqual(object.yPixels, 125, "yPixels", file: #function)
+                XCTAssertEqual(object.center, 15_250_000, "center", file: #function)
+                XCTAssertEqual(object.bandwidth, 200_000, "bandwidth", file: #function)
+                XCTAssertEqual(object.minDbm, -150, "minDbm", file: #function)
+                XCTAssertEqual(object.maxDbm, 20, "maxDbm", file: #function)
+                XCTAssertEqual(object.fps, 10, "fps", file: #function)
+                XCTAssertEqual(object.average, average + 5, "average", file: #function)
+                XCTAssertEqual(object.weightedAverageEnabled, !weightedAverageEnabled, "weightedAverageEnabled", file: #function)
+                XCTAssertEqual(object.rfGain, 10, "rfGain", file: #function)
+                XCTAssertEqual(object.rxAnt, "ANT2", "rxAnt", file: #function)
+                XCTAssertEqual(object.wide, wide, "wide", file: #function)
+                XCTAssertEqual(object.loopAEnabled, !loopAEnabled, "loopAEnabled", file: #function)
+                XCTAssertEqual(object.loopBEnabled, !loopBEnabled, "loopBEnabled", file: #function)
+                XCTAssertEqual(object.band, "WWV2", "band", file: #function)
+                XCTAssertEqual(object.daxIqChannel, daxIqChannel+1, "daxIqChannel", file: #function)
+                XCTAssertEqual(object.waterfallId, waterfallId, "waterfallId", file: #function)
+                XCTAssertEqual(object.minBw, minBw, "minBw", file: #function)
+                XCTAssertEqual(object.maxBw, maxBw, "maxBw", file: #function)
+                XCTAssertEqual(object.antList, antList, "antList", file: #function)
                 
-                if showInfoMessages { Swift.print("***** 2nd PANADAPTER modified parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) modified parameters verified") }
+                                
+                if showInfoMessages { Swift.print("***** 2nd \(type) removed") }
                 
+                radio!.panadapters[id]!.remove()
+                sleep(1)
+                if radio!.panadapters[id] == nil {
+                                
+                  if showInfoMessages { Swift.print("***** 2nd \(type) removal confirmed") }
+                
+                } else {
+                  XCTFail("***** \(type) remaining, id = \(radio!.panadapters.first!.key.hex) *****", file: #function)
+                }
               } else {
-                XCTFail("***** 2nd PANADAPTER NOT found *****")
+                XCTFail("***** 2nd \(type) NOT found *****", file: #function)
               }
             } else {
-              XCTFail("***** 2nd PANADAPTER NOT created *****")
+              XCTFail("***** 2nd \(type) NOT created *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st PANADAPTER NOT removed *****")
+            XCTFail("***** 1st \(type) NOT removed *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st PANADAPTER NOT created *****")
+          XCTFail("***** 1st \(type) NOT created *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing PANADAPTER(s) NOT removed *****")
+        XCTFail("***** Existing \(type)(s) NOT removed *****", file: #function)
       }
-      removeAllPanadapters(radio: radio!)
     }
+    
+    Swift.print("Remaining pan id = \(radio!.panadapters.first!.key.hex)")
+    
     disconnect()
   }
   
@@ -753,10 +790,10 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Slice.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Slice.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 { sliceStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())" }
+    if radio!.version.isV3Api { sliceStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())" }
 
     let id: ObjectId = sliceStatus.keyValuesArray()[0].key.objectId!
     Slice.parseStatus(radio!, sliceStatus.keyValuesArray(), true)
@@ -766,7 +803,7 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** SLICE created") }
       
-      if radio!.version.isV3 { XCTAssertEqual(sliceObject.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle") }
+      if radio!.version.isV3Api { XCTAssertEqual(sliceObject.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle") }
       XCTAssertEqual(sliceObject.mode, "USB", "mode")
       XCTAssertEqual(sliceObject.filterLow, 100, "filterLow")
       XCTAssertEqual(sliceObject.filterHigh, 2_800, "filterHigh")
@@ -802,7 +839,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Slice.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Slice.swift"]))
     guard radio != nil else { return }
     
     // remove all
@@ -1003,7 +1040,7 @@ final class ObjectTests: XCTestCase {
                 
                 XCTAssertEqual(object.rttyShift, rttyShift, "RttyShift")
                 XCTAssertEqual(object.rxAntList, rxAntList, "RxAntList")
-                if radio!.version.isV3 { XCTAssertEqual(object.sliceLetter, sliceLetter, "SliceLetter") }
+                if radio!.version.isV3Api { XCTAssertEqual(object.sliceLetter, sliceLetter, "SliceLetter") }
                 XCTAssertEqual(object.step, step, "Step")
                 XCTAssertEqual(object.squelchEnabled, squelchEnabled, "SquelchEnabled")
                 
@@ -1239,7 +1276,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Tnf.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Tnf.swift"]))
     guard radio != nil else { return }
 
     let id: ObjectId = tnfStatus.keyValuesArray()[0].key.objectId!
@@ -1266,7 +1303,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Tnf.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Tnf.swift"]))
     guard radio != nil else { return }
     
     // remove all
@@ -1367,7 +1404,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Transmit.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Transmit.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -1384,7 +1421,7 @@ final class ObjectTests: XCTestCase {
 
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
-    } else if radio!.version.isV3 {
+    } else if radio!.version.isV3Api {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_1.keyValuesArray())
       
@@ -1409,7 +1446,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Transmit.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Transmit.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -1426,7 +1463,7 @@ final class ObjectTests: XCTestCase {
 
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
-    } else if radio!.version.isV3 {
+    } else if radio!.version.isV3Api {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_2.keyValuesArray())
       
@@ -1452,7 +1489,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Transmit.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Transmit.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -1503,7 +1540,7 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
-    } else if radio!.version.isV3 {
+    } else if radio!.version.isV3Api {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_3.keyValuesArray())
       
@@ -1564,7 +1601,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "UsbCable.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["UsbCable.swift"]))
     guard radio != nil else { return }
     
     XCTFail("NOT performed, --- FIX ME ---")
@@ -1576,7 +1613,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "UsbCable.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["UsbCable.swift"]))
     guard radio != nil else { return }
     
     XCTFail("NOT performed, --- FIX ME ---")
@@ -1606,7 +1643,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Waterfall.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Waterfall.swift"]))
     guard radio != nil else { return }
     
     let id: StreamId = waterfallStatus.keyValuesArray()[1].key.streamId!
@@ -1635,7 +1672,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Waterfall.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Waterfall.swift"]))
     guard radio != nil else { return }
     
     removeAllWaterfalls(radio: radio!)
@@ -1747,7 +1784,7 @@ final class ObjectTests: XCTestCase {
   
   func xvtrCheck(status: String, expectedName: String) {
     
-    let radio = discoverRadio(logState: .limited(to: "Xvtr.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Xvtr.swift"]))
     guard radio != nil else { return }
     
     let id: XvtrId = status.keyValuesArray()[0].key.objectId!
@@ -1783,7 +1820,7 @@ final class ObjectTests: XCTestCase {
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: "Xvtr.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Xvtr.swift"]))
     guard radio != nil else { return }
     
     // remove all

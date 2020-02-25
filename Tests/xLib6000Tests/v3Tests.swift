@@ -9,7 +9,7 @@ import XCTest
 
 final class v3Tests: XCTestCase {
   let requiredVersion   = "v3"
-  let showInfoMessages  = true
+  let showInfoMessages  = false
   let minPause          : UInt32 = 30_000
 
   // Helper functions
@@ -53,10 +53,10 @@ final class v3Tests: XCTestCase {
 
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
 
       sleep(1)
       
@@ -97,18 +97,18 @@ final class v3Tests: XCTestCase {
     disconnect()
   }
 
-  private var bandSettingStatus_2 = "band 998 band_name=WWV rfpower=50 tunepower=10 hwalc_enabled=1 inhibit=0"
-  private let bandSettingRemove_2 = "band 998 removed"
+  private var bandSettingStatus_2 = "998 band_name=WWV rfpower=50 tunepower=10 hwalc_enabled=1 inhibit=0"
+  private let bandSettingRemove_2 = "998 removed"
   func testBandSetting2Parse() {
     let type = "BandSetting"
-    let id = bandSettingStatus_2.components(separatedBy: " ")[1].objectId!
+    let id = bandSettingStatus_2.components(separatedBy: " ")[0].objectId!
 
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
 
       // remove (if present)
       radio!.bandSettings["2".objectId!] = nil
@@ -168,10 +168,10 @@ final class v3Tests: XCTestCase {
     
     Swift.print("\n***** Please Wait, this test takes longer than others *****\n")
     
-    let radio = discoverRadio(logState: .limited(to: "BandSetting.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["BandSetting.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
       
       sleep(1)
       
@@ -319,10 +319,10 @@ final class v3Tests: XCTestCase {
     
     Swift.print("\n***** \(#function)" + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
       
       daxIqStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
@@ -382,10 +382,10 @@ final class v3Tests: XCTestCase {
     
     Swift.print("\n***** \(#function)" + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
       
       // remove all
       radio!.iqStreams.forEach { $0.value.remove() }
@@ -486,10 +486,10 @@ final class v3Tests: XCTestCase {
 
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
       
       daxMicAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
@@ -539,10 +539,10 @@ final class v3Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
       
       // remove all
       radio!.daxMicAudioStreams.forEach( {$0.value.remove() } )
@@ -637,10 +637,10 @@ final class v3Tests: XCTestCase {
 
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
       
       daxRxAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
@@ -694,10 +694,10 @@ final class v3Tests: XCTestCase {
 
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
       
       // remove all
       radio!.daxRxAudioStreams.forEach { $0.value.remove() }
@@ -794,10 +794,10 @@ final class v3Tests: XCTestCase {
 
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
       
       daxTxAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
@@ -845,10 +845,10 @@ final class v3Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
       
       // remove all
       for (_, object) in radio!.daxTxAudioStreams { object.remove() }
@@ -941,10 +941,10 @@ final class v3Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift]"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
       
       remoteRxAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
@@ -997,10 +997,10 @@ final class v3Tests: XCTestCase {
         
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 {
+    if radio!.version.isV3Api {
       
       // remove all
       radio!.remoteRxAudioStreams.forEach { $0.value.remove() }
@@ -1092,10 +1092,10 @@ final class v3Tests: XCTestCase {
 
       Swift.print("\n***** \(#function), " + requiredVersion)
       
-      let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+      let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
       guard radio != nil else { return }
       
-      if radio!.version.isV3 {
+      if radio!.version.isV3Api {
         
         remoteTxAudioStreamStatus_1 += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
         
@@ -1149,10 +1149,10 @@ final class v3Tests: XCTestCase {
 
       Swift.print("\n***** \(#function), " + requiredVersion)
       
-      let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+      let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
       guard radio != nil else { return }
       
-      if radio!.version.isV3 {
+      if radio!.version.isV3Api {
         
         remoteTxAudioStreamStatus_2 += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
         
@@ -1205,10 +1205,10 @@ final class v3Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
       
-    let radio = discoverRadio(logState: .limited(to: "\(type).swift"))
+    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
       guard radio != nil else { return }
       
-      if radio!.version.isV3 {
+      if radio!.version.isV3Api {
         
         radio!.remoteTxAudioStreams.forEach { $0.value.remove() }
         sleep(1)
