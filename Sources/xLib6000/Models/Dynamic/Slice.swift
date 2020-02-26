@@ -177,18 +177,21 @@ public final class Slice  : NSObject, DynamicModel {
     get { _txEnabled }
     set {
       if _txEnabled != newValue {
+        
+//        if newValue {
+//          // look for the actual tx slice and disable tx there
+//          if let slice = _radio.getTransmitSliceForClientId(_radio.boundClientId ?? "") {
+//            // found one, disable tx
+//            // due to barrier queue issue the command directly
+//            // the property will be set correctly later with the status message from the radio
+//            // Log.sharedInstance.logMessage
+//            _log("Removed TX from Slice \(slice.sliceLetter ?? ""): id = \(slice.id)", .debug, #function, #file, #line)
+//            _radio.sendCommand("slice set " + "\(slice.id) tx=0")
+//          }
+//        }
+        
         _txEnabled = newValue
-        if newValue {
-          // look for the actual tx slice and disable tx there
-          if let slice = _radio.getTransmitSliceForClientId(_radio.boundClientId ?? "") {
-            // found one, disable tx
-            // due to barrier queue issue the command directly
-            // the property will be set correctly later with the status message from the radio
-            // Log.sharedInstance.logMessage
-            _log("Removed TX from Slice \(slice.sliceLetter ?? ""): id = \(slice.id)", .debug, #function, #file, #line)
-            _radio.sendCommand("slice set " + "\(slice.id) tx=0")
-          }
-        }
+        
         _log("Enabling TX for Slice \(sliceLetter ?? ""): id = \(id)", .debug, #function, #file, #line)
         sliceCmd( .txEnabled, newValue.as1or0)
       }
