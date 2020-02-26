@@ -705,6 +705,41 @@ extension Radio {
     // return the first one
     return filteredSlices[0]
   }
+  /// Get the transmit slice for a GUI client
+  ///
+  /// - Parameter
+  ///   - guiClientHandle:                the handle for the GUI client the slice belongs to
+  /// - Returns:             a Slice (if any)
+  ///
+  public func getTransmitSliceForHandle(_ guiClientHandle: Handle) -> xLib6000.Slice? {
+    
+    // find the Slices with the specified Channel (if any)
+    let filteredSlices = slices.values.filter { $0.txEnabled && $0.clientHandle == guiClientHandle }
+    guard filteredSlices.count >= 1 else { return nil }
+    
+    // return the first one
+    return filteredSlices[0]
+  }
+  /// Get the transmit slice for a GUI client
+  ///
+  /// - Parameter
+  ///   - guiClientId:                        the ID (UUID) for the GUI client the slice belongs to
+  /// - Returns:             a Slice (if any)
+  ///
+  public func getTransmitSliceForClientId(_ guiClientId: String) -> xLib6000.Slice? {
+    
+    // find the GUI client for the ID
+    if let myGuiClient = findGuiClient(with: guiClientId) {
+      // find the Slices with the specified Channel (if any)
+      let filteredSlices = slices.values.filter { $0.txEnabled && $0.clientHandle == myGuiClient.handle }
+      guard filteredSlices.count >= 1 else { return nil }
+      
+      // return the first one
+      return filteredSlices[0]
+    }
+    
+    return nil
+  }
   
   // ----------------------------------------------------------------------------
   // MARK: -  RemoteRxAudioStream methods
