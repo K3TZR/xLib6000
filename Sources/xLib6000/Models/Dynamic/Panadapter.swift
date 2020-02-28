@@ -420,48 +420,74 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       }
       // Known keys, in alphabetical order
       switch token {
-        
-      case .antList:                update(self, &_antList,                 to: property.value.list,            signal: \.antList)
-      case .average:                update(self, &_average,                 to: property.value.iValue,          signal: \.average)
-      case .band:                   update(self, &_band,                    to: property.value,                 signal: \.band)
-      case .bandwidth:              update(self, &_bandwidth,               to: property.value.mhzToHz,         signal: \.bandwidth)
-      case .bandZoomEnabled:        update(self, &_bandZoomEnabled,         to: property.value.bValue,          signal: \.bandZoomEnabled)
-      case .center:
-        //update(self, &_center,                  to: property.value.mhzToHz,         signal: \.center)
-        willChangeValue(forKey: "center")
-        _center = property.value.mhzToHz
-        didChangeValue(forKey: "center")
-      case .clientHandle:           update(self, &_clientHandle,            to: property.value.handle ?? 0,     signal: \.clientHandle)
-      case .daxIq:                  update(self, &_daxIqChannel,            to: property.value.iValue,          signal: \.daxIqChannel)
-      case .daxIqChannel:           update(self, &_daxIqChannel,            to: property.value.iValue,          signal: \.daxIqChannel)
-      case .fps:                    update(self, &_fps,                     to: property.value.iValue,          signal: \.fps)
-      case .loopAEnabled:           update(self, &_loopAEnabled,            to: property.value.bValue,          signal: \.loopAEnabled)
-      case .loopBEnabled:           update(self, &_loopBEnabled,            to: property.value.bValue,          signal: \.loopBEnabled)
-      case .maxBw:                  update(self, &_maxBw,                   to: property.value.mhzToHz,         signal: \.maxBw)
-      case .maxDbm:                 update(self, &_maxDbm,                  to: property.value.cgValue,         signal: \.maxDbm)
-      case .minBw:                  update(self, &_minBw,                   to: property.value.mhzToHz,         signal: \.minBw)
-      case .minDbm:                 update(self, &_minDbm,                  to: property.value.cgValue,         signal: \.minDbm)
-      case .preamp:                 update(self, &_preamp,                  to: property.value,                 signal: \.preamp)
-      case .rfGain:                 update(self, &_rfGain,                  to: property.value.iValue,          signal: \.rfGain)
-      case .rxAnt:                  update(self, &_rxAnt,                   to: property.value,                 signal: \.rxAnt)
-      case .segmentZoomEnabled:     update(self, &_segmentZoomEnabled,      to: property.value.bValue,          signal: \.segmentZoomEnabled)
-      case .waterfallId:            update(self, &_waterfallId,             to: property.value.streamId ?? 0,   signal: \.waterfallId)
-      case .wide:                   update(self, &_wide,                    to: property.value.bValue,          signal: \.wide)
-      case .weightedAverageEnabled: update(self, &_weightedAverageEnabled,  to: property.value.bValue,          signal: \.weightedAverageEnabled)
-      case .wnbEnabled:             update(self, &_wnbEnabled,              to: property.value.bValue,          signal: \.wnbEnabled)
-      case .wnbLevel:               update(self, &_wnbLevel,                to: property.value.iValue,          signal: \.wnbLevel)
-      case .wnbUpdating:            update(self, &_wnbUpdating,             to: property.value.bValue,          signal: \.wnbUpdating)
-      case .xPixels:                break
-      case .xvtrLabel:              update(self, &_xvtrLabel,               to: property.value, signal: \.xvtrLabel)
-      case .yPixels:                break
 
-      case .available, .capacity, .daxIqRate:
-        // ignored by Panadapter
-        break
-        
-      case .n1mmSpectrumEnable, .n1mmAddress, .n1mmPort, .n1mmRadio:
-        // not sent in status messages
-        break
+        case .antList:                willChangeValue(for: \.antList)                 ; _antList = property.value.list                  ; didChangeValue(for: \.antList)
+        case .average:                willChangeValue(for: \.average)                 ; _average = property.value.iValue                ; didChangeValue(for: \.average)
+        case .band:                   willChangeValue(for: \.band)                    ; _band = property.value                          ; didChangeValue(for: \.band)
+        case .bandwidth:              willChangeValue(for: \.bandwidth)               ; _bandwidth = property.value.mhzToHz             ; didChangeValue(for: \.bandwidth)
+        case .bandZoomEnabled:        willChangeValue(for: \.bandZoomEnabled)         ; _bandZoomEnabled = property.value.bValue        ; didChangeValue(for: \.bandZoomEnabled)
+        case .center:                 willChangeValue(for: \.center)                  ; _center = property.value.mhzToHz                ; didChangeValue(for: \.center)
+        case .clientHandle:           willChangeValue(for: \.clientHandle)            ; _clientHandle = property.value.handle ?? 0      ; didChangeValue(for: \.clientHandle)
+        case .daxIq:                  willChangeValue(for: \.daxIqChannel)            ; _daxIqChannel = property.value.iValue           ; didChangeValue(for: \.daxIqChannel)
+        case .daxIqChannel:           willChangeValue(for: \.daxIqChannel)            ; _daxIqChannel = property.value.iValue           ; didChangeValue(for: \.daxIqChannel)
+        case .fps:                    willChangeValue(for: \.fps)                     ; _fps = property.value.iValue                    ; didChangeValue(for: \.fps)
+        case .loopAEnabled:           willChangeValue(for: \.loopAEnabled)            ; _loopAEnabled = property.value.bValue           ; didChangeValue(for: \.loopAEnabled)
+        case .loopBEnabled:           willChangeValue(for: \.loopBEnabled)            ; _loopBEnabled = property.value.bValue           ; didChangeValue(for: \.loopBEnabled)
+        case .maxBw:                  willChangeValue(for: \.maxBw)                   ; _maxBw = property.value.mhzToHz                 ; didChangeValue(for: \.maxBw)
+        case .maxDbm:                 willChangeValue(for: \.maxDbm)                  ; _maxDbm = property.value.cgValue                ; didChangeValue(for: \.maxDbm)
+        case .minBw:                  willChangeValue(for: \.minBw)                   ; _minBw = property.value.mhzToHz                 ; didChangeValue(for: \.minBw)
+        case .minDbm:                 willChangeValue(for: \.minDbm)                  ; _minDbm = property.value.cgValue                ; didChangeValue(for: \.minDbm)
+        case .preamp:                 willChangeValue(for: \.preamp)                  ; _preamp = property.value                        ; didChangeValue(for: \.preamp)
+        case .rfGain:                 willChangeValue(for: \.rfGain)                  ; _rfGain = property.value.iValue                 ; didChangeValue(for: \.rfGain)
+        case .rxAnt:                  willChangeValue(for: \.rxAnt)                   ; _rxAnt = property.value                         ; didChangeValue(for: \.rxAnt)
+        case .segmentZoomEnabled:     willChangeValue(for: \.segmentZoomEnabled)      ; _segmentZoomEnabled = property.value.bValue     ; didChangeValue(for: \.segmentZoomEnabled)
+        case .waterfallId:            willChangeValue(for: \.waterfallId)             ; _waterfallId = property.value.streamId ?? 0     ; didChangeValue(for: \.waterfallId)
+        case .wide:                   willChangeValue(for: \.wide)                    ; _wide = property.value.bValue                   ; didChangeValue(for: \.wide)
+        case .weightedAverageEnabled: willChangeValue(for: \.weightedAverageEnabled)  ; _weightedAverageEnabled = property.value.bValue ; didChangeValue(for: \.weightedAverageEnabled)
+        case .wnbEnabled:             willChangeValue(for: \.wnbEnabled)              ; _wnbEnabled = property.value.bValue             ; didChangeValue(for: \.wnbEnabled)
+        case .wnbLevel:               willChangeValue(for: \.wnbLevel)                ; _wnbLevel = property.value.iValue               ; didChangeValue(for: \.wnbLevel)
+        case .wnbUpdating:            willChangeValue(for: \.wnbUpdating)             ; _wnbUpdating = property.value.bValue            ; didChangeValue(for: \.wnbUpdating)
+        case .xvtrLabel:              willChangeValue(for: \.xvtrLabel)               ; _xvtrLabel = property.value                     ; didChangeValue(for: \.xvtrLabel)
+        case .available, .capacity, .daxIqRate, .xPixels, .yPixels:     break // ignored by Panadapter
+        case .n1mmSpectrumEnable, .n1mmAddress, .n1mmPort, .n1mmRadio:  break // not sent in status messages
+
+        //      case .antList:                update(self, &_antList,                 to: property.value.list,            signal: \.antList)
+//      case .average:                update(self, &_average,                 to: property.value.iValue,          signal: \.average)
+//      case .band:                   update(self, &_band,                    to: property.value,                 signal: \.band)
+//      case .bandwidth:              update(self, &_bandwidth,               to: property.value.mhzToHz,         signal: \.bandwidth)
+//      case .bandZoomEnabled:        update(self, &_bandZoomEnabled,         to: property.value.bValue,          signal: \.bandZoomEnabled)
+//      case .center:                 update(self, &_center,                  to: property.value.mhzToHz,         signal: \.center)
+//      case .clientHandle:           update(self, &_clientHandle,            to: property.value.handle ?? 0,     signal: \.clientHandle)
+//      case .daxIq:                  update(self, &_daxIqChannel,            to: property.value.iValue,          signal: \.daxIqChannel)
+//      case .daxIqChannel:           update(self, &_daxIqChannel,            to: property.value.iValue,          signal: \.daxIqChannel)
+//      case .fps:                    update(self, &_fps,                     to: property.value.iValue,          signal: \.fps)
+//      case .loopAEnabled:           update(self, &_loopAEnabled,            to: property.value.bValue,          signal: \.loopAEnabled)
+//      case .loopBEnabled:           update(self, &_loopBEnabled,            to: property.value.bValue,          signal: \.loopBEnabled)
+//      case .maxBw:                  update(self, &_maxBw,                   to: property.value.mhzToHz,         signal: \.maxBw)
+//      case .maxDbm:                 update(self, &_maxDbm,                  to: property.value.cgValue,         signal: \.maxDbm)
+//      case .minBw:                  update(self, &_minBw,                   to: property.value.mhzToHz,         signal: \.minBw)
+//      case .minDbm:                 update(self, &_minDbm,                  to: property.value.cgValue,         signal: \.minDbm)
+//      case .preamp:                 update(self, &_preamp,                  to: property.value,                 signal: \.preamp)
+//      case .rfGain:                 update(self, &_rfGain,                  to: property.value.iValue,          signal: \.rfGain)
+//      case .rxAnt:                  update(self, &_rxAnt,                   to: property.value,                 signal: \.rxAnt)
+//      case .segmentZoomEnabled:     update(self, &_segmentZoomEnabled,      to: property.value.bValue,          signal: \.segmentZoomEnabled)
+//      case .waterfallId:            update(self, &_waterfallId,             to: property.value.streamId ?? 0,   signal: \.waterfallId)
+//      case .wide:                   update(self, &_wide,                    to: property.value.bValue,          signal: \.wide)
+//      case .weightedAverageEnabled: update(self, &_weightedAverageEnabled,  to: property.value.bValue,          signal: \.weightedAverageEnabled)
+//      case .wnbEnabled:             update(self, &_wnbEnabled,              to: property.value.bValue,          signal: \.wnbEnabled)
+//      case .wnbLevel:               update(self, &_wnbLevel,                to: property.value.iValue,          signal: \.wnbLevel)
+//      case .wnbUpdating:            update(self, &_wnbUpdating,             to: property.value.bValue,          signal: \.wnbUpdating)
+//      case .xPixels:                break
+//      case .xvtrLabel:              update(self, &_xvtrLabel,               to: property.value, signal: \.xvtrLabel)
+//      case .yPixels:                break
+//
+//      case .available, .capacity, .daxIqRate:
+//        // ignored by Panadapter
+//        break
+//
+//      case .n1mmSpectrumEnable, .n1mmAddress, .n1mmPort, .n1mmRadio:
+//        // not sent in status messages
+//        break
       }
     }
     // is the Panadapter initialized?

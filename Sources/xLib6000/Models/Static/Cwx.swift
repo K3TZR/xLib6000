@@ -194,8 +194,6 @@ public final class Cwx : NSObject, StaticModel {
         // Known tokens, in alphabetical order
         switch token {
           
-        case .breakInDelay: update(self, &_breakInDelay, to: property.value.iValue, signal: \.breakInDelay)
-
         case .erase:
           let values = property.value.components(separatedBy: ",")
           if values.count != 2 { break }
@@ -205,10 +203,15 @@ public final class Cwx : NSObject, StaticModel {
             // inform the Event Handler (if any)
             eraseSentEventHandler?(start, stop)
           }
-          
-        case .qskEnabled:   update(self, &_qskEnabled,  to: property.value.bValue, signal: \.qskEnabled)
+        case .breakInDelay: willChangeValue(for: \.breakInDelay)  ; _breakInDelay = property.value.iValue ; didChangeValue(for: \.breakInDelay)
+        case .qskEnabled:   willChangeValue(for: \.qskEnabled)    ; _qskEnabled = property.value.bValue   ; didChangeValue(for: \.qskEnabled)
+        case .wpm:          willChangeValue(for: \.wpm)           ; _wpm = property.value.iValue          ; didChangeValue(for: \.wpm)
+
         case .sent:         charSentEventHandler?(property.value.iValue)
-        case .wpm:          update(self, &_wpm,         to: property.value.iValue, signal: \.wpm)
+
+//        case .breakInDelay: update(self, &_breakInDelay, to: property.value.iValue, signal: \.breakInDelay)
+//        case .qskEnabled:   update(self, &_qskEnabled,  to: property.value.bValue, signal: \.qskEnabled)
+//        case .wpm:          update(self, &_wpm,         to: property.value.iValue, signal: \.wpm)
         }
       }
     }

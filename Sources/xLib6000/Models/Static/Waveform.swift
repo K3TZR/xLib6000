@@ -76,7 +76,10 @@ public final class Waveform : NSObject, StaticModel {
       // Known tokens, in alphabetical order
       switch token {
         
-      case .waveformList: update(self, &_waveformList, to: property.value, signal: \.waveformList)      }
+      case .waveformList: willChangeValue(for: \.waveformList)  ; _waveformList = property.value  ; didChangeValue(for: \.waveformList)
+
+//      case .waveformList: update(self, &_waveformList, to: property.value, signal: \.waveformList)        
+      }
     }
   }
   

@@ -240,18 +240,24 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       // Known keys, in alphabetical order
       switch token {
         
-      case .autoBlackEnabled: update(self, &_autoBlackEnabled,  to: property.value.bValue,        signal: \.autoBlackEnabled)
-      case .blackLevel:       update(self, &_blackLevel,        to: property.value.iValue,        signal: \.blackLevel)
-      case .clientHandle:     update(self, &_clientHandle,      to: property.value.handle ?? 0,   signal: \.clientHandle)
-      case .colorGain:        update(self, &_colorGain,         to: property.value.iValue,        signal: \.colorGain)
-      case .gradientIndex:    update(self, &_gradientIndex,     to: property.value.iValue,        signal: \.gradientIndex)
-      case .lineDuration:     update(self, &_lineDuration,      to: property.value.iValue,        signal: \.lineDuration)
-      case .panadapterId:     update(self, &_panadapterId,      to: property.value.streamId ?? 0, signal: \.panadapterId)
+      case .autoBlackEnabled: willChangeValue(for: \.autoBlackEnabled)  ; _autoBlackEnabled = property.value.bValue     ; didChangeValue(for: \.autoBlackEnabled)
+      case .blackLevel:       willChangeValue(for: \.blackLevel)        ; _blackLevel = property.value.iValue           ; didChangeValue(for: \.blackLevel)
+      case .clientHandle:     willChangeValue(for: \.clientHandle)      ; _clientHandle = property.value.handle ?? 0    ; didChangeValue(for: \.clientHandle)
+      case .colorGain:        willChangeValue(for: \.colorGain)         ; _colorGain = property.value.iValue            ; didChangeValue(for: \.colorGain)
+      case .gradientIndex:    willChangeValue(for: \.gradientIndex)     ; _gradientIndex = property.value.iValue        ; didChangeValue(for: \.gradientIndex)
+      case .lineDuration:     willChangeValue(for: \.lineDuration)      ; _lineDuration = property.value.iValue         ; didChangeValue(for: \.lineDuration)
+      case .panadapterId:     willChangeValue(for: \.panadapterId)      ; _panadapterId = property.value.streamId ?? 0  ; didChangeValue(for: \.panadapterId)
+
+//      case .autoBlackEnabled: update(self, &_autoBlackEnabled,  to: property.value.bValue,        signal: \.autoBlackEnabled)
+//      case .blackLevel:       update(self, &_blackLevel,        to: property.value.iValue,        signal: \.blackLevel)
+//      case .clientHandle:     update(self, &_clientHandle,      to: property.value.handle ?? 0,   signal: \.clientHandle)
+//      case .colorGain:        update(self, &_colorGain,         to: property.value.iValue,        signal: \.colorGain)
+//      case .gradientIndex:    update(self, &_gradientIndex,     to: property.value.iValue,        signal: \.gradientIndex)
+//      case .lineDuration:     update(self, &_lineDuration,      to: property.value.iValue,        signal: \.lineDuration)
+//      case .panadapterId:     update(self, &_panadapterId,      to: property.value.streamId ?? 0, signal: \.panadapterId)
       
       case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqChannel,
-           .daxIqRate, .loopA, .loopB, .rfGain, .rxAnt, .segmentZoomEnabled, .wide, .xPixels, .xvtr:
-        // ignored here
-        break
+           .daxIqRate, .loopA, .loopB, .rfGain, .rxAnt, .segmentZoomEnabled, .wide, .xPixels, .xvtr:  break   // ignored here
       }
     }
     // is the waterfall initialized?

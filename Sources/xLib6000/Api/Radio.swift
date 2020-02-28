@@ -826,12 +826,12 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // if PTT_REQUESTED or TRANSMITTING
     if state == Interlock.State.pttRequested.rawValue || state == Interlock.State.transmitting.rawValue {
       // and mox not on, turn it on
-      if currentMox == false { update(self, &_mox, to: true, signal: \.mox) }
+      if currentMox == false { willChangeValue(for: \.mox) ; _mox = true ; didChangeValue(for: \.mox) }
       
     // if READY or UNKEY_REQUESTED
     } else if state == Interlock.State.ready.rawValue || state == Interlock.State.unKeyRequested.rawValue {
       // and mox is on, turn it off
-      if currentMox == true { update(self, &_mox, to: false, signal: \.mox) }
+      if currentMox == true { willChangeValue(for: \.mox) ; _mox = false ; didChangeValue(for: \.mox) }
     }
   }
   
@@ -1125,7 +1125,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .waveform:       waveform.parseProperties(self, remainder.keyValuesArray())
     case .xvtr:           Xvtr.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
     }
-    if version.isV3Api {
+    if version.isV3 {
       // check if we received a status message for our handle to see if our client is connected now
       if !_clientInitialized && components[0].handle == _api.connectionHandle {
         
@@ -1154,7 +1154,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // is there a valid handle"
     if let handle = properties[0].key.handle {
       
-      if version.isV3Api {
+      if version.isV3 {
         
         switch properties[1].key {
           
@@ -1296,7 +1296,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     if let id = keyValues[0].key.streamId {
       
       // YES, is it a removal?
-      if radio.version.isV3Api && remainder.contains(Api.kRemoved) {
+      if radio.version.isV3 && remainder.contains(Api.kRemoved) {
         
         // YES v3 removal, find the stream & remove it
         if radio.daxIqStreams[id] != nil          { radio.daxIqStreams[id] = nil          ; notify(id, .daxIq)    ; return }
@@ -1412,24 +1412,44 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Known keys, in alphabetical order
       switch token {
         
-      case .atuPresent:       update(self, &_atuPresent,        to: property.value.bValue,  signal: \.atuPresent)
-      case .callsign:         update(self, &_callsign,          to: property.value,         signal: \.callsign)
-      case .chassisSerial:    update(self, &_chassisSerial,     to: property.value,         signal: \.chassisSerial)
-      case .gateway:          update(self, &_gateway,           to: property.value,         signal: \.gateway)
-      case .gps:              update(self, &_gpsPresent,        to: (property.value != "Not Present"), signal: \.gpsPresent)
-      case .ipAddress:        update(self, &_ipAddress,         to: property.value,         signal: \.ipAddress)
-      case .location:         update(self, &_location,          to: property.value,         signal: \.location)
-      case .macAddress:       update(self, &_macAddress,        to: property.value,         signal: \.macAddress)
-      case .model:            update(self, &_radioModel,        to: property.value,         signal: \.radioModel)
-      case .netmask:          update(self, &_netmask,           to: property.value,         signal: \.netmask)
-      case .name:             update(self, &_nickname,          to: property.value,         signal: \.nickname)
-      case .numberOfScus:     update(self, &_numberOfScus,      to: property.value.iValue,  signal: \.numberOfScus)
-      case .numberOfSlices:   update(self, &_numberOfSlices,    to: property.value.iValue,  signal: \.numberOfSlices)
-      case .numberOfTx:       update(self, &_numberOfTx,        to: property.value.iValue,  signal: \.numberOfTx)
-      case .options:          update(self, &_radioOptions,      to: property.value,         signal: \.radioOptions)
-      case .region:           update(self, &_region,            to: property.value,         signal: \.region)
-      case .screensaver:      update(self, &_radioScreenSaver,  to: property.value,         signal: \.radioScreenSaver)
-      case .softwareVersion:  update(self, &_softwareVersion,   to: property.value,         signal: \.softwareVersion)
+      case .atuPresent:       willChangeValue(for: \.atuPresent)        ; _atuPresent = property.value.bValue     ; didChangeValue(for: \.atuPresent)
+      case .callsign:         willChangeValue(for: \.callsign)          ; _callsign = property.value              ; didChangeValue(for: \.callsign)
+      case .chassisSerial:    willChangeValue(for: \.chassisSerial)     ; _chassisSerial = property.value         ; didChangeValue(for: \.chassisSerial)
+      case .gateway:          willChangeValue(for: \.gateway)           ; _gateway = property.value               ; didChangeValue(for: \.gateway)
+      case .gps:              willChangeValue(for: \.gps)               ; _gpsPresent = (property.value != "Not Present") ; didChangeValue(for: \.gps)
+      case .ipAddress:        willChangeValue(for: \.ipAddress)         ; _ipAddress = property.value             ; didChangeValue(for: \.ipAddress)
+      case .location:         willChangeValue(for: \.location)          ; _location = property.value              ; didChangeValue(for: \.location)
+      case .macAddress:       willChangeValue(for: \.macAddress)        ; _macAddress = property.value            ; didChangeValue(for: \.macAddress)
+      case .model:            willChangeValue(for: \.radioModel)        ; _radioModel = property.value            ; didChangeValue(for: \.radioModel)
+      case .netmask:          willChangeValue(for: \.netmask)           ; _netmask = property.value               ; didChangeValue(for: \.netmask)
+        
+      case .name:             willChangeValue(for: \.nickname)          ; _nickname = property.value              ; didChangeValue(for: \.nickname)
+      case .numberOfScus:     willChangeValue(for: \.numberOfScus)      ; _numberOfScus = property.value.iValue   ; didChangeValue(for: \.numberOfScus)
+      case .numberOfSlices:   willChangeValue(for: \.numberOfSlices)    ; _numberOfSlices = property.value.iValue ; didChangeValue(for: \.numberOfSlices)
+      case .numberOfTx:       willChangeValue(for: \.numberOfTx)        ; _numberOfTx = property.value.iValue     ; didChangeValue(for: \.numberOfTx)
+      case .options:          willChangeValue(for: \.radioOptions)      ; _radioOptions = property.value          ; didChangeValue(for: \.radioOptions)
+      case .region:           willChangeValue(for: \.region)            ; _region = property.value                ; didChangeValue(for: \.region)
+      case .screensaver:      willChangeValue(for: \.radioScreenSaver)  ; _radioScreenSaver = property.value      ; didChangeValue(for: \.radioScreenSaver)
+      case .softwareVersion:  willChangeValue(for: \.softwareVersion)   ; _softwareVersion = property.value       ; didChangeValue(for: \.softwareVersion)
+
+//      case .atuPresent:       update(self, &_atuPresent,        to: property.value.bValue,  signal: \.atuPresent)
+//      case .callsign:         update(self, &_callsign,          to: property.value,         signal: \.callsign)
+//      case .chassisSerial:    update(self, &_chassisSerial,     to: property.value,         signal: \.chassisSerial)
+//      case .gateway:          update(self, &_gateway,           to: property.value,         signal: \.gateway)
+//      case .gps:              update(self, &_gpsPresent,        to: (property.value != "Not Present"), signal: \.gpsPresent)
+//      case .ipAddress:        update(self, &_ipAddress,         to: property.value,         signal: \.ipAddress)
+//      case .location:         update(self, &_location,          to: property.value,         signal: \.location)
+//      case .macAddress:       update(self, &_macAddress,        to: property.value,         signal: \.macAddress)
+//      case .model:            update(self, &_radioModel,        to: property.value,         signal: \.radioModel)
+//      case .netmask:          update(self, &_netmask,           to: property.value,         signal: \.netmask)
+//      case .name:             update(self, &_nickname,          to: property.value,         signal: \.nickname)
+//      case .numberOfScus:     update(self, &_numberOfScus,      to: property.value.iValue,  signal: \.numberOfScus)
+//      case .numberOfSlices:   update(self, &_numberOfSlices,    to: property.value.iValue,  signal: \.numberOfSlices)
+//      case .numberOfTx:       update(self, &_numberOfTx,        to: property.value.iValue,  signal: \.numberOfTx)
+//      case .options:          update(self, &_radioOptions,      to: property.value,         signal: \.radioOptions)
+//      case .region:           update(self, &_region,            to: property.value,         signal: \.region)
+//      case .screensaver:      update(self, &_radioScreenSaver,  to: property.value,         signal: \.radioScreenSaver)
+//      case .softwareVersion:  update(self, &_softwareVersion,   to: property.value,         signal: \.softwareVersion)
       }
     }
   }
@@ -1535,11 +1555,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Known tokens, in alphabetical order
       switch token {
         
-      case .smartSdrMB:   update(self, &_smartSdrMB,          to: property.value, signal: \.smartSdrMB)
-      case .picDecpu:     update(self, &_picDecpuVersion,     to: property.value, signal: \.picDecpuVersion)
-      case .psocMbTrx:    update(self, &_psocMbtrxVersion,    to: property.value, signal: \.psocMbtrxVersion)
-      case .psocMbPa100:  update(self, &_psocMbPa100Version,  to: property.value, signal: \.psocMbPa100Version)
-      case .fpgaMb:       update(self, &_fpgaMbVersion,       to: property.value, signal: \.fpgaMbVersion)
+      case .smartSdrMB:   willChangeValue(for: \.smartSdrMB)          ; _smartSdrMB = property.value          ; didChangeValue(for: \.smartSdrMB)
+      case .picDecpu:     willChangeValue(for: \.picDecpuVersion)     ; _picDecpuVersion = property.value     ; didChangeValue(for: \.picDecpuVersion)
+      case .psocMbTrx:    willChangeValue(for: \.psocMbtrxVersion)    ; _psocMbtrxVersion = property.value    ; didChangeValue(for: \.psocMbtrxVersion)
+      case .psocMbPa100:  willChangeValue(for: \.psocMbPa100Version)  ; _psocMbPa100Version = property.value  ; didChangeValue(for: \.psocMbPa100Version)
+      case .fpgaMb:       willChangeValue(for: \.fpgaMbVersion)       ; _fpgaMbVersion = property.value       ; didChangeValue(for: \.fpgaMbVersion)
+
+//      case .smartSdrMB:   update(self, &_smartSdrMB,          to: property.value, signal: \.smartSdrMB)
+//      case .picDecpu:     update(self, &_picDecpuVersion,     to: property.value, signal: \.picDecpuVersion)
+//      case .psocMbTrx:    update(self, &_psocMbtrxVersion,    to: property.value, signal: \.psocMbtrxVersion)
+//      case .psocMbPa100:  update(self, &_psocMbPa100Version,  to: property.value, signal: \.psocMbPa100Version)
+//      case .fpgaMb:       update(self, &_fpgaMbVersion,       to: property.value, signal: \.fpgaMbVersion)
       }
     }
   }
@@ -1571,14 +1597,23 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       case .digital:  digital = true
       case .voice:    voice = true
 
+      willChangeValue(for: \.filterCwAutoEnabled) ; _filterCwAutoEnabled = property.value.bValue ; didChangeValue(for: \.filterCwAutoEnabled)
+
+        
       case .autoLevel:
-        if cw {     update(self, &_filterCwAutoEnabled,       to: property.value.bValue, signal: \.filterCwAutoEnabled); cw = false }
-        if digital {update(self, &_filterDigitalAutoEnabled,  to: property.value.bValue, signal: \.filterDigitalAutoEnabled); digital = false }
-        if voice {  update(self, &_filterVoiceAutoEnabled,    to: property.value.bValue, signal: \.filterVoiceAutoEnabled); voice = false }
+        if cw       { willChangeValue(for: \.filterCwAutoEnabled) ; _filterCwAutoEnabled = property.value.bValue ; didChangeValue(for: \.filterCwAutoEnabled) ; cw = false }
+        if digital  { willChangeValue(for: \.filterDigitalAutoEnabled) ; _filterDigitalAutoEnabled = property.value.bValue ; didChangeValue(for: \.filterDigitalAutoEnabled) ; digital = false }
+        if voice    { willChangeValue(for: \.filterVoiceAutoEnabled) ; _filterVoiceAutoEnabled = property.value.bValue ; didChangeValue(for: \.filterVoiceAutoEnabled) ; voice = false }
+//        if cw {     update(self, &_filterCwAutoEnabled,       to: property.value.bValue, signal: \.filterCwAutoEnabled); cw = false }
+//        if digital {update(self, &_filterDigitalAutoEnabled,  to: property.value.bValue, signal: \.filterDigitalAutoEnabled); digital = false }
+//        if voice {  update(self, &_filterVoiceAutoEnabled,    to: property.value.bValue, signal: \.filterVoiceAutoEnabled); voice = false }
       case .level:
-        if cw {       update(self, &_filterCwLevel,       to: property.value.iValue, signal: \.filterCwLevel) }
-        if digital {  update(self, &_filterDigitalLevel,  to: property.value.iValue, signal: \.filterDigitalLevel) }
-        if voice {    update(self, &_filterVoiceLevel,    to: property.value.iValue, signal: \.filterVoiceLevel) }
+        if cw {       willChangeValue(for: \.filterCwLevel) ; _filterCwLevel = property.value.iValue ; didChangeValue(for: \.filterCwLevel) }
+        if digital {  willChangeValue(for: \.filterDigitalLevel) ; _filterDigitalLevel = property.value.iValue ; didChangeValue(for: \.filterDigitalLevel) }
+        if voice {    willChangeValue(for: \.filterVoiceLevel) ; _filterVoiceLevel = property.value.iValue ; didChangeValue(for: \.filterVoiceLevel) }
+//        if cw {       update(self, &_filterCwLevel,       to: property.value.iValue, signal: \.filterCwLevel) }
+//        if digital {  update(self, &_filterDigitalLevel,  to: property.value.iValue, signal: \.filterDigitalLevel) }
+//        if voice {    update(self, &_filterVoiceLevel,    to: property.value.iValue, signal: \.filterVoiceLevel) }
       }
     }
   }
@@ -1603,9 +1638,13 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Known tokens, in alphabetical order
       switch token {
         
-      case .gateway:  update(self, &_staticGateway, to: property.value, signal: \.staticGateway)
-      case .ip:       update(self, &_staticIp,      to: property.value, signal: \.staticIp)
-      case .netmask:  update(self, &_staticNetmask, to: property.value, signal: \.staticNetmask)
+      case .gateway:  willChangeValue(for: \.staticGateway) ; _staticGateway = property.value ; didChangeValue(for: \.staticGateway)
+      case .ip:       willChangeValue(for: \.staticIp)      ; _staticIp = property.value      ; didChangeValue(for: \.staticIp)
+      case .netmask:  willChangeValue(for: \.staticNetmask) ; _staticNetmask = property.value ; didChangeValue(for: \.staticNetmask)
+        
+//      case .gateway:  update(self, &_staticGateway, to: property.value, signal: \.staticGateway)
+//      case .ip:       update(self, &_staticIp,      to: property.value, signal: \.staticIp)
+//      case .netmask:  update(self, &_staticNetmask, to: property.value, signal: \.staticNetmask)
       }
     }
   }
@@ -1630,12 +1669,19 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Known tokens, in alphabetical order
       switch token {
         
-      case .extPresent:   update(self, &_extPresent,    to: property.value.bValue,  signal: \.extPresent)
-      case .gpsdoPresent: update(self, &_gpsdoPresent,  to: property.value.bValue,  signal: \.gpsdoPresent)
-      case .locked:       update(self, &_locked,        to: property.value.bValue,  signal: \.locked)
-      case .setting:      update(self, &_setting,       to: property.value,         signal: \.setting)
-      case .state:        update(self, &_state,         to: property.value,         signal: \.state)
-      case .tcxoPresent:  update(self, &_tcxoPresent,   to: property.value.bValue,  signal: \.tcxoPresent)
+      case .extPresent:   willChangeValue(for: \.extPresent)    ; _extPresent = property.value.bValue   ; didChangeValue(for: \.extPresent)
+      case .gpsdoPresent: willChangeValue(for: \.gpsdoPresent)  ; _gpsdoPresent = property.value.bValue ; didChangeValue(for: \.gpsdoPresent)
+      case .locked:       willChangeValue(for: \.locked)        ; _locked = property.value.bValue       ; didChangeValue(for: \.locked)
+      case .setting:      willChangeValue(for: \.setting)       ; _setting = property.value             ; didChangeValue(for: \.setting)
+      case .state:        willChangeValue(for: \.state)         ; _state = property.value               ; didChangeValue(for: \.state)
+      case .tcxoPresent:  willChangeValue(for: \.tcxoPresent)   ; _tcxoPresent = property.value.bValue  ; didChangeValue(for: \.tcxoPresent)
+
+//      case .extPresent:   update(self, &_extPresent,    to: property.value.bValue,  signal: \.extPresent)
+//      case .gpsdoPresent: update(self, &_gpsdoPresent,  to: property.value.bValue,  signal: \.gpsdoPresent)
+//      case .locked:       update(self, &_locked,        to: property.value.bValue,  signal: \.locked)
+//      case .setting:      update(self, &_setting,       to: property.value,         signal: \.setting)
+//      case .state:        update(self, &_state,         to: property.value,         signal: \.state)
+//      case .tcxoPresent:  update(self, &_tcxoPresent,   to: property.value.bValue,  signal: \.tcxoPresent)
       }
     }
   }
@@ -1682,30 +1728,55 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         // Known tokens, in alphabetical order
         switch token {
           
-        case .backlight:                update(self, &_backlight,               to: property.value.iValue,  signal: \.backlight)
-        case .bandPersistenceEnabled:   update(self, &_bandPersistenceEnabled,  to: property.value.bValue,  signal: \.bandPersistenceEnabled)
-        case .binauralRxEnabled:        update(self, &_binauralRxEnabled,       to: property.value.bValue,  signal: \.binauralRxEnabled)
-        case .calFreq:                  update(self, &_calFreq,                 to: property.value.mhzToHz, signal: \.calFreq)
-        case .callsign:                 update(self, &_callsign,                to: property.value,         signal: \.callsign)
-        case .daxIqAvailable:           update(self, &_daxIqAvailable,          to: property.value.iValue,  signal: \.daxIqAvailable)
-        case .daxIqCapacity:            update(self, &_daxIqCapacity,           to: property.value.iValue,  signal: \.daxIqCapacity)
-        case .enforcePrivateIpEnabled:  update(self, &_enforcePrivateIpEnabled, to: property.value.bValue,  signal: \.enforcePrivateIpEnabled)
-        case .freqErrorPpb:             update(self, &_freqErrorPpb,            to: property.value.iValue,  signal: \.freqErrorPpb)
-        case .fullDuplexEnabled:        update(self, &_fullDuplexEnabled,       to: property.value.bValue,  signal: \.fullDuplexEnabled)
-        case .frontSpeakerMute:         update(self, &_frontSpeakerMute,        to: property.value.bValue,  signal: \.frontSpeakerMute)
-        case .headphoneGain:            update(self, &_headphoneGain,           to: property.value.iValue,  signal: \.headphoneGain)
-        case .headphoneMute:            update(self, &_headphoneMute,           to: property.value.bValue,  signal: \.headphoneMute)
-        case .lineoutGain:              update(self, &_lineoutGain,             to: property.value.iValue,  signal: \.lineoutGain)
-        case .lineoutMute:              update(self, &_lineoutMute,             to: property.value.bValue,  signal: \.lineoutMute)
-        case .muteLocalAudio:           update(self, &_muteLocalAudio,          to: property.value.bValue,  signal: \.muteLocalAudio)
-        case .nickname:                 update(self, &_nickname,                to: property.value,         signal: \.nickname)
-        case .panadapters:              update(self, &_availablePanadapters,    to: property.value.iValue,  signal: \.availablePanadapters)
-        case .pllDone:                  update(self, &_startCalibration,        to: property.value.bValue,  signal: \.startCalibration)
-        case .remoteOnEnabled:          update(self, &_remoteOnEnabled,         to: property.value.bValue,  signal: \.remoteOnEnabled)
-        case .rttyMark:                 update(self, &_rttyMark,                to: property.value.iValue,  signal: \.rttyMark)
-        case .slices:                   update(self, &_availableSlices,         to: property.value.iValue,  signal: \.availableSlices)
-        case .snapTuneEnabled:          update(self, &_snapTuneEnabled,         to: property.value.bValue,  signal: \.snapTuneEnabled)
-        case .tnfsEnabled:              update(self, &_tnfsEnabled,             to: property.value.bValue,  signal: \.tnfsEnabled)
+        case .backlight:                willChangeValue(for: \.backlight)               ; _backlight = property.value.iValue                ; didChangeValue(for: \.backlight)
+        case .bandPersistenceEnabled:   willChangeValue(for: \.bandPersistenceEnabled)  ; _bandPersistenceEnabled = property.value.bValue   ; didChangeValue(for: \.bandPersistenceEnabled)
+        case .binauralRxEnabled:        willChangeValue(for: \.binauralRxEnabled)       ; _binauralRxEnabled = property.value.bValue        ; didChangeValue(for: \.binauralRxEnabled)
+        case .calFreq:                  willChangeValue(for: \.calFreq)                 ; _calFreq = property.value.mhzToHz                 ; didChangeValue(for: \.calFreq)
+        case .callsign:                 willChangeValue(for: \.callsign)                ; _callsign = property.value                        ; didChangeValue(for: \.callsign)
+        case .daxIqAvailable:           willChangeValue(for: \.daxIqAvailable)          ; _daxIqAvailable = property.value.iValue           ; didChangeValue(for: \.daxIqAvailable)
+        case .daxIqCapacity:            willChangeValue(for: \.daxIqCapacity)           ; _daxIqCapacity = property.value.iValue            ; didChangeValue(for: \.daxIqCapacity)
+        case .enforcePrivateIpEnabled:  willChangeValue(for: \.enforcePrivateIpEnabled) ; _enforcePrivateIpEnabled = property.value.bValue  ; didChangeValue(for: \.enforcePrivateIpEnabled)
+        case .freqErrorPpb:             willChangeValue(for: \.freqErrorPpb)            ; _freqErrorPpb = property.value.iValue             ; didChangeValue(for: \.freqErrorPpb)
+        case .fullDuplexEnabled:        willChangeValue(for: \.fullDuplexEnabled)       ; _fullDuplexEnabled = property.value.bValue        ; didChangeValue(for: \.fullDuplexEnabled)
+        case .frontSpeakerMute:         willChangeValue(for: \.frontSpeakerMute)        ; _frontSpeakerMute = property.value.bValue         ; didChangeValue(for: \.frontSpeakerMute)
+        case .headphoneGain:            willChangeValue(for: \.headphoneGain)           ; _headphoneGain = property.value.iValue            ; didChangeValue(for: \.headphoneGain)
+        case .headphoneMute:            willChangeValue(for: \.headphoneMute)           ; _headphoneMute = property.value.bValue            ; didChangeValue(for: \.headphoneMute)
+        case .lineoutGain:              willChangeValue(for: \.lineoutGain)             ; _lineoutGain = property.value.iValue              ; didChangeValue(for: \.lineoutGain)
+        case .lineoutMute:              willChangeValue(for: \.lineoutMute)             ; _lineoutMute = property.value.bValue              ; didChangeValue(for: \.lineoutMute)
+        case .muteLocalAudio:           willChangeValue(for: \.muteLocalAudio)          ; _muteLocalAudio = property.value.bValue           ; didChangeValue(for: \.muteLocalAudio)
+        case .nickname:                 willChangeValue(for: \.nickname)                ; _nickname = property.value                        ; didChangeValue(for: \.nickname)
+        case .panadapters:              willChangeValue(for: \.availablePanadapters)    ; _startCalibration = property.value.bValue         ; didChangeValue(for: \.availablePanadapters)
+        case .pllDone:                  willChangeValue(for: \.startCalibration)        ; _lineoutMute = property.value.bValue              ; didChangeValue(for: \.startCalibration)
+        case .remoteOnEnabled:          willChangeValue(for: \.remoteOnEnabled)         ; _remoteOnEnabled = property.value.bValue          ; didChangeValue(for: \.remoteOnEnabled)
+        case .rttyMark:                 willChangeValue(for: \.rttyMark)                ; _rttyMark = property.value.iValue                 ; didChangeValue(for: \.rttyMark)
+        case .slices:                   willChangeValue(for: \.availableSlices)         ; _availableSlices = property.value.iValue          ; didChangeValue(for: \.availableSlices)
+        case .snapTuneEnabled:          willChangeValue(for: \.snapTuneEnabled)         ; _snapTuneEnabled = property.value.bValue          ; didChangeValue(for: \.snapTuneEnabled)
+        case .tnfsEnabled:              willChangeValue(for: \.tnfsEnabled)             ; _tnfsEnabled = property.value.bValue              ; didChangeValue(for: \.tnfsEnabled)
+
+//        case .backlight:                update(self, &_backlight,               to: property.value.iValue,  signal: \.backlight)
+//        case .bandPersistenceEnabled:   update(self, &_bandPersistenceEnabled,  to: property.value.bValue,  signal: \.bandPersistenceEnabled)
+//        case .binauralRxEnabled:        update(self, &_binauralRxEnabled,       to: property.value.bValue,  signal: \.binauralRxEnabled)
+//        case .calFreq:                  update(self, &_calFreq,                 to: property.value.mhzToHz, signal: \.calFreq)
+//        case .callsign:                 update(self, &_callsign,                to: property.value,         signal: \.callsign)
+//        case .daxIqAvailable:           update(self, &_daxIqAvailable,          to: property.value.iValue,  signal: \.daxIqAvailable)
+//        case .daxIqCapacity:            update(self, &_daxIqCapacity,           to: property.value.iValue,  signal: \.daxIqCapacity)
+//        case .enforcePrivateIpEnabled:  update(self, &_enforcePrivateIpEnabled, to: property.value.bValue,  signal: \.enforcePrivateIpEnabled)
+//        case .freqErrorPpb:             update(self, &_freqErrorPpb,            to: property.value.iValue,  signal: \.freqErrorPpb)
+//        case .fullDuplexEnabled:        update(self, &_fullDuplexEnabled,       to: property.value.bValue,  signal: \.fullDuplexEnabled)
+//        case .frontSpeakerMute:         update(self, &_frontSpeakerMute,        to: property.value.bValue,  signal: \.frontSpeakerMute)
+//        case .headphoneGain:            update(self, &_headphoneGain,           to: property.value.iValue,  signal: \.headphoneGain)
+//        case .headphoneMute:            update(self, &_headphoneMute,           to: property.value.bValue,  signal: \.headphoneMute)
+//        case .lineoutGain:              update(self, &_lineoutGain,             to: property.value.iValue,  signal: \.lineoutGain)
+//        case .lineoutMute:              update(self, &_lineoutMute,             to: property.value.bValue,  signal: \.lineoutMute)
+//        case .muteLocalAudio:           update(self, &_muteLocalAudio,          to: property.value.bValue,  signal: \.muteLocalAudio)
+//        case .nickname:                 update(self, &_nickname,                to: property.value,         signal: \.nickname)
+//        case .panadapters:              update(self, &_availablePanadapters,    to: property.value.iValue,  signal: \.availablePanadapters)
+//        case .pllDone:                  update(self, &_startCalibration,        to: property.value.bValue,  signal: \.startCalibration)
+//        case .remoteOnEnabled:          update(self, &_remoteOnEnabled,         to: property.value.bValue,  signal: \.remoteOnEnabled)
+//        case .rttyMark:                 update(self, &_rttyMark,                to: property.value.iValue,  signal: \.rttyMark)
+//        case .slices:                   update(self, &_availableSlices,         to: property.value.iValue,  signal: \.availableSlices)
+//        case .snapTuneEnabled:          update(self, &_snapTuneEnabled,         to: property.value.bValue,  signal: \.snapTuneEnabled)
+//        case .tnfsEnabled:              update(self, &_tnfsEnabled,             to: property.value.bValue,  signal: \.tnfsEnabled)
         }
       }
     }
@@ -1921,7 +1992,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // DL3LSM added calls to v3 handlers
     case .daxAudio:
       // Dax Slice Audio
-      if version.isV3Api {
+      if version.isV3 {
         if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
           daxAudio.vitaProcessor(vitaPacket)
         }
@@ -1931,7 +2002,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         }
       }
       // Dax Microphone Audio
-      if version.isV3Api {
+      if version.isV3 {
         if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
           daxMicAudio.vitaProcessor(vitaPacket)
         }
@@ -1942,7 +2013,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     case .daxReducedBw:
       // Dax Audio with reduced bandwidth
-      if version.isV3Api {
+      if version.isV3 {
         if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
           daxAudio.vitaProcessor(vitaPacket)
         }
@@ -1952,7 +2023,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         }
       }
       // Dax Microphone Audio with reduced bandwidth
-      if version.isV3Api {
+      if version.isV3 {
         if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
           daxMicAudio.vitaProcessor(vitaPacket)
         }
@@ -1963,7 +2034,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
       // Dax IQ
-      if version.isV3Api {
+      if version.isV3 {
         if let daxIq = daxIqStreams[vitaPacket.streamId] {
           daxIq.vitaProcessor(vitaPacket)
         }
@@ -1980,7 +2051,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .opus:
       // Opus
-      if version.isV3Api {
+      if version.isV3 {
         if let opus = remoteRxAudioStreams[vitaPacket.streamId] {
           
           if opus.isStreaming == false {

@@ -190,20 +190,32 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       }
       // known keys, in alphabetical order
       switch token {
-       
-      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
-      case .daxChannel:   update(self, &_daxChannel,    to: property.value.iValue,      signal: \.daxChannel)
-      case .daxClients:   update(self, &_daxClients,    to: property.value.iValue,      signal: \.daxClients)
+        
+      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
+      case .daxChannel:   willChangeValue(for: \.daxChannel)    ; _daxChannel = property.value.iValue         ; didChangeValue(for: \.daxChannel)
+      case .daxClients:   willChangeValue(for: \.daxClients)    ; _daxClients = property.value .iValue        ; didChangeValue(for: \.daxClients)
       case .inUse:        break   // included to inhibit unknown token warnings
-      case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
-      case .port:         update(self, &_port,          to: property.value.iValue,      signal: \.port)
+      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
+      case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue               ; didChangeValue(for: \.port)
       case .slice:
-        if let sliceId = property.value.objectId {
-          update(self, &_slice, to: _radio.slices[sliceId], signal: \.slice)
-        }
+        if let sliceId = property.value.objectId { willChangeValue(for: \.slice) ; _slice = _radio.slices[sliceId] ; didChangeValue(for: \.slice) }
         let gain = _rxGain
         _rxGain = 0
         rxGain = gain
+
+//      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
+//      case .daxChannel:   update(self, &_daxChannel,    to: property.value.iValue,      signal: \.daxChannel)
+//      case .daxClients:   update(self, &_daxClients,    to: property.value.iValue,      signal: \.daxClients)
+//      case .inUse:        break   // included to inhibit unknown token warnings
+//      case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
+//      case .port:         update(self, &_port,          to: property.value.iValue,      signal: \.port)
+//      case .slice:
+//        if let sliceId = property.value.objectId {
+//          update(self, &_slice, to: _radio.slices[sliceId], signal: \.slice)
+//        }
+//        let gain = _rxGain
+//        _rxGain = 0
+//        rxGain = gain
       }
     }    
     // if this is not yet initialized and inUse becomes true

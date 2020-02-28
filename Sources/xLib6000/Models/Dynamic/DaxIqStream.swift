@@ -162,17 +162,21 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .clientHandle:   update(self, &_clientHandle,  to: property.value.handle ?? 0,   signal: \.clientHandle)
-      case .channel:        update(self, &_channel,       to: property.value.iValue,        signal: \.channel)
-      case .ip:             update(self, &_ip,            to: property.value,               signal: \.ip)
-      case .isActive:       update(self, &_isActive,      to: property.value.bValue,        signal: \.isActive)
-      case .pan:
-        //update(self, &_pan,           to: property.value.streamId ?? 0, signal: \.pan)
-        willChangeValue(forKey: "pan")
-        _pan = property.value.streamId ?? 0
-        didChangeValue(forKey: "pan")
-      case .rate:           update(self, &_rate,          to: property.value.iValue,        signal: \.rate)
-      case .type:           break  // included to inhibit unknown token warnings
+      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
+      case .channel:      willChangeValue(for: \.channel)       ; _channel = property.value.iValue            ; didChangeValue(for: \.channel)
+      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
+      case .isActive:     willChangeValue(for: \.isActive)      ; _isActive = property.value.bValue           ; didChangeValue(for: \.isActive)
+      case .pan:          willChangeValue(for: \.pan)           ; _pan = property.value.streamId ?? 0         ; didChangeValue(for: \.pan)
+      case .rate:         willChangeValue(for: \.rate)          ; _rate = property.value.iValue               ; didChangeValue(for: \.rate)
+      case .type:         break  // included to inhibit unknown token warnings
+        
+//      case .clientHandle:   update(self, &_clientHandle,  to: property.value.handle ?? 0,   signal: \.clientHandle)
+//      case .channel:        update(self, &_channel,       to: property.value.iValue,        signal: \.channel)
+//      case .ip:             update(self, &_ip,            to: property.value,               signal: \.ip)
+//      case .isActive:       update(self, &_isActive,      to: property.value.bValue,        signal: \.isActive)
+//      case .pan:            update(self, &_pan,           to: property.value.streamId ?? 0, signal: \.pan)
+//      case .rate:           update(self, &_rate,          to: property.value.iValue,        signal: \.rate)
+//      case .type:           break  // included to inhibit unknown token warnings
       }
     }
     // is the Stream initialized?

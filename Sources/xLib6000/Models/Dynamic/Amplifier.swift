@@ -182,12 +182,12 @@ public final class Amplifier  : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
-      case .ant:          update(self, &_ant,           to: property.value,             signal: \.ant)
-      case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
-      case .model:        update(self, &_model,         to: property.value,             signal: \.model)
-      case .port:         update(self, &_port,          to: property.value.iValue,      signal: \.port)
-      case .serialNumber: update(self, &_serialNumber,  to: property.value,             signal: \.serialNumber)
-      case .state:        update(self, &_state,         to: property.value,             signal: \.state)
+      case .ant:          willChangeValue(for: \.ant)           ; _ant = property.value           ; didChangeValue(for: \.ant)
+      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value            ;  didChangeValue(for: \.ip)
+      case .model:        willChangeValue(for: \.model)         ; _model = property.value         ;didChangeValue(for: \.model)
+      case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue   ; didChangeValue(for: \.port)
+      case .serialNumber: willChangeValue(for: \.serialNumber)  ; _serialNumber = property.value  ; didChangeValue(for: \.serialNumber)
+      case .state:        willChangeValue(for: \.state)         ; _state = property.value         ; didChangeValue(for: \.state)
       }
     }
     // is the Amplifier initialized?

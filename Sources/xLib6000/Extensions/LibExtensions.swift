@@ -436,7 +436,7 @@ public struct Version {
   public var isV3m            : Bool    { major >= 3 }
   public var isV3             : Bool    { major == 2 && minor >= 5 || major >= 3 }
   public var isV2newApi       : Bool    { major == 2 && minor >= 5 }
-  public var isGreaterThan22  : Bool    { major >= 2 && minor >= 2 }
+  public var isGreaterThanV22 : Bool    { major >= 2 && minor >= 2 }
   public var isV2             : Bool    { major == 2 && minor < 5 }
   public var isV1             : Bool    { major == 1 }
   
@@ -551,8 +551,8 @@ struct BarrierClamped<Element: Comparable> {
 
 /// Function to change a value and signal KVO
 ///
-func update<S:NSObject, T>(_ object: S, _ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<S,T>) {
-  object.willChangeValue(for: keyPath)
-  property.pointee = value
-  object.didChangeValue(for: keyPath)
-}
+//func update<S:NSObject, T>(_ object: S, _ property: UnsafeMutablePointer<T>, to value: T, signal keyPath: KeyPath<S,T>) {
+//  object.willChangeValue(for: keyPath)
+//  property.pointee = value
+//  object.didChangeValue(for: keyPath)
+//}

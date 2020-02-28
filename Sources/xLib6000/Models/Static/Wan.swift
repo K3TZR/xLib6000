@@ -80,8 +80,11 @@ public final class Wan : NSObject, StaticModel {
       // Known tokens, in alphabetical order
       switch token {
         
-      case .serverConnected:    update(self, &_serverConnected,     to: property.value.bValue, signal: \.serverConnected)
-      case .radioAuthenticated: update(self, &_radioAuthenticated,  to: property.value.bValue, signal: \.radioAuthenticated)
+      case .serverConnected:    willChangeValue(for: \.serverConnected)     ; _serverConnected = property.value.bValue    ; didChangeValue(for: \.serverConnected)
+      case .radioAuthenticated: willChangeValue(for: \.radioAuthenticated)  ; _radioAuthenticated = property.value.bValue ; didChangeValue(for: \.radioAuthenticated)
+        
+//      case .serverConnected:    update(self, &_serverConnected,     to: property.value.bValue, signal: \.serverConnected)
+//      case .radioAuthenticated: update(self, &_radioAuthenticated,  to: property.value.bValue, signal: \.radioAuthenticated)
       }
     }
   }

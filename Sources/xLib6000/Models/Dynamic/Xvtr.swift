@@ -210,18 +210,30 @@ public final class Xvtr : NSObject, DynamicModel {
       }
       // Known keys, in alphabetical order
       switch token {
-        
-      case .name:         update(self, &_name,        to: property.value,         signal: \.name)
-      case .ifFrequency:  update(self, &_ifFrequency, to: property.value.mhzToHz, signal: \.ifFrequency)
-      case .isValid:      update(self, &_isValid,     to: property.value.bValue,  signal: \.isValid)
-      case .loError:      update(self, &_loError,     to: property.value.iValue,  signal: \.loError)
-      case .maxPower:     update(self, &_maxPower,    to: property.value.iValue,  signal: \.maxPower)
-      case .order:        update(self, &_order,       to: property.value.iValue,  signal: \.order)
-      case .preferred:    update(self, &_preferred,   to: property.value.bValue,  signal: \.preferred)
-      case .rfFrequency:  update(self, &_rfFrequency, to: property.value.mhzToHz, signal: \.rfFrequency)
-      case .rxGain:       update(self, &_rxGain,      to: property.value.iValue,  signal: \.rxGain)
-      case .rxOnly:       update(self, &_rxOnly,      to: property.value.bValue,  signal: \.rxOnly)
-      case .twoMeterInt:  update(self, &_twoMeterInt, to: property.value.iValue,  signal: \.twoMeterInt)
+
+        case .name:         willChangeValue(for: \.name)        ; _name = property.value                ; didChangeValue(for: \.name)
+        case .ifFrequency:  willChangeValue(for: \.ifFrequency) ; _ifFrequency = property.value.mhzToHz ; didChangeValue(for: \.ifFrequency)
+        case .isValid:      willChangeValue(for: \.isValid)     ; _isValid = property.value.bValue      ; didChangeValue(for: \.isValid)
+        case .loError:      willChangeValue(for: \.loError)     ; _loError = property.value.iValue      ; didChangeValue(for: \.loError)
+        case .maxPower:     willChangeValue(for: \.maxPower)    ; _maxPower = property.value.iValue     ; didChangeValue(for: \.maxPower)
+        case .order:        willChangeValue(for: \.order)       ; _order = property.value.iValue        ; didChangeValue(for: \.order)
+        case .preferred:    willChangeValue(for: \.preferred)   ; _preferred = property.value.bValue    ; didChangeValue(for: \.preferred)
+        case .rfFrequency:  willChangeValue(for: \.rfFrequency) ; _rfFrequency = property.value.mhzToHz ; didChangeValue(for: \.rfFrequency)
+        case .rxGain:       willChangeValue(for: \.rxGain)      ; _rxGain = property.value.iValue       ; didChangeValue(for: \.rxGain)
+        case .rxOnly:       willChangeValue(for: \.rxOnly)      ; _rxOnly = property.value.bValue       ; didChangeValue(for: \.rxOnly)
+        case .twoMeterInt:  willChangeValue(for: \.twoMeterInt) ; _twoMeterInt = property.value.iValue  ; didChangeValue(for: \.twoMeterInt)
+
+//      case .name:         update(self, &_name,        to: property.value,         signal: \.name)
+//      case .ifFrequency:  update(self, &_ifFrequency, to: property.value.mhzToHz, signal: \.ifFrequency)
+//      case .isValid:      update(self, &_isValid,     to: property.value.bValue,  signal: \.isValid)
+//      case .loError:      update(self, &_loError,     to: property.value.iValue,  signal: \.loError)
+//      case .maxPower:     update(self, &_maxPower,    to: property.value.iValue,  signal: \.maxPower)
+//      case .order:        update(self, &_order,       to: property.value.iValue,  signal: \.order)
+//      case .preferred:    update(self, &_preferred,   to: property.value.bValue,  signal: \.preferred)
+//      case .rfFrequency:  update(self, &_rfFrequency, to: property.value.mhzToHz, signal: \.rfFrequency)
+//      case .rxGain:       update(self, &_rxGain,      to: property.value.iValue,  signal: \.rxGain)
+//      case .rxOnly:       update(self, &_rxOnly,      to: property.value.bValue,  signal: \.rxOnly)
+//      case .twoMeterInt:  update(self, &_twoMeterInt, to: property.value.iValue,  signal: \.twoMeterInt)
       }
     }
     // is the waterfall initialized?

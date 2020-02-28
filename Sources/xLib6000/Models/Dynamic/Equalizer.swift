@@ -199,15 +199,25 @@ public final class Equalizer : NSObject, DynamicModel {
       // known Keys, in alphabetical order
       switch token {
         
-      case .level63Hz:    update(self, &_level63Hz,   to: property.value.iValue, signal: \.level63Hz)
-      case .level125Hz:   update(self, &_level125Hz,  to: property.value.iValue, signal: \.level125Hz)
-      case .level250Hz:   update(self, &_level250Hz,  to: property.value.iValue, signal: \.level250Hz)
-      case .level500Hz:   update(self, &_level500Hz,  to: property.value.iValue, signal: \.level500Hz)
-      case .level1000Hz:  update(self, &_level1000Hz, to: property.value.iValue, signal: \.level1000Hz)
-      case .level2000Hz:  update(self, &_level2000Hz, to: property.value.iValue, signal: \.level2000Hz)
-      case .level4000Hz:  update(self, &_level4000Hz, to: property.value.iValue, signal: \.level4000Hz)
-      case .level8000Hz:  update(self, &_level8000Hz, to: property.value.iValue, signal: \.level8000Hz)
-      case .enabled:      update(self, &_eqEnabled,   to: property.value.bValue, signal: \.eqEnabled)
+      case .level63Hz:    willChangeValue(for: \.level63Hz)   ; _level63Hz = property.value.iValue    ; didChangeValue(for: \.level63Hz)
+      case .level125Hz:   willChangeValue(for: \.level125Hz)  ; _level125Hz = property.value.iValue   ; didChangeValue(for: \.level125Hz)
+      case .level250Hz:   willChangeValue(for: \.level250Hz)  ; _level250Hz = property.value.iValue   ; didChangeValue(for: \.level250Hz)
+      case .level500Hz:   willChangeValue(for: \.level500Hz)  ; _level500Hz = property.value.iValue   ; didChangeValue(for: \.level500Hz)
+      case .level1000Hz:  willChangeValue(for: \.level1000Hz) ; _level1000Hz = property.value.iValue  ; didChangeValue(for: \.level1000Hz)
+      case .level2000Hz:  willChangeValue(for: \.level2000Hz) ; _level2000Hz = property.value.iValue  ; didChangeValue(for: \.level2000Hz)
+      case .level4000Hz:  willChangeValue(for: \.level4000Hz) ; _level4000Hz = property.value.iValue  ; didChangeValue(for: \.level4000Hz)
+      case .level8000Hz:  willChangeValue(for: \.level8000Hz) ; _level8000Hz = property.value.iValue  ; didChangeValue(for: \.level8000Hz)
+      case .enabled:      willChangeValue(for: \.eqEnabled)   ; _eqEnabled = property.value.bValue    ; didChangeValue(for: \.eqEnabled)
+
+//      case .level63Hz:    update(self, &_level63Hz,   to: property.value.iValue, signal: \.level63Hz)
+//      case .level125Hz:   update(self, &_level125Hz,  to: property.value.iValue, signal: \.level125Hz)
+//      case .level250Hz:   update(self, &_level250Hz,  to: property.value.iValue, signal: \.level250Hz)
+//      case .level500Hz:   update(self, &_level500Hz,  to: property.value.iValue, signal: \.level500Hz)
+//      case .level1000Hz:  update(self, &_level1000Hz, to: property.value.iValue, signal: \.level1000Hz)
+//      case .level2000Hz:  update(self, &_level2000Hz, to: property.value.iValue, signal: \.level2000Hz)
+//      case .level4000Hz:  update(self, &_level4000Hz, to: property.value.iValue, signal: \.level4000Hz)
+//      case .level8000Hz:  update(self, &_level8000Hz, to: property.value.iValue, signal: \.level8000Hz)
+//      case .enabled:      update(self, &_eqEnabled,   to: property.value.bValue, signal: \.eqEnabled)
       }
     }
     // is the Equalizer initialized?

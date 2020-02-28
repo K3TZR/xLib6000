@@ -195,17 +195,29 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .available:    update(self, &_available,     to: property.value.iValue,        signal: \.available)
-      case .capacity:     update(self, &_capacity,      to: property.value.iValue,        signal: \.capacity)
-      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0,   signal: \.clientHandle)
-      case .daxIqChannel: update(self, &_daxIqChannel,  to: property.value.iValue,        signal: \.daxIqChannel)
-      case .daxIqRate:    update(self, &_rate,          to: property.value.iValue,        signal: \.rate)
+      case .available:    willChangeValue(for: \.available)     ; _available = property.value.iValue          ; didChangeValue(for: \.available)
+      case .capacity:     willChangeValue(for: \.capacity)      ; _capacity = property.value.iValue           ; didChangeValue(for: \.capacity)
+      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
+      case .daxIqChannel: willChangeValue(for: \.daxIqChannel)  ; _daxIqChannel = property.value.iValue       ; didChangeValue(for: \.daxIqChannel)
+      case .daxIqRate:    willChangeValue(for: \.rate)          ; _rate = property.value.iValue               ; didChangeValue(for: \.rate)
       case .inUse:        break   // included to inhibit unknown token warnings
-      case .ip:           update(self, &_ip,            to: property.value,               signal: \.ip)
-      case .pan:          update(self, &_pan,           to: property.value.streamId ?? 0, signal: \.pan)
-      case .port:         update(self, &_port,          to: property.value.iValue,        signal: \.port)
-      case .rate:         update(self, &_rate,          to: property.value.iValue,        signal: \.rate)
-      case .streaming:    update(self, &_streaming,     to: property.value.bValue,        signal: \.streaming)
+      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
+      case .pan:          willChangeValue(for: \.pan)           ; _pan = property.value.streamId ?? 0         ; didChangeValue(for: \.pan)
+      case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue               ; didChangeValue(for: \.port)
+      case .rate:         willChangeValue(for: \.rate)          ; _rate = property.value.iValue               ; didChangeValue(for: \.rate)
+      case .streaming:    willChangeValue(for: \.streaming)     ; _streaming = property.value.bValue          ; didChangeValue(for: \.streaming)
+        
+//      case .available:    update(self, &_available,     to: property.value.iValue,        signal: \.available)
+//      case .capacity:     update(self, &_capacity,      to: property.value.iValue,        signal: \.capacity)
+//      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0,   signal: \.clientHandle)
+//      case .daxIqChannel: update(self, &_daxIqChannel,  to: property.value.iValue,        signal: \.daxIqChannel)
+//      case .daxIqRate:    update(self, &_rate,          to: property.value.iValue,        signal: \.rate)
+//      case .inUse:        break   // included to inhibit unknown token warnings
+//      case .ip:           update(self, &_ip,            to: property.value,               signal: \.ip)
+//      case .pan:          update(self, &_pan,           to: property.value.streamId ?? 0, signal: \.pan)
+//      case .port:         update(self, &_port,          to: property.value.iValue,        signal: \.port)
+//      case .rate:         update(self, &_rate,          to: property.value.iValue,        signal: \.rate)
+//      case .streaming:    update(self, &_streaming,     to: property.value.bValue,        signal: \.streaming)
       }
     }
     // is the Stream initialized?

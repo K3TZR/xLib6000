@@ -185,7 +185,10 @@ extension Radio {
     if Api.sharedInstance.isGui { return }
     
     sendCommand("client bind client_id=" + clientId, replyTo: callback)
-    update(self, &_boundClientId, to: clientId, signal: \.boundClientId)
+
+    willChangeValue(for: \.boundClientId) ; _boundClientId = clientId ; didChangeValue(for: \.boundClientId)
+
+//    update(self, &_boundClientId, to: clientId, signal: \.boundClientId)
   }
   
   // ----------------------------------------------------------------------------
@@ -336,11 +339,11 @@ extension Radio {
   ///   - dimensions:         Panafall dimensions
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestPanadapter(_ dimensions: CGSize, callback: ReplyHandler? = nil) {
-    
+  public func requestPanadapter(_ dimensions: CGSize = CGSize(width: 100, height: 100), callback: ReplyHandler? = nil) {
+
     // tell the Radio to create a Panafall (if any available)
     if availablePanadapters > 0 {
-      sendCommand("display pan create x=\(dimensions.width) y=\(dimensions.height)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+      sendCommand("display panafall create x=\(dimensions.width) y=\(dimensions.height)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
     }
   }
   /// Create a Panafall
@@ -351,17 +354,17 @@ extension Radio {
   ///   - dimensions:         Panafall dimensions
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestPanadapter(frequency: Hz, antenna: String? = nil, dimensions: CGSize? = nil, callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to create a Panafall (if any available)
-    if availablePanadapters > 0 {
-      
-      var cmd = "display pan create freq" + "=\(frequency.hzToMhz)"
-      if antenna != nil { cmd += " ant=" + "\(antenna!)" }
-      if dimensions != nil { cmd += " x" + "=\(dimensions!.width)" + " y" + "=\(dimensions!.height)" }
-      sendCommand(cmd, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
-    }
-  }
+//  public func requestPanadapter(frequency: Hz, antenna: String? = nil, dimensions: CGSize? = nil, callback: ReplyHandler? = nil) {
+//
+//    // tell the Radio to create a Panafall (if any available)
+//    if availablePanadapters > 0 {
+//
+//      var cmd = "display pan create freq" + "=\(frequency.hzToMhz)"
+//      if antenna != nil { cmd += " ant=" + "\(antenna!)" }
+//      if dimensions != nil { cmd += " x" + "=\(dimensions!.width)" + " y" + "=\(dimensions!.height)" }
+//      sendCommand(cmd, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+//    }
+//  }
   /// Find the active Panadapter
   ///
   /// - Returns:      a reference to a Panadapter (or nil)
@@ -415,7 +418,7 @@ extension Radio {
     sendCommand("sub usb_cable all")
     sendCommand("sub tnf all")
     
-    if version.isV3Api { sendCommand("sub client all") }
+    if version.isV3 { sendCommand("sub client all") }
     
     //      send("sub spot all")    // TODO:
   }

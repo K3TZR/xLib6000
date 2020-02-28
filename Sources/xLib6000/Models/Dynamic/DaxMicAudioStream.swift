@@ -159,10 +159,14 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
       }
       // known keys, in alphabetical order
       switch token {
-        
-      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
-      case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
-      case .type:         break  // included to inhibit unknown token warnings
+
+        case .clientHandle: willChangeValue(for: \.clientHandle) ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
+        case .ip:           willChangeValue(for: \.ip)           ; _ip = property.value                        ; didChangeValue(for: \.ip)
+        case .type:         break  // included to inhibit unknown token warnings
+
+//      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
+//      case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
+//      case .type:         break  // included to inhibit unknown token warnings
       }
     }
     // is the AudioStream acknowledged by the radio?
