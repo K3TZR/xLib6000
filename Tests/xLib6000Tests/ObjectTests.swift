@@ -3,7 +3,7 @@ import XCTest
 
 final class ObjectTests: XCTestCase {
   let showInfoMessages = true
-
+  
   // Helper functions
   func discoverRadio(logState: Api.NSLogging = .normal) -> Radio? {
     let discovery = Discovery.sharedInstance
@@ -19,11 +19,11 @@ final class ObjectTests: XCTestCase {
         
         return Api.sharedInstance.radio
       } else {
-        XCTFail("***** Failed to connect to Radio\n")
+        XCTFail("***** Failed to connect to Radio\n", file: #function)
         return nil
       }
     } else {
-      XCTFail("***** No Radio(s) found\n")
+      XCTFail("***** No Radio(s) found\n", file: #function)
       return nil
     }
   }
@@ -52,13 +52,13 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** AMPLIFIER created") }
       
-      XCTAssertEqual(object.id, "0x12345678".handle!)
-      XCTAssertEqual(object.ant, "ANT1", "ant")
-      XCTAssertEqual(object.ip, "10.0.1.106")
-      XCTAssertEqual(object.model, "PGXL")
-      XCTAssertEqual(object.port, 4123)
-      XCTAssertEqual(object.serialNumber, "1234-5678-9012")
-      XCTAssertEqual(object.state, "STANDBY")
+      XCTAssertEqual(object.id, "0x12345678".handle!, file: #function)
+      XCTAssertEqual(object.ant, "ANT1", "ant", file: #function)
+      XCTAssertEqual(object.ip, "10.0.1.106", file: #function)
+      XCTAssertEqual(object.model, "PGXL", file: #function)
+      XCTAssertEqual(object.port, 4123, file: #function)
+      XCTAssertEqual(object.serialNumber, "1234-5678-9012", file: #function)
+      XCTAssertEqual(object.state, "STANDBY", file: #function)
       
       if showInfoMessages { Swift.print("***** AMPLIFIER Parameters verified") }
       
@@ -71,13 +71,13 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** AMPLIFIER Parameters modified") }
       
-      XCTAssertEqual(object.id, "0x12345678".handle!)
-      XCTAssertEqual(object.ant, "ANT2")
-      XCTAssertEqual(object.ip, "11.1.217")
-      XCTAssertEqual(object.model, "QIYM")
-      XCTAssertEqual(object.port, 3214)
-      XCTAssertEqual(object.serialNumber, "2109-8765-4321")
-      XCTAssertEqual(object.state, "IDLE")
+      XCTAssertEqual(object.id, "0x12345678".handle!, file: #function)
+      XCTAssertEqual(object.ant, "ANT2", file: #function)
+      XCTAssertEqual(object.ip, "11.1.217", file: #function)
+      XCTAssertEqual(object.model, "QIYM", file: #function)
+      XCTAssertEqual(object.port, 3214, file: #function)
+      XCTAssertEqual(object.serialNumber, "2109-8765-4321", file: #function)
+      XCTAssertEqual(object.state, "IDLE", file: #function)
       
       if showInfoMessages { Swift.print("***** Modified AMPLIFIER parameters verified") }
       
@@ -99,7 +99,7 @@ final class ObjectTests: XCTestCase {
   
   private var equalizerRxStatus = "rxsc mode=0 63Hz=0 125Hz=10 250Hz=20 500Hz=30 1000Hz=-10 2000Hz=-20 4000Hz=-30 8000Hz=-40"
   private var equalizerTxStatus = "txsc mode=0 63Hz=0 125Hz=10 250Hz=20 500Hz=30 1000Hz=-10 2000Hz=-20 4000Hz=-30 8000Hz=-40"
-
+  
   func testEqualizerRxParse() {
     
     Swift.print("\n***** \(#function)")
@@ -130,20 +130,20 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** \(type.rawValue) EQUALIZER exists") }
       
-      XCTAssertEqual(object.eqEnabled, false, "eqEnabled")
-      XCTAssertEqual(object.level63Hz, 0, "level63Hz")
-      XCTAssertEqual(object.level125Hz, 10, "level125Hz")
-      XCTAssertEqual(object.level250Hz, 20, "level250Hz")
-      XCTAssertEqual(object.level500Hz, 30, "level500Hz")
-      XCTAssertEqual(object.level1000Hz, -10, "level1000Hz")
-      XCTAssertEqual(object.level2000Hz, -20, "level2000Hz")
-      XCTAssertEqual(object.level4000Hz, -30, "level4000Hz")
-      XCTAssertEqual(object.level8000Hz, -40, "level8000Hz")
+      XCTAssertEqual(object.eqEnabled, false, "eqEnabled", file: #function)
+      XCTAssertEqual(object.level63Hz, 0, "level63Hz", file: #function)
+      XCTAssertEqual(object.level125Hz, 10, "level125Hz", file: #function)
+      XCTAssertEqual(object.level250Hz, 20, "level250Hz", file: #function)
+      XCTAssertEqual(object.level500Hz, 30, "level500Hz", file: #function)
+      XCTAssertEqual(object.level1000Hz, -10, "level1000Hz", file: #function)
+      XCTAssertEqual(object.level2000Hz, -20, "level2000Hz", file: #function)
+      XCTAssertEqual(object.level4000Hz, -30, "level4000Hz", file: #function)
+      XCTAssertEqual(object.level8000Hz, -40, "level8000Hz", file: #function)
       
       if showInfoMessages { Swift.print("***** Modified \(type.rawValue) EQUALIZER parameters verified\n") }
       
     } else {
-      XCTFail("***** \(type.rawValue) EQUALIZER does NOT exist *****")
+      XCTFail("***** \(type.rawValue) EQUALIZER does NOT exist *****", file: #function)
     }
     disconnect()
   }
@@ -182,15 +182,15 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** \(type.rawValue) EQUALIZER Parameters modified") }
       
-      XCTAssertEqual(object.eqEnabled, true, "eqEnabled")
-      XCTAssertEqual(object.level63Hz, 10, "level63Hz")
-      XCTAssertEqual(object.level125Hz, -10, "level125Hz")
-      XCTAssertEqual(object.level250Hz, 15, "level250Hz")
-      XCTAssertEqual(object.level500Hz, -20, "level500Hz")
-      XCTAssertEqual(object.level1000Hz, 30, "level1000Hz")
-      XCTAssertEqual(object.level2000Hz, -30, "level2000Hz")
-      XCTAssertEqual(object.level4000Hz, 40, "level4000Hz")
-      XCTAssertEqual(object.level8000Hz, -35, "level8000Hz")
+      XCTAssertEqual(object.eqEnabled, true, "eqEnabled", file: #function)
+      XCTAssertEqual(object.level63Hz, 10, "level63Hz", file: #function)
+      XCTAssertEqual(object.level125Hz, -10, "level125Hz", file: #function)
+      XCTAssertEqual(object.level250Hz, 15, "level250Hz", file: #function)
+      XCTAssertEqual(object.level500Hz, -20, "level500Hz", file: #function)
+      XCTAssertEqual(object.level1000Hz, 30, "level1000Hz", file: #function)
+      XCTAssertEqual(object.level2000Hz, -30, "level2000Hz", file: #function)
+      XCTAssertEqual(object.level4000Hz, 40, "level4000Hz", file: #function)
+      XCTAssertEqual(object.level8000Hz, -35, "level8000Hz", file: #function)
       
       if showInfoMessages { Swift.print("***** Modified \(type.rawValue) EQUALIZER parameters verified") }
       
@@ -206,20 +206,20 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** \(type.rawValue) EQUALIZER Parameters zeroed") }
       
-      XCTAssertEqual(object.eqEnabled, false, "eqEnabled")
-      XCTAssertEqual(object.level63Hz, 0, "level63Hz")
-      XCTAssertEqual(object.level125Hz, 0, "level125Hz")
-      XCTAssertEqual(object.level250Hz, 0, "level250Hz")
-      XCTAssertEqual(object.level500Hz, 0, "level500Hz")
-      XCTAssertEqual(object.level1000Hz, 0, "level1000Hz")
-      XCTAssertEqual(object.level2000Hz, 0, "level2000Hz")
-      XCTAssertEqual(object.level4000Hz, 0, "level4000Hz")
-      XCTAssertEqual(object.level8000Hz, 0, "level8000Hz")
+      XCTAssertEqual(object.eqEnabled, false, "eqEnabled", file: #function)
+      XCTAssertEqual(object.level63Hz, 0, "level63Hz", file: #function)
+      XCTAssertEqual(object.level125Hz, 0, "level125Hz", file: #function)
+      XCTAssertEqual(object.level250Hz, 0, "level250Hz", file: #function)
+      XCTAssertEqual(object.level500Hz, 0, "level500Hz", file: #function)
+      XCTAssertEqual(object.level1000Hz, 0, "level1000Hz", file: #function)
+      XCTAssertEqual(object.level2000Hz, 0, "level2000Hz", file: #function)
+      XCTAssertEqual(object.level4000Hz, 0, "level4000Hz", file: #function)
+      XCTAssertEqual(object.level8000Hz, 0, "level8000Hz", file: #function)
       
       if showInfoMessages { Swift.print("***** Zeroed \(type.rawValue) EQUALIZER parameters verified") }
       
     } else {
-      XCTFail("***** \(type.rawValue) EQUALIZER does NOT exist *****")
+      XCTFail("***** \(type.rawValue) EQUALIZER does NOT exist *****", file: #function)
     }
     disconnect()
   }
@@ -242,26 +242,26 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** MEMORY created") }
       
-      XCTAssertEqual(object.owner, "K3TZR", "owner")
-      XCTAssertEqual(object.group, "", "Group")
-      XCTAssertEqual(object.frequency, 14_100_000, "frequency")
-      XCTAssertEqual(object.name, "", "name")
-      XCTAssertEqual(object.mode, "USB", "mode")
-      XCTAssertEqual(object.step, 100, "step")
-      XCTAssertEqual(object.offsetDirection, "SIMPLEX", "offsetDirection")
-      XCTAssertEqual(object.offset, 0, "offset")
-      XCTAssertEqual(object.toneMode, "OFF", "toneMode")
-      XCTAssertEqual(object.toneValue, 67.0, "toneValue")
-      XCTAssertEqual(object.filterLow, 100, "filterLow")
-      XCTAssertEqual(object.filterHigh, 2_900, "filterHigh")
-      XCTAssertEqual(object.highlight, false, "highlight")
-      XCTAssertEqual(object.highlightColor, "0x00000000".streamId, "highlightColor")
-      XCTAssertEqual(object.squelchEnabled, true, "squelchEnabled")
-      XCTAssertEqual(object.squelchLevel, 20, "squelchLevel")
-      XCTAssertEqual(object.rttyMark, 2, "rttyMark")
-      XCTAssertEqual(object.rttyShift, 170, "rttyShift")
-      XCTAssertEqual(object.digitalLowerOffset, 2210, "digitalLowerOffset")
-      XCTAssertEqual(object.digitalUpperOffset, 1500, "digitalUpperOffset")
+      XCTAssertEqual(object.owner, "K3TZR", "owner", file: #function)
+      XCTAssertEqual(object.group, "", "Group", file: #function)
+      XCTAssertEqual(object.frequency, 14_100_000, "frequency", file: #function)
+      XCTAssertEqual(object.name, "", "name", file: #function)
+      XCTAssertEqual(object.mode, "USB", "mode", file: #function)
+      XCTAssertEqual(object.step, 100, "step", file: #function)
+      XCTAssertEqual(object.offsetDirection, "SIMPLEX", "offsetDirection", file: #function)
+      XCTAssertEqual(object.offset, 0, "offset", file: #function)
+      XCTAssertEqual(object.toneMode, "OFF", "toneMode", file: #function)
+      XCTAssertEqual(object.toneValue, 67.0, "toneValue", file: #function)
+      XCTAssertEqual(object.filterLow, 100, "filterLow", file: #function)
+      XCTAssertEqual(object.filterHigh, 2_900, "filterHigh", file: #function)
+      XCTAssertEqual(object.highlight, false, "highlight", file: #function)
+      XCTAssertEqual(object.highlightColor, "0x00000000".streamId, "highlightColor", file: #function)
+      XCTAssertEqual(object.squelchEnabled, true, "squelchEnabled", file: #function)
+      XCTAssertEqual(object.squelchLevel, 20, "squelchLevel", file: #function)
+      XCTAssertEqual(object.rttyMark, 2, "rttyMark", file: #function)
+      XCTAssertEqual(object.rttyShift, 170, "rttyShift", file: #function)
+      XCTAssertEqual(object.digitalLowerOffset, 2210, "digitalLowerOffset", file: #function)
+      XCTAssertEqual(object.digitalUpperOffset, 1500, "digitalUpperOffset", file: #function)
       
       if showInfoMessages { Swift.print("***** MEMORY Parameters verified") }
       
@@ -288,31 +288,31 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** MEMORY Parameters modified") }
       
-      XCTAssertEqual(object.owner, "DL3LSM", "owner")
-      XCTAssertEqual(object.group, "X", "group")
-      XCTAssertEqual(object.frequency, 7_125_000, "frequency")
-      XCTAssertEqual(object.name, "40", "name")
-      XCTAssertEqual(object.mode, "LSB", "mode")
-      XCTAssertEqual(object.step, 212, "step")
-      XCTAssertEqual(object.offsetDirection, "UP", "offsetDirection")
-      XCTAssertEqual(object.offset, 10, "offset")
-      XCTAssertEqual(object.toneMode, "ON", "toneMode")
-      XCTAssertEqual(object.toneValue, 76.0, "toneValue")
-      XCTAssertEqual(object.filterLow, 200, "filterLow")
-      XCTAssertEqual(object.filterHigh, 3_000, "filterHigh")
-      XCTAssertEqual(object.highlight, true, "highlight")
-      XCTAssertEqual(object.highlightColor, "0x01010101".streamId, "highlightColor")
-      XCTAssertEqual(object.squelchEnabled, false, "squelchEnabled")
-      XCTAssertEqual(object.squelchLevel, 19, "squelchLevel")
-      XCTAssertEqual(object.rttyMark, 3, "rttyMark")
-      XCTAssertEqual(object.rttyShift, 269, "rttyShift")
-      XCTAssertEqual(object.digitalLowerOffset, 3321, "digitalLowerOffset")
-      XCTAssertEqual(object.digitalUpperOffset, 2612, "digitalUpperOffset")
+      XCTAssertEqual(object.owner, "DL3LSM", "owner", file: #function)
+      XCTAssertEqual(object.group, "X", "group", file: #function)
+      XCTAssertEqual(object.frequency, 7_125_000, "frequency", file: #function)
+      XCTAssertEqual(object.name, "40", "name", file: #function)
+      XCTAssertEqual(object.mode, "LSB", "mode", file: #function)
+      XCTAssertEqual(object.step, 212, "step", file: #function)
+      XCTAssertEqual(object.offsetDirection, "UP", "offsetDirection", file: #function)
+      XCTAssertEqual(object.offset, 10, "offset", file: #function)
+      XCTAssertEqual(object.toneMode, "ON", "toneMode", file: #function)
+      XCTAssertEqual(object.toneValue, 76.0, "toneValue", file: #function)
+      XCTAssertEqual(object.filterLow, 200, "filterLow", file: #function)
+      XCTAssertEqual(object.filterHigh, 3_000, "filterHigh", file: #function)
+      XCTAssertEqual(object.highlight, true, "highlight", file: #function)
+      XCTAssertEqual(object.highlightColor, "0x01010101".streamId, "highlightColor", file: #function)
+      XCTAssertEqual(object.squelchEnabled, false, "squelchEnabled", file: #function)
+      XCTAssertEqual(object.squelchLevel, 19, "squelchLevel", file: #function)
+      XCTAssertEqual(object.rttyMark, 3, "rttyMark", file: #function)
+      XCTAssertEqual(object.rttyShift, 269, "rttyShift", file: #function)
+      XCTAssertEqual(object.digitalLowerOffset, 3321, "digitalLowerOffset", file: #function)
+      XCTAssertEqual(object.digitalUpperOffset, 2612, "digitalUpperOffset", file: #function)
       
       if showInfoMessages { Swift.print("***** Modified MEMORY parameters verified") }
       
     } else {
-      XCTFail("***** MEMORY NOT created")
+      XCTFail("***** MEMORY NOT created", file: #function)
     }
     disconnect()
   }
@@ -387,26 +387,26 @@ final class ObjectTests: XCTestCase {
                 
                 let id = object.id
                 
-                XCTAssertEqual(object.owner, owner, "owner")
-                XCTAssertEqual(object.group, group, "Group")
-                XCTAssertEqual(object.frequency, frequency, "frequency")
-                XCTAssertEqual(object.name, name, "name")
-                XCTAssertEqual(object.mode, mode, "mode")
-                XCTAssertEqual(object.step, step, "step")
-                XCTAssertEqual(object.offsetDirection, offsetDirection, "offsetDirection")
-                XCTAssertEqual(object.offset, offset, "offset")
-                XCTAssertEqual(object.toneMode, toneMode, "toneMode")
-                XCTAssertEqual(object.toneValue, toneValue, "toneValue")
-                XCTAssertEqual(object.filterLow, filterLow, "filterLow")
-                XCTAssertEqual(object.filterHigh, filterHigh, "filterHigh")
-                XCTAssertEqual(object.highlight, highlight, "highlight")
-                XCTAssertEqual(object.highlightColor, highlightColor, "highlightColor")
-                XCTAssertEqual(object.squelchEnabled, squelchEnabled, "squelchEnabled")
-                XCTAssertEqual(object.squelchLevel, squelchLevel, "squelchLevel")
-                XCTAssertEqual(object.rttyMark, rttyMark, "rttyMark")
-                XCTAssertEqual(object.rttyShift, rttyShift, "rttyShift")
-                XCTAssertEqual(object.digitalLowerOffset, digitalLowerOffset, "digitalLowerOffset")
-                XCTAssertEqual(object.digitalUpperOffset, digitalUpperOffset, "digitalUpperOffset")
+                XCTAssertEqual(object.owner, owner, "owner", file: #function)
+                XCTAssertEqual(object.group, group, "Group", file: #function)
+                XCTAssertEqual(object.frequency, frequency, "frequency", file: #function)
+                XCTAssertEqual(object.name, name, "name", file: #function)
+                XCTAssertEqual(object.mode, mode, "mode", file: #function)
+                XCTAssertEqual(object.step, step, "step", file: #function)
+                XCTAssertEqual(object.offsetDirection, offsetDirection, "offsetDirection", file: #function)
+                XCTAssertEqual(object.offset, offset, "offset", file: #function)
+                XCTAssertEqual(object.toneMode, toneMode, "toneMode", file: #function)
+                XCTAssertEqual(object.toneValue, toneValue, "toneValue", file: #function)
+                XCTAssertEqual(object.filterLow, filterLow, "filterLow", file: #function)
+                XCTAssertEqual(object.filterHigh, filterHigh, "filterHigh", file: #function)
+                XCTAssertEqual(object.highlight, highlight, "highlight", file: #function)
+                XCTAssertEqual(object.highlightColor, highlightColor, "highlightColor", file: #function)
+                XCTAssertEqual(object.squelchEnabled, squelchEnabled, "squelchEnabled", file: #function)
+                XCTAssertEqual(object.squelchLevel, squelchLevel, "squelchLevel", file: #function)
+                XCTAssertEqual(object.rttyMark, rttyMark, "rttyMark", file: #function)
+                XCTAssertEqual(object.rttyShift, rttyShift, "rttyShift", file: #function)
+                XCTAssertEqual(object.digitalLowerOffset, digitalLowerOffset, "digitalLowerOffset", file: #function)
+                XCTAssertEqual(object.digitalUpperOffset, digitalUpperOffset, "digitalUpperOffset", file: #function)
                 
                 if showInfoMessages { Swift.print("***** 2nd MEMORY parameters verified") }
                 
@@ -433,26 +433,26 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd MEMORY parameters modified") }
                 
-                XCTAssertEqual(object.owner, "DL3LSM", "owner")
-                XCTAssertEqual(object.group, "X", "group")
-                XCTAssertEqual(object.frequency, 7_125_000, "frequency")
-                XCTAssertEqual(object.name, "40", "name")
-                XCTAssertEqual(object.mode, "LSB", "mode")
-                XCTAssertEqual(object.step, 212, "step")
-                XCTAssertEqual(object.offsetDirection, "UP", "offsetDirection")
-                XCTAssertEqual(object.offset, 10, "offset")
-                XCTAssertEqual(object.toneMode, "ON", "toneMode")
-                XCTAssertEqual(object.toneValue, 76.0, "toneValue")
-                XCTAssertEqual(object.filterLow, 200, "filterLow")
-                XCTAssertEqual(object.filterHigh, 3_000, "filterHigh")
-                XCTAssertEqual(object.highlight, true, "highlight")
-                XCTAssertEqual(object.highlightColor, "0x01010101".streamId, "highlightColor")
-                XCTAssertEqual(object.squelchEnabled, false, "squelchEnabled")
-                XCTAssertEqual(object.squelchLevel, 19, "squelchLevel")
-                XCTAssertEqual(object.rttyMark, 3, "rttyMark")
-                XCTAssertEqual(object.rttyShift, 269, "rttyShift")
-                XCTAssertEqual(object.digitalLowerOffset, 3321, "digitalLowerOffset")
-                XCTAssertEqual(object.digitalUpperOffset, 2612, "digitalUpperOffset")
+                XCTAssertEqual(object.owner, "DL3LSM", "owner", file: #function)
+                XCTAssertEqual(object.group, "X", "group", file: #function)
+                XCTAssertEqual(object.frequency, 7_125_000, "frequency", file: #function)
+                XCTAssertEqual(object.name, "40", "name", file: #function)
+                XCTAssertEqual(object.mode, "LSB", "mode", file: #function)
+                XCTAssertEqual(object.step, 212, "step", file: #function)
+                XCTAssertEqual(object.offsetDirection, "UP", "offsetDirection", file: #function)
+                XCTAssertEqual(object.offset, 10, "offset", file: #function)
+                XCTAssertEqual(object.toneMode, "ON", "toneMode", file: #function)
+                XCTAssertEqual(object.toneValue, 76.0, "toneValue", file: #function)
+                XCTAssertEqual(object.filterLow, 200, "filterLow", file: #function)
+                XCTAssertEqual(object.filterHigh, 3_000, "filterHigh", file: #function)
+                XCTAssertEqual(object.highlight, true, "highlight", file: #function)
+                XCTAssertEqual(object.highlightColor, "0x01010101".streamId, "highlightColor", file: #function)
+                XCTAssertEqual(object.squelchEnabled, false, "squelchEnabled", file: #function)
+                XCTAssertEqual(object.squelchLevel, 19, "squelchLevel", file: #function)
+                XCTAssertEqual(object.rttyMark, 3, "rttyMark", file: #function)
+                XCTAssertEqual(object.rttyShift, 269, "rttyShift", file: #function)
+                XCTAssertEqual(object.digitalLowerOffset, 3321, "digitalLowerOffset", file: #function)
+                XCTAssertEqual(object.digitalUpperOffset, 2612, "digitalUpperOffset", file: #function)
                 
                 if showInfoMessages { Swift.print("***** 2nd MEMORY modified parameters verified") }
                 
@@ -464,25 +464,25 @@ final class ObjectTests: XCTestCase {
                   if showInfoMessages { Swift.print("***** 2nd MEMORY removed") }
                   
                 } else {
-                  XCTFail("***** 2nd MEMORY NOT removed ****")
+                  XCTFail("***** 2nd MEMORY NOT removed ****", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd MEMORY NOT found ****")
+                XCTFail("***** 2nd MEMORY NOT found ****", file: #function)
               }
             } else {
-              XCTFail("***** 2nd MEMORY NOT created ****")
+              XCTFail("***** 2nd MEMORY NOT created ****", file: #function)
             }
           } else {
-            XCTFail("***** 1st MEMORY NOT removed ****")
+            XCTFail("***** 1st MEMORY NOT removed ****", file: #function)
           }
         } else {
-          XCTFail("***** 1st MEMORY NOT found ****")
+          XCTFail("***** 1st MEMORY NOT found ****", file: #function)
         }
       } else {
-        XCTFail("***** 1st MEMORY NOT created ****")
+        XCTFail("***** 1st MEMORY NOT created ****", file: #function)
       }      
     } else {
-      XCTFail("***** Existing MEMORY(s) NOT removed ****")
+      XCTFail("***** Existing MEMORY(s) NOT removed ****", file: #function)
     }
     disconnect()
   }
@@ -504,34 +504,34 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** METER created") }
       
-      XCTAssertEqual(object.source, "cod-", "source")
-      XCTAssertEqual(object.name, "micpeak", "name")
-      XCTAssertEqual(object.low, -150.0, "low")
-      XCTAssertEqual(object.high, 20.0, "high")
-      XCTAssertEqual(object.desc, "Signal strength of MIC output in CODEC", "desc")
-      XCTAssertEqual(object.units, "dbfs", "units")
-      XCTAssertEqual(object.fps, 40, "fps")
+      XCTAssertEqual(object.source, "cod-", "source", file: #function)
+      XCTAssertEqual(object.name, "micpeak", "name", file: #function)
+      XCTAssertEqual(object.low, -150.0, "low", file: #function)
+      XCTAssertEqual(object.high, 20.0, "high", file: #function)
+      XCTAssertEqual(object.desc, "Signal strength of MIC output in CODEC", "desc", file: #function)
+      XCTAssertEqual(object.units, "dbfs", "units", file: #function)
+      XCTAssertEqual(object.fps, 40, "fps", file: #function)
       
       if showInfoMessages { Swift.print("***** METER Parameters verified") }
       
     } else {
-      XCTFail("***** Meter NOT created ****")
+      XCTFail("***** Meter NOT created ****", file: #function)
     }
     disconnect()
   }
   
   // ------------------------------------------------------------------------------
   // MARK: - Panadapter
-    
+  
   func removeAllPanadapters(radio: Radio) {
     
     // find the Panadapters
     for (_, panadapter) in radio.panadapters {
       // remove any Slices on this panadapter
-      for (_, slice) in radio.slices where slice.panadapterId == panadapter.id {
-        slice.remove()
-        sleep(1)
-      }
+//      for (_, slice) in radio.slices where slice.panadapterId == panadapter.id {
+//        slice.remove()
+//        sleep(1)
+//      }
       // remove the Panadapter (which removes the Waterfall)
       panadapter.remove()
       sleep(1)
@@ -541,16 +541,17 @@ final class ObjectTests: XCTestCase {
       
       radio.panadapters.forEach { Swift.print("Remaining Panadapter id = \($0.value.id.hex)") }
       
-      XCTFail("***** Panadapter object(s) NOT removed *****")
+      XCTFail("***** Panadapter object(s) NOT removed *****", file: #function)
     }
-    if radio.slices.count != 0 { XCTFail("***** Slice object(s) NOT removed *****") }
+    if radio.slices.count != 0 { XCTFail("***** Slice object(s) NOT removed *****", file: #function) }
   }
+  
   private let panadapterStatus = "pan 0x40000001 wnb=0 wnb_level=92 wnb_updating=0 band_zoom=0 segment_zoom=0 x_pixels=50 y_pixels=100 center=14.100000 bandwidth=0.200000 min_dbm=-125.00 max_dbm=-40.00 fps=25 average=23 weighted_average=0 rfgain=50 rxant=ANT1 wide=0 loopa=0 loopb=1 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 waterfall=42000000 min_bw=0.004920 max_bw=14.745601 xvtr= pre= ant_list=ANT1,ANT2,RX_A,XVTR"
-
+  
   func testPanadapterParse() {
     let type = "Panadapter"
     let id = panadapterStatus.components(separatedBy: " ")[1].streamId!
-
+    
     Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Waterfall.swift"]))
@@ -561,7 +562,7 @@ final class ObjectTests: XCTestCase {
     Panadapter.parseStatus(radio!, panadapterStatus.keyValuesArray(), true)
     
     if let panadapter = radio!.panadapters[id] {
-
+      
       XCTAssertEqual(panadapter.wnbLevel, 92, file: #function)
       XCTAssertEqual(panadapter.wnbUpdating, false, file: #function)
       XCTAssertEqual(panadapter.bandZoomEnabled, false, file: #function)
@@ -602,28 +603,30 @@ final class ObjectTests: XCTestCase {
     Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Waterfall.swift"]))
-    guard radio != nil else { return }
+    guard radio != nil else { disconnect() ; return }
     
-    if showInfoMessages { Swift.print("***** Remove existing \(type)(s)") }
-          
-    removeAllPanadapters(radio: radio!)
+    if showInfoMessages { Swift.print("\n***** Remove existing \(type)(s)") }
+    
+    //    removeAllPanadapters(radio: radio!)
+    radio!.panadapters.forEach { $0.value.remove() ; sleep(1)}
+//    sleep(1)
     if radio!.panadapters.count == 0 {
       
-      if showInfoMessages { Swift.print("***** Existing \(type)(s) removal confirmed") }
-            
-      if showInfoMessages { Swift.print("***** Request 1st \(type)") }
+      if showInfoMessages { Swift.print("***** Existing \(type)(s) removal confirmed\n") }
       
-      radio!.requestPanadapter(frequency: 15_000_000)
+      if showInfoMessages { Swift.print("\n***** Request 1st \(type)") }
+      
+      radio!.requestPanadapter()
       sleep(1)
       // verify added
       if radio!.panadapters.count == 1 {
         if let object = radio!.panadapters.first?.value {
           
-          if showInfoMessages { Swift.print("***** 1st \(type) created") }
+          if showInfoMessages { Swift.print("***** 1st \(type) created\n") }
           
-          let id = object.id
+          let firstId = object.id
           
-          if radio!.version.isV3Api { clientHandle = object.clientHandle }
+          if radio!.version.isV3 { clientHandle = object.clientHandle }
           let wnbLevel = object.wnbLevel
           let bandZoomEnabled = object.bandZoomEnabled
           let segmentZoomEnabled = object.segmentZoomEnabled
@@ -650,28 +653,27 @@ final class ObjectTests: XCTestCase {
           
           if showInfoMessages { Swift.print("***** 1st \(type) parameters saved") }
           
-          if showInfoMessages { Swift.print("***** Remove 1st \(type)") }
+          if showInfoMessages { Swift.print("\n***** Remove 1st \(type)") }
           
-          radio!.panadapters[id]!.remove()
+          radio!.panadapters[firstId]!.remove()
           sleep(1)
           if radio!.panadapters.count == 0 {
             
-            if showInfoMessages { Swift.print("***** 1st \(type) removal confirmed") }
+            if showInfoMessages { Swift.print("***** 1st \(type) removal confirmed\n") }
             
-            if showInfoMessages { Swift.print("***** Request 2nd \(type)") }
-                        
+            if showInfoMessages { Swift.print("\n***** Request 2nd \(type)") }
+            
             // ask for new
-            radio!.requestPanadapter(frequency: 15_000_000)
+            radio!.requestPanadapter()
             sleep(1)
-
-            if showInfoMessages { Swift.print("***** 2nd \(type) created") }
-            
             // verify added
             if radio!.panadapters.count == 1 {
               
+              if showInfoMessages { Swift.print("***** 2nd \(type) creation confirmed\n") }
+              
               if let object = radio!.panadapters.first?.value {
                 
-                if radio!.version.isV3Api { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function) }
+                if radio!.version.isV3 { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function) }
                 
                 XCTAssertEqual(object.wnbLevel, wnbLevel, "wnbLevel", file: #function)
                 XCTAssertEqual(object.bandZoomEnabled, bandZoomEnabled, "bandZoomEnabled", file: #function)
@@ -699,7 +701,7 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd \(type) parameters verified") }
                 
-                let id = object.id
+                let secondId = object.id
                 
                 object.wnbLevel = wnbLevel+1
                 object.bandZoomEnabled = !bandZoomEnabled
@@ -722,7 +724,7 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd \(type) parameters modified") }
                 
-                if radio!.version.isV3Api { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function) }
+                if radio!.version.isV3 { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function) }
                 XCTAssertEqual(object.wnbLevel, wnbLevel + 1, "wnbLevel", file: #function)
                 XCTAssertEqual(object.bandZoomEnabled, !bandZoomEnabled, "bandZoomEnabled", file: #function)
                 XCTAssertEqual(object.segmentZoomEnabled, !segmentZoomEnabled, "segmentZoomEnabled", file: #function)
@@ -748,17 +750,15 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.antList, antList, "antList", file: #function)
                 
                 if showInfoMessages { Swift.print("***** 2nd \(type) modified parameters verified") }
-                                
-                if showInfoMessages { Swift.print("***** 2nd \(type) removed") }
                 
-                radio!.panadapters[id]!.remove()
+                if showInfoMessages { Swift.print("\n***** 2nd \(type) removed") }
+                
+                radio!.panadapters[secondId]!.remove()
                 sleep(1)
-                if radio!.panadapters[id] == nil {
-                                
-                  if showInfoMessages { Swift.print("***** 2nd \(type) removal confirmed") }
-                
-                } else {
-                  XCTFail("***** \(type) remaining, id = \(radio!.panadapters.first!.key.hex) *****", file: #function)
+                if radio!.panadapters[secondId] == nil {
+                  
+                  if showInfoMessages { Swift.print("***** 2nd \(type) removal confirmed\n") }
+                  
                 }
               } else {
                 XCTFail("***** 2nd \(type) NOT found *****", file: #function)
@@ -773,12 +773,14 @@ final class ObjectTests: XCTestCase {
           XCTFail("***** 1st \(type) NOT created *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type)(s) NOT removed *****", file: #function)
+        
       }
+    } else {
+      XCTFail("***** Existing \(type)(s) NOT removed *****", file: #function)
+      
+      Swift.print("\nRemaining pan:       count = \(radio!.panadapters.count), 1st id = \(radio!.panadapters.first?.key.hex)")
+      Swift.print("Remaining waterfall: count = \(radio!.waterfalls.count), 1st id = \(radio!.waterfalls.first?.key.hex)\n")
     }
-    
-    Swift.print("Remaining pan id = \(radio!.panadapters.first!.key.hex)")
-    
     disconnect()
   }
   
@@ -793,8 +795,8 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["Slice.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api { sliceStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())" }
-
+    if radio!.version.isV3 { sliceStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())" }
+    
     let id: ObjectId = sliceStatus.keyValuesArray()[0].key.objectId!
     Slice.parseStatus(radio!, sliceStatus.keyValuesArray(), true)
     sleep(1)
@@ -803,33 +805,33 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** SLICE created") }
       
-      if radio!.version.isV3Api { XCTAssertEqual(sliceObject.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle") }
-      XCTAssertEqual(sliceObject.mode, "USB", "mode")
-      XCTAssertEqual(sliceObject.filterLow, 100, "filterLow")
-      XCTAssertEqual(sliceObject.filterHigh, 2_800, "filterHigh")
-      XCTAssertEqual(sliceObject.agcMode, "med", "agcMode")
-      XCTAssertEqual(sliceObject.agcThreshold, 65, "agcThreshold")
-      XCTAssertEqual(sliceObject.agcOffLevel, 10, "agcOffLevel")
-      XCTAssertEqual(sliceObject.qskEnabled, true, "qskEnabled")
-      XCTAssertEqual(sliceObject.step, 100, "step")
-      XCTAssertEqual(sliceObject.stepList, "1,10,50,100,500,1000,2000,3000", "stepList")
-      XCTAssertEqual(sliceObject.anfEnabled, true, "anfEnabled")
-      XCTAssertEqual(sliceObject.anfLevel, 33, "anfLevel")
-      XCTAssertEqual(sliceObject.nrEnabled, false, "nrEnabled")
-      XCTAssertEqual(sliceObject.nrLevel, 25, "nrLevel")
-      XCTAssertEqual(sliceObject.nbEnabled, true, "nbEnabled")
-      XCTAssertEqual(sliceObject.nbLevel, 50, "nbLevel")
-      XCTAssertEqual(sliceObject.wnbEnabled, false, "wnbEnabled")
-      XCTAssertEqual(sliceObject.wnbLevel, 42, "wnbLevel")
-      XCTAssertEqual(sliceObject.apfEnabled, true, "apfEnabled")
-      XCTAssertEqual(sliceObject.apfLevel, 76, "apfLevel")
-      XCTAssertEqual(sliceObject.squelchEnabled, true, "squelchEnabled")
-      XCTAssertEqual(sliceObject.squelchLevel, 22, "squelchLevel")
+      if radio!.version.isV3 { XCTAssertEqual(sliceObject.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle", file: #function) }
+      XCTAssertEqual(sliceObject.mode, "USB", "mode", file: #function)
+      XCTAssertEqual(sliceObject.filterLow, 100, "filterLow", file: #function)
+      XCTAssertEqual(sliceObject.filterHigh, 2_800, "filterHigh", file: #function)
+      XCTAssertEqual(sliceObject.agcMode, "med", "agcMode", file: #function)
+      XCTAssertEqual(sliceObject.agcThreshold, 65, "agcThreshold", file: #function)
+      XCTAssertEqual(sliceObject.agcOffLevel, 10, "agcOffLevel", file: #function)
+      XCTAssertEqual(sliceObject.qskEnabled, true, "qskEnabled", file: #function)
+      XCTAssertEqual(sliceObject.step, 100, "step", file: #function)
+      XCTAssertEqual(sliceObject.stepList, "1,10,50,100,500,1000,2000,3000", "stepList", file: #function)
+      XCTAssertEqual(sliceObject.anfEnabled, true, "anfEnabled", file: #function)
+      XCTAssertEqual(sliceObject.anfLevel, 33, "anfLevel", file: #function)
+      XCTAssertEqual(sliceObject.nrEnabled, false, "nrEnabled", file: #function)
+      XCTAssertEqual(sliceObject.nrLevel, 25, "nrLevel", file: #function)
+      XCTAssertEqual(sliceObject.nbEnabled, true, "nbEnabled", file: #function)
+      XCTAssertEqual(sliceObject.nbLevel, 50, "nbLevel", file: #function)
+      XCTAssertEqual(sliceObject.wnbEnabled, false, "wnbEnabled", file: #function)
+      XCTAssertEqual(sliceObject.wnbLevel, 42, "wnbLevel", file: #function)
+      XCTAssertEqual(sliceObject.apfEnabled, true, "apfEnabled", file: #function)
+      XCTAssertEqual(sliceObject.apfLevel, 76, "apfLevel", file: #function)
+      XCTAssertEqual(sliceObject.squelchEnabled, true, "squelchEnabled", file: #function)
+      XCTAssertEqual(sliceObject.squelchLevel, 22, "squelchLevel", file: #function)
       
       if showInfoMessages { Swift.print("***** SLICE Parameters verified") }
       
     } else {
-      XCTFail("***** SLICE NOT created *****")
+      XCTFail("***** SLICE NOT created *****", file: #function)
     }
     // disconnect the radio
     disconnect()
@@ -970,92 +972,92 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd SLICE created") }
                 
-                XCTAssertEqual(object.frequency, frequency, "Frequency")
-                XCTAssertEqual(object.rxAnt, rxAnt, "RxAntenna")
-                XCTAssertEqual(object.mode, mode, "Mode")
+                XCTAssertEqual(object.frequency, frequency, "Frequency", file: #function)
+                XCTAssertEqual(object.rxAnt, rxAnt, "RxAntenna", file: #function)
+                XCTAssertEqual(object.mode, mode, "Mode", file: #function)
                 
-                XCTAssertEqual(object.active, active, "Active")
-                XCTAssertEqual(object.agcMode, agcMode, "AgcMode")
-                XCTAssertEqual(object.agcOffLevel, agcOffLevel, "AgcOffLevel")
-                XCTAssertEqual(object.agcThreshold, agcThreshold, "AgcThreshold")
-                XCTAssertEqual(object.anfEnabled, anfEnabled, "AnfEnabled")
+                XCTAssertEqual(object.active, active, "Active", file: #function)
+                XCTAssertEqual(object.agcMode, agcMode, "AgcMode", file: #function)
+                XCTAssertEqual(object.agcOffLevel, agcOffLevel, "AgcOffLevel", file: #function)
+                XCTAssertEqual(object.agcThreshold, agcThreshold, "AgcThreshold", file: #function)
+                XCTAssertEqual(object.anfEnabled, anfEnabled, "AnfEnabled", file: #function)
                 
-                XCTAssertEqual(object.anfLevel, anfLevel, "AnfLevel")
-                XCTAssertEqual(object.apfEnabled, apfEnabled, "ApfEnabled")
-                XCTAssertEqual(object.apfLevel, apfLevel, "ApfLevel")
-                XCTAssertEqual(object.audioGain, audioGain, "AudioGain")
-                XCTAssertEqual(object.audioLevel, audioLevel, "AudioLevel")
+                XCTAssertEqual(object.anfLevel, anfLevel, "AnfLevel", file: #function)
+                XCTAssertEqual(object.apfEnabled, apfEnabled, "ApfEnabled", file: #function)
+                XCTAssertEqual(object.apfLevel, apfLevel, "ApfLevel", file: #function)
+                XCTAssertEqual(object.audioGain, audioGain, "AudioGain", file: #function)
+                XCTAssertEqual(object.audioLevel, audioLevel, "AudioLevel", file: #function)
                 
-                XCTAssertEqual(object.audioMute, audioMute, "AudioMute")
-                XCTAssertEqual(object.audioPan, audioPan, "AudioPan")
-                XCTAssertEqual(object.autoPan, autoPan, "AutoPan")
-                XCTAssertEqual(object.daxChannel, daxChannel, "DaxChannel")
+                XCTAssertEqual(object.audioMute, audioMute, "AudioMute", file: #function)
+                XCTAssertEqual(object.audioPan, audioPan, "AudioPan", file: #function)
+                XCTAssertEqual(object.autoPan, autoPan, "AutoPan", file: #function)
+                XCTAssertEqual(object.daxChannel, daxChannel, "DaxChannel", file: #function)
                 
-                XCTAssertEqual(object.daxClients, daxClients, "DaxClients")
-                XCTAssertEqual(object.daxTxEnabled, daxTxEnabled, "DaxTxEnabled")
-                XCTAssertEqual(object.detached, detached, "Detached")
-                XCTAssertEqual(object.dfmPreDeEmphasisEnabled, dfmPreDeEmphasisEnabled, "DfmPreDeEmphasisEnabled")
-                XCTAssertEqual(object.digitalLowerOffset, digitalLowerOffset, "DigitalLowerOffset")
+                XCTAssertEqual(object.daxClients, daxClients, "DaxClients", file: #function)
+                XCTAssertEqual(object.daxTxEnabled, daxTxEnabled, "DaxTxEnabled", file: #function)
+                XCTAssertEqual(object.detached, detached, "Detached", file: #function)
+                XCTAssertEqual(object.dfmPreDeEmphasisEnabled, dfmPreDeEmphasisEnabled, "DfmPreDeEmphasisEnabled", file: #function)
+                XCTAssertEqual(object.digitalLowerOffset, digitalLowerOffset, "DigitalLowerOffset", file: #function)
                 
-                XCTAssertEqual(object.digitalUpperOffset, digitalUpperOffset, "DigitalUpperOffset")
-                XCTAssertEqual(object.diversityChild, diversityChild, "DiversityChild")
-                XCTAssertEqual(object.diversityEnabled, diversityEnabled, "DiversityEnabled")
-                XCTAssertEqual(object.diversityIndex, diversityIndex, "DiversityIndex")
-                XCTAssertEqual(object.diversityParent, diversityParent, "DiversityParent")
+                XCTAssertEqual(object.digitalUpperOffset, digitalUpperOffset, "DigitalUpperOffset", file: #function)
+                XCTAssertEqual(object.diversityChild, diversityChild, "DiversityChild", file: #function)
+                XCTAssertEqual(object.diversityEnabled, diversityEnabled, "DiversityEnabled", file: #function)
+                XCTAssertEqual(object.diversityIndex, diversityIndex, "DiversityIndex", file: #function)
+                XCTAssertEqual(object.diversityParent, diversityParent, "DiversityParent", file: #function)
                 
-                XCTAssertEqual(object.filterHigh, filterHigh, "FilterHigh")
-                XCTAssertEqual(object.filterLow, filterLow, "FilterLow")
-                XCTAssertEqual(object.fmDeviation, fmDeviation, "FmDeviation")
-                XCTAssertEqual(object.fmRepeaterOffset, fmRepeaterOffset, "FmRepeaterOffset")
-                XCTAssertEqual(object.fmToneBurstEnabled, fmToneBurstEnabled, "FmToneBurstEnabled")
+                XCTAssertEqual(object.filterHigh, filterHigh, "FilterHigh", file: #function)
+                XCTAssertEqual(object.filterLow, filterLow, "FilterLow", file: #function)
+                XCTAssertEqual(object.fmDeviation, fmDeviation, "FmDeviation", file: #function)
+                XCTAssertEqual(object.fmRepeaterOffset, fmRepeaterOffset, "FmRepeaterOffset", file: #function)
+                XCTAssertEqual(object.fmToneBurstEnabled, fmToneBurstEnabled, "FmToneBurstEnabled", file: #function)
                 
-                XCTAssertEqual(object.fmToneFreq, fmToneFreq, "FmToneFreq")
-                XCTAssertEqual(object.fmToneMode, fmToneMode, "FmToneMode")
-                XCTAssertEqual(object.locked, locked, "Locked")
-                XCTAssertEqual(object.loopAEnabled, loopAEnabled, "LoopAEnabled")
-                XCTAssertEqual(object.loopBEnabled, loopBEnabled, "LoopBEnabled")
+                XCTAssertEqual(object.fmToneFreq, fmToneFreq, "FmToneFreq", file: #function)
+                XCTAssertEqual(object.fmToneMode, fmToneMode, "FmToneMode", file: #function)
+                XCTAssertEqual(object.locked, locked, "Locked", file: #function)
+                XCTAssertEqual(object.loopAEnabled, loopAEnabled, "LoopAEnabled", file: #function)
+                XCTAssertEqual(object.loopBEnabled, loopBEnabled, "LoopBEnabled", file: #function)
                 
-                XCTAssertEqual(object.modeList, modeList, "modeList")
-                XCTAssertEqual(object.nbEnabled, nbEnabled, "NbEnabled")
-                XCTAssertEqual(object.nbLevel, nbLevel, "NbLevel")
-                XCTAssertEqual(object.nrEnabled, nrEnabled, "NrEnabled")
-                XCTAssertEqual(object.nrLevel, nrLevel, "NrLevel")
+                XCTAssertEqual(object.modeList, modeList, "modeList", file: #function)
+                XCTAssertEqual(object.nbEnabled, nbEnabled, "NbEnabled", file: #function)
+                XCTAssertEqual(object.nbLevel, nbLevel, "NbLevel", file: #function)
+                XCTAssertEqual(object.nrEnabled, nrEnabled, "NrEnabled", file: #function)
+                XCTAssertEqual(object.nrLevel, nrLevel, "NrLevel", file: #function)
                 
-                XCTAssertEqual(object.nr2, nr2, "Nr2")
-                XCTAssertEqual(object.owner, owner, "Owner")
-                XCTAssertEqual(object.playbackEnabled, playbackEnabled, "PlaybackEnabled")
-                XCTAssertEqual(object.postDemodBypassEnabled, postDemodBypassEnabled, "PostDemodBypassEnabled")
+                XCTAssertEqual(object.nr2, nr2, "Nr2", file: #function)
+                XCTAssertEqual(object.owner, owner, "Owner", file: #function)
+                XCTAssertEqual(object.playbackEnabled, playbackEnabled, "PlaybackEnabled", file: #function)
+                XCTAssertEqual(object.postDemodBypassEnabled, postDemodBypassEnabled, "PostDemodBypassEnabled", file: #function)
                 
-                XCTAssertEqual(object.postDemodHigh, postDemodHigh, "PostDemodHigh")
-                XCTAssertEqual(object.postDemodLow, postDemodLow, "PostDemodLow")
-                XCTAssertEqual(object.qskEnabled, qskEnabled, "QskEnabled")
-                XCTAssertEqual(object.recordEnabled, recordEnabled, "RecordEnabled")
-                XCTAssertEqual(object.recordLength, recordLength, "RecordLength")
+                XCTAssertEqual(object.postDemodHigh, postDemodHigh, "PostDemodHigh", file: #function)
+                XCTAssertEqual(object.postDemodLow, postDemodLow, "PostDemodLow", file: #function)
+                XCTAssertEqual(object.qskEnabled, qskEnabled, "QskEnabled", file: #function)
+                XCTAssertEqual(object.recordEnabled, recordEnabled, "RecordEnabled", file: #function)
+                XCTAssertEqual(object.recordLength, recordLength, "RecordLength", file: #function)
                 
-                XCTAssertEqual(object.repeaterOffsetDirection, repeaterOffsetDirection, "RepeaterOffsetDirection")
-                XCTAssertEqual(object.rfGain, rfGain, "RfGain")
-                XCTAssertEqual(object.ritEnabled, ritEnabled, "RitEnabled")
-                XCTAssertEqual(object.ritOffset, ritOffset, "RitOffset")
-                XCTAssertEqual(object.rttyMark, rttyMark, "RttyMark")
+                XCTAssertEqual(object.repeaterOffsetDirection, repeaterOffsetDirection, "RepeaterOffsetDirection", file: #function)
+                XCTAssertEqual(object.rfGain, rfGain, "RfGain", file: #function)
+                XCTAssertEqual(object.ritEnabled, ritEnabled, "RitEnabled", file: #function)
+                XCTAssertEqual(object.ritOffset, ritOffset, "RitOffset", file: #function)
+                XCTAssertEqual(object.rttyMark, rttyMark, "RttyMark", file: #function)
                 
-                XCTAssertEqual(object.rttyShift, rttyShift, "RttyShift")
-                XCTAssertEqual(object.rxAntList, rxAntList, "RxAntList")
-                if radio!.version.isV3Api { XCTAssertEqual(object.sliceLetter, sliceLetter, "SliceLetter") }
-                XCTAssertEqual(object.step, step, "Step")
-                XCTAssertEqual(object.squelchEnabled, squelchEnabled, "SquelchEnabled")
+                XCTAssertEqual(object.rttyShift, rttyShift, "RttyShift", file: #function)
+                XCTAssertEqual(object.rxAntList, rxAntList, "RxAntList", file: #function)
+                if radio!.version.isV3 { XCTAssertEqual(object.sliceLetter, sliceLetter, "SliceLetter", file: #function) }
+                XCTAssertEqual(object.step, step, "Step", file: #function)
+                XCTAssertEqual(object.squelchEnabled, squelchEnabled, "SquelchEnabled", file: #function)
                 
-                XCTAssertEqual(object.squelchLevel, squelchLevel, "SquelchLevel")
-                XCTAssertEqual(object.stepList, stepList, "StepList")
-                XCTAssertEqual(object.txAnt, txAnt, "TxAnt")
-                XCTAssertEqual(object.txAntList, txAntList, "TxAntList")
-                XCTAssertEqual(object.txEnabled, txEnabled, "TxEnabled")
+                XCTAssertEqual(object.squelchLevel, squelchLevel, "SquelchLevel", file: #function)
+                XCTAssertEqual(object.stepList, stepList, "StepList", file: #function)
+                XCTAssertEqual(object.txAnt, txAnt, "TxAnt", file: #function)
+                XCTAssertEqual(object.txAntList, txAntList, "TxAntList", file: #function)
+                XCTAssertEqual(object.txEnabled, txEnabled, "TxEnabled", file: #function)
                 
-                XCTAssertEqual(object.txOffsetFreq, txOffsetFreq, "TxOffsetFreq")
-                XCTAssertEqual(object.wide, wide, "Wide")
-                XCTAssertEqual(object.wnbEnabled, wnbEnabled, "WnbEnabled")
-                XCTAssertEqual(object.wnbLevel, wnbLevel, "WnbLevel")
-                XCTAssertEqual(object.xitEnabled, xitEnabled, "XitEnabled")
-                XCTAssertEqual(object.xitOffset, xitOffset, "XitOffset")
+                XCTAssertEqual(object.txOffsetFreq, txOffsetFreq, "TxOffsetFreq", file: #function)
+                XCTAssertEqual(object.wide, wide, "Wide", file: #function)
+                XCTAssertEqual(object.wnbEnabled, wnbEnabled, "WnbEnabled", file: #function)
+                XCTAssertEqual(object.wnbLevel, wnbLevel, "WnbLevel", file: #function)
+                XCTAssertEqual(object.xitEnabled, xitEnabled, "XitEnabled", file: #function)
+                XCTAssertEqual(object.xitOffset, xitOffset, "XitOffset", file: #function)
                 
                 if showInfoMessages { Swift.print("***** 2nd SLICE parameters verified") }
                 
@@ -1147,92 +1149,92 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd SLICE parameters modified") }
                 
-                XCTAssertEqual(object.frequency, 7_100_000, "Frequency")
-                XCTAssertEqual(object.rxAnt,  "ANT2", "RxAntenna")
-                XCTAssertEqual(object.mode, "CWU", "Mode")
+                XCTAssertEqual(object.frequency, 7_100_000, "Frequency", file: #function)
+                XCTAssertEqual(object.rxAnt,  "ANT2", "RxAntenna", file: #function)
+                XCTAssertEqual(object.mode, "CWU", "Mode", file: #function)
                 
-                XCTAssertEqual(object.active, false, "Active")
-                XCTAssertEqual(object.agcMode, Slice.AgcMode.fast.rawValue, "AgcMode")
-                XCTAssertEqual(object.agcOffLevel, 20, "AgcOffLevel")
-                XCTAssertEqual(object.agcThreshold, 65, "AgcThreshold")
-                XCTAssertEqual(object.anfEnabled, true, "AnfEnabled")
+                XCTAssertEqual(object.active, false, "Active", file: #function)
+                XCTAssertEqual(object.agcMode, Slice.AgcMode.fast.rawValue, "AgcMode", file: #function)
+                XCTAssertEqual(object.agcOffLevel, 20, "AgcOffLevel", file: #function)
+                XCTAssertEqual(object.agcThreshold, 65, "AgcThreshold", file: #function)
+                XCTAssertEqual(object.anfEnabled, true, "AnfEnabled", file: #function)
                 
-                XCTAssertEqual(object.anfLevel, 10, "AnfLevel")
-                XCTAssertEqual(object.apfEnabled, true, "ApfEnabled")
-                XCTAssertEqual(object.apfLevel, 30, "ApfLevel")
-                XCTAssertEqual(object.audioGain, 40, "AudioGain")
-                XCTAssertEqual(object.audioLevel, 70, "AudioLevel")
+                XCTAssertEqual(object.anfLevel, 10, "AnfLevel", file: #function)
+                XCTAssertEqual(object.apfEnabled, true, "ApfEnabled", file: #function)
+                XCTAssertEqual(object.apfLevel, 30, "ApfLevel", file: #function)
+                XCTAssertEqual(object.audioGain, 40, "AudioGain", file: #function)
+                XCTAssertEqual(object.audioLevel, 70, "AudioLevel", file: #function)
                 
-                XCTAssertEqual(object.audioMute, true, "AudioMute")
-                XCTAssertEqual(object.audioPan, 20, "AudioPan")
-                XCTAssertEqual(object.autoPan, true, "AutoPan")
-                XCTAssertEqual(object.daxChannel, 1, "DaxChannel")
+                XCTAssertEqual(object.audioMute, true, "AudioMute", file: #function)
+                XCTAssertEqual(object.audioPan, 20, "AudioPan", file: #function)
+                XCTAssertEqual(object.autoPan, true, "AutoPan", file: #function)
+                XCTAssertEqual(object.daxChannel, 1, "DaxChannel", file: #function)
                 
-                XCTAssertEqual(object.daxClients, 1, "DaxClients")
-                XCTAssertEqual(object.daxTxEnabled, true, "DaxTxEnabled")
-                XCTAssertEqual(object.detached, true, "Detached")
-                XCTAssertEqual(object.dfmPreDeEmphasisEnabled, true, "DfmPreDeEmphasisEnabled")
-                XCTAssertEqual(object.digitalLowerOffset, 3320, "DigitalLowerOffset")
+                XCTAssertEqual(object.daxClients, 1, "DaxClients", file: #function)
+                XCTAssertEqual(object.daxTxEnabled, true, "DaxTxEnabled", file: #function)
+                XCTAssertEqual(object.detached, true, "Detached", file: #function)
+                XCTAssertEqual(object.dfmPreDeEmphasisEnabled, true, "DfmPreDeEmphasisEnabled", file: #function)
+                XCTAssertEqual(object.digitalLowerOffset, 3320, "DigitalLowerOffset", file: #function)
                 
-                XCTAssertEqual(object.digitalUpperOffset, 2611, "DigitalUpperOffset")
-                XCTAssertEqual(object.diversityChild, false, "DiversityChild")
-                XCTAssertEqual(object.diversityEnabled, true, "DiversityEnabled")
-                XCTAssertEqual(object.diversityIndex, 0, "DiversityIndex")
-                XCTAssertEqual(object.diversityParent, false, "DiversityParent")
+                XCTAssertEqual(object.digitalUpperOffset, 2611, "DigitalUpperOffset", file: #function)
+                XCTAssertEqual(object.diversityChild, false, "DiversityChild", file: #function)
+                XCTAssertEqual(object.diversityEnabled, true, "DiversityEnabled", file: #function)
+                XCTAssertEqual(object.diversityIndex, 0, "DiversityIndex", file: #function)
+                XCTAssertEqual(object.diversityParent, false, "DiversityParent", file: #function)
                 
-                XCTAssertEqual(object.filterHigh, 3911, "FilterHigh")
-                XCTAssertEqual(object.filterLow, 2111, "FilterLow")
-                XCTAssertEqual(object.fmDeviation, 4999, "FmDeviation")
-                XCTAssertEqual(object.fmRepeaterOffset, 100.0, "FmRepeaterOffset")
-                XCTAssertEqual(object.fmToneBurstEnabled, true, "FmToneBurstEnabled")
+                XCTAssertEqual(object.filterHigh, 3911, "FilterHigh", file: #function)
+                XCTAssertEqual(object.filterLow, 2111, "FilterLow", file: #function)
+                XCTAssertEqual(object.fmDeviation, 4999, "FmDeviation", file: #function)
+                XCTAssertEqual(object.fmRepeaterOffset, 100.0, "FmRepeaterOffset", file: #function)
+                XCTAssertEqual(object.fmToneBurstEnabled, true, "FmToneBurstEnabled", file: #function)
                 
-                XCTAssertEqual(object.fmToneFreq, 78.1, "FmToneFreq")
-                XCTAssertEqual(object.fmToneMode, "CTSS", "FmToneMode")
-                XCTAssertEqual(object.locked, true, "Locked")
-                XCTAssertEqual(object.loopAEnabled, true, "LoopAEnabled")
-                XCTAssertEqual(object.loopBEnabled, true, "LoopBEnabled")
+                XCTAssertEqual(object.fmToneFreq, 78.1, "FmToneFreq", file: #function)
+                XCTAssertEqual(object.fmToneMode, "CTSS", "FmToneMode", file: #function)
+                XCTAssertEqual(object.locked, true, "Locked", file: #function)
+                XCTAssertEqual(object.loopAEnabled, true, "LoopAEnabled", file: #function)
+                XCTAssertEqual(object.loopBEnabled, true, "LoopBEnabled", file: #function)
                 
-                XCTAssertEqual(object.modeList, ["RTTY", "LSB", "USB", "AM", "CW", "DIGL", "DIGU", "SAM", "FM", "NFM", "DFM"], "ModeList")
-                XCTAssertEqual(object.nbEnabled, true, "NbEnabled")
-                XCTAssertEqual(object.nbLevel, 35, "NbLevel")
-                XCTAssertEqual(object.nrEnabled, true, "NrEnabled")
-                XCTAssertEqual(object.nrLevel, 10, "NrLevel")
+                XCTAssertEqual(object.modeList, ["RTTY", "LSB", "USB", "AM", "CW", "DIGL", "DIGU", "SAM", "FM", "NFM", "DFM"], "ModeList", file: #function)
+                XCTAssertEqual(object.nbEnabled, true, "NbEnabled", file: #function)
+                XCTAssertEqual(object.nbLevel, 35, "NbLevel", file: #function)
+                XCTAssertEqual(object.nrEnabled, true, "NrEnabled", file: #function)
+                XCTAssertEqual(object.nrLevel, 10, "NrLevel", file: #function)
                 
-                XCTAssertEqual(object.nr2, 5, "Nr2")
-                XCTAssertEqual(object.owner, 1, "Owner")
-                XCTAssertEqual(object.playbackEnabled, true, "PlaybackEnabled")
-                XCTAssertEqual(object.postDemodBypassEnabled, true, "PostDemodBypassEnabled")
+                XCTAssertEqual(object.nr2, 5, "Nr2", file: #function)
+                XCTAssertEqual(object.owner, 1, "Owner", file: #function)
+                XCTAssertEqual(object.playbackEnabled, true, "PlaybackEnabled", file: #function)
+                XCTAssertEqual(object.postDemodBypassEnabled, true, "PostDemodBypassEnabled", file: #function)
                 
-                XCTAssertEqual(object.postDemodHigh, 4411, "PostDemodHigh")
-                XCTAssertEqual(object.postDemodLow, 212, "PostDemodLow")
-                XCTAssertEqual(object.qskEnabled, true, "QskEnabled")
-                XCTAssertEqual(object.recordEnabled, true, "RecordEnabled")
-                XCTAssertEqual(object.recordLength, 10.9, "RecordLength")
+                XCTAssertEqual(object.postDemodHigh, 4411, "PostDemodHigh", file: #function)
+                XCTAssertEqual(object.postDemodLow, 212, "PostDemodLow", file: #function)
+                XCTAssertEqual(object.qskEnabled, true, "QskEnabled", file: #function)
+                XCTAssertEqual(object.recordEnabled, true, "RecordEnabled", file: #function)
+                XCTAssertEqual(object.recordLength, 10.9, "RecordLength", file: #function)
                 
-                XCTAssertEqual(object.repeaterOffsetDirection, Slice.Offset.up.rawValue.uppercased(), "RepeaterOffsetDirection")
-                XCTAssertEqual(object.rfGain, 4, "RfGain")
-                XCTAssertEqual(object.ritEnabled, true, "RitEnabled")
-                XCTAssertEqual(object.ritOffset, 20, "RitOffset")
-                XCTAssertEqual(object.rttyMark, 5, "RttyMark")
+                XCTAssertEqual(object.repeaterOffsetDirection, Slice.Offset.up.rawValue.uppercased(), "RepeaterOffsetDirection", file: #function)
+                XCTAssertEqual(object.rfGain, 4, "RfGain", file: #function)
+                XCTAssertEqual(object.ritEnabled, true, "RitEnabled", file: #function)
+                XCTAssertEqual(object.ritOffset, 20, "RitOffset", file: #function)
+                XCTAssertEqual(object.rttyMark, 5, "RttyMark", file: #function)
                 
-                XCTAssertEqual(object.rttyShift, 281, "RttyShift")
-                XCTAssertEqual(object.rxAntList, ["XVTR", "ANT1", "ANT2", "RX_A"], "RxAntList")
+                XCTAssertEqual(object.rttyShift, 281, "RttyShift", file: #function)
+                XCTAssertEqual(object.rxAntList, ["XVTR", "ANT1", "ANT2", "RX_A"], "RxAntList", file: #function)
                 //                XCTAssertEqual(object.sliceLetter, "A", "SliceLetter")
-                XCTAssertEqual(object.step, 213, "Step")
-                XCTAssertEqual(object.squelchEnabled, false, "SquelchEnabled")
+                XCTAssertEqual(object.step, 213, "Step", file: #function)
+                XCTAssertEqual(object.squelchEnabled, false, "SquelchEnabled", file: #function)
                 
-                XCTAssertEqual(object.squelchLevel, 19, "SquelchLevel")
-                XCTAssertEqual(object.stepList, "3000,1,10,50,100,500,1000,2000", "StepList")
-                XCTAssertEqual(object.txAnt, "ANT2", "TxAnt")
-                XCTAssertEqual(object.txAntList, ["XVTR", "ANT1", "ANT2"], "TxAntList")
-                XCTAssertEqual(object.txEnabled, false, "TxEnabled")
+                XCTAssertEqual(object.squelchLevel, 19, "SquelchLevel", file: #function)
+                XCTAssertEqual(object.stepList, "3000,1,10,50,100,500,1000,2000", "StepList", file: #function)
+                XCTAssertEqual(object.txAnt, "ANT2", "TxAnt", file: #function)
+                XCTAssertEqual(object.txAntList, ["XVTR", "ANT1", "ANT2"], "TxAntList", file: #function)
+                XCTAssertEqual(object.txEnabled, false, "TxEnabled", file: #function)
                 
-                XCTAssertEqual(object.txOffsetFreq, 5.0, "TxOffsetFreq")
-                XCTAssertEqual(object.wide, false, "Wide")
-                XCTAssertEqual(object.wnbEnabled, true, "WnbEnabled")
-                XCTAssertEqual(object.wnbLevel, 2, "WnbLevel")
-                XCTAssertEqual(object.xitEnabled, true, "XitEnabled")
-                XCTAssertEqual(object.xitOffset, 7, "XitOffset")
+                XCTAssertEqual(object.txOffsetFreq, 5.0, "TxOffsetFreq", file: #function)
+                XCTAssertEqual(object.wide, false, "Wide", file: #function)
+                XCTAssertEqual(object.wnbEnabled, true, "WnbEnabled", file: #function)
+                XCTAssertEqual(object.wnbLevel, 2, "WnbLevel", file: #function)
+                XCTAssertEqual(object.xitEnabled, true, "XitEnabled", file: #function)
+                XCTAssertEqual(object.xitOffset, 7, "XitOffset", file: #function)
                 
                 if showInfoMessages { Swift.print("***** 2nd SLICE modified parameters verified") }
                 
@@ -1245,25 +1247,25 @@ final class ObjectTests: XCTestCase {
                   if showInfoMessages { Swift.print("***** 2nd SLICE removed") }
                   
                 } else {
-                  XCTFail("***** 2nd SLICE NOT removed")
+                  XCTFail("***** 2nd SLICE NOT removed", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd SLICE NOT found")
+                XCTFail("***** 2nd SLICE NOT found", file: #function)
               }
             } else {
-              XCTFail("***** 2nd SLICE NOT created")
+              XCTFail("***** 2nd SLICE NOT created", file: #function)
             }
           } else {
-            XCTFail("***** 1st SLICE NOT removed")
+            XCTFail("***** 1st SLICE NOT removed", file: #function)
           }
         } else {
-          XCTFail("***** 1st SLICE NOT found")
+          XCTFail("***** 1st SLICE NOT found", file: #function)
         }
       } else {
-        XCTFail("***** 1st SLICE NOT created")
+        XCTFail("***** 1st SLICE NOT created", file: #function)
       }
     } else {
-      XCTFail("***** Existing SLICE(s) NOT removed")
+      XCTFail("***** Existing SLICE(s) NOT removed", file: #function)
     }
     disconnect()
   }
@@ -1278,7 +1280,7 @@ final class ObjectTests: XCTestCase {
     
     let radio = discoverRadio(logState: .limited(to: ["Tnf.swift"]))
     guard radio != nil else { return }
-
+    
     let id: ObjectId = tnfStatus.keyValuesArray()[0].key.objectId!
     Tnf.parseStatus(radio!, tnfStatus.keyValuesArray(), true)
     
@@ -1286,15 +1288,15 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** TNF created") }
       
-      XCTAssertEqual(tnf.depth, 2, "Depth")
-      XCTAssertEqual(tnf.frequency, 14_260_000, "Frequency")
-      XCTAssertEqual(tnf.permanent, true, "Permanent")
-      XCTAssertEqual(tnf.width, 100, "Width")
+      XCTAssertEqual(tnf.depth, 2, "Depth", file: #function)
+      XCTAssertEqual(tnf.frequency, 14_260_000, "Frequency", file: #function)
+      XCTAssertEqual(tnf.permanent, true, "Permanent", file: #function)
+      XCTAssertEqual(tnf.width, 100, "Width", file: #function)
       
       if showInfoMessages { Swift.print("***** TNF parameters verified") }
       
     } else {
-      XCTFail("***** TNF NOT created")
+      XCTFail("***** TNF NOT created", file: #function)
     }
     disconnect()
   }
@@ -1351,10 +1353,10 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd TNF object created") }
                 
-                XCTAssertEqual(object.depth, depth, "Depth")
-                XCTAssertEqual(object.frequency,  frequency, "Frequency")
-                XCTAssertEqual(object.permanent, permanent, "Permanent")
-                XCTAssertEqual(object.width, width, "Width")
+                XCTAssertEqual(object.depth, depth, "Depth", file: #function)
+                XCTAssertEqual(object.frequency,  frequency, "Frequency", file: #function)
+                XCTAssertEqual(object.permanent, permanent, "Permanent", file: #function)
+                XCTAssertEqual(object.width, width, "Width", file: #function)
                 
                 if showInfoMessages { Swift.print("***** 2nd TNF object parameters verified") }
                 
@@ -1365,30 +1367,30 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd TNF object parameters modified") }
                 
-                XCTAssertEqual(object.depth, Tnf.Depth.veryDeep.rawValue, "Depth")
-                XCTAssertEqual(object.frequency,  14_270_000, "Frequency")
-                XCTAssertEqual(object.permanent, !permanent, "Permanent")
-                XCTAssertEqual(object.width, Tnf.kWidthMax, "Width")
+                XCTAssertEqual(object.depth, Tnf.Depth.veryDeep.rawValue, "Depth", file: #function)
+                XCTAssertEqual(object.frequency,  14_270_000, "Frequency", file: #function)
+                XCTAssertEqual(object.permanent, !permanent, "Permanent", file: #function)
+                XCTAssertEqual(object.width, Tnf.kWidthMax, "Width", file: #function)
                 
                 if showInfoMessages { Swift.print("***** 2nd TNF object modified parameters verified") }
                 
               } else {
-                XCTFail("***** 2nd TNF object NOT found *****")
+                XCTFail("***** 2nd TNF object NOT found *****", file: #function)
               }
             } else {
-              XCTFail("***** 2nd TNF object NOT created *****")
+              XCTFail("***** 2nd TNF object NOT created *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st TNF object NOT removed *****")
+            XCTFail("***** 1st TNF object NOT removed *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st TNF object NOT found *****")
+          XCTFail("***** 1st TNF object NOT found *****", file: #function)
         }
       } else {
-        XCTFail("***** 1st TNF object NOT created *****")
+        XCTFail("***** 1st TNF object NOT created *****", file: #function)
       }
     } else {
-      XCTFail("***** Existing TNF object(s) NOT removed *****")
+      XCTFail("***** Existing TNF object(s) NOT removed *****", file: #function)
     }
     // remove all
     radio!.tnfs.forEach( {$0.value.remove() } )
@@ -1408,39 +1410,39 @@ final class ObjectTests: XCTestCase {
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
-          
+      
       radio!.transmit.parseProperties(radio!, transmitProperties_1.keyValuesArray())
       
       if showInfoMessages { Swift.print("***** TRANSMIT object found") }
       
-      XCTAssertEqual(radio!.transmit.txRfPowerChanges, true, "txRfPowerChanges")
-      XCTAssertEqual(radio!.transmit.tune, false, "tune")
-      XCTAssertEqual(radio!.transmit.txInWaterfallEnabled, false, "txInWaterfallEnabled")
-      XCTAssertEqual(radio!.transmit.txMonitorAvailable, true, "txMonitorAvailable")
-      XCTAssertEqual(radio!.transmit.maxPowerLevel, 100, "maxPowerLevel")
-
+      XCTAssertEqual(radio!.transmit.txRfPowerChanges, true, "txRfPowerChanges", file: #function)
+      XCTAssertEqual(radio!.transmit.tune, false, "tune", file: #function)
+      XCTAssertEqual(radio!.transmit.txInWaterfallEnabled, false, "txInWaterfallEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.txMonitorAvailable, true, "txMonitorAvailable", file: #function)
+      XCTAssertEqual(radio!.transmit.maxPowerLevel, 100, "maxPowerLevel", file: #function)
+      
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
-    } else if radio!.version.isV3Api {
+    } else if radio!.version.isV3 {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_1.keyValuesArray())
       
       if showInfoMessages { Swift.print("***** TRANSMIT object found") }
       
-      XCTAssertEqual(radio!.transmit.txRfPowerChanges, true, "txRfPowerChanges")
-      XCTAssertEqual(radio!.transmit.tune, false, "tune")
-      XCTAssertEqual(radio!.transmit.txInWaterfallEnabled, false, "txInWaterfallEnabled")
-      XCTAssertEqual(radio!.transmit.txMonitorAvailable, true, "txMonitorAvailable")
-      XCTAssertEqual(radio!.transmit.maxPowerLevel, 100, "maxPowerLevel")
-
+      XCTAssertEqual(radio!.transmit.txRfPowerChanges, true, "txRfPowerChanges", file: #function)
+      XCTAssertEqual(radio!.transmit.tune, false, "tune", file: #function)
+      XCTAssertEqual(radio!.transmit.txInWaterfallEnabled, false, "txInWaterfallEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.txMonitorAvailable, true, "txMonitorAvailable", file: #function)
+      XCTAssertEqual(radio!.transmit.maxPowerLevel, 100, "maxPowerLevel", file: #function)
+      
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
     }  else {
-      XCTFail("Unknown Radio version (\(radio!.version.longString)")
+      XCTFail("Unknown Radio version (\(radio!.version.longString)", file: #function)
     }
     disconnect()
   }
-
+  
   private let transmitProperties_2 = "am_carrier_level=35 compander=1 compander_level=50 break_in_delay=10 break_in=0"
   func testTransmit_2() {
     
@@ -1450,41 +1452,41 @@ final class ObjectTests: XCTestCase {
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
-          
+      
       radio!.transmit.parseProperties(radio!, transmitProperties_2.keyValuesArray())
       
       if showInfoMessages { Swift.print("***** TRANSMIT object found") }
       
-      XCTAssertEqual(radio!.transmit.carrierLevel, 35, "carrierLevel")
-      XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled")
-      XCTAssertEqual(radio!.transmit.companderLevel, 50, "companderLevel")
-      XCTAssertEqual(radio!.transmit.cwBreakInDelay, 10, "cwBreakInDelay")
-      XCTAssertEqual(radio!.transmit.cwBreakInEnabled, false, "cwBreakInEnabled")
-
+      XCTAssertEqual(radio!.transmit.carrierLevel, 35, "carrierLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.companderLevel, 50, "companderLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.cwBreakInDelay, 10, "cwBreakInDelay", file: #function)
+      XCTAssertEqual(radio!.transmit.cwBreakInEnabled, false, "cwBreakInEnabled", file: #function)
+      
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
-    } else if radio!.version.isV3Api {
+    } else if radio!.version.isV3 {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_2.keyValuesArray())
       
       if showInfoMessages { Swift.print("***** TRANSMIT object found") }
       
-      XCTAssertEqual(radio!.transmit.carrierLevel, 35, "carrierLevel")
-      XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled")
-      XCTAssertEqual(radio!.transmit.companderLevel, 50, "companderLevel")
-      XCTAssertEqual(radio!.transmit.cwBreakInDelay, 10, "cwBreakInDelay")
-      XCTAssertEqual(radio!.transmit.cwBreakInEnabled, false, "cwBreakInEnabled")
-
+      XCTAssertEqual(radio!.transmit.carrierLevel, 35, "carrierLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.companderLevel, 50, "companderLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.cwBreakInDelay, 10, "cwBreakInDelay", file: #function)
+      XCTAssertEqual(radio!.transmit.cwBreakInEnabled, false, "cwBreakInEnabled", file: #function)
+      
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
     }  else {
-      XCTFail("Unknown Radio version (\(radio!.version.longString)")
+      XCTFail("Unknown Radio version (\(radio!.version.longString)", file: #function)
     }
     disconnect()
   }
-
+  
   private let transmitProperties_3 = "freq=14.100000 rfpower=100 tunepower=10 tx_slice_mode=USB hwalc_enabled=0 inhibit=0 dax=0 sb_monitor=0 mon_gain_sb=75 mon_pan_sb=50 met_in_rx=0 am_carrier_level=100 mic_selection=MIC mic_level=40 mic_boost=1 mic_bias=0 mic_acc=0 compander=1 compander_level=70 vox_enable=0 vox_level=50 vox_delay=72 speech_processor_enable=1 speech_processor_level=0 lo=100 hi=2900 tx_filter_changes_allowed=1 tx_antenna=ANT1 pitch=600 speed=30 iambic=1 iambic_mode=1 swap_paddles=0 break_in=1 break_in_delay=41 cwl_enabled=0 sidetone=1 mon_gain_cw=80 mon_pan_cw=50 synccwx=1"
-
+  
   func testTransmit_3() {
     
     Swift.print("\n***** \(#function)")
@@ -1498,102 +1500,102 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** TRANSMIT object found") }
       
-      XCTAssertEqual(radio!.transmit.carrierLevel, 100, "carrierLevel")
-      XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled")
-      XCTAssertEqual(radio!.transmit.companderLevel, 70, "companderLevel")
-      XCTAssertEqual(radio!.transmit.cwIambicEnabled, true, "cwIambicEnabled")
-      XCTAssertEqual(radio!.transmit.cwIambicMode, 1, "cwIambicMode")
-      XCTAssertEqual(radio!.transmit.cwPitch, 600, "cwPitch")
-      XCTAssertEqual(radio!.transmit.cwSpeed, 30, "cwSpeed")
-      XCTAssertEqual(radio!.transmit.cwSwapPaddles, false, "cwSwapPaddles")
-      XCTAssertEqual(radio!.transmit.cwBreakInDelay, 41, "cwBreakInDelay")
-      XCTAssertEqual(radio!.transmit.cwBreakInEnabled, true, "cwBreakInEnabled")
-      XCTAssertEqual(radio!.transmit.cwlEnabled, false, "cwlEnabled")
-      XCTAssertEqual(radio!.transmit.cwSidetoneEnabled, true, "cwSidetoneEnabled")
-      XCTAssertEqual(radio!.transmit.cwSyncCwxEnabled, true, "cwSyncCwxEnabled")
-      XCTAssertEqual(radio!.transmit.daxEnabled, false, "daxEnabled")
-      XCTAssertEqual(radio!.transmit.frequency, 14_100_000, "frequency")
-      XCTAssertEqual(radio!.transmit.hwAlcEnabled, false, "hwAlcEnabled")
-      XCTAssertEqual(radio!.transmit.inhibit, false, "inhibit")
-      XCTAssertEqual(radio!.transmit.metInRxEnabled, false, "metInRxEnabled")
-      XCTAssertEqual(radio!.transmit.micAccEnabled, false, "micAccEnabled")
-      XCTAssertEqual(radio!.transmit.micBiasEnabled, false, "micBiasEnabled")
-      XCTAssertEqual(radio!.transmit.micBoostEnabled, true, "micBoostEnabled")
-      XCTAssertEqual(radio!.transmit.micLevel, 40, "micLevel")
-      XCTAssertEqual(radio!.transmit.micSelection, "MIC", "micSelection")
-      XCTAssertEqual(radio!.transmit.rfPower, 100, "rfPower")
-      XCTAssertEqual(radio!.transmit.speechProcessorEnabled, true, "speechProcessorEnabled")
-      XCTAssertEqual(radio!.transmit.speechProcessorLevel, 0, "speechProcessorLevel")
-      XCTAssertEqual(radio!.transmit.tunePower, 10, "tunePower")
-      XCTAssertEqual(radio!.transmit.txAntenna, "ANT1", "txAntenna")
-      XCTAssertEqual(radio!.transmit.txFilterChanges, true, "txFilterChanges")
-      XCTAssertEqual(radio!.transmit.txFilterHigh, 2_900, "txFilterHigh")
-      XCTAssertEqual(radio!.transmit.txFilterLow, 100, "txFilterLow")
-      XCTAssertEqual(radio!.transmit.txMonitorEnabled, false, "txMonitorEnabled")
-      XCTAssertEqual(radio!.transmit.txMonitorGainCw, 80, "txMonitorGainCw")
-      XCTAssertEqual(radio!.transmit.txMonitorGainSb, 75, "txMonitorGainSb")
-      XCTAssertEqual(radio!.transmit.txMonitorPanCw, 50, "txMonitorPanCw")
-      XCTAssertEqual(radio!.transmit.txSliceMode, "USB", "txSliceMode")
-      XCTAssertEqual(radio!.transmit.voxDelay, 72, "voxDelay")
-      XCTAssertEqual(radio!.transmit.voxEnabled, false, "voxEnabled")
-      XCTAssertEqual(radio!.transmit.voxLevel, 50, "voxLevel")
+      XCTAssertEqual(radio!.transmit.carrierLevel, 100, "carrierLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.companderLevel, 70, "companderLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.cwIambicEnabled, true, "cwIambicEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.cwIambicMode, 1, "cwIambicMode", file: #function)
+      XCTAssertEqual(radio!.transmit.cwPitch, 600, "cwPitch", file: #function)
+      XCTAssertEqual(radio!.transmit.cwSpeed, 30, "cwSpeed", file: #function)
+      XCTAssertEqual(radio!.transmit.cwSwapPaddles, false, "cwSwapPaddles", file: #function)
+      XCTAssertEqual(radio!.transmit.cwBreakInDelay, 41, "cwBreakInDelay", file: #function)
+      XCTAssertEqual(radio!.transmit.cwBreakInEnabled, true, "cwBreakInEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.cwlEnabled, false, "cwlEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.cwSidetoneEnabled, true, "cwSidetoneEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.cwSyncCwxEnabled, true, "cwSyncCwxEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.daxEnabled, false, "daxEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.frequency, 14_100_000, "frequency", file: #function)
+      XCTAssertEqual(radio!.transmit.hwAlcEnabled, false, "hwAlcEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.inhibit, false, "inhibit", file: #function)
+      XCTAssertEqual(radio!.transmit.metInRxEnabled, false, "metInRxEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.micAccEnabled, false, "micAccEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.micBiasEnabled, false, "micBiasEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.micBoostEnabled, true, "micBoostEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.micLevel, 40, "micLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.micSelection, "MIC", "micSelection", file: #function)
+      XCTAssertEqual(radio!.transmit.rfPower, 100, "rfPower", file: #function)
+      XCTAssertEqual(radio!.transmit.speechProcessorEnabled, true, "speechProcessorEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.speechProcessorLevel, 0, "speechProcessorLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.tunePower, 10, "tunePower", file: #function)
+      XCTAssertEqual(radio!.transmit.txAntenna, "ANT1", "txAntenna", file: #function)
+      XCTAssertEqual(radio!.transmit.txFilterChanges, true, "txFilterChanges", file: #function)
+      XCTAssertEqual(radio!.transmit.txFilterHigh, 2_900, "txFilterHigh", file: #function)
+      XCTAssertEqual(radio!.transmit.txFilterLow, 100, "txFilterLow", file: #function)
+      XCTAssertEqual(radio!.transmit.txMonitorEnabled, false, "txMonitorEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.txMonitorGainCw, 80, "txMonitorGainCw", file: #function)
+      XCTAssertEqual(radio!.transmit.txMonitorGainSb, 75, "txMonitorGainSb", file: #function)
+      XCTAssertEqual(radio!.transmit.txMonitorPanCw, 50, "txMonitorPanCw", file: #function)
+      XCTAssertEqual(radio!.transmit.txSliceMode, "USB", "txSliceMode", file: #function)
+      XCTAssertEqual(radio!.transmit.voxDelay, 72, "voxDelay", file: #function)
+      XCTAssertEqual(radio!.transmit.voxEnabled, false, "voxEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.voxLevel, 50, "voxLevel", file: #function)
       
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
-    } else if radio!.version.isV3Api {
+    } else if radio!.version.isV3 {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_3.keyValuesArray())
       
       if showInfoMessages { Swift.print("***** TRANSMIT object found") }
       
-      XCTAssertEqual(radio!.transmit.carrierLevel, 100, "carrierLevel")
-      XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled")
-      XCTAssertEqual(radio!.transmit.companderLevel, 70, "companderLevel")
-      XCTAssertEqual(radio!.transmit.cwIambicEnabled, true, "cwIambicEnabled")
-      XCTAssertEqual(radio!.transmit.cwIambicMode, 1, "cwIambicMode")
-      XCTAssertEqual(radio!.transmit.cwPitch, 600, "cwPitch")
-      XCTAssertEqual(radio!.transmit.cwSpeed, 30, "cwSpeed")
-      XCTAssertEqual(radio!.transmit.cwSwapPaddles, false, "cwSwapPaddles")
-      XCTAssertEqual(radio!.transmit.cwBreakInDelay, 41, "cwBreakInDelay")
-      XCTAssertEqual(radio!.transmit.cwBreakInEnabled, true, "cwBreakInEnabled")
-      XCTAssertEqual(radio!.transmit.cwlEnabled, false, "cwlEnabled")
-      XCTAssertEqual(radio!.transmit.cwSidetoneEnabled, true, "cwSidetoneEnabled")
-      XCTAssertEqual(radio!.transmit.cwSyncCwxEnabled, true, "cwSyncCwxEnabled")
-      XCTAssertEqual(radio!.transmit.daxEnabled, false, "daxEnabled")
-      XCTAssertEqual(radio!.transmit.frequency, 14_100_000, "frequency")
-      XCTAssertEqual(radio!.transmit.hwAlcEnabled, false, "hwAlcEnabled")
-      XCTAssertEqual(radio!.transmit.inhibit, false, "inhibit")
-      XCTAssertEqual(radio!.transmit.metInRxEnabled, false, "metInRxEnabled")
-      XCTAssertEqual(radio!.transmit.micAccEnabled, false, "micAccEnabled")
-      XCTAssertEqual(radio!.transmit.micBiasEnabled, false, "micBiasEnabled")
-      XCTAssertEqual(radio!.transmit.micBoostEnabled, true, "micBoostEnabled")
-      XCTAssertEqual(radio!.transmit.micLevel, 40, "micLevel")
-      XCTAssertEqual(radio!.transmit.micSelection, "MIC", "micSelection")
-      XCTAssertEqual(radio!.transmit.rfPower, 100, "rfPower")
-      XCTAssertEqual(radio!.transmit.speechProcessorEnabled, true, "speechProcessorEnabled")
-      XCTAssertEqual(radio!.transmit.speechProcessorLevel, 0, "speechProcessorLevel")
-      XCTAssertEqual(radio!.transmit.tunePower, 10, "tunePower")
-      XCTAssertEqual(radio!.transmit.txAntenna, "ANT1", "txAntenna")
-      XCTAssertEqual(radio!.transmit.txFilterChanges, true, "txFilterChanges")
-      XCTAssertEqual(radio!.transmit.txFilterHigh, 2_900, "txFilterHigh")
-      XCTAssertEqual(radio!.transmit.txFilterLow, 100, "txFilterLow")
-      XCTAssertEqual(radio!.transmit.txMonitorEnabled, false, "txMonitorEnabled")
-      XCTAssertEqual(radio!.transmit.txMonitorGainCw, 80, "txMonitorGainCw")
-      XCTAssertEqual(radio!.transmit.txMonitorGainSb, 75, "txMonitorGainSb")
-      XCTAssertEqual(radio!.transmit.txMonitorPanCw, 50, "txMonitorPanCw")
-      XCTAssertEqual(radio!.transmit.txSliceMode, "USB", "txSliceMode")
-      XCTAssertEqual(radio!.transmit.voxDelay, 72, "voxDelay")
-      XCTAssertEqual(radio!.transmit.voxEnabled, false, "voxEnabled")
-      XCTAssertEqual(radio!.transmit.voxLevel, 50, "voxLevel")
-
+      XCTAssertEqual(radio!.transmit.carrierLevel, 100, "carrierLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.companderLevel, 70, "companderLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.cwIambicEnabled, true, "cwIambicEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.cwIambicMode, 1, "cwIambicMode", file: #function)
+      XCTAssertEqual(radio!.transmit.cwPitch, 600, "cwPitch", file: #function)
+      XCTAssertEqual(radio!.transmit.cwSpeed, 30, "cwSpeed", file: #function)
+      XCTAssertEqual(radio!.transmit.cwSwapPaddles, false, "cwSwapPaddles", file: #function)
+      XCTAssertEqual(radio!.transmit.cwBreakInDelay, 41, "cwBreakInDelay", file: #function)
+      XCTAssertEqual(radio!.transmit.cwBreakInEnabled, true, "cwBreakInEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.cwlEnabled, false, "cwlEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.cwSidetoneEnabled, true, "cwSidetoneEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.cwSyncCwxEnabled, true, "cwSyncCwxEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.daxEnabled, false, "daxEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.frequency, 14_100_000, "frequency", file: #function)
+      XCTAssertEqual(radio!.transmit.hwAlcEnabled, false, "hwAlcEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.inhibit, false, "inhibit", file: #function)
+      XCTAssertEqual(radio!.transmit.metInRxEnabled, false, "metInRxEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.micAccEnabled, false, "micAccEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.micBiasEnabled, false, "micBiasEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.micBoostEnabled, true, "micBoostEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.micLevel, 40, "micLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.micSelection, "MIC", "micSelection", file: #function)
+      XCTAssertEqual(radio!.transmit.rfPower, 100, "rfPower", file: #function)
+      XCTAssertEqual(radio!.transmit.speechProcessorEnabled, true, "speechProcessorEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.speechProcessorLevel, 0, "speechProcessorLevel", file: #function)
+      XCTAssertEqual(radio!.transmit.tunePower, 10, "tunePower", file: #function)
+      XCTAssertEqual(radio!.transmit.txAntenna, "ANT1", "txAntenna", file: #function)
+      XCTAssertEqual(radio!.transmit.txFilterChanges, true, "txFilterChanges", file: #function)
+      XCTAssertEqual(radio!.transmit.txFilterHigh, 2_900, "txFilterHigh", file: #function)
+      XCTAssertEqual(radio!.transmit.txFilterLow, 100, "txFilterLow", file: #function)
+      XCTAssertEqual(radio!.transmit.txMonitorEnabled, false, "txMonitorEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.txMonitorGainCw, 80, "txMonitorGainCw", file: #function)
+      XCTAssertEqual(radio!.transmit.txMonitorGainSb, 75, "txMonitorGainSb", file: #function)
+      XCTAssertEqual(radio!.transmit.txMonitorPanCw, 50, "txMonitorPanCw", file: #function)
+      XCTAssertEqual(radio!.transmit.txSliceMode, "USB", "txSliceMode", file: #function)
+      XCTAssertEqual(radio!.transmit.voxDelay, 72, "voxDelay", file: #function)
+      XCTAssertEqual(radio!.transmit.voxEnabled, false, "voxEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.voxLevel, 50, "voxLevel", file: #function)
+      
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
     }  else {
-      XCTFail("Unknown Radio version (\(radio!.version.longString)")
+      XCTFail("Unknown Radio version (\(radio!.version.longString)", file: #function)
     }
     disconnect()
   }
-
+  
   // ------------------------------------------------------------------------------
   // MARK: - UsbCable
   
@@ -1604,8 +1606,8 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["UsbCable.swift"]))
     guard radio != nil else { return }
     
-    XCTFail("NOT performed, --- FIX ME ---")
-      
+    XCTFail("NOT performed, --- FIX ME ---", file: #function)
+    
     disconnect()
   }
   
@@ -1616,8 +1618,8 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["UsbCable.swift"]))
     guard radio != nil else { return }
     
-    XCTFail("NOT performed, --- FIX ME ---")
-
+    XCTFail("NOT performed, --- FIX ME ---", file: #function)
+    
     disconnect()
   }
   
@@ -1625,7 +1627,7 @@ final class ObjectTests: XCTestCase {
   // MARK: - Waterfall
   
   private var waterfallStatus = "waterfall 0x42000000 x_pixels=50 center=14.100000 bandwidth=0.200000 band_zoom=0 segment_zoom=0 line_duration=100 rfgain=0 rxant=ANT1 wide=0 loopa=0 loopb=0 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 panadapter=40000000 color_gain=50 auto_black=1 black_level=20 gradient_index=1 xvtr="
-
+  
   func removeAllWaterfalls(radio: Radio) {
     
     for (_, panadapter) in radio.panadapters {
@@ -1635,10 +1637,10 @@ final class ObjectTests: XCTestCase {
       panadapter.remove()
     }
     sleep(1)
-    if radio.panadapters.count != 0 { XCTFail("***** Waterfall(s) NOT removed *****") }
-    if radio.slices.count != 0 { XCTFail("***** Slice(s) NOT removed *****") }
+    if radio.panadapters.count != 0 { XCTFail("***** Waterfall(s) NOT removed *****", file: #function) }
+    if radio.slices.count != 0 { XCTFail("***** Slice(s) NOT removed *****", file: #function) }
   }
-
+  
   func testWaterfallParse() {
     
     Swift.print("\n***** \(#function)")
@@ -1653,43 +1655,47 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** WATERFALL created") }
       
-      XCTAssertEqual(waterfallObject.autoBlackEnabled, true, "AutoBlackEnabled")
-      XCTAssertEqual(waterfallObject.blackLevel, 20, "BlackLevel")
-      XCTAssertEqual(waterfallObject.colorGain, 50, "ColorGain")
-      XCTAssertEqual(waterfallObject.gradientIndex, 1, "GradientIndex")
-      XCTAssertEqual(waterfallObject.lineDuration, 100, "LineDuration")
-      XCTAssertEqual(waterfallObject.panadapterId, "0x40000000".streamId, "Panadapter Id")
+      XCTAssertEqual(waterfallObject.autoBlackEnabled, true, "AutoBlackEnabled", file: #function)
+      XCTAssertEqual(waterfallObject.blackLevel, 20, "BlackLevel", file: #function)
+      XCTAssertEqual(waterfallObject.colorGain, 50, "ColorGain", file: #function)
+      XCTAssertEqual(waterfallObject.gradientIndex, 1, "GradientIndex", file: #function)
+      XCTAssertEqual(waterfallObject.lineDuration, 100, "LineDuration", file: #function)
+      XCTAssertEqual(waterfallObject.panadapterId, "0x40000000".streamId, "Panadapter Id", file: #function)
       
       if showInfoMessages { Swift.print("***** WATERFALL parameters verified") }
       
     } else {
-      XCTFail("***** WATERFALL NOT created *****")
+      XCTFail("***** WATERFALL NOT created *****", file: #function)
     }
     disconnect()
   }
   
   func testWaterfall() {
+    let type = "Waterfall"
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Waterfall.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Panadapter.swift"]))
     guard radio != nil else { return }
+    
+    if showInfoMessages { Swift.print("\n***** Remove existing \(type)(s)") }
     
     removeAllWaterfalls(radio: radio!)
     if radio!.panadapters.count == 0 {
       
-      if showInfoMessages { Swift.print("***** Existing PANADAPTER(s) & WATERFALL(s) removed") }
+      if showInfoMessages { Swift.print("***** Existing \(type)(s) removal confirmed\n") }
       
-      radio!.requestPanadapter(frequency: 15_000_000)
+      if showInfoMessages { Swift.print("\n***** Request 1st \(type)") }
+      
+      radio!.requestPanadapter()
       sleep(1)
-      
-      if showInfoMessages { Swift.print("***** 1st PANADAPTER & WATERFALL requested") }
-      
       // verify added
       if radio!.waterfalls.count == 1 {
         if let object = radio!.waterfalls.first?.value {
           
-          if showInfoMessages { Swift.print("***** 1st PANADAPTER & WATERFALL created") }
+          if showInfoMessages { Swift.print("***** 1st \(type) created\n") }
+          
+          let firstId = object.id
           
           let autoBlackEnabled = object.autoBlackEnabled
           let blackLevel = object.blackLevel
@@ -1697,70 +1703,89 @@ final class ObjectTests: XCTestCase {
           let gradientIndex = object.gradientIndex
           let lineDuration = object.lineDuration
           let panadapterId = object.panadapterId
-
-          if showInfoMessages { Swift.print("***** 1st WATERFALL parameters saved") }
           
-          removeAllPanadapters(radio: radio!)
+          if showInfoMessages { Swift.print("***** 1st \(type) parameters saved") }
+          
+          if showInfoMessages { Swift.print("\n***** Remove 1st \(type): pan id = \(radio!.waterfalls[firstId]!.panadapterId.hex)") }
+          
+          radio!.panadapters[radio!.waterfalls[firstId]!.panadapterId]!.remove()
+          sleep(1)
           if radio!.panadapters.count == 0 {
             
+            if showInfoMessages { Swift.print("***** 1st \(type) removal confirmed\n") }
+            
+            if showInfoMessages { Swift.print("\n***** Request 2nd \(type)") }
+            
             // ask for new
-            radio!.requestPanadapter(frequency: 15_000_000)
+            radio!.requestPanadapter()
             sleep(1)
-            
-            if showInfoMessages { Swift.print("***** 2nd PANADAPTER & WATERFALL requested") }
-            
             // verify added
             if radio!.waterfalls.count == 1 {
+              
+              if showInfoMessages { Swift.print("***** 2nd \(type) creation confirmed\n") }
+              
               if let object = radio!.waterfalls.first?.value {
                 
-                if showInfoMessages { Swift.print("***** 2nd PANADAPTER & WATERFALL created") }
+                XCTAssertEqual(object.autoBlackEnabled, autoBlackEnabled, "AutoBlackEnabled", file: #function)
+                XCTAssertEqual(object.blackLevel, blackLevel, "BlackLevel", file: #function)
+                XCTAssertEqual(object.colorGain, colorGain, "ColorGain", file: #function)
+                XCTAssertEqual(object.gradientIndex, gradientIndex, "GradientIndex", file: #function)
+                XCTAssertEqual(object.lineDuration, lineDuration, "LineDuration", file: #function)
+                XCTAssertEqual(object.panadapterId, panadapterId, "Panadapter Id", file: #function)
                 
-                XCTAssertEqual(object.autoBlackEnabled, autoBlackEnabled, "AutoBlackEnabled")
-                XCTAssertEqual(object.blackLevel, blackLevel, "BlackLevel")
-                XCTAssertEqual(object.colorGain, colorGain, "ColorGain")
-                XCTAssertEqual(object.gradientIndex, gradientIndex, "GradientIndex")
-                XCTAssertEqual(object.lineDuration, lineDuration, "LineDuration")
-                XCTAssertEqual(object.panadapterId, panadapterId, "Panadapter Id")
-
-                if showInfoMessages { Swift.print("***** 2nd WATERFALL parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) parameters verified") }
+                
+                let secondId = object.id
                 
                 object.autoBlackEnabled = !autoBlackEnabled
                 object.blackLevel = blackLevel + 10
                 object.colorGain = colorGain + 20
                 object.gradientIndex = gradientIndex + 1
                 object.lineDuration = lineDuration - 10
-
-                if showInfoMessages { Swift.print("***** 2nd WATERFALL parameters modified") }
                 
-                XCTAssertEqual(object.autoBlackEnabled, !autoBlackEnabled, "AutoBlackEnabled")
-                XCTAssertEqual(object.blackLevel, blackLevel + 10, "BlackLevel")
-                XCTAssertEqual(object.colorGain, colorGain + 20, "ColorGain")
-                XCTAssertEqual(object.gradientIndex, gradientIndex + 1, "GradientIndex")
-                XCTAssertEqual(object.lineDuration, lineDuration - 10, "LineDuration")
-                XCTAssertEqual(object.panadapterId, panadapterId, "Panadapter Id")
-
-                if showInfoMessages { Swift.print("***** 2nd WATERFALL modified parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) parameters modified") }
                 
+                XCTAssertEqual(object.autoBlackEnabled, !autoBlackEnabled, "AutoBlackEnabled", file: #function)
+                XCTAssertEqual(object.blackLevel, blackLevel + 10, "BlackLevel", file: #function)
+                XCTAssertEqual(object.colorGain, colorGain + 20, "ColorGain", file: #function)
+                XCTAssertEqual(object.gradientIndex, gradientIndex + 1, "GradientIndex", file: #function)
+                XCTAssertEqual(object.lineDuration, lineDuration - 10, "LineDuration", file: #function)
+                XCTAssertEqual(object.panadapterId, panadapterId, "Panadapter Id", file: #function)
+                
+                if showInfoMessages { Swift.print("***** 2nd \(type) modified parameters verified") }
+                
+                if showInfoMessages { Swift.print("\n***** 2nd \(type) removed") }
+                
+                radio!.panadapters[radio!.waterfalls[secondId]!.panadapterId]!.remove()
+                sleep(1)
+                if radio!.panadapters[secondId] == nil {
+                  
+                  if showInfoMessages { Swift.print("***** 2nd \(type) removal confirmed\n") }
+                  
+                }
               } else {
-                XCTFail("***** 2nd WATERFALL NOT found *****")
+                XCTFail("***** 2nd \(type) NOT found *****", file: #function)
               }
             } else {
-              XCTFail("***** 2nd WATERFALL NOT created *****")
+              XCTFail("***** 2nd \(type) NOT created *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st WATERFALL NOT removed *****")
+            XCTFail("***** 1st \(type) NOT removed *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st WATERFALL NOT created *****")
+          XCTFail("***** 1st \(type) NOT created *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing PANADAPTER(s) & WATERFALL(s) NOT removed *****")
+        XCTFail("***** Existing PANADAPTER(s) & \(type)(s) NOT removed *****", file: #function)
       }
-      removeAllPanadapters(radio: radio!)
     }
+    
+    Swift.print("\nRemaining pan:       count = \(radio!.panadapters.count), 1st id = \(radio!.panadapters.first?.key.hex)")
+    Swift.print("Remaining waterfall: count = \(radio!.waterfalls.count), 1st id = \(radio!.waterfalls.first?.key.hex)\n")
+    
     disconnect()
   }
-
+  
   // ------------------------------------------------------------------------------
   // MARK: - Xvtr
   
@@ -1794,16 +1819,16 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** XVTR created") }
       
-      XCTAssertEqual(xvtrObject.ifFrequency, 28_000_000, "IfFrequency")
-      XCTAssertEqual(xvtrObject.isValid, true, "IsValid")
-      XCTAssertEqual(xvtrObject.loError, 0, "LoError")
-      XCTAssertEqual(xvtrObject.name, expectedName, "Name")
-      XCTAssertEqual(xvtrObject.maxPower, 10, "MaxPower")
-      XCTAssertEqual(xvtrObject.order, 0, "Order")
-      XCTAssertEqual(xvtrObject.preferred, true, "Preferred")
-      XCTAssertEqual(xvtrObject.rfFrequency, 220_000_000, "RfFrequency")
-      XCTAssertEqual(xvtrObject.rxGain, 0, "RxGain")
-      XCTAssertEqual(xvtrObject.rxOnly, true, "RxOnly")
+      XCTAssertEqual(xvtrObject.ifFrequency, 28_000_000, "IfFrequency", file: #function)
+      XCTAssertEqual(xvtrObject.isValid, true, "IsValid", file: #function)
+      XCTAssertEqual(xvtrObject.loError, 0, "LoError", file: #function)
+      XCTAssertEqual(xvtrObject.name, expectedName, "Name", file: #function)
+      XCTAssertEqual(xvtrObject.maxPower, 10, "MaxPower", file: #function)
+      XCTAssertEqual(xvtrObject.order, 0, "Order", file: #function)
+      XCTAssertEqual(xvtrObject.preferred, true, "Preferred", file: #function)
+      XCTAssertEqual(xvtrObject.rfFrequency, 220_000_000, "RfFrequency", file: #function)
+      XCTAssertEqual(xvtrObject.rxGain, 0, "RxGain", file: #function)
+      XCTAssertEqual(xvtrObject.rxOnly, true, "RxOnly", file: #function)
       
       if showInfoMessages { Swift.print("***** XVTR parameters verified") }
       
@@ -1811,7 +1836,7 @@ final class ObjectTests: XCTestCase {
       //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
       
     } else {
-      XCTFail("***** XVTR NOT created *****")
+      XCTFail("***** XVTR NOT created *****", file: #function)
     }
     disconnect()
   }
@@ -1855,9 +1880,9 @@ final class ObjectTests: XCTestCase {
           let rfFrequency = object.rfFrequency
           let rxGain = object.rxGain
           let rxOnly = object.rxOnly
-
+          
           if showInfoMessages { Swift.print("***** 1st XVTR parameters saved") }
-
+          
           radio!.xvtrs[id]!.remove()
           sleep(1)
           if radio!.xvtrs.count == 0 {
@@ -1874,20 +1899,20 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd XVTR created") }
                 
-                XCTAssertEqual(object.isValid, isValid, "isValid")
-                XCTAssertEqual(object.preferred, preferred, "Preferred")
+                XCTAssertEqual(object.isValid, isValid, "isValid", file: #function)
+                XCTAssertEqual(object.preferred, preferred, "Preferred", file: #function)
                 
-                XCTAssertEqual(object.ifFrequency, ifFrequency, "IfFrequency")
-                XCTAssertEqual(object.loError, loError, "LoError")
-                XCTAssertEqual(object.name, name, "Name")
-                XCTAssertEqual(object.maxPower, maxPower, "MaxPower")
-                XCTAssertEqual(object.order, order, "Order")
-                XCTAssertEqual(object.rfFrequency, rfFrequency, "RfFrequency")
-                XCTAssertEqual(object.rxGain, rxGain, "RxGain")
-                XCTAssertEqual(object.rxOnly, rxOnly, "RxOnly")
+                XCTAssertEqual(object.ifFrequency, ifFrequency, "IfFrequency", file: #function)
+                XCTAssertEqual(object.loError, loError, "LoError", file: #function)
+                XCTAssertEqual(object.name, name, "Name", file: #function)
+                XCTAssertEqual(object.maxPower, maxPower, "MaxPower", file: #function)
+                XCTAssertEqual(object.order, order, "Order", file: #function)
+                XCTAssertEqual(object.rfFrequency, rfFrequency, "RfFrequency", file: #function)
+                XCTAssertEqual(object.rxGain, rxGain, "RxGain", file: #function)
+                XCTAssertEqual(object.rxOnly, rxOnly, "RxOnly", file: #function)
                 
                 if showInfoMessages { Swift.print("***** 2nd XVTR parameters verified") }
-                                
+                
                 object.ifFrequency = ifFrequency + 1_000_000
                 object.loError = loError + 10
                 object.name = "x" + name
@@ -1896,20 +1921,20 @@ final class ObjectTests: XCTestCase {
                 object.rfFrequency = rfFrequency + 10_000_000
                 object.rxGain = rxGain + 5
                 object.rxOnly = !rxOnly
-
-                if showInfoMessages { Swift.print("***** 2nd XVTR parameters modified") }
-
-                XCTAssertEqual(object.isValid, false, "isValid")
-                XCTAssertEqual(object.preferred, false, "Preferred")
                 
-                XCTAssertEqual(object.ifFrequency, ifFrequency + 1_000_000, "IfFrequency")
-                XCTAssertEqual(object.loError, loError + 10, "LoError")
-                XCTAssertEqual(object.name, "x" + name, "Name")
-                XCTAssertEqual(object.maxPower, maxPower * 2, "MaxPower")
-                XCTAssertEqual(object.order, order, "Order")
-                XCTAssertEqual(object.rfFrequency, rfFrequency + 10_000_000, "RfFrequency")
-                XCTAssertEqual(object.rxGain, rxGain + 5, "RxGain")
-                XCTAssertEqual(object.rxOnly, !rxOnly, "RxOnly")
+                if showInfoMessages { Swift.print("***** 2nd XVTR parameters modified") }
+                
+                XCTAssertEqual(object.isValid, false, "isValid", file: #function)
+                XCTAssertEqual(object.preferred, false, "Preferred", file: #function)
+                
+                XCTAssertEqual(object.ifFrequency, ifFrequency + 1_000_000, "IfFrequency", file: #function)
+                XCTAssertEqual(object.loError, loError + 10, "LoError", file: #function)
+                XCTAssertEqual(object.name, "x" + name, "Name", file: #function)
+                XCTAssertEqual(object.maxPower, maxPower * 2, "MaxPower", file: #function)
+                XCTAssertEqual(object.order, order, "Order", file: #function)
+                XCTAssertEqual(object.rfFrequency, rfFrequency + 10_000_000, "RfFrequency", file: #function)
+                XCTAssertEqual(object.rxGain, rxGain + 5, "RxGain", file: #function)
+                XCTAssertEqual(object.rxOnly, !rxOnly, "RxOnly", file: #function)
                 
                 // FIXME: ??? what is this
                 //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
@@ -1917,19 +1942,19 @@ final class ObjectTests: XCTestCase {
                 if showInfoMessages { Swift.print("***** 2nd XVTR modified parameters verified") }
                 
               } else {
-                XCTFail("***** 2nd XVTR NOT found *****")
+                XCTFail("***** 2nd XVTR NOT found *****", file: #function)
               }
             } else {
-              XCTFail("***** 2nd XVTR NOT created *****")
+              XCTFail("***** 2nd XVTR NOT created *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st XVTR NOT removed *****")
+            XCTFail("***** 1st XVTR NOT removed *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st XVTR NOT created *****")
+          XCTFail("***** 1st XVTR NOT created *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing XVTR(s) NOT removed *****")
+        XCTFail("***** Existing XVTR(s) NOT removed *****", file: #function)
       }
       // remove all
       for (_, object) in radio!.xvtrs { object.remove() }

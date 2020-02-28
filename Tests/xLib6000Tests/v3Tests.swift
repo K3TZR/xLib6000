@@ -27,11 +27,11 @@ final class v3Tests: XCTestCase {
         
         return Api.sharedInstance.radio
       } else {
-        XCTFail("***** Failed to connect to Radio\n")
+        XCTFail("***** Failed to connect to Radio\n", file: #function)
         return nil
       }
     } else {
-      XCTFail("***** No Radio(s) found\n")
+      XCTFail("***** No Radio(s) found\n", file: #function)
       return nil
     }
   }
@@ -56,7 +56,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
 
       sleep(1)
       
@@ -108,7 +108,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
 
       // remove (if present)
       radio!.bandSettings["2".objectId!] = nil
@@ -171,7 +171,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["BandSetting.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
       
       sleep(1)
       
@@ -322,7 +322,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
       
       daxIqStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
@@ -363,13 +363,13 @@ final class v3Tests: XCTestCase {
             if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
             
           } else {
-            XCTFail("***** \(type) object NOT found *****")
+            XCTFail("***** \(type) object NOT found *****", file: #function)
           }
         } else {
-          XCTFail("***** \(type) object NOT created *****")
+          XCTFail("***** \(type) object NOT created *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) NOT removed *****")
+        XCTFail("***** Existing \(type) object(s) NOT removed *****", file: #function)
       }
     } else {
       Swift.print("SKIPPED: \(#function) requires \(requiredVersion)")
@@ -385,7 +385,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
       
       // remove all
       radio!.iqStreams.forEach { $0.value.remove() }
@@ -447,22 +447,22 @@ final class v3Tests: XCTestCase {
                   if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd \(type) object NOT found *****")
+                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT created *****")
+                XCTFail("***** 2nd \(type) object NOT created *****", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object NOT removed *****")
+              XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object  NOT found *****")
+            XCTFail("***** 1st \(type) object  NOT found *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT added *****")
+          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
         }
       } else {
-        XCTFail("***** Previous \(type) object(s) NOT removed *****")
+        XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
       }
       // remove
       radio!.daxIqStreams.forEach { $0.value.remove() }
@@ -489,7 +489,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
       
       daxMicAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
@@ -521,10 +521,10 @@ final class v3Tests: XCTestCase {
           if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
           
         } else {
-          XCTFail("***** \(type) object NOT created *****")
+          XCTFail("***** \(type) object NOT created *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) *****")
+        XCTFail("***** Existing \(type) object(s) *****", file: #function)
       }
       
     } else {
@@ -542,7 +542,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
       
       // remove all
       radio!.daxMicAudioStreams.forEach( {$0.value.remove() } )
@@ -606,19 +606,19 @@ final class v3Tests: XCTestCase {
                 }
                 
               } else {
-               XCTFail("***** 2nd \(type) object NOT found *****")
+               XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
               }
             } else {
-              XCTFail("***** 2nd \(type) object NOT added *****")
+              XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object NOT removed *****")
+            XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT found *****")
+          XCTFail("***** 1st \(type) object NOT found *****", file: #function)
         }
       } else {
-        XCTFail("***** 1st \(type) object NOT added *****")
+        XCTFail("***** 1st \(type) object NOT added *****", file: #function)
       }
     } else {
       Swift.print("SKIPPED: \(#function) requires \(requiredVersion)")
@@ -640,7 +640,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
       
       daxRxAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
@@ -678,10 +678,10 @@ final class v3Tests: XCTestCase {
           if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
           
         } else {
-          XCTFail("***** \(type) object NOT created *****")
+          XCTFail("***** \(type) object NOT created *****", file: #function)
         }
       } else {
-        XCTFail("***** \(type) object NOT removed *****")
+        XCTFail("***** \(type) object NOT removed *****", file: #function)
       }
     } else {
       Swift.print("SKIPPED: \(#function) requires \(requiredVersion)")
@@ -697,7 +697,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
       
       // remove all
       radio!.daxRxAudioStreams.forEach { $0.value.remove() }
@@ -755,22 +755,22 @@ final class v3Tests: XCTestCase {
                   if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd \(type) object NOT found *****")
+                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT added *****")
+                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object NOT removed *****")
+              XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object NOT found *****")
+            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT added *****")
+          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
         }
       } else {
-        XCTFail("***** Previous \(type) object(s) NOT removed *****")
+        XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
       }
       // remove
       radio!.daxRxAudioStreams.forEach { $0.value.remove() }
@@ -797,7 +797,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
       
       daxTxAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
@@ -828,10 +828,10 @@ final class v3Tests: XCTestCase {
           if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
           
         } else {
-          XCTFail("***** \(type) object NOT created *****")
+          XCTFail("***** \(type) object NOT created *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) NOT removed *****")
+        XCTFail("***** Existing \(type) object(s) NOT removed *****", file: #function)
       }
       
     } else {
@@ -848,7 +848,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
       
       // remove all
       for (_, object) in radio!.daxTxAudioStreams { object.remove() }
@@ -902,19 +902,19 @@ final class v3Tests: XCTestCase {
                   if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd \(type) object NOT found *****")
+                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT added *****")
+                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object NOT removed *****")
+              XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object NOT found *****")
+            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT added *****")
+          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
         }
       } else {
         XCTFail("***** Previous \(type) object(s) NOT removed *****")
@@ -944,7 +944,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift]"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
       
       remoteRxAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
@@ -980,10 +980,10 @@ final class v3Tests: XCTestCase {
           if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
           
         } else {
-          XCTFail("***** \(type) object NOT created *****")
+          XCTFail("***** \(type) object NOT created *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) NOT removed *****")
+        XCTFail("***** Existing \(type) object(s) NOT removed *****", file: #function)
       }
       
     } else {
@@ -1000,7 +1000,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3Api {
+    if radio!.version.isV3 {
       
       // remove all
       radio!.remoteRxAudioStreams.forEach { $0.value.remove() }
@@ -1053,22 +1053,22 @@ final class v3Tests: XCTestCase {
                   if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd \(type) object NOT found *****")
+                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT added *****")
+                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object NOT removed *****")
+              XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object NOT found *****")
+            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT added *****")
+          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
         }
       } else {
-        XCTFail("***** Previous \(type) object(s) NOT removed *****")
+        XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
       }
       // remove
       radio!.daxRxAudioStreams.forEach { $0.value.remove() }
@@ -1095,7 +1095,7 @@ final class v3Tests: XCTestCase {
       let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
       guard radio != nil else { return }
       
-      if radio!.version.isV3Api {
+      if radio!.version.isV3 {
         
         remoteTxAudioStreamStatus_1 += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
         
@@ -1131,10 +1131,10 @@ final class v3Tests: XCTestCase {
             if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
             
           } else {
-            XCTFail("***** \(type) object NOT created *****")
+            XCTFail("***** \(type) object NOT created *****", file: #function)
           }
         } else {
-          XCTFail("***** Existing \(type) object(s) NOT removed *****")
+          XCTFail("***** Existing \(type) object(s) NOT removed *****", file: #function)
         }
         
       } else {
@@ -1152,7 +1152,7 @@ final class v3Tests: XCTestCase {
       let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
       guard radio != nil else { return }
       
-      if radio!.version.isV3Api {
+      if radio!.version.isV3 {
         
         remoteTxAudioStreamStatus_2 += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
         
@@ -1188,10 +1188,10 @@ final class v3Tests: XCTestCase {
             if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
             
           } else {
-            XCTFail("***** \(type) object NOT created *****")
+            XCTFail("***** \(type) object NOT created *****", file: #function)
           }
         } else {
-          XCTFail("***** Existing \(type) object(s) NOT removed *****")
+          XCTFail("***** Existing \(type) object(s) NOT removed *****", file: #function)
         }
         
       } else {
@@ -1208,7 +1208,7 @@ final class v3Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
       guard radio != nil else { return }
       
-      if radio!.version.isV3Api {
+      if radio!.version.isV3 {
         
         radio!.remoteTxAudioStreams.forEach { $0.value.remove() }
         sleep(1)
@@ -1254,22 +1254,22 @@ final class v3Tests: XCTestCase {
                     if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
                     
                   } else {
-                    XCTFail("***** 2nd \(type) object NOT found *****")
+                    XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
                   }
                 } else {
-                  XCTFail("***** 2nd \(type) object NOT added *****")
+                  XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
                 }
               } else {
-                XCTFail("***** 1st \(type) object NOT removed *****")
+                XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object NOT found *****")
+              XCTFail("***** 1st \(type) object NOT found *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object NOT added *****")
+            XCTFail("***** 1st \(type) object NOT added *****", file: #function)
           }
         } else {
-          XCTFail("***** Previous \(type) object(s) NOT removed *****")
+          XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
         }
         // remove all
         radio!.remoteTxAudioStreams.forEach { $0.value.remove() }

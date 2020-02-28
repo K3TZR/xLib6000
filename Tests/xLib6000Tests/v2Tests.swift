@@ -27,11 +27,11 @@ class v2Tests: XCTestCase {
         
         return Api.sharedInstance.radio
       } else {
-        XCTFail("***** Failed to connect to Radio *****\n")
+        XCTFail("***** Failed to connect to Radio *****\n", file: #function)
         return nil
       }
     } else {
-      XCTFail("***** No Radio(s) found *****\n")
+      XCTFail("***** No Radio(s) found *****\n", file: #function)
       return nil
     }
   }
@@ -72,15 +72,15 @@ class v2Tests: XCTestCase {
         
         XCTAssertEqual(object.id, "0x40000009".streamId!)
 
-        XCTAssertEqual(object.daxChannel, 3)
-        XCTAssertEqual(object.ip, "10.0.1.107")
-        XCTAssertEqual(object.port, 4124)
-        XCTAssertEqual(object.slice, radio!.slices["0".objectId!])
+        XCTAssertEqual(object.daxChannel, 3, "daxChannel", file: #function)
+        XCTAssertEqual(object.ip, "10.0.1.107", "ip", file: #function)
+        XCTAssertEqual(object.port, 4124, "port", file: #function)
+        XCTAssertEqual(object.slice, radio!.slices["0".objectId!], "slice", file: #function)
         
         if showInfoMessages { Swift.print("***** AUDIO STREAM object parameters verified") }
         
       } else {
-        XCTFail("***** AUDIO STREAM object NOT created *****")
+        XCTFail("***** AUDIO STREAM object NOT created *****", file: #function)
       }
       
     } else {
@@ -146,11 +146,11 @@ class v2Tests: XCTestCase {
                   
                   if showInfoMessages { Swift.print("***** 2nd AUDIO STREAM object created") }
                   
-                  XCTAssertEqual(object.clientHandle, clientHandle)
-                  XCTAssertEqual(object.daxChannel, daxChannel)
-                  XCTAssertEqual(object.ip, ip)
-                  XCTAssertEqual(object.port, port)
-                  XCTAssertEqual(object.slice, slice)
+                  XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
+                  XCTAssertEqual(object.daxChannel, daxChannel, "daxChannel", file: #function)
+                  XCTAssertEqual(object.ip, ip, "ip", file: #function)
+                  XCTAssertEqual(object.port, port, "port", file: #function)
+                  XCTAssertEqual(object.slice, slice, "slice", file: #function)
                   
                   if showInfoMessages { Swift.print("***** 2nd AUDIO STREAM object parameters verified") }
                   
@@ -161,31 +161,31 @@ class v2Tests: XCTestCase {
                   
                   if showInfoMessages { Swift.print("***** 2nd AUDIO STREAM object parameters modified") }
                   
-                  XCTAssertEqual(object.clientHandle, clientHandle)
-                  XCTAssertEqual(object.daxChannel, 4)
-                  XCTAssertEqual(object.ip, "12.2.3.218")
-                  XCTAssertEqual(object.port, 4214)
-                  XCTAssertEqual(object.slice, radio!.slices["0".objectId!])
+                  XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
+                  XCTAssertEqual(object.daxChannel, 4, "daxChannel", file: #function)
+                  XCTAssertEqual(object.ip, "12.2.3.218", "ip", file: #function)
+                  XCTAssertEqual(object.port, 4214, "port", file: #function)
+                  XCTAssertEqual(object.slice, radio!.slices["0".objectId!], "slice", file: #function)
                   
                   if showInfoMessages { Swift.print("***** 2nd AUDIO STREAM object modified parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd AUDIO STREAM object NOT found *****")
+                  XCTFail("***** 2nd AUDIO STREAM object NOT found *****", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd AUDIO STREAM object NOT created")
+                XCTFail("***** 2nd AUDIO STREAM object NOT created", file: #function)
               }
             } else {
-              XCTFail("***** 1st AUDIO STREAM object NOT removed")
+              XCTFail("***** 1st AUDIO STREAM object NOT removed", file: #function)
             }
           } else {
-            XCTFail("***** 1st AUDIO STREAM object NOT found")
+            XCTFail("***** 1st AUDIO STREAM object NOT found", file: #function)
           }
         } else {
-          XCTFail("***** 1st AUDIO STREAM object NOT created")
+          XCTFail("***** 1st AUDIO STREAM object NOT created", file: #function)
         }
       } else {
-        XCTFail("***** Existing AUDIO STREAM object(s) NOT removed")
+        XCTFail("***** Existing AUDIO STREAM object(s) NOT removed", file: #function)
       }
       // remove all
       radio!.audioStreams.forEach( {$0.value.remove() } )
@@ -218,15 +218,15 @@ class v2Tests: XCTestCase {
 
         XCTAssertEqual(object.id, "3".streamId!)
 
-        XCTAssertEqual(object.available, 16)
-        XCTAssertEqual(object.capacity, 16)
-        XCTAssertEqual(object.pan, "0x0".streamId!)
-        XCTAssertEqual(object.rate, 48_000)
+        XCTAssertEqual(object.available, 16, "available", file: #function)
+        XCTAssertEqual(object.capacity, 16, "capacity", file: #function)
+        XCTAssertEqual(object.pan, "0x0".streamId!, "pan", file: #function)
+        XCTAssertEqual(object.rate, 48_000, "rate", file: #function)
 
         if showInfoMessages { Swift.print("***** IQ STREAM object parameters verified") }
 
       } else {
-        XCTFail("***** IQ STREAM object NOT created *****")
+        XCTFail("***** IQ STREAM object NOT created *****", file: #function)
       }
 
     } else {
@@ -254,18 +254,18 @@ class v2Tests: XCTestCase {
 
         XCTAssertEqual(object.id, "3".streamId!)
 
-        XCTAssertEqual(object.available, 16)
-        XCTAssertEqual(object.capacity, 16)
-        XCTAssertEqual(object.pan, "0x0".streamId!)
-        XCTAssertEqual(object.rate, 48_000)
-        XCTAssertEqual(object.ip, "10.0.1.100")
-        XCTAssertEqual(object.port, 4992)
-        XCTAssertEqual(object.streaming, true)
+        XCTAssertEqual(object.available, 16, "available", file: #function)
+        XCTAssertEqual(object.capacity, 16, "capacity", file: #function)
+        XCTAssertEqual(object.pan, "0x0".streamId!, "pan", file: #function)
+        XCTAssertEqual(object.rate, 48_000, "rate", file: #function)
+        XCTAssertEqual(object.ip, "10.0.1.100", "ip", file: #function)
+        XCTAssertEqual(object.port, 4992, "port", file: #function)
+        XCTAssertEqual(object.streaming, true, "streaming", file: #function)
 
         if showInfoMessages { Swift.print("***** IQ STREAM object parameters verified") }
 
       } else {
-        XCTFail("***** IQ STREAM object NOT created *****")
+        XCTFail("***** IQ STREAM object NOT created *****", file: #function)
       }
 
     } else {
@@ -293,15 +293,15 @@ class v2Tests: XCTestCase {
 
         XCTAssertEqual(object.id, "3".streamId!)
 
-        XCTAssertEqual(object.available, 16)
-        XCTAssertEqual(object.capacity, 16)
-        XCTAssertEqual(object.pan, "0x0".streamId!)
-        XCTAssertEqual(object.rate, 48_000)
+        XCTAssertEqual(object.available, 16, "available", file: #function)
+        XCTAssertEqual(object.capacity, 16, "capacity", file: #function)
+        XCTAssertEqual(object.pan, "0x0".streamId!, "pan", file: #function)
+        XCTAssertEqual(object.rate, 48_000, "rate", file: #function)
 
         if showInfoMessages { Swift.print("***** IQ STREAM object parameters verified") }
 
       } else {
-        XCTFail("***** IQ STREAM object NOT created *****")
+        XCTFail("***** IQ STREAM object NOT created *****", file: #function)
       }
 
     } else {
@@ -368,10 +368,10 @@ class v2Tests: XCTestCase {
                   
                   if showInfoMessages { Swift.print("***** 2nd IQ STREAM object created") }
                   
-                  XCTAssertEqual(object.available, available)
-                  XCTAssertEqual(object.capacity, capacity)
-                  XCTAssertEqual(object.pan, pan)
-                  XCTAssertEqual(object.rate, rate)
+                  XCTAssertEqual(object.available, available, "available", file: #function)
+                  XCTAssertEqual(object.capacity, capacity, "capacity", file: #function)
+                  XCTAssertEqual(object.pan, pan, "pan", file: #function)
+                  XCTAssertEqual(object.rate, rate, "rate", file: #function)
                   
                   if showInfoMessages { Swift.print("***** 2nd IQ STREAM object parameters verified") }
                   
@@ -379,30 +379,30 @@ class v2Tests: XCTestCase {
                   
                   if showInfoMessages { Swift.print("***** 2nd IQ STREAM object parameters modified") }
                   
-                  XCTAssertEqual(object.available, available)
-                  XCTAssertEqual(object.capacity, capacity)
-                  XCTAssertEqual(object.pan, pan)
-                  XCTAssertEqual(object.rate, rate * 2)
+                  XCTAssertEqual(object.available, available, "available", file: #function)
+                  XCTAssertEqual(object.capacity, capacity, "capacity", file: #function)
+                  XCTAssertEqual(object.pan, pan, "pan", file: #function)
+                  XCTAssertEqual(object.rate, rate * 2, "rate", file: #function)
                   
                   if showInfoMessages { Swift.print("***** 2nd IQ STREAM object modified parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd IQ STREAM object NOT found *****")
+                  XCTFail("***** 2nd IQ STREAM object NOT found *****", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd IQ STREAM object NOT added *****")
+                XCTFail("***** 2nd IQ STREAM object NOT added *****", file: #function)
               }
             } else {
-              XCTFail("***** 1st IQ STREAM object NOT removed *****")
+              XCTFail("***** 1st IQ STREAM object NOT removed *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st IQ STREAM object NOT found *****")
+            XCTFail("***** 1st IQ STREAM object NOT found *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st IQ STREAM object NOT created *****")
+          XCTFail("***** 1st IQ STREAM object NOT created *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing IQ STREAM object(s) NOT removed *****")
+        XCTFail("***** Existing IQ STREAM object(s) NOT removed *****", file: #function)
       }
       // remove all
       radio!.iqStreams.forEach { $0.value.remove() }
@@ -433,15 +433,15 @@ class v2Tests: XCTestCase {
         
         if showInfoMessages { Swift.print("***** MIC AUDIO STREAM object created") }
         
-        XCTAssertEqual(object.id, "0x04000009".streamId!)
+        XCTAssertEqual(object.id, "0x04000009".streamId!, file: #function)
 
-        XCTAssertEqual(object.ip, "192.168.1.162")
-        XCTAssertEqual(object.port, 4991)
+        XCTAssertEqual(object.ip, "192.168.1.162", "ip", file: #function)
+        XCTAssertEqual(object.port, 4991, "port", file: #function)
         
         if showInfoMessages { Swift.print("***** MIC AUDIO STREAM object Properties verified") }
         
       } else {
-        XCTAssertTrue(false, "***** MIC AUDIO STREAM object NOT created")
+        XCTFail("***** MIC AUDIO STREAM object NOT created", file: #function)
       }
       
     } else {
@@ -506,8 +506,8 @@ class v2Tests: XCTestCase {
                   
                   if showInfoMessages { Swift.print("***** 2nd MIC AUDIO STREAM object created") }
                   
-                  XCTAssertEqual(object.ip, ip)
-                  XCTAssertEqual(object.port, port)
+                  XCTAssertEqual(object.ip, ip, "ip", file: #function)
+                  XCTAssertEqual(object.port, port, "port", file: #function)
                   
                   if showInfoMessages { Swift.print("***** 2nd MIC AUDIO STREAM object parameters verified") }
                   
@@ -516,28 +516,28 @@ class v2Tests: XCTestCase {
                   
                   if showInfoMessages { Swift.print("***** 2nd MIC AUDIO STREAM object parameters modified") }
                   
-                  XCTAssertEqual(object.ip, "12.2.3.218")
-                  XCTAssertEqual(object.port, 4214)
+                  XCTAssertEqual(object.ip, "12.2.3.218", "ip", file: #function)
+                  XCTAssertEqual(object.port, 4214, "port", file: #function)
                   
                   if showInfoMessages { Swift.print("***** 2nd MIC AUDIO STREAM object modified parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd MIC AUDIO STREAM object NOT removed *****")
+                  XCTFail("***** 2nd MIC AUDIO STREAM object NOT removed *****", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd MIC AUDIO STREAM object NOT added *****")
+                XCTFail("***** 2nd MIC AUDIO STREAM object NOT added *****", file: #function)
               }
             } else {
-              XCTFail("***** 1st MIC AUDIO STREAM object NOT removed *****")
+              XCTFail("***** 1st MIC AUDIO STREAM object NOT removed *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st MIC AUDIO STREAM object NOT found *****")
+            XCTFail("***** 1st MIC AUDIO STREAM object NOT found *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st MIC AUDIO STREAM object NOT added *****")
+          XCTFail("***** 1st MIC AUDIO STREAM object NOT added *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing MIC AUDIO STREAM object(s) NOT removed *****")
+        XCTFail("***** Existing MIC AUDIO STREAM object(s) NOT removed *****", file: #function)
       }
       // remove all
       radio!.iqStreams.forEach { $0.value.remove() }
@@ -569,14 +569,14 @@ class v2Tests: XCTestCase {
           
           if showInfoMessages { Swift.print("***** TX AUDIO STREAM object created") }
           
-          XCTAssertEqual(object.ip, "192.168.1.162")
-          XCTAssertEqual(object.port, 4991)
-          XCTAssertEqual(object.transmit, false)
+          XCTAssertEqual(object.ip, "192.168.1.162", "ip", file: #function)
+          XCTAssertEqual(object.port, 4991, "port", file: #function)
+          XCTAssertEqual(object.transmit, false, "transmit", file: #function)
           
           if showInfoMessages { Swift.print("***** TX AUDIO STREAM object Properties verified") }
                     
         } else {
-          XCTFail("***** TX AUDIO STREAM object NOT created *****")
+          XCTFail("***** TX AUDIO STREAM object NOT created *****", file: #function)
         }
     } else {
       Swift.print("SKIPPED: \(#function) requires \(requiredVersion)")
@@ -641,9 +641,9 @@ class v2Tests: XCTestCase {
                   
                   if showInfoMessages { Swift.print("***** 2nd TX AUDIO STREAM object created") }
                   
-                  XCTAssertEqual(object.transmit, transmit)
-                  XCTAssertEqual(object.ip, ip)
-                  XCTAssertEqual(object.port, port)
+                  XCTAssertEqual(object.transmit, transmit, "transmit", file: #function)
+                  XCTAssertEqual(object.ip, ip, "ip", file: #function)
+                  XCTAssertEqual(object.port, port, "port", file: #function)
                   
                   if showInfoMessages { Swift.print("***** 2nd TX AUDIO STREAM object parameters verified") }
                   
@@ -655,29 +655,29 @@ class v2Tests: XCTestCase {
                   if showInfoMessages { Swift.print("***** 2nd TX AUDIO STREAM object parameters modified") }
                   
                   // re-verify properties
-                  XCTAssertEqual(object.transmit, false)
-                  XCTAssertEqual(object.ip, "12.2.3.218")
-                  XCTAssertEqual(object.port, 4214)
+                  XCTAssertEqual(object.transmit, false, "transmit", file: #function)
+                  XCTAssertEqual(object.ip, "12.2.3.218", "ip", file: #function)
+                  XCTAssertEqual(object.port, 4214, "port", file: #function)
                   
                   if showInfoMessages { Swift.print("***** 2nd TX AUDIO STREAM object modified parameters verified") }
                   
                 } else {
-                  XCTFail("***** 2nd TX AUDIO STREAM object NOT found *****")
+                  XCTFail("***** 2nd TX AUDIO STREAM object NOT found *****", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd TX AUDIO STREAM object NOT added *****")
+                XCTFail("***** 2nd TX AUDIO STREAM object NOT added *****", file: #function)
               }
             } else {
-              XCTFail("***** 1st TX AUDIO STREAM object NOT removed *****")
+              XCTFail("***** 1st TX AUDIO STREAM object NOT removed *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st TX AUDIO STREAM object NOT found *****")
+            XCTFail("***** 1st TX AUDIO STREAM object NOT found *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st TX AUDIO STREAM object NOT created *****")
+          XCTFail("***** 1st TX AUDIO STREAM object NOT created *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing TX AUDIO STREAM object(s) NOT removed *****")
+        XCTFail("***** Existing TX AUDIO STREAM object(s) NOT removed *****", file: #function)
       }
       // remove all
       radio!.txAudioStreams.forEach { $0.value.remove() }
@@ -709,18 +709,18 @@ class v2Tests: XCTestCase {
 
         if showInfoMessages { Swift.print("***** OPUS STREAM object created") }
 
-        XCTAssertEqual(object.id, "0x50000000".streamId!)
+        XCTAssertEqual(object.id, "0x50000000".streamId!, file: #function)
 
-        XCTAssertEqual(object.ip, "10.0.1.100")
-        XCTAssertEqual(object.port, 4993)
-        XCTAssertEqual(object.rxStopped, false)
-        XCTAssertEqual(object.rxEnabled, false)
-        XCTAssertEqual(object.txEnabled, false)
+        XCTAssertEqual(object.ip, "10.0.1.100", "ip", file: #function)
+        XCTAssertEqual(object.port, 4993, "port", file: #function)
+        XCTAssertEqual(object.rxStopped, false, "rxStopped", file: #function)
+        XCTAssertEqual(object.rxEnabled, false, "rxEnabled", file: #function)
+        XCTAssertEqual(object.txEnabled, false, "txEnabled", file: #function)
 
         if showInfoMessages { Swift.print("***** OPUS STREAM object parameters verified") }
 
       } else {
-        XCTFail("***** OPUS STREAM object NOT created *****")
+        XCTFail("***** OPUS STREAM object NOT created *****", file: #function)
       }
 
     } else {
@@ -760,19 +760,19 @@ class v2Tests: XCTestCase {
           
           if showInfoMessages { Swift.print("***** OPUS STREAM object parameters modified") }
           
-          XCTAssertEqual(object.ip, "10.0.1.100", "ip")
-          XCTAssertEqual(object.port, 5_000, "port")
-          XCTAssertEqual(object.rxStopped, !rxStopped, "rxStopped")
-          XCTAssertEqual(object.rxEnabled, !rxEnabled, "rxEnabled")
-          XCTAssertEqual(object.txEnabled, !txEnabled, "txEnabled")
+          XCTAssertEqual(object.ip, "10.0.1.100", "ip", file: #function)
+          XCTAssertEqual(object.port, 5_000, "port", file: #function)
+          XCTAssertEqual(object.rxStopped, !rxStopped, "rxStopped", file: #function)
+          XCTAssertEqual(object.rxEnabled, !rxEnabled, "rxEnabled", file: #function)
+          XCTAssertEqual(object.txEnabled, !txEnabled, "txEnabled", file: #function)
 
           if showInfoMessages { Swift.print("***** OPUS STREAM object modified parameters verified") }
           
         } else {
-          XCTFail("***** OPUS STREAM object NOT found *****")
+          XCTFail("***** OPUS STREAM object NOT found *****", file: #function)
         }
       } else {
-        XCTFail("***** OPUS STREAM object does NOT exist *****")
+        XCTFail("***** OPUS STREAM object does NOT exist *****", file: #function)
       }
       
     } else {
