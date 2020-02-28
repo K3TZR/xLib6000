@@ -177,7 +177,10 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
           continue
         }
         let slice = _radio.findSlice(letter: property.value, guiClientHandle: gui!.handle)
-        update(self, &_slice, to: slice, signal: \.slice)
+        //update(self, &_slice, to: slice, signal: \.slice)
+        willChangeValue(forKey: "slice")
+        _slice = slice
+        didChangeValue(forKey: "slice")
         
         let gain = _rxGain
         _rxGain = 0

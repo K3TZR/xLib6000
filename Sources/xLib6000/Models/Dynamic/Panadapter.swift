@@ -426,7 +426,11 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       case .band:                   update(self, &_band,                    to: property.value,                 signal: \.band)
       case .bandwidth:              update(self, &_bandwidth,               to: property.value.mhzToHz,         signal: \.bandwidth)
       case .bandZoomEnabled:        update(self, &_bandZoomEnabled,         to: property.value.bValue,          signal: \.bandZoomEnabled)
-      case .center:                 update(self, &_center,                  to: property.value.mhzToHz,         signal: \.center)
+      case .center:
+        //update(self, &_center,                  to: property.value.mhzToHz,         signal: \.center)
+        willChangeValue(forKey: "center")
+        _center = property.value.mhzToHz
+        didChangeValue(forKey: "center")
       case .clientHandle:           update(self, &_clientHandle,            to: property.value.handle ?? 0,     signal: \.clientHandle)
       case .daxIq:                  update(self, &_daxIqChannel,            to: property.value.iValue,          signal: \.daxIqChannel)
       case .daxIqChannel:           update(self, &_daxIqChannel,            to: property.value.iValue,          signal: \.daxIqChannel)

@@ -248,7 +248,11 @@ public final class Interlock : NSObject, StaticModel {
         case .rcaTxReqPolarity: update(self, &_rcaTxReqPolarity,  to: property.value.bValue,      signal: \.rcaTxReqPolarity)
         case .reason:           update(self, &_reason,            to: property.value,             signal: \.reason)
         case .source:           update(self, &_source,            to: property.value,             signal: \.source)
-        case .state:            update(self, &_state,             to: property.value,             signal: \.state)
+        case .state:
+          //update(self, &_state,             to: property.value,             signal: \.state)
+          willChangeValue(forKey: "state")
+          _state = property.value
+          didChangeValue(forKey: "state")
         // determine if a Mox change is needed
         _radio.interlockStateChange(_state)
           
