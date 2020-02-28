@@ -157,7 +157,7 @@ public final class BandSetting                : NSObject, DynamicModel {
     //          <band, > <bandId, > <"band_name", name> <"acc_txreq_enabled", 0/1> <"rca_txreq_enabled", 0/1> <"acc_tx_enabled", 0/1> <"tx1_enabled", 0/1> <"tx2_enabled", 0/1> <"tx3_enabled", 0/1>
     //              OR
     //          <band, > <bandId, > <"removed", >
-
+    
     // get the Id
     if let id = properties[0].key.objectId {
       
@@ -178,12 +178,13 @@ public final class BandSetting                : NSObject, DynamicModel {
         // does it exist?
         if radio.bandSettings[id] != nil {
           
-          // YES, remove it
+          // YES, remove it, notify observers
+          NC.post(.bandSettingWillBeRemoved, object: radio.bandSettings[id] as Any?)
+          
           radio.bandSettings[id] = nil
           
           Log.sharedInstance.logMessage("BandSetting removed: id = \(id)", .debug, #function, #file, #line)
           
-          // notify all observers
           NC.post(.bandSettingHasBeenRemoved, object: id as Any?)
         }
       }

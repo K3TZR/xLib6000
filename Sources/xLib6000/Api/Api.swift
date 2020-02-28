@@ -41,7 +41,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   public enum NSLogging {
     case normal
-    case limited (to: String)
+    case limited (to: [String])
     case none
   }
   public        var nsLogState              : NSLogging = .normal
@@ -365,7 +365,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // gui clientId
       if isGui {
 
-        if radio.version.isV3 && _clientId != nil   {
+        if radio.version.isV3Api && _clientId != nil   {
           send("client gui " + _clientId!)
         } else {
           send("client gui")
@@ -373,8 +373,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       }      
       
       send("client program " + _programName)
-      if radio.version.isV3                                { send("client station " + _clientStation) }
-      if radio.version.isV3 && !isGui && _clientId != nil  { radio.bindGuiClient(_clientId!) }
+      if radio.version.isV3Api && isGui                       { send("client station " + _clientStation) }
+      if radio.version.isV3Api && !isGui && _clientId != nil  { radio.bindGuiClient(_clientId!) }
 
       if _lowBandwidthConnect           { radio.requestLowBandwidthConnect() }
       radio.requestInfo()
@@ -386,8 +386,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       radio.requestMicProfile()
       radio.requestDisplayProfile()
       radio.requestSubAll()
-      if radio.version.isGreaterThan22  { radio.requestMtuLimit(1_500) }
-      if radio.version.isV3             { radio.requestDaxBandwidthLimit(self.reducedDaxBw) }
+      if radio.version.isGreaterThanV22   { radio.requestMtuLimit(1_500) }
+      if radio.version.isV3Api            { radio.requestDaxBandwidthLimit(self.reducedDaxBw) }
     }
   }
   /// Determine if the Radio Firmware version is compatable with the API version

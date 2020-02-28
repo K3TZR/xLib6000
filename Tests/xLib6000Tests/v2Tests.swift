@@ -20,7 +20,7 @@ class v2Tests: XCTestCase {
       
       Swift.print("***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))")
 
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "AudioTests", logState: logState) {
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "v2Tests", logState: logState) {
         sleep(1)
         
         Swift.print("***** Connected")
@@ -58,7 +58,7 @@ class v2Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "AudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["AudioStream.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -93,7 +93,7 @@ class v2Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "AudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["AudioStream.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -204,7 +204,7 @@ class v2Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "IqStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["IqStream.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -240,7 +240,7 @@ class v2Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "IqStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["IqStream.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -279,7 +279,7 @@ class v2Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "IqStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["IqStream.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -314,7 +314,7 @@ class v2Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "IqStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["IqStream.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -421,7 +421,7 @@ class v2Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "MicAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["MicAudioStream.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -454,7 +454,7 @@ class v2Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "MicAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["MicAudioStream.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -557,7 +557,7 @@ class v2Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "TxAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["TxAudioStream.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -588,7 +588,7 @@ class v2Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "TxAudioStream.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["TxAudioStream.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -697,7 +697,7 @@ class v2Tests: XCTestCase {
   func testOpusParse() {
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "Opus.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Opus.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
@@ -734,7 +734,7 @@ class v2Tests: XCTestCase {
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: "Opus.swift"))
+    let radio = discoverRadio(logState: .limited(to: ["Opus.swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {

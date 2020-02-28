@@ -30,9 +30,14 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   public static let isInterleaved           = true
   public static let application             = 2049
   
-  public static let kOpus                   = "opus"
-  public static let kUncompressed           = "none"
+//  public static let kOpus                   = "opus"
+//  public static let kUncompressed           = "none"
 
+  public enum Compression : String {
+    case opus
+    case none
+  }
+  
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
@@ -102,8 +107,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
     
     // get the Id
     if let id =  properties[0].key.streamId {
-      
-      
+            
       // YES, does it exist?
       if radio.remoteRxAudioStreams[id] == nil {
         
@@ -167,7 +171,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this RxRemoteAudioStream
       _initialized = true
                   
-      _log("RemoteRxAudioStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("RemoteRxAudioStream added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.remoteRxAudioStreamHasBeenAdded, object: self as Any?)
@@ -246,7 +250,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   private var _delegate      : StreamHandler? = nil
 
   private var __clientHandle : Handle = 0
-  private var __compression  : String = RemoteRxAudioStream.kUncompressed
+  private var __compression  : String = RemoteRxAudioStream.Compression.none.rawValue
   private var __ip           = ""
 }
 

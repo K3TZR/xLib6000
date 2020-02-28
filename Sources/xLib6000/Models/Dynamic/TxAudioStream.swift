@@ -210,13 +210,15 @@ public final class TxAudioStream : NSObject, DynamicModel {
   ///
   public func remove(callback: ReplyHandler? = nil) {
     
-    // tell the Radio to remove a Stream
+    // tell the Radio to remove a Stream, notify observers
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
     
-    // notify all observers
     NC.post(.txAudioStreamWillBeRemoved, object: self as Any?)
     
+    // remove it immediately
     _radio.txAudioStreams[id] = nil
+    
+    NC.post(.txAudioStreamHasBeenRemoved, object: id as Any?)
   }
   
   // ----------------------------------------------------------------------------

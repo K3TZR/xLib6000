@@ -232,13 +232,14 @@ public final class Memory                   : NSObject, DynamicModel {
         // does it exist?
         if radio.memories[id] != nil {
           
-          // YES, remove it
+          // YES, remove it, notify observers
+          NC.post(.memoryWillBeRemoved, object: radio.memories[id] as Any?)
+          
           radio.memories[id] = nil
           
           Log.sharedInstance.logMessage("Memory removed: id = \(id)", .debug, #function, #file, #line)
           
-          // NO, notify all observers
-          NC.post(.memoryHasBeenRemoved, object: radio.memories[id] as Any?)
+          NC.post(.memoryHasBeenRemoved, object: id as Any?)
         }
       }
     }

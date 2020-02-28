@@ -196,21 +196,21 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
         // does it exist?
         if radio.waterfalls[id] != nil {
           
-          // notify all observers
-          NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[id] as Any?)
-          
-          // remove the associated Panadapter
+          // YES, remove the Panadapter & Waterfall, notify all observers
           let panadapterId = radio.waterfalls[id]!.panadapterId
+                    
           radio.panadapters[panadapterId] = nil
           
           Log.sharedInstance.logMessage("Panadapter removed: id = \(panadapterId.hex)", .debug, #function, #file, #line)
 
-          // remove the Waterfall
+          NC.post(.panadapterHasBeenRemoved, object: id as Any?)
+
+          NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[id] as Any?)
+                    
           radio.waterfalls[id] = nil
           
-           Log.sharedInstance.logMessage("Waterfall removed: id = \(id.hex)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("Waterfall removed: id = \(id.hex)", .debug, #function, #file, #line)
           
-          // notify all observers
           NC.post(.waterfallHasBeenRemoved, object: id as Any?)
         }
       }
@@ -398,7 +398,7 @@ public class WaterfallFrame {
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
-    if version.isGreaterThan22 {
+    if version.isGreaterThanV22 {
       // 2.3.x or greater
       // map the payload to the New Payload struct
       let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)

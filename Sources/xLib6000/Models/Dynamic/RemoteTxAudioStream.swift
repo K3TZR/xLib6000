@@ -164,7 +164,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Opus
       _initialized = true
                   
-      _log("RemoteTxAudioStream added: id = \(id)", .debug, #function, #file, #line)
+      _log("RemoteTxAudioStream added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.remoteTxAudioStreamHasBeenAdded, object: self as Any?)
@@ -227,7 +227,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   private var _delegate      : StreamHandler? = nil
 
   private var __clientHandle : Handle = 0
-  private var __compression  : String = RemoteRxAudioStream.kUncompressed
+  private var __compression  : String = RemoteRxAudioStream.Compression.none.rawValue
   private var __ip           = ""
 }
 

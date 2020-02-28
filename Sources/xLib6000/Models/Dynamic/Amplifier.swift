@@ -130,12 +130,13 @@ public final class Amplifier  : NSObject, DynamicModel {
         // does it exist?
         if radio.amplifiers[id] != nil {
           
-          // YES, remove it
+          // YES, remove it, notify observers
+          NC.post(.amplifierWillBeRemoved, object: radio.amplifiers[id] as Any?)
+          
           radio.amplifiers[id] = nil
           
           Log.sharedInstance.logMessage("Amplifier removed: id = \(id.hex)", .debug, #function, #file, #line)
           
-          // notify all observers
           NC.post(.amplifierHasBeenRemoved, object: id as Any?)
         }
       }

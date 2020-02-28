@@ -415,7 +415,7 @@ extension Radio {
     sendCommand("sub usb_cable all")
     sendCommand("sub tnf all")
     
-    if version.isV3 { sendCommand("sub client all") }
+    if version.isV3Api { sendCommand("sub client all") }
     
     //      send("sub spot all")    // TODO:
   }
@@ -751,7 +751,7 @@ extension Radio {
   ///   - callback:           ReplyHandler (optional)
   /// - Returns:              success / failure
   ///
-  public func requestRemoteRxAudioStream(compression: String = RemoteRxAudioStream.kUncompressed, callback: ReplyHandler? = nil) {
+  public func requestRemoteRxAudioStream(compression: String = RemoteRxAudioStream.Compression.none.rawValue, callback: ReplyHandler? = nil) {
     
     // tell the Radio to enable Opus Rx
     sendCommand("stream create type=remote_audio_rx compression=\(compression)", replyTo: callback)
@@ -767,7 +767,7 @@ extension Radio {
   ///   - callback:           ReplyHandler (optional)
   /// - Returns:              success / failure
   ///
-  public func requestRemoteTxAudioStream(compression: String = RemoteRxAudioStream.kUncompressed, callback: ReplyHandler? = nil) {
+  public func requestRemoteTxAudioStream(compression: String = RemoteRxAudioStream.Compression.none.rawValue, callback: ReplyHandler? = nil) {
     
     // tell the Radio to enable RemoteTxAudioStream
     sendCommand("stream create type=remote_audio_tx compression=\(compression)", replyTo: callback)

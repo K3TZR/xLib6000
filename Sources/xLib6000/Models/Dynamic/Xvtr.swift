@@ -175,14 +175,14 @@ public final class Xvtr : NSObject, DynamicModel {
         // does it exist?
         if radio.xvtrs[id] != nil {
           
-          // remove it
+          // YES, remove it, notify all observers
+          NC.post(.xvtrWillBeRemoved, object: radio.xvtrs[id] as Any?)
+
           radio.xvtrs[id] = nil
           
           Log.sharedInstance.logMessage("Xvtr removed: id = \(id)", .debug, #function, #file, #line)
           
-          // notify all observers
           NC.post(.xvtrHasBeenRemoved, object: id as Any?)
-          
         }
       }
     }

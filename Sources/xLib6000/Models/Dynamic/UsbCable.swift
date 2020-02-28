@@ -224,12 +224,13 @@ public final class UsbCable : NSObject, DynamicModel {
       // does the object exist?
       if radio.usbCables[id] != nil {
         
-        // YES, remove it
+        // YES, remove it, notify observers
+        NC.post(.usbCableWillBeRemoved, object: radio.usbCables[id] as Any?)
+
         radio.usbCables[id] = nil
         
         Log.sharedInstance.logMessage("UsbCable removed: id = \(id)", .debug, #function, #file, #line)
         
-        // notify all observers
         NC.post(.usbCableHasBeenRemoved, object: id as Any?)
       }
     }

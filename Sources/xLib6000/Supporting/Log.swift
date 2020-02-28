@@ -59,8 +59,10 @@ public final class Log {
       switch state {
       case .normal:
         NSLog(Api.kName.prefix(4) + ": " + msg)
-      case .limited (let exception):
-        if URL(fileURLWithPath: file.description).lastPathComponent == exception { NSLog(Api.kName.prefix(4) + ": " + msg) }
+      case .limited (let exceptions):
+        exceptions.forEach {
+          if URL(fileURLWithPath: file.description).lastPathComponent == $0 { NSLog(Api.kName.prefix(4) + ": " + msg) }
+        }
       case .none:
         break
       }
