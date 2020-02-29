@@ -1,5 +1,5 @@
 //
-//  v2Tests.swift
+//  OldApiTests.swift
 //  xLib6000Tests
 //
 //  Created by Douglas Adams on 2/15/20.
@@ -8,8 +8,9 @@
 import XCTest
 @testable import xLib6000
 
-class v2Tests: XCTestCase {
-  let requiredVersion = "v1 or v2"
+class OldApiTests: XCTestCase {
+  let connectAsGui = true
+  let requiredVersion = "v1 || v2 OldApi"
   let showInfoMessages = false
 
   // Helper functions
@@ -20,8 +21,8 @@ class v2Tests: XCTestCase {
       
       Swift.print("***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))")
 
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "v2Tests", logState: logState) {
-        sleep(1)
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "v2Tests", isGui: connectAsGui, logState: logState) {
+        sleep(2)
         
         Swift.print("***** Connected")
         
@@ -61,10 +62,10 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["AudioStream.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
       
       AudioStream.parseStatus(radio!, Array(audioStreamStatus.keyValuesArray()), true)
-      sleep(1)
+      sleep(2)
       
       if let object = radio!.audioStreams["0x40000009".streamId!] {
         
@@ -84,7 +85,7 @@ class v2Tests: XCTestCase {
       }
       
     } else {
-      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
@@ -96,18 +97,18 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["AudioStream.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
       
       // remove all
       radio!.audioStreams.forEach( {$0.value.remove() } )
-      sleep(1)
+      sleep(2)
       if radio!.audioStreams.count == 0 {
         
         if showInfoMessages { Swift.print("***** Existing AUDIO STREAM object(s) removed") }
         
         // ask for new
         radio!.requestAudioStream( "2")
-        sleep(1)
+        sleep(2)
         
         if showInfoMessages { Swift.print("***** 1st AUDIO STREAM object requested") }
         
@@ -129,14 +130,14 @@ class v2Tests: XCTestCase {
             
             // remove it
             radio!.audioStreams[id]!.remove()
-            sleep(1)
+            sleep(2)
             if radio!.audioStreams.count == 0 {
               
               if showInfoMessages { Swift.print("***** 1st AUDIO STREAM object removed") }
               
               // ask for new
               radio!.requestAudioStream( "2")
-              sleep(1)
+              sleep(2)
               
               if showInfoMessages { Swift.print("***** 2nd AUDIO STREAM object requested") }
               
@@ -191,7 +192,7 @@ class v2Tests: XCTestCase {
       radio!.audioStreams.forEach( {$0.value.remove() } )
 
     } else {
-      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
@@ -207,10 +208,10 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["IqStream.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
 
       IqStream.parseStatus(radio!, Array(iqStreamStatus_1.keyValuesArray()), true)
-      sleep(1)
+      sleep(2)
 
       if let object = radio!.iqStreams["3".streamId!] {
 
@@ -230,7 +231,7 @@ class v2Tests: XCTestCase {
       }
 
     } else {
-      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
@@ -243,10 +244,10 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["IqStream.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
 
       IqStream.parseStatus(radio!, Array(iqStreamStatus_2.keyValuesArray()), true)
-      sleep(1)
+      sleep(2)
 
       if let object = radio!.iqStreams["3".streamId!] {
 
@@ -269,7 +270,7 @@ class v2Tests: XCTestCase {
       }
 
     } else {
-      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
@@ -282,10 +283,10 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["IqStream.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
 
       IqStream.parseStatus(radio!, Array(iqStreamStatus_3.keyValuesArray()), true)
-      sleep(1)
+      sleep(2)
 
       if let object = radio!.iqStreams["3".streamId!] {
 
@@ -305,7 +306,7 @@ class v2Tests: XCTestCase {
       }
 
     } else {
-      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
@@ -317,18 +318,18 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["IqStream.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
       
       // remove all
       radio!.iqStreams.forEach { $0.value.remove() }
-      sleep(1)
+      sleep(2)
       if radio!.iqStreams.count == 0 {
         
         if showInfoMessages { Swift.print("***** Existing IQ STREAM object(s) removed") }
         
         // get new
         radio!.requestIqStream("3")
-        sleep(1)
+        sleep(2)
         
         if showInfoMessages { Swift.print("***** 1st IQ STREAM object requested") }
         
@@ -350,7 +351,7 @@ class v2Tests: XCTestCase {
             
             // remove it
             radio!.iqStreams[id]!.remove()
-            sleep(1)
+            sleep(2)
             
             if radio!.iqStreams.count == 0 {
               
@@ -358,7 +359,7 @@ class v2Tests: XCTestCase {
               
               // get new
               radio!.requestIqStream("3")
-              sleep(1)
+              sleep(2)
               
               if showInfoMessages { Swift.print("***** 2nd IQ STREAM object requested") }
               
@@ -408,7 +409,7 @@ class v2Tests: XCTestCase {
       radio!.iqStreams.forEach { $0.value.remove() }
       
     } else {
-      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
@@ -424,10 +425,10 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["MicAudioStream.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
       
       MicAudioStream.parseStatus(radio!, micAudioStreamStatus.keyValuesArray(), true)
-      sleep(1)
+      sleep(2)
       
       if let object = radio!.micAudioStreams["0x04000009".streamId!] {
         
@@ -445,7 +446,7 @@ class v2Tests: XCTestCase {
       }
       
     } else {
-      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
@@ -457,18 +458,18 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["MicAudioStream.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
       
       // remove all
       radio!.micAudioStreams.forEach( {$0.value.remove() } )
-      sleep(1)
+      sleep(2)
       if radio!.micAudioStreams.count == 0 {
         
         if showInfoMessages { Swift.print("***** Existing MIC AUDIO STREAM object(s) removed") }
         
         // ask new
         radio!.requestMicAudioStream()
-        sleep(1)
+        sleep(2)
         
         if showInfoMessages { Swift.print("***** 1st MIC AUDIO STREAM object requested") }
         
@@ -488,7 +489,7 @@ class v2Tests: XCTestCase {
             
             // remove it
             radio!.micAudioStreams[id]!.remove()
-            sleep(1)
+            sleep(2)
             
             if radio!.micAudioStreams.count == 0 {
               
@@ -496,7 +497,7 @@ class v2Tests: XCTestCase {
               
               // ask new
               radio!.requestMicAudioStream()
-              sleep(1)
+              sleep(2)
               
               if showInfoMessages { Swift.print("***** 2nd MIC AUDIO STREAM object requested") }
               
@@ -543,7 +544,7 @@ class v2Tests: XCTestCase {
       radio!.iqStreams.forEach { $0.value.remove() }
       
     } else {
-      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
@@ -560,10 +561,10 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["TxAudioStream.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
       
         TxAudioStream.parseStatus(radio!, txAudioStreamStatus.keyValuesArray(), true)
-        sleep(1)
+        sleep(2)
         
         if let object = radio!.txAudioStreams["0x84000000".streamId!] {
           
@@ -579,7 +580,7 @@ class v2Tests: XCTestCase {
           XCTFail("***** TX AUDIO STREAM object NOT created *****", file: #function)
         }
     } else {
-      Swift.print("SKIPPED: \(#function) requires \(requiredVersion)")
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
@@ -591,18 +592,18 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["TxAudioStream.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
       
       // remove all
       radio!.txAudioStreams.forEach( {$0.value.remove() } )
-      sleep(1)
+      sleep(2)
       if radio!.txAudioStreams.count == 0 {
         
         if showInfoMessages { Swift.print("***** Existing TX AUDIO STREAM object(s) removed") }
 
         // ask for a new AudioStream
         radio!.requestTxAudioStream()
-        sleep(1)
+        sleep(2)
         
         if showInfoMessages { Swift.print("***** 1st TX AUDIO STREAM object requested") }
         
@@ -623,14 +624,14 @@ class v2Tests: XCTestCase {
             
             // remove it
             radio!.txAudioStreams[id]!.remove()
-            sleep(1)
+            sleep(2)
             if radio!.txAudioStreams.count == 0 {
               
               if showInfoMessages { Swift.print("***** 1st TX AUDIO STREAM object removed") }
               
               // ask new
               radio!.requestTxAudioStream()
-              sleep(1)
+              sleep(2)
               
               if showInfoMessages { Swift.print("***** 2nd TX AUDIO STREAM object requested") }
               
@@ -683,7 +684,7 @@ class v2Tests: XCTestCase {
       radio!.txAudioStreams.forEach { $0.value.remove() }
 
     } else {
-      Swift.print("SKIPPED: \(#function) requires \(requiredVersion)")
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
@@ -700,10 +701,10 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["Opus.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
 
       Opus.parseStatus(radio!, Array(opusStatus.keyValuesArray()), true)
-      sleep(1)
+      sleep(2)
 
       if let object = radio!.opusStreams["0x50000000".streamId!] {
 
@@ -724,7 +725,7 @@ class v2Tests: XCTestCase {
       }
 
     } else {
-      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
 
@@ -737,7 +738,7 @@ class v2Tests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["Opus.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
       
       // verify added
       if radio!.opusStreams.count == 1 {
@@ -776,7 +777,7 @@ class v2Tests: XCTestCase {
       }
       
     } else {
-      if showInfoMessages { Swift.print("***** \(#function) skipped, requires \(requiredVersion)") }
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
