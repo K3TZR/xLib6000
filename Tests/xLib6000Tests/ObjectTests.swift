@@ -2,6 +2,7 @@ import XCTest
 @testable import xLib6000
 
 final class ObjectTests: XCTestCase {
+  let connectAsGui = true
   let showInfoMessages = true
   
   // Helper functions
@@ -12,8 +13,8 @@ final class ObjectTests: XCTestCase {
       
       Swift.print("***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))")
       
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "ObjectTests", logState: logState) {
-        sleep(1)
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "ObjectTests", isGui: connectAsGui, logState: logState) {
+        sleep(2)
         
         if showInfoMessages { Swift.print("***** Connected") }
         
@@ -326,24 +327,24 @@ final class ObjectTests: XCTestCase {
     
     // remove all
     radio!.memories.forEach( {$0.value.remove() } )
-    sleep(1)
+    sleep(2)
     if radio!.memories.count == 0 {
       
       if showInfoMessages { Swift.print("***** Existing MEMORY(s) removed") }
+            
+      if showInfoMessages { Swift.print("\n***** 1st MEMORY requested") }
       
       radio!.requestMemory()
-      sleep(1)
-      
-      if showInfoMessages { Swift.print("***** 1st MEMORY requested") }
-      
+      sleep(2)
       if radio!.memories.count == 1 {
         
-        if showInfoMessages { Swift.print("***** 1st MEMORY added") }
+        if showInfoMessages { Swift.print("***** 1st MEMORY added\n") }
         
         if let object = radio!.memories.first?.value {
           
           // save params
-          let id = object.id
+          let firstId = object.id
+          
           let owner = object.owner
           let group = object.group
           let frequency = object.frequency
@@ -367,25 +368,26 @@ final class ObjectTests: XCTestCase {
           
           if showInfoMessages { Swift.print("***** 1st MEMORY parameters saved") }
           
-          radio!.memories[id]!.remove()
-          sleep(1)
+          if showInfoMessages { Swift.print("***** 1st MEMORY removed") }
+          
+          radio!.memories[firstId]!.remove()
+          sleep(2)
           
           if radio!.memories.count == 0 {
             
-            if showInfoMessages { Swift.print("***** 1st MEMORY removed") }
+            if showInfoMessages { Swift.print("***** 1st MEMORY removal confirmed") }
+            
+            if showInfoMessages { Swift.print("\n***** 2nd MEMORY requested") }
             
             radio!.requestMemory()
-            sleep(1)
-            
-            if showInfoMessages { Swift.print("***** 2nd MEMORY requested") }
-            
+            sleep(2)
             if radio!.memories.count == 1 {
               
-              if showInfoMessages { Swift.print("***** 2nd MEMORY added") }
+              if showInfoMessages { Swift.print("***** 2nd MEMORY added\n") }
               
               if let object = radio!.memories.first?.value {
                 
-                let id = object.id
+                let secondId = object.id
                 
                 XCTAssertEqual(object.owner, owner, "owner", file: #function)
                 XCTAssertEqual(object.group, group, "Group", file: #function)
@@ -456,33 +458,35 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd MEMORY modified parameters verified") }
                 
-                radio!.memories[id]!.remove()
-                sleep(1)
+                if showInfoMessages { Swift.print("\n***** 2nd MEMORY removed") }
+                
+                radio!.memories[secondId]!.remove()
+                sleep(2)
                 
                 if radio!.memories.count == 0 {
                   
-                  if showInfoMessages { Swift.print("***** 2nd MEMORY removed") }
+                  if showInfoMessages { Swift.print("***** 2nd MEMORY removal confirmed/n") }
                   
                 } else {
-                  XCTFail("***** 2nd MEMORY NOT removed ****", file: #function)
+                  XCTFail("***** 2nd MEMORY removal FAILED ****/n", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd MEMORY NOT found ****", file: #function)
+                XCTFail("***** 2nd MEMORY NOT found ****/n", file: #function)
               }
             } else {
-              XCTFail("***** 2nd MEMORY NOT created ****", file: #function)
+              XCTFail("***** 2nd MEMORY NOT created ****/n", file: #function)
             }
           } else {
             XCTFail("***** 1st MEMORY NOT removed ****", file: #function)
           }
         } else {
-          XCTFail("***** 1st MEMORY NOT found ****", file: #function)
+          XCTFail("***** 1st MEMORY NOT found ****/n", file: #function)
         }
       } else {
-        XCTFail("***** 1st MEMORY NOT created ****", file: #function)
+        XCTFail("***** 1st MEMORY NOT created ****/n", file: #function)
       }      
     } else {
-      XCTFail("***** Existing MEMORY(s) NOT removed ****", file: #function)
+      XCTFail("***** Existing MEMORY(s) NOT removed ****/n", file: #function)
     }
     disconnect()
   }
@@ -530,13 +534,13 @@ final class ObjectTests: XCTestCase {
       // remove any Slices on this panadapter
 //      for (_, slice) in radio.slices where slice.panadapterId == panadapter.id {
 //        slice.remove()
-//        sleep(1)
+//        sleep(2)
 //      }
       // remove the Panadapter (which removes the Waterfall)
       panadapter.remove()
-      sleep(1)
+      sleep(2)
     }
-    sleep(1)
+    sleep(2)
     if radio.panadapters.count != 0 {
       
       radio.panadapters.forEach { Swift.print("Remaining Panadapter id = \($0.value.id.hex)") }
@@ -557,7 +561,7 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Waterfall.swift"]))
     guard radio != nil else { return }
     
-    if showInfoMessages { Swift.print("***** \(type) created") }
+    if showInfoMessages { Swift.print("\n***** \(type) created") }
     
     Panadapter.parseStatus(radio!, panadapterStatus.keyValuesArray(), true)
     
@@ -588,10 +592,10 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(panadapter.maxBw, 14_745_601, file: #function)
       XCTAssertEqual(panadapter.antList, ["ANT1","ANT2","RX_A","XVTR"], file: #function)
       
-      if showInfoMessages { Swift.print("***** \(type) Parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) Parameters verified\n") }
       
     } else {
-      XCTFail("***** \(type) NOT created *****", file: #function)
+      XCTFail("***** \(type) NOT created *****\n", file: #function)
     }
     disconnect()
   }
@@ -608,8 +612,8 @@ final class ObjectTests: XCTestCase {
     if showInfoMessages { Swift.print("\n***** Remove existing \(type)(s)") }
     
     //    removeAllPanadapters(radio: radio!)
-    radio!.panadapters.forEach { $0.value.remove() ; sleep(1)}
-//    sleep(1)
+    radio!.panadapters.forEach { $0.value.remove() ; sleep(2)}
+//    sleep(2)
     if radio!.panadapters.count == 0 {
       
       if showInfoMessages { Swift.print("***** Existing \(type)(s) removal confirmed\n") }
@@ -617,7 +621,7 @@ final class ObjectTests: XCTestCase {
       if showInfoMessages { Swift.print("\n***** Request 1st \(type)") }
       
       radio!.requestPanadapter()
-      sleep(1)
+      sleep(2)
       // verify added
       if radio!.panadapters.count == 1 {
         if let object = radio!.panadapters.first?.value {
@@ -626,7 +630,7 @@ final class ObjectTests: XCTestCase {
           
           let firstId = object.id
           
-          if radio!.version.isV3 { clientHandle = object.clientHandle }
+          if radio!.version.isNewApi { clientHandle = object.clientHandle }
           let wnbLevel = object.wnbLevel
           let bandZoomEnabled = object.bandZoomEnabled
           let segmentZoomEnabled = object.segmentZoomEnabled
@@ -656,7 +660,7 @@ final class ObjectTests: XCTestCase {
           if showInfoMessages { Swift.print("\n***** Remove 1st \(type)") }
           
           radio!.panadapters[firstId]!.remove()
-          sleep(1)
+          sleep(2)
           if radio!.panadapters.count == 0 {
             
             if showInfoMessages { Swift.print("***** 1st \(type) removal confirmed\n") }
@@ -665,7 +669,7 @@ final class ObjectTests: XCTestCase {
             
             // ask for new
             radio!.requestPanadapter()
-            sleep(1)
+            sleep(2)
             // verify added
             if radio!.panadapters.count == 1 {
               
@@ -673,7 +677,7 @@ final class ObjectTests: XCTestCase {
               
               if let object = radio!.panadapters.first?.value {
                 
-                if radio!.version.isV3 { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function) }
+                if radio!.version.isNewApi { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function) }
                 
                 XCTAssertEqual(object.wnbLevel, wnbLevel, "wnbLevel", file: #function)
                 XCTAssertEqual(object.bandZoomEnabled, bandZoomEnabled, "bandZoomEnabled", file: #function)
@@ -724,7 +728,7 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd \(type) parameters modified") }
                 
-                if radio!.version.isV3 { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function) }
+                if radio!.version.isNewApi { XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function) }
                 XCTAssertEqual(object.wnbLevel, wnbLevel + 1, "wnbLevel", file: #function)
                 XCTAssertEqual(object.bandZoomEnabled, !bandZoomEnabled, "bandZoomEnabled", file: #function)
                 XCTAssertEqual(object.segmentZoomEnabled, !segmentZoomEnabled, "segmentZoomEnabled", file: #function)
@@ -754,7 +758,7 @@ final class ObjectTests: XCTestCase {
                 if showInfoMessages { Swift.print("\n***** 2nd \(type) removed") }
                 
                 radio!.panadapters[secondId]!.remove()
-                sleep(1)
+                sleep(2)
                 if radio!.panadapters[secondId] == nil {
                   
                   if showInfoMessages { Swift.print("***** 2nd \(type) removal confirmed\n") }
@@ -773,7 +777,7 @@ final class ObjectTests: XCTestCase {
           XCTFail("***** 1st \(type) NOT created *****", file: #function)
         }
       } else {
-        
+        XCTFail("***** 1st \(type) request FAILED *****\n", file: #function)
       }
     } else {
       XCTFail("***** Existing \(type)(s) NOT removed *****", file: #function)
@@ -795,17 +799,17 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["Slice.swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV3 { sliceStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())" }
+    if radio!.version.isNewApi { sliceStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())" }
     
     let id: ObjectId = sliceStatus.keyValuesArray()[0].key.objectId!
     Slice.parseStatus(radio!, sliceStatus.keyValuesArray(), true)
-    sleep(1)
+    sleep(2)
     
     if let sliceObject = radio!.slices[id] {
       
       if showInfoMessages { Swift.print("***** SLICE created") }
       
-      if radio!.version.isV3 { XCTAssertEqual(sliceObject.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle", file: #function) }
+      if radio!.version.isNewApi { XCTAssertEqual(sliceObject.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle", file: #function) }
       XCTAssertEqual(sliceObject.mode, "USB", "mode", file: #function)
       XCTAssertEqual(sliceObject.filterLow, 100, "filterLow", file: #function)
       XCTAssertEqual(sliceObject.filterHigh, 2_800, "filterHigh", file: #function)
@@ -844,25 +848,27 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: ["Slice.swift"]))
     guard radio != nil else { return }
     
+    if showInfoMessages { Swift.print("\n***** Existing SLICE(s) removed") }
+    
     // remove all
     radio!.slices.forEach( {$0.value.remove() } )
-    sleep(1)
+    sleep(2)
     if radio!.slices.count == 0 {
       
-      if showInfoMessages { Swift.print("***** Existing SLICE(s) removed") }
+      if showInfoMessages { Swift.print("***** Existing SLICE(s) removal confirmation\n") }
+            
+      if showInfoMessages { Swift.print("***** 1st SLICE requested") }
       
       // get new
       radio!.requestSlice(frequency: 7_225_000, rxAntenna: "ANT2", mode: "USB")
-      sleep(1)
-      
-      if showInfoMessages { Swift.print("***** 1st SLICE requested") }
+      sleep(2)
       
       // verify added
       if radio!.slices.count == 1 {
         
         if let object = radio!.slices.first?.value {
           
-          if showInfoMessages { Swift.print("***** 1st SLICE created") }
+          if showInfoMessages { Swift.print("***** 1st SLICE added\n") }
           
           let frequency = object.frequency
           let rxAnt = object.rxAnt
@@ -894,7 +900,7 @@ final class ObjectTests: XCTestCase {
           let digitalUpperOffset = object.digitalUpperOffset
           let diversityChild = object.diversityChild
           let diversityEnabled = object.diversityEnabled
-          let diversityIndex = object.diversityIndex
+          let diversityIndex = object.diversityIndex      // this looks like 0x5000000d, which is invalid Slice rcvr
           let diversityParent = object.diversityParent
           
           let filterHigh = object.filterHigh
@@ -952,25 +958,26 @@ final class ObjectTests: XCTestCase {
           let xitOffset = object.xitOffset
           
           if showInfoMessages { Swift.print("***** 1st SLICE parameters saved") }
+                    
+          if showInfoMessages { Swift.print("\n***** 1st SLICE removed") }
           
           object.remove()
-          sleep(1)
+          sleep(2)
           if radio!.slices.count == 0 {
             
-            if showInfoMessages { Swift.print("***** 1st SLICE removed") }
+            if showInfoMessages { Swift.print("***** 1st SLICE removal confirmed\n") }
+                        
+            if showInfoMessages { Swift.print("***** 2nd SLICE requested") }
             
             // get new
             radio!.requestSlice(frequency: 7_225_000, rxAntenna: "ANT2", mode: "USB")
-            sleep(1)
-            
-            if showInfoMessages { Swift.print("***** 2nd SLICE requested") }
-            
+            sleep(2)
             // verify added
             if radio!.slices.count == 1 {
               
               if let object = radio!.slices.first?.value {
                 
-                if showInfoMessages { Swift.print("***** 2nd SLICE created") }
+                if showInfoMessages { Swift.print("***** 2nd SLICE added\n") }
                 
                 XCTAssertEqual(object.frequency, frequency, "Frequency", file: #function)
                 XCTAssertEqual(object.rxAnt, rxAnt, "RxAntenna", file: #function)
@@ -1002,7 +1009,7 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.digitalUpperOffset, digitalUpperOffset, "DigitalUpperOffset", file: #function)
                 XCTAssertEqual(object.diversityChild, diversityChild, "DiversityChild", file: #function)
                 XCTAssertEqual(object.diversityEnabled, diversityEnabled, "DiversityEnabled", file: #function)
-                XCTAssertEqual(object.diversityIndex, diversityIndex, "DiversityIndex", file: #function)
+                XCTAssertEqual(object.diversityIndex, diversityIndex, "DiversityIndex", file: #function)    // this looks like 0x5000000d, which is invalid Slice rcvr
                 XCTAssertEqual(object.diversityParent, diversityParent, "DiversityParent", file: #function)
                 
                 XCTAssertEqual(object.filterHigh, filterHigh, "FilterHigh", file: #function)
@@ -1042,7 +1049,7 @@ final class ObjectTests: XCTestCase {
                 
                 XCTAssertEqual(object.rttyShift, rttyShift, "RttyShift", file: #function)
                 XCTAssertEqual(object.rxAntList, rxAntList, "RxAntList", file: #function)
-                if radio!.version.isV3 { XCTAssertEqual(object.sliceLetter, sliceLetter, "SliceLetter", file: #function) }
+                if radio!.version.isNewApi { XCTAssertEqual(object.sliceLetter, sliceLetter, "SliceLetter", file: #function) }
                 XCTAssertEqual(object.step, step, "Step", file: #function)
                 XCTAssertEqual(object.squelchEnabled, squelchEnabled, "SquelchEnabled", file: #function)
                 
@@ -1091,7 +1098,7 @@ final class ObjectTests: XCTestCase {
                 object.digitalUpperOffset = 2611
                 object.diversityChild = true
                 object.diversityEnabled = true
-                object.diversityIndex = 1
+//                object.diversityIndex = 1
                 object.diversityParent = true
                 
                 object.filterHigh = 3911
@@ -1179,7 +1186,7 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.digitalUpperOffset, 2611, "DigitalUpperOffset", file: #function)
                 XCTAssertEqual(object.diversityChild, false, "DiversityChild", file: #function)
                 XCTAssertEqual(object.diversityEnabled, true, "DiversityEnabled", file: #function)
-                XCTAssertEqual(object.diversityIndex, 0, "DiversityIndex", file: #function)
+                XCTAssertEqual(object.diversityIndex, diversityIndex, "DiversityIndex", file: #function)  // this looks like 0x5000000d, which is invalid Slice rcvr
                 XCTAssertEqual(object.diversityParent, false, "DiversityParent", file: #function)
                 
                 XCTAssertEqual(object.filterHigh, 3911, "FilterHigh", file: #function)
@@ -1239,12 +1246,14 @@ final class ObjectTests: XCTestCase {
                 if showInfoMessages { Swift.print("***** 2nd SLICE modified parameters verified") }
                 
                 let id = object.id
-                //                object.remove()
+                
+                if showInfoMessages { Swift.print("\n***** 2nd SLICE removed") }
+                
                 radio!.slices[id]!.remove()
-                sleep(1)
+                sleep(2)
                 if radio!.slices[id] == nil {
                   
-                  if showInfoMessages { Swift.print("***** 2nd SLICE removed") }
+                  if showInfoMessages { Swift.print("***** 2nd SLICE removal confirmed\n") }
                   
                 } else {
                   XCTFail("***** 2nd SLICE NOT removed", file: #function)
@@ -1310,14 +1319,14 @@ final class ObjectTests: XCTestCase {
     
     // remove all
     radio!.tnfs.forEach { $0.value.remove() }
-    sleep(1)
+    sleep(2)
     if radio!.tnfs.count == 0 {
       
       if showInfoMessages { Swift.print("***** Existing TNF object(s) removed") }
       
       // get new
       radio!.requestTnf(at: 14_260_000)
-      sleep(1)
+      sleep(2)
       
       if showInfoMessages { Swift.print("***** 1st TNF object requested") }
       
@@ -1343,7 +1352,7 @@ final class ObjectTests: XCTestCase {
             
             // ask for new
             radio!.requestTnf(at: 14_260_000)
-            sleep(1)
+            sleep(2)
             
             if showInfoMessages { Swift.print("***** 2nd TNF object requested") }
             
@@ -1423,7 +1432,7 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
-    } else if radio!.version.isV3 {
+    } else if radio!.version.isNewApi {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_1.keyValuesArray())
       
@@ -1465,7 +1474,7 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
-    } else if radio!.version.isV3 {
+    } else if radio!.version.isNewApi {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_2.keyValuesArray())
       
@@ -1542,7 +1551,7 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
       
-    } else if radio!.version.isV3 {
+    } else if radio!.version.isNewApi {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_3.keyValuesArray())
       
@@ -1636,7 +1645,7 @@ final class ObjectTests: XCTestCase {
       }
       panadapter.remove()
     }
-    sleep(1)
+    sleep(2)
     if radio.panadapters.count != 0 { XCTFail("***** Waterfall(s) NOT removed *****", file: #function) }
     if radio.slices.count != 0 { XCTFail("***** Slice(s) NOT removed *****", file: #function) }
   }
@@ -1688,7 +1697,7 @@ final class ObjectTests: XCTestCase {
       if showInfoMessages { Swift.print("\n***** Request 1st \(type)") }
       
       radio!.requestPanadapter()
-      sleep(1)
+      sleep(2)
       // verify added
       if radio!.waterfalls.count == 1 {
         if let object = radio!.waterfalls.first?.value {
@@ -1709,7 +1718,7 @@ final class ObjectTests: XCTestCase {
           if showInfoMessages { Swift.print("\n***** Remove 1st \(type): pan id = \(radio!.waterfalls[firstId]!.panadapterId.hex)") }
           
           radio!.panadapters[radio!.waterfalls[firstId]!.panadapterId]!.remove()
-          sleep(1)
+          sleep(2)
           if radio!.panadapters.count == 0 {
             
             if showInfoMessages { Swift.print("***** 1st \(type) removal confirmed\n") }
@@ -1718,7 +1727,7 @@ final class ObjectTests: XCTestCase {
             
             // ask for new
             radio!.requestPanadapter()
-            sleep(1)
+            sleep(2)
             // verify added
             if radio!.waterfalls.count == 1 {
               
@@ -1757,7 +1766,7 @@ final class ObjectTests: XCTestCase {
                 if showInfoMessages { Swift.print("\n***** 2nd \(type) removed") }
                 
                 radio!.panadapters[radio!.waterfalls[secondId]!.panadapterId]!.remove()
-                sleep(1)
+                sleep(2)
                 if radio!.panadapters[secondId] == nil {
                   
                   if showInfoMessages { Swift.print("***** 2nd \(type) removal confirmed\n") }
@@ -1850,14 +1859,14 @@ final class ObjectTests: XCTestCase {
     
     // remove all
     for (_, object) in radio!.xvtrs { object.remove() }
-    sleep(1)
+    sleep(2)
     if radio!.xvtrs.count == 0 {
       
       if showInfoMessages { Swift.print("***** Existing XVTR(s) removed") }
       
       // ask for new
       radio!.requestXvtr()
-      sleep(1)
+      sleep(2)
       
       if showInfoMessages { Swift.print("***** 1st XVTR requested") }
       
@@ -1884,12 +1893,12 @@ final class ObjectTests: XCTestCase {
           if showInfoMessages { Swift.print("***** 1st XVTR parameters saved") }
           
           radio!.xvtrs[id]!.remove()
-          sleep(1)
+          sleep(2)
           if radio!.xvtrs.count == 0 {
             
             // ask for new
             radio!.requestXvtr()
-            sleep(1)
+            sleep(2)
             
             if showInfoMessages { Swift.print("***** 2nd XVTR requested") }
             
