@@ -177,11 +177,6 @@ public final class Tnf : NSObject, DynamicModel {
       case .frequency:  willChangeValue(for: \.frequency) ; _frequency = property.value.mhzToHz ; didChangeValue(for: \.frequency)
       case .permanent:  willChangeValue(for: \.permanent) ; _permanent = property.value.bValue  ; didChangeValue(for: \.permanent)
       case .width:      willChangeValue(for: \.width)     ; _width = property.value.mhzToHz     ; didChangeValue(for: \.width)
-
-//      case .depth:      update(self, &_depth,     to: property.value.uValue,  signal: \.depth)
-//      case .frequency:  update(self, &_frequency, to: property.value.mhzToHz, signal: \.frequency)
-//      case .permanent:  update(self, &_permanent, to: property.value.bValue,  signal: \.permanent)
-//      case .width:      update(self, &_width,     to: property.value.mhzToHz, signal: \.width)
       }
       // is the Tnf initialized?
       if !_initialized && _frequency != 0 {

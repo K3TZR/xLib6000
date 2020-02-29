@@ -183,8 +183,8 @@ public final class Amplifier  : NSObject, DynamicModel {
       switch token {
         
       case .ant:          willChangeValue(for: \.ant)           ; _ant = property.value           ; didChangeValue(for: \.ant)
-      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value            ;  didChangeValue(for: \.ip)
-      case .model:        willChangeValue(for: \.model)         ; _model = property.value         ;didChangeValue(for: \.model)
+      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value            ; didChangeValue(for: \.ip)
+      case .model:        willChangeValue(for: \.model)         ; _model = property.value         ; didChangeValue(for: \.model)
       case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue   ; didChangeValue(for: \.port)
       case .serialNumber: willChangeValue(for: \.serialNumber)  ; _serialNumber = property.value  ; didChangeValue(for: \.serialNumber)
       case .state:        willChangeValue(for: \.state)         ; _state = property.value         ; didChangeValue(for: \.state)

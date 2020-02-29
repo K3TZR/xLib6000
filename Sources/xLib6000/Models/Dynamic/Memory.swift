@@ -378,29 +378,6 @@ public final class Memory                   : NSObject, DynamicModel {
         case .step:                     willChangeValue(for: \.step)                ; _step = property.value.iValue                       ; didChangeValue(for: \.step)
         case .toneMode:                 willChangeValue(for: \.toneMode)            ; _toneMode = property.value.replacingSpaces()        ; didChangeValue(for: \.toneMode)
         case .toneValue:                willChangeValue(for: \.toneValue)           ; _toneValue = property.value.fValue                  ; didChangeValue(for: \.toneValue)
-
-//      case .digitalLowerOffset:       update(self, &_digitalLowerOffset,  to: property.value.iValue,                    signal: \.digitalLowerOffset)
-//      case .digitalUpperOffset:       update(self, &_digitalUpperOffset,  to: property.value.iValue,                    signal: \.digitalUpperOffset)
-//      case .frequency:                update(self, &_frequency,           to: property.value.mhzToHz,                   signal: \.frequency)
-//      case .group:                    update(self, &_group,               to: property.value.replacingSpaces(),         signal: \.group)
-//      case .highlight:                update(self, &_highlight,           to: property.value.bValue,                    signal: \.highlight)
-//      case .highlightColor:           update(self, &_highlightColor,      to: property.value.uValue32,                  signal: \.highlightColor)
-//      case .mode:                     update(self, &_mode,                to: property.value.replacingSpaces(),         signal: \.mode)
-//      case .name:                     update(self, &_name,                to: property.value.replacingSpaces(),         signal: \.name)
-//      case .owner:                    update(self, &_owner,               to: property.value.replacingSpaces(),         signal: \.owner)
-//      case .repeaterOffsetDirection:  update(self, &_offsetDirection,     to: property.value.replacingSpaces(),         signal: \.offsetDirection)
-//
-//      case .repeaterOffset:           update(self, &_offset,              to: property.value.iValue,                    signal: \.offset)
-//      case .rfPower:                  update(self, &_rfPower,             to: property.value.iValue,                    signal: \.rfPower)
-//      case .rttyMark:                 update(self, &_rttyMark,            to: property.value.iValue,                    signal: \.rttyMark)
-//      case .rttyShift:                update(self, &_rttyShift,           to: property.value.iValue,                    signal: \.rttyShift)
-//      case .rxFilterHigh:             update(self, &_filterHigh,          to: property.value.iValue,                    signal: \.filterHigh)
-//      case .rxFilterLow:              update(self, &_filterLow,           to: property.value.iValue,                    signal: \.filterLow)
-//      case .squelchEnabled:           update(self, &_squelchEnabled,      to: property.value.bValue,                    signal: \.squelchEnabled)
-//      case .squelchLevel:             update(self, &_squelchLevel,        to: property.value.iValue,                    signal: \.squelchLevel)
-//      case .step:                     update(self, &_step,                to: property.value.iValue,                    signal: \.step)
-//      case .toneMode:                 update(self, &_toneMode,            to: property.value.replacingSpaces(),         signal: \.toneMode)
-//      case .toneValue:                update(self, &_toneValue,           to: property.value.fValue,                    signal: \.toneValue)
       }
     }
     // is the Memory initialized?

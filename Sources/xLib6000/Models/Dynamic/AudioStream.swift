@@ -202,20 +202,6 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
         let gain = _rxGain
         _rxGain = 0
         rxGain = gain
-
-//      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
-//      case .daxChannel:   update(self, &_daxChannel,    to: property.value.iValue,      signal: \.daxChannel)
-//      case .daxClients:   update(self, &_daxClients,    to: property.value.iValue,      signal: \.daxClients)
-//      case .inUse:        break   // included to inhibit unknown token warnings
-//      case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
-//      case .port:         update(self, &_port,          to: property.value.iValue,      signal: \.port)
-//      case .slice:
-//        if let sliceId = property.value.objectId {
-//          update(self, &_slice, to: _radio.slices[sliceId], signal: \.slice)
-//        }
-//        let gain = _rxGain
-//        _rxGain = 0
-//        rxGain = gain
       }
     }    
     // if this is not yet initialized and inUse becomes true

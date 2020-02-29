@@ -247,15 +247,6 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       case .gradientIndex:    willChangeValue(for: \.gradientIndex)     ; _gradientIndex = property.value.iValue        ; didChangeValue(for: \.gradientIndex)
       case .lineDuration:     willChangeValue(for: \.lineDuration)      ; _lineDuration = property.value.iValue         ; didChangeValue(for: \.lineDuration)
       case .panadapterId:     willChangeValue(for: \.panadapterId)      ; _panadapterId = property.value.streamId ?? 0  ; didChangeValue(for: \.panadapterId)
-
-//      case .autoBlackEnabled: update(self, &_autoBlackEnabled,  to: property.value.bValue,        signal: \.autoBlackEnabled)
-//      case .blackLevel:       update(self, &_blackLevel,        to: property.value.iValue,        signal: \.blackLevel)
-//      case .clientHandle:     update(self, &_clientHandle,      to: property.value.handle ?? 0,   signal: \.clientHandle)
-//      case .colorGain:        update(self, &_colorGain,         to: property.value.iValue,        signal: \.colorGain)
-//      case .gradientIndex:    update(self, &_gradientIndex,     to: property.value.iValue,        signal: \.gradientIndex)
-//      case .lineDuration:     update(self, &_lineDuration,      to: property.value.iValue,        signal: \.lineDuration)
-//      case .panadapterId:     update(self, &_panadapterId,      to: property.value.streamId ?? 0, signal: \.panadapterId)
-      
       case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqChannel,
            .daxIqRate, .loopA, .loopB, .rfGain, .rxAnt, .segmentZoomEnabled, .wide, .xPixels, .xvtr:  break   // ignored here
       }

@@ -291,7 +291,7 @@ public final class UsbCable : NSObject, DynamicModel {
           
         case .autoReport:   willChangeValue(for: \.autoReport)  ; _autoReport = property.value.bValue   ; didChangeValue(for: \.autoReport)
         case .band:         willChangeValue(for: \.band)        ; _band = property.value                ; didChangeValue(for: \.band)
-        case .cableType:    break
+        case .cableType:    break   // FIXME:
         case .dataBits:     willChangeValue(for: \.dataBits)    ; _dataBits = property.value.iValue     ; didChangeValue(for: \.dataBits)
         case .enable:       willChangeValue(for: \.enable)      ; _enable = property.value.bValue       ; didChangeValue(for: \.enable)
         case .flowControl:  willChangeValue(for: \.flowControl) ; _flowControl = property.value         ; didChangeValue(for: \.flowControl)
@@ -307,30 +307,6 @@ public final class UsbCable : NSObject, DynamicModel {
         case .speed:        willChangeValue(for: \.speed)       ; _speed = property.value.iValue        ; didChangeValue(for: \.speed)
         case .stopBits:     willChangeValue(for: \.stopBits)    ; _stopBits = property.value.iValue     ; didChangeValue(for: \.stopBits)
         case .usbLog:       willChangeValue(for: \.usbLog)      ; _usbLog = property.value.bValue       ; didChangeValue(for: \.usbLog)
-
-//        case .autoReport:   update(self, &_autoReport,  to: property.value.bValue,  signal: \.autoReport)
-//        case .band:         update(self, &_band,        to: property.value,         signal: \.band)
-//        case .cableType:    break
-//        case .dataBits:     update(self, &_dataBits,    to: property.value.iValue,  signal: \.dataBits)
-//        case .enable:       update(self, &_enable,      to: property.value.bValue,  signal: \.enable)
-//        case .flowControl:  update(self, &_flowControl, to: property.value,         signal: \.flowControl)
-//        case .name:         update(self, &_name,        to: property.value,         signal: \.name)
-//        case .parity:       update(self, &_parity,      to: property.value,         signal: \.parity)
-//        case .pluggedIn:    update(self, &_pluggedIn,   to: property.value.bValue,  signal: \.pluggedIn)
-//        case .polarity:     update(self, &_polarity,    to: property.value,         signal: \.polarity)
-//        case .preamp:       update(self, &_preamp,      to: property.value,         signal: \.preamp)
-//        case .source:       update(self, &_source,      to: property.value,         signal: \.source)
-//        case .sourceRxAnt:  update(self, &_sourceRxAnt, to: property.value,         signal: \.sourceRxAnt)
-//        case .sourceSlice:  update(self, &_sourceSlice, to: property.value.iValue,  signal: \.sourceSlice)
-//        case .sourceTxAnt:  update(self, &_sourceTxAnt, to: property.value,         signal: \.sourceTxAnt)
-//        case .speed:        update(self, &_speed,       to: property.value.iValue,  signal: \.speed)
-//        case .stopBits:     update(self, &_stopBits,    to: property.value.iValue,  signal: \.stopBits)
-//        case .usbLog:       update(self, &_usbLog,      to: property.value.bValue,  signal: \.usbLog)
-
-          //                case .usbLogLine:
-          //                    willChangeValue(forKey: "usbLogLine")
-          //                    _usbLogLine = property.value
-          //                    didChangeValue(forKey: "usbLogLine")
         }
       }
       

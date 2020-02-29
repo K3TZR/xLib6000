@@ -169,14 +169,6 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       case .pan:          willChangeValue(for: \.pan)           ; _pan = property.value.streamId ?? 0         ; didChangeValue(for: \.pan)
       case .rate:         willChangeValue(for: \.rate)          ; _rate = property.value.iValue               ; didChangeValue(for: \.rate)
       case .type:         break  // included to inhibit unknown token warnings
-        
-//      case .clientHandle:   update(self, &_clientHandle,  to: property.value.handle ?? 0,   signal: \.clientHandle)
-//      case .channel:        update(self, &_channel,       to: property.value.iValue,        signal: \.channel)
-//      case .ip:             update(self, &_ip,            to: property.value,               signal: \.ip)
-//      case .isActive:       update(self, &_isActive,      to: property.value.bValue,        signal: \.isActive)
-//      case .pan:            update(self, &_pan,           to: property.value.streamId ?? 0, signal: \.pan)
-//      case .rate:           update(self, &_rate,          to: property.value.iValue,        signal: \.rate)
-//      case .type:           break  // included to inhibit unknown token warnings
       }
     }
     // is the Stream initialized?

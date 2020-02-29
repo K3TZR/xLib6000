@@ -241,18 +241,6 @@ public final class BandSetting                : NSObject, DynamicModel {
         case .tx1Enabled:       willChangeValue(for: \.tx1Enabled)      ; _tx1Enabled = property.value.bValue       ; didChangeValue(for: \.tx1Enabled)
         case .tx2Enabled:       willChangeValue(for: \.tx2Enabled)      ; _tx2Enabled = property.value.bValue       ; didChangeValue(for: \.tx2Enabled)
         case .tx3Enabled:       willChangeValue(for: \.tx3Enabled)      ; _tx3Enabled = property.value.bValue       ; didChangeValue(for: \.tx3Enabled)
-
-//      case .accTxEnabled:     update(self, &_accTxEnabled,    to: property.value.bValue,  signal: \.accTxEnabled)
-//      case .accTxReqEnabled:  update(self, &_accTxReqEnabled, to: property.value.bValue,  signal: \.accTxReqEnabled)
-//      case .bandName:         update(self, &_bandName,        to: property.value,         signal: \.bandName)
-//      case .hwAlcEnabled:     update(self, &_hwAlcEnabled,    to: property.value.bValue,  signal: \.hwAlcEnabled)
-//      case .inhibit:          update(self, &_inhibit,         to: property.value.bValue,  signal: \.inhibit)
-//      case .rcaTxReqEnabled:  update(self, &_rcaTxReqEnabled, to: property.value.bValue,  signal: \.rcaTxReqEnabled)
-//      case .rfPower:          update(self, &_rfPower,         to: property.value.iValue,  signal: \.rfPower)
-//      case .tunePower:        update(self, &_tunePower,       to: property.value.iValue,  signal: \.tunePower)
-//      case .tx1Enabled:       update(self, &_tx1Enabled,      to: property.value.bValue,  signal: \.tx1Enabled)
-//      case .tx2Enabled:       update(self, &_tx2Enabled,      to: property.value.bValue,  signal: \.tx2Enabled)
-//      case .tx3Enabled:       update(self, &_tx3Enabled,      to: property.value.bValue,  signal: \.tx3Enabled)
       }
     }
     // is the BandSetting initialized?

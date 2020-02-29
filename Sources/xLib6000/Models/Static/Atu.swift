@@ -133,12 +133,6 @@ public final class Atu : NSObject, StaticModel {
       case .memoriesEnabled:  willChangeValue(for: \.memoriesEnabled) ; _memoriesEnabled = property.value.bValue  ; didChangeValue(for: \.memoriesEnabled)
       case .status:           break // unused
       case .usingMemories:    willChangeValue(for: \.usingMemories)   ; _usingMemories = property.value.bValue    ; didChangeValue(for: \.usingMemories)
-
-//      case .enabled:          update(self, &_enabled,         to: property.value.bValue, signal: \.enabled)
-//      case .memoriesEnabled:  update(self, &_memoriesEnabled, to: property.value.bValue, signal: \.memoriesEnabled)
-//      case .status: //        update(self, &_status, to: property.value, signal: \.status)
-//        break
-//      case .usingMemories:    update(self, &_usingMemories,   to: property.value.bValue, signal: \.usingMemories)
       }
     }
   }

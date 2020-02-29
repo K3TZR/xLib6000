@@ -162,11 +162,6 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       case .ip:                 willChangeValue(for: \.ip)                ; _ip = property.value                        ; didChangeValue(for: \.ip)
       case .isTransmitChannel:  willChangeValue(for: \.isTransmitChannel) ; _isTransmitChannel = property.value.bValue  ; didChangeValue(for: \.isTransmitChannel)
       case .type:               break  // included to inhibit unknown token warnings
-        
-//      case .clientHandle:       update(self, &_clientHandle,      to: property.value.handle ?? 0, signal: \.clientHandle)
-//      case .ip:                 update(self, &_ip,                to: property.value,             signal: \.ip)
-//      case .isTransmitChannel:  update(self, &_isTransmitChannel, to: property.value.bValue,      signal: \.isTransmitChannel)
-//      case .type:               break  // included to inhibit unknown token warnings
       }
     }
     // is the AudioStream acknowledged by the radio?

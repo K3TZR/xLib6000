@@ -208,10 +208,6 @@ public final class Cwx : NSObject, StaticModel {
         case .wpm:          willChangeValue(for: \.wpm)           ; _wpm = property.value.iValue          ; didChangeValue(for: \.wpm)
 
         case .sent:         charSentEventHandler?(property.value.iValue)
-
-//        case .breakInDelay: update(self, &_breakInDelay, to: property.value.iValue, signal: \.breakInDelay)
-//        case .qskEnabled:   update(self, &_qskEnabled,  to: property.value.bValue, signal: \.qskEnabled)
-//        case .wpm:          update(self, &_wpm,         to: property.value.iValue, signal: \.wpm)
         }
       }
     }

@@ -169,40 +169,19 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
       case .type:         break  // included to inhibit unknown token warnings
       case .slice:
-        let gui = _radio.findGuiClient(with: _radio.boundClientId ?? "")
         // do we have a good reference to the GUI Client?
-        if gui == nil {
-          // no -- clear the Slice reference and carry on
+        if let gui = _radio.findGuiClient(with: _radio.boundClientId ?? "") {
+          // YES,
+          let slice = _radio.findSlice(letter: property.value, guiClientHandle: gui.handle)
+          willChangeValue(for: \.slice)  ; _slice = slice  ; didChangeValue(for: \.slice)
+          let gain = _rxGain
+          _rxGain = 0
+          rxGain = gain
+        } else {
+          // NO, clear the Slice reference and carry on
           willChangeValue(for: \.slice)  ; _slice = nil  ; didChangeValue(for: \.slice)
           continue
         }
-        let slice = _radio.findSlice(letter: property.value, guiClientHandle: gui!.handle)
-        willChangeValue(for: \.slice)  ; _slice = slice  ; didChangeValue(for: \.slice)
-        let gain = _rxGain
-        _rxGain = 0
-        rxGain = gain
-
-
-//      case .clientHandle: update(self, &_clientHandle,  to: property.value.handle ?? 0, signal: \.clientHandle)
-//      case .daxChannel:   update(self, &_daxChannel,    to: property.value.iValue,      signal: \.daxChannel)
-//      case .ip:           update(self, &_ip,            to: property.value,             signal: \.ip)
-//      case .slice:
-//
-//        let gui = _radio.findGuiClient(with: _radio.boundClientId ?? "")
-//        // do we have a good reference to the GUI Client?
-//        if gui == nil {
-//          // no -- clear the Slice reference and carry on
-//          update(self, &_slice, to: nil, signal: \.slice)
-//          continue
-//        }
-//        let slice = _radio.findSlice(letter: property.value, guiClientHandle: gui!.handle)
-//        update(self, &_slice, to: slice, signal: \.slice)
-//
-//        let gain = _rxGain
-//        _rxGain = 0
-//        rxGain = gain
-//
-//      case .type:         break  // included to inhibit unknown token warnings
       }
     }    
     // if this is not yet initialized and inUse becomes true

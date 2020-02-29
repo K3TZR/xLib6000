@@ -166,18 +166,6 @@ public final class Gps : NSObject, StaticModel {
       case .track:          willChangeValue(for: \.track)           ; _track = property.value.dValue          ; didChangeValue(for: \.track)
       case .tracked:        willChangeValue(for: \.tracked)         ; _tracked = property.value.bValue        ; didChangeValue(for: \.tracked)
       case .visible:        willChangeValue(for: \.visible)         ; _visible = property.value.bValue        ; didChangeValue(for: \.visible)
-
-//      case .altitude:       update(self, &_altitude,        to: property.value,         signal: \.altitude)
-//      case .frequencyError: update(self, &_frequencyError,  to: property.value.dValue,  signal: \.frequencyError)
-//      case .grid:           update(self, &_grid,            to: property.value,         signal: \.grid)
-//      case .latitude:       update(self, &_latitude,        to: property.value,         signal: \.latitude)
-//      case .longitude:      update(self, &_longitude,       to: property.value,         signal: \.longitude)
-//      case .speed:          update(self, &_speed,           to: property.value,         signal: \.speed)
-//      case .status:         update(self, &_status,          to: property.value == "present" ? true : false, signal: \.status)
-//      case .time:           update(self, &_time,            to: property.value,         signal: \.time)
-//      case .track:          update(self, &_track,           to: property.value.dValue,  signal: \.track)
-//      case .tracked:        update(self, &_tracked,         to: property.value.bValue,  signal: \.tracked)
-//      case .visible:        update(self, &_visible,         to: property.value.bValue,  signal: \.visible)
       }
     }
   }
