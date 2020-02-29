@@ -923,7 +923,7 @@ public final class Slice  : NSObject, DynamicModel {
       case .squelchEnabled:           willChangeValue(for: \.squelchEnabled)          ; _squelchEnabled = property.value.bValue           ; didChangeValue(for: \.squelchEnabled)
       case .squelchLevel:             willChangeValue(for: \.squelchLevel)            ; _squelchLevel = property.value.iValue             ; didChangeValue(for: \.squelchLevel)
       case .step:                     willChangeValue(for: \.step)                    ; _step = property.value.iValue                     ; didChangeValue(for: \.step)
-      case .stepList:                 willChangeValue(for: \.stepList)                ; stepList = property.value                         ; didChangeValue(for: \.stepList)
+      case .stepList:                 willChangeValue(for: \.stepList)                ; _stepList = property.value                        ; didChangeValue(for: \.stepList)
       case .txEnabled:                willChangeValue(for: \.txEnabled)               ; _txEnabled = property.value.bValue                ; didChangeValue(for: \.txEnabled)
       case .txAnt:                    willChangeValue(for: \.txAnt)                   ; _txAnt = property.value                           ; didChangeValue(for: \.txAnt)
       case .txAntList:                willChangeValue(for: \.txAntList)               ; _txAntList = property.value.list                  ; didChangeValue(for: \.txAntList)
