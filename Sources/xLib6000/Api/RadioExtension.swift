@@ -418,7 +418,7 @@ extension Radio {
     sendCommand("sub usb_cable all")
     sendCommand("sub tnf all")
     
-    if version.isV3 { sendCommand("sub client all") }
+    if version.isNewApi { sendCommand("sub client all") }
     
     //      send("sub spot all")    // TODO:
   }

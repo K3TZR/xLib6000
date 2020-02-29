@@ -1125,7 +1125,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .waveform:       waveform.parseProperties(self, remainder.keyValuesArray())
     case .xvtr:           Xvtr.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
     }
-    if version.isV3 {
+    if version.isNewApi {
       // check if we received a status message for our handle to see if our client is connected now
       if !_clientInitialized && components[0].handle == _api.connectionHandle {
         
@@ -1154,7 +1154,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // is there a valid handle"
     if let handle = properties[0].key.handle {
       
-      if version.isV3 {
+      if version.isNewApi {
         
         switch properties[1].key {
           
@@ -1296,7 +1296,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     if let id = keyValues[0].key.streamId {
       
       // YES, is it a removal?
-      if radio.version.isV3 && remainder.contains(Api.kRemoved) {
+      if radio.version.isNewApi && remainder.contains(Api.kRemoved) {
         
         // YES v3 removal, find the stream & remove it
         if radio.daxIqStreams[id] != nil          { radio.daxIqStreams[id] = nil          ; notify(id, .daxIq)    ; return }
@@ -1745,8 +1745,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         case .lineoutMute:              willChangeValue(for: \.lineoutMute)             ; _lineoutMute = property.value.bValue              ; didChangeValue(for: \.lineoutMute)
         case .muteLocalAudio:           willChangeValue(for: \.muteLocalAudio)          ; _muteLocalAudio = property.value.bValue           ; didChangeValue(for: \.muteLocalAudio)
         case .nickname:                 willChangeValue(for: \.nickname)                ; _nickname = property.value                        ; didChangeValue(for: \.nickname)
-        case .panadapters:              willChangeValue(for: \.availablePanadapters)    ; _startCalibration = property.value.bValue         ; didChangeValue(for: \.availablePanadapters)
-        case .pllDone:                  willChangeValue(for: \.startCalibration)        ; _lineoutMute = property.value.bValue              ; didChangeValue(for: \.startCalibration)
+        case .panadapters:              willChangeValue(for: \.availablePanadapters)    ; _availablePanadapters = property.value.iValue     ; didChangeValue(for: \.availablePanadapters)
+        case .pllDone:                  willChangeValue(for: \.startCalibration)        ; _startCalibration = property.value.bValue         ; didChangeValue(for: \.startCalibration)
         case .remoteOnEnabled:          willChangeValue(for: \.remoteOnEnabled)         ; _remoteOnEnabled = property.value.bValue          ; didChangeValue(for: \.remoteOnEnabled)
         case .rttyMark:                 willChangeValue(for: \.rttyMark)                ; _rttyMark = property.value.iValue                 ; didChangeValue(for: \.rttyMark)
         case .slices:                   willChangeValue(for: \.availableSlices)         ; _availableSlices = property.value.iValue          ; didChangeValue(for: \.availableSlices)
@@ -1992,7 +1992,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // DL3LSM added calls to v3 handlers
     case .daxAudio:
       // Dax Slice Audio
-      if version.isV3 {
+      if version.isNewApi {
         if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
           daxAudio.vitaProcessor(vitaPacket)
         }
@@ -2002,7 +2002,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         }
       }
       // Dax Microphone Audio
-      if version.isV3 {
+      if version.isNewApi {
         if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
           daxMicAudio.vitaProcessor(vitaPacket)
         }
@@ -2013,7 +2013,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     case .daxReducedBw:
       // Dax Audio with reduced bandwidth
-      if version.isV3 {
+      if version.isNewApi {
         if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
           daxAudio.vitaProcessor(vitaPacket)
         }
@@ -2023,7 +2023,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         }
       }
       // Dax Microphone Audio with reduced bandwidth
-      if version.isV3 {
+      if version.isNewApi {
         if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
           daxMicAudio.vitaProcessor(vitaPacket)
         }
@@ -2034,7 +2034,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
       // Dax IQ
-      if version.isV3 {
+      if version.isNewApi {
         if let daxIq = daxIqStreams[vitaPacket.streamId] {
           daxIq.vitaProcessor(vitaPacket)
         }
@@ -2051,7 +2051,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .opus:
       // Opus
-      if version.isV3 {
+      if version.isNewApi {
         if let opus = remoteRxAudioStreams[vitaPacket.streamId] {
           
           if opus.isStreaming == false {

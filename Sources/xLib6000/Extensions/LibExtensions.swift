@@ -433,13 +433,15 @@ public struct Version {
   public var longString       : String  { "\(major).\(minor).\(patch) (\(build))" }
   public var string           : String  { "\(major).\(minor).\(patch)" }
 
-  public var isV3m            : Bool    { major >= 3 }
-  public var isV3             : Bool    { major == 2 && minor >= 5 || major >= 3 }
-  public var isV2newApi       : Bool    { major == 2 && minor >= 5 }
+  public var isV3             : Bool    { major >= 3 }
+  public var isV2NewApi       : Bool    { major == 2 && minor >= 5 }
   public var isGreaterThanV22 : Bool    { major >= 2 && minor >= 2 }
   public var isV2             : Bool    { major == 2 && minor < 5 }
   public var isV1             : Bool    { major == 1 }
   
+  public var isNewApi         : Bool    { isV3 || isV2NewApi }
+  public var isOldApi         : Bool    { isV1 || isV2 }
+
   public var group            : Versions {
     if isV1 {
       return .v1
