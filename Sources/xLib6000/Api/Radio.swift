@@ -105,7 +105,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public private(set) var cwx         : Cwx!
   @objc dynamic public private(set) var gps         : Gps!
   @objc dynamic public private(set) var interlock   : Interlock!
-  @objc dynamic public private(set) var netCWStream : NetCWStream!
   @objc dynamic public private(set) var transmit    : Transmit!
   @objc dynamic public private(set) var wan         : Wan!
   @objc dynamic public private(set) var waveform    : Waveform!
@@ -114,7 +113,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public private(set) var micList     = [MicrophonePort]()
   @objc dynamic public private(set) var rfGainList  = [RfGainValue]()
   @objc dynamic public private(set) var sliceList   = [SliceId]()
-  
+
+  @objc dynamic public private(set) var netCwStream : NetCwStream!
+
   // Shadowed properties that send commands
   @objc dynamic public var apfEnabled: Bool {
     get {  return _apfEnabled }
@@ -653,8 +654,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _hardwareVersion              : String?
   private var _radioInitialized             = false
   
-  private var _netCWStream                  : NetCWStream?
-  
   private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
   private let _log                          = Log.sharedInstance.logMessage
   
@@ -680,7 +679,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     cwx = Cwx(radio: self)
     gps = Gps(radio: self)
     interlock = Interlock(radio: self)
-    netCWStream = NetCWStream(radio: self)
+    netCwStream = NetCwStream(radio: self)
     transmit = Transmit(radio: self)
     wan = Wan(radio: self)
     waveform = Waveform(radio: self)
@@ -1303,13 +1302,12 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       if radio.version.isNewApi && remainder.contains(Api.kRemoved) {
         
         // YES v3 removal, find the stream & remove it
-        if radio.daxIqStreams[id] != nil          { DaxIqStream.parseStatus(radio, keyValues, false)          ; return }
-        if radio.daxMicAudioStreams[id] != nil    { DaxMicAudioStream.parseStatus(radio, keyValues, false)    ; return }
-        if radio.daxRxAudioStreams[id] != nil     { DaxRxAudioStream.parseStatus(radio, keyValues, false)     ; return }
-        if radio.daxTxAudioStreams[id] != nil     { DaxTxAudioStream.parseStatus(radio, keyValues, false)     ; return }
-        if radio.remoteRxAudioStreams[id] != nil  { RemoteRxAudioStream.parseStatus(radio, keyValues, false)  ; return }
-        if radio.remoteTxAudioStreams[id] != nil  { RemoteTxAudioStream.parseStatus(radio, keyValues, false)  ; return }
-
+        if daxIqStreams[id] != nil          { DaxIqStream.parseStatus(self, keyValues, false)           ; return }
+        if daxMicAudioStreams[id] != nil    { DaxMicAudioStream.parseStatus(self, keyValues, false)     ; return }
+        if daxRxAudioStreams[id] != nil     { DaxRxAudioStream.parseStatus(self, keyValues, false)      ; return }
+        if daxTxAudioStreams[id] != nil     { DaxTxAudioStream.parseStatus(self, keyValues, false)      ; return }
+        if remoteRxAudioStreams[id] != nil  { RemoteRxAudioStream.parseStatus(self, keyValues, false)   ; return }
+        if remoteTxAudioStreams[id] != nil  { RemoteTxAudioStream.parseStatus(self, keyValues, false)   ; return }
 
 
 //        if radio.daxIqStreams[id] != nil          { radio.daxIqStreams[id] = nil          ; notify(id, .daxIq)    ; return }
@@ -1323,12 +1321,12 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       } else if (radio.version.isV1 || radio.version.isV2) && remainder.contains(Api.kNotInUse) {
         
         // YES, v1 or v2 removal, find the stream & remove it
-        if radio.audioStreams[id] != nil          { AudioStream.parseStatus(radio, keyValues, false)    ; return }
-        if radio.txAudioStreams[id] != nil        { TxAudioStream.parseStatus(radio, keyValues, false)  ; return }
-        if radio.micAudioStreams[id] != nil       { MicAudioStream.parseStatus(radio, keyValues, false) ; return }
-        if radio.iqStreams[id] != nil             { IqStream.parseStatus(radio, keyValues, false)       ; return }
+        if audioStreams[id] != nil          { AudioStream.parseStatus(self, keyValues, false)           ; return }
+        if txAudioStreams[id] != nil        { TxAudioStream.parseStatus(self, keyValues, false)         ; return }
+        if micAudioStreams[id] != nil       { MicAudioStream.parseStatus(self, keyValues, false)        ; return }
+        if iqStreams[id] != nil             { IqStream.parseStatus(self, keyValues, false)              ; return }
 
-//        if radio.audioStreams[id] != nil          { radio.audioStreams[id] = nil          ; notify(id, .audio)      ; return }
+        //        if radio.audioStreams[id] != nil          { radio.audioStreams[id] = nil          ; notify(id, .audio)      ; return }
 //        if radio.txAudioStreams[id] != nil        { radio.txAudioStreams[id] = nil        ; notify(id, .txAudio)    ; return }
 //        if radio.micAudioStreams[id] != nil       { radio.micAudioStreams[id] = nil       ; notify(id, .micAudio)   ; return }
 //        if radio.iqStreams[id] != nil             { radio.iqStreams[id] = nil             ; notify(id, .iq)         ; return }

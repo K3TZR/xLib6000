@@ -67,6 +67,7 @@ final class BaseTests: XCTestCase {
       XCTAssertNotNil(radio.cwx, "\n***** Failed to instantiate Cwx *****\n", file: #function)
       XCTAssertNotNil(radio.gps, "\n***** Failed to instantiate Gps *****\n", file: #function)
       XCTAssertNotNil(radio.interlock, "\n***** Failed to instantiate Interlock *****\n", file: #function)
+      XCTAssertNotNil(radio.netCwStream, "\n***** Failed to instantiate NetCwStream *****\n", file: #function)
       XCTAssertNotNil(radio.transmit, "\n***** Failed to instantiate Transmit *****\n", file: #function)
       XCTAssertNotNil(radio.wan, "\n***** Failed to instantiate Wan *****\n", file: #function)
       XCTAssertNotNil(radio.waveform, "\n***** Failed to instantiate Waveform *****\n", file: #function)

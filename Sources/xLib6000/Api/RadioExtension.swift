@@ -69,19 +69,29 @@ extension Radio {
   public func requestBandSetting(_ channel: String, callback: ReplyHandler? = nil) {
   
     // FIXME: need information
+    
   }
 
   // ----------------------------------------------------------------------------
-  // MARK: - NetCWStream methods
+  // MARK: - NetCwStream methods
   
-  public func requestNetCWStream() -> Void {
+  public func requestNetCwStream() -> Void {
     
-    netCWStream.requestNetCwStream()
+    if netCwStream.isActive {
+      
+      Log.sharedInstance.logMessage("NetCwStream was already requested", .error, #function, #file, #line)
+      return
+    }
+        
+    // send the command to the radio to create the object...need to change this..
+    sendCommand("stream create netcw", diagnostic: false, replyTo: netCwStream.updateStreamId)
+    netCwStream.isActive = true
+
   }
   
   public func cwKey(state: Bool, timestamp: String, guiClientHandle: Handle = 0) -> Void {
     
-    if (netCWStream.isActive) {
+    if (netCwStream.isActive) {
       
       // If the GUI Client Handle was not specified, assume that this is the GUIClient, and use it as the Client Handle.
       // Otherwise, use the passed in guiClientHandle.  This will usually be done for non-gui clients that have been
@@ -89,14 +99,14 @@ extension Radio {
       
       if let cwGuiClientHandle = (guiClientHandle == 0 ? Api.sharedInstance.connectionHandle : guiClientHandle) {
         
-        netCWStream.cwKey(state: state, timestamp: timestamp, guiClientHandle: cwGuiClientHandle)
+        netCwStream.cwKey(state: state, timestamp: timestamp, guiClientHandle: cwGuiClientHandle)
       }
     }
   }
   
   public func cwPTT(state: Bool, timestamp: String, guiClientHandle: Handle = 0) -> Void {
     
-    if (netCWStream.isActive) {
+    if (netCwStream.isActive) {
       
       // If the GUI Client Handle was not specified, assume that this is the GUIClient, and use it as the Client Handle.
       // Otherwise, use the passed in guiClientHandle.  This will usually be done for non-gui clients that have been
@@ -104,7 +114,7 @@ extension Radio {
       
       if let cwGuiClientHandle = (guiClientHandle == 0 ? Api.sharedInstance.connectionHandle : guiClientHandle) {
         
-        netCWStream.cwPTT(state: state, timestamp: timestamp, guiClientHandle: cwGuiClientHandle)
+        netCwStream.cwPTT(state: state, timestamp: timestamp, guiClientHandle: cwGuiClientHandle)
       }
     }
   }

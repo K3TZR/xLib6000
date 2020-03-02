@@ -73,6 +73,10 @@ public enum NotificationType : String {
   case micAudioStreamWillBeRemoved
   case micAudioStreamHasBeenRemoved
 
+  case netCwStreamHasBeenAdded
+  case netCwStreamWillBeRemoved
+  case netCwStreamHasBeenRemoved
+  
   case opusHasBeenAdded
   case opusWillBeRemoved
 

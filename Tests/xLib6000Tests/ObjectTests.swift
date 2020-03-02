@@ -545,6 +545,67 @@ final class ObjectTests: XCTestCase {
   }
   
   // ------------------------------------------------------------------------------
+  // MARK: - NetCwStream
+  
+  func testNetCwStream () {
+    let type = "NetCwStream"
+    var existingObjects = false
+    
+    Swift.print("\n***** \(#function)")
+    
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+    guard radio != nil else { return }
+    
+    if radio!.netCwStream.isActive {
+      existingObjects = true
+      if showInfoMessages { Swift.print("\n***** Existing \(type) removed") }
+      
+      // remove it
+      radio!.netCwStream.remove()
+      sleep(2)
+    }
+    if radio!.netCwStream.isActive == false {
+      
+      if showInfoMessages && existingObjects { Swift.print("***** Existing \(type)(s) removal confirmed") }
+      
+      if showInfoMessages { Swift.print("\n***** \(type) requested") }
+      
+      // ask for new
+      radio!.requestNetCwStream()
+      sleep(2)
+      
+      // verify added
+      if radio!.netCwStream.isActive {
+        
+        if showInfoMessages { Swift.print("***** \(type) added\n") }
+        
+        if radio!.netCwStream.id != 0 {
+        
+          if showInfoMessages { Swift.print("***** \(type) removed") }
+          
+          radio!.netCwStream.remove()
+          sleep(2)
+          
+          if radio!.netCwStream.isActive == false {
+            
+            if showInfoMessages { Swift.print("***** \(type) removal confirmed\n") }
+            
+          } else {
+            XCTFail("***** \(type) removal FAILED *****", file: #function)
+          }
+        } else {
+          XCTFail("***** \(type) StreamId invalid *****", file: #function)
+        }
+      } else {
+        XCTFail("***** \(type) NOT added *****", file: #function)
+      }
+    } else {
+      XCTFail("***** Existing \(type) removal FAILED *****", file: #function)
+    }
+    disconnect()
+  }
+
+  // ------------------------------------------------------------------------------
   // MARK: - Panadapter
   
   func removeAllPanadapters(radio: Radio) {
