@@ -72,6 +72,44 @@ extension Radio {
   }
 
   // ----------------------------------------------------------------------------
+  // MARK: - NetCWStream methods
+  
+  public func requestNetCWStream() -> Void {
+    
+    netCWStream.requestNetCwStream()
+  }
+  
+  public func cwKey(state: Bool, timestamp: String, guiClientHandle: Handle = 0) -> Void {
+    
+    if (netCWStream.isActive) {
+      
+      // If the GUI Client Handle was not specified, assume that this is the GUIClient, and use it as the Client Handle.
+      // Otherwise, use the passed in guiClientHandle.  This will usually be done for non-gui clients that have been
+      // bound to a different GUIClient context.
+      
+      if let cwGuiClientHandle = (guiClientHandle == 0 ? Api.sharedInstance.connectionHandle : guiClientHandle) {
+        
+        netCWStream.cwKey(state: state, timestamp: timestamp, guiClientHandle: cwGuiClientHandle)
+      }
+    }
+  }
+  
+  public func cwPTT(state: Bool, timestamp: String, guiClientHandle: Handle = 0) -> Void {
+    
+    if (netCWStream.isActive) {
+      
+      // If the GUI Client Handle was not specified, assume that this is the GUIClient, and use it as the Client Handle.
+      // Otherwise, use the passed in guiClientHandle.  This will usually be done for non-gui clients that have been
+      // bound to a different GUIClient context.
+      
+      if let cwGuiClientHandle = (guiClientHandle == 0 ? Api.sharedInstance.connectionHandle : guiClientHandle) {
+        
+        netCWStream.cwPTT(state: state, timestamp: timestamp, guiClientHandle: cwGuiClientHandle)
+      }
+    }
+  }
+  
+  // ----------------------------------------------------------------------------
   // MARK: - DaxIqStream methods
   
   /// Create a DaxIQStream

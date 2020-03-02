@@ -330,10 +330,12 @@ public extension UInt {
   var hzToMhz : String { String(format: "%02.6f", Float(self) / 1_000_000.0) }
 }
 
-//public extension UInt16 {
-//  var 
-//}
+public extension UInt16 {
+  
+  var hex: String { return String(format: "0x%04X", self) }
 
+  func toHex(_ format: String = "0x%04X") -> String { String(format: format, self) }
+}
 public extension UInt32 {
   
   var hex: String { return String(format: "0x%08X", self) }
