@@ -134,6 +134,9 @@ public final class Tnf : NSObject, DynamicModel {
         
       } else {
         
+        // NOTE: Tnf remove does not receive any Status message to confirm removal
+        // therefore this code will never be executed
+
         // does it exist?
         if radio.tnfs[id] != nil {
           
@@ -205,8 +208,14 @@ public final class Tnf : NSObject, DynamicModel {
     // notify all observers
     NC.post(.tnfWillBeRemoved, object: self as Any?)
     
+    // NOTE: Tnf remove does not receive any Status message to confirm removal
+
     // remove the Tnf
     _radio.tnfs[id] = nil
+
+    _log("Tnf removed: id = \(id)", .debug, #function, #file, #line)
+
+    NC.post(.tnfHasBeenRemoved, object: id as Any?)
   }
 
 //  /// Given a Frequency, return a reference to the Tnf containing it (if any)
