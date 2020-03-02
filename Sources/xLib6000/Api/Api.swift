@@ -53,6 +53,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public        var isGui                   = true
   public        var isWan                   = false
   public        var reducedDaxBw            = false
+  public        var needsNetCwStream        = false
   public        var testerDelegate          : ApiDelegate?
   public        var testerModeEnabled       = false
   public        var pingerEnabled           = true
@@ -198,6 +199,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     - wanHandle:            Wan Handle (if any)
   ///     - reducedDaxBw:         Use reduced bandwidth for Dax
   ///     - suppressNSLog:        Suppress NSLogs when no Log delegate
+  ///     - needsCwStream:        cleint application needs the network cw stream
   /// - Returns:                  Success / Failure
   ///
   public func connect(_ discoveryPacket: DiscoveryStruct,
@@ -208,7 +210,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       isWan: Bool = false,
                       wanHandle: String = "",
                       reducedDaxBw: Bool = false,
-                      logState: NSLogging = .normal) -> Bool {
+                      logState: NSLogging = .normal,
+                      needsCwStream: Bool = false) -> Bool {
 
     self.nsLogState = logState
     
@@ -230,6 +233,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       self.isGui = isGui
       self.isWan = isWan
       self.reducedDaxBw = reducedDaxBw
+      self.needsNetCwStream = needsCwStream
       connectionHandleWan = wanHandle
             
     } else {
@@ -317,6 +321,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         let port = (isWan ? radio.discoveryPacket.publicTlsPort : radio.discoveryPacket.port)
         _log("Pinger started: \(radio.discoveryPacket.nickname) @ \(radio.discoveryPacket.publicIp), port \(port) \(wanStatus)", .info, #function, #file, #line)
       }
+      
+      if needsNetCwStream {
+        radio.requestNetCWStream()
+      }
+      
       // TCP & UDP connections established, inform observers
       NC.post(.clientDidConnect, object: radio as Any?)
     }

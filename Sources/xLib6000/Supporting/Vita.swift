@@ -436,8 +436,11 @@ public class Vita {
   convenience init(type: VitaType, streamId: UInt32, reducedBW: Bool = false) {
     
     switch type {
-    case .opusTx:
+      case .netCW:
       self.init(packetType: .extDataWithStream, classCode: .daxAudio, streamId: streamId, tsi: .other, tsf: .sampleCount)
+      
+    case .opusTx:
+      self.init(packetType: .extDataWithStream, classCode: .opus, streamId: streamId, tsi: .other, tsf: .sampleCount)
       
     case .txAudio:
       var classCode = PacketClassCode.daxAudio
@@ -532,6 +535,7 @@ extension Vita {
   /// Types
   ///
   enum VitaType {
+    case netCW
     case opusTx
     case txAudio
   }
