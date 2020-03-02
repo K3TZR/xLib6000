@@ -113,14 +113,32 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
     // get the Id
     if let id =  properties[0].key.streamId {
       
-      // YES, does it exist?
-      if radio.daxIqStreams[id] == nil {
+      // is the object in use?
+      if inUse {
         
-        // create a new object & add it to the collection
-        radio.daxIqStreams[id] = DaxIqStream(radio: radio, id: id)
+        // YES, does it exist?
+        if radio.daxIqStreams[id] == nil {
+          
+          // create a new object & add it to the collection
+          radio.daxIqStreams[id] = DaxIqStream(radio: radio, id: id)
+        }
+        // pass the remaining key values for parsing
+        radio.daxIqStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
+        
+      } else {
+        // NO, does it exist?
+        if radio.daxIqStreams[id] != nil {
+          
+          // YES, remove it, notify observers
+          NC.post(.daxIqStreamWillBeRemoved, object: radio.daxIqStreams[id] as Any?)
+          
+          radio.daxIqStreams[id] = nil
+          
+          Log.sharedInstance.logMessage("DaxIqStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+          
+          NC.post(.daxIqStreamHasBeenRemoved, object: id as Any?)
+        }
       }
-      // pass the remaining key values for parsing
-      radio.daxIqStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
     }
   }
 

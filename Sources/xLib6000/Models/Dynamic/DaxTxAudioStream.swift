@@ -105,17 +105,36 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
     // get the Id
     if let id =  properties[0].key.streamId {
       
-      // YES, does it exist?
-      if radio.daxTxAudioStreams[id] == nil {
+      // is the object in use?
+      if inUse {
         
-        // NO, is it for this client?
-        if !isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) { return }
-        
-        // create a new object & add it to the collection
-        radio.daxTxAudioStreams[id] = DaxTxAudioStream(radio: radio, id: id)
+        // YES, does it exist?
+        if radio.daxTxAudioStreams[id] == nil {
+          
+          // NO, is it for this client?
+          if !isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) { return }
+          
+          // create a new object & add it to the collection
+          radio.daxTxAudioStreams[id] = DaxTxAudioStream(radio: radio, id: id)
+        }
+        // pass the remaining key values for parsing
+        radio.daxTxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
+      
+      }  else {
+        // NO, does it exist?
+        if radio.daxTxAudioStreams[id] != nil {
+          
+          // YES, remove it, notify observers
+          NC.post(.daxTxAudioStreamWillBeRemoved, object: radio.daxTxAudioStreams[id] as Any?)
+          
+          radio.daxTxAudioStreams[id] = nil
+          
+          Log.sharedInstance.logMessage("DaxTxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+          
+          NC.post(.daxTxAudioStreamHasBeenRemoved, object: id as Any?)
+        }
       }
-      // pass the remaining key values for parsing
-      radio.daxTxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
+    
     }
   }
 

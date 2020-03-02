@@ -103,21 +103,39 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   ///
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_mic"> <"client_handle", handle> <"ip", ipAddress>
-
+    
     // get the Id
     if let id =  properties[0].key.streamId {
       
-      // YES, does it exist?
-      if radio.daxMicAudioStreams[id] == nil {
+      // is the object in use?
+      if inUse {
         
-        // NO, is it for this client?
-        if !isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) { return }
-
-        // create a new object & add it to the collection
-        radio.daxMicAudioStreams[id] = DaxMicAudioStream(radio: radio, id: id)
+        // YES, does it exist?
+        if radio.daxMicAudioStreams[id] == nil {
+          
+          // NO, is it for this client?
+          if !isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) { return }
+          
+          // create a new object & add it to the collection
+          radio.daxMicAudioStreams[id] = DaxMicAudioStream(radio: radio, id: id)
+        }
+        // pass the remaining key values for parsing
+        radio.daxMicAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
+      
+      } else {
+        // NO, does it exist?
+        if radio.daxMicAudioStreams[id] != nil {
+          
+          // YES, remove it, notify observers
+          NC.post(.daxMicAudioStreamWillBeRemoved, object: radio.daxMicAudioStreams[id] as Any?)
+          
+          radio.daxMicAudioStreams[id] = nil
+          
+          Log.sharedInstance.logMessage("DaxMicAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+          
+          NC.post(.daxMicAudioStreamHasBeenRemoved, object: id as Any?)
+        }
       }
-      // pass the remaining key values for parsing
-      radio.daxMicAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
     }
   }
 

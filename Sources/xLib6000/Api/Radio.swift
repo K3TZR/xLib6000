@@ -1265,29 +1265,29 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // ---------------------------------------------------------------------------------
     // embedded func to perform Logging & Notifications
     
-    func notify(_ id: StreamId, _ type: StreamType) {
-      var notify : NotificationType
-      var streamName : String
-      
-      switch type {
-        
-      case .daxIq:      notify = .daxIqStreamHasBeenRemoved         ; streamName = "DaxIqStreaam"
-      case .daxMic:     notify = .daxMicAudioStreamHasBeenRemoved   ; streamName = "DaxMicAudioStream"
-      case .daxRx:      notify = .daxRxAudioStreamHasBeenRemoved    ; streamName = "DaxRxAudioStream"
-      case .daxTx:      notify = .daxTxAudioStreamHasBeenRemoved    ; streamName = "DaxTxAudioStream"
-      case .remoteRx:   notify = .remoteRxAudioStreamHasBeenRemoved ; streamName = "RemoteRxAudioStream"
-      case .remoteTx:   notify = .remoteTxAudioStreamHasBeenRemoved ; streamName = "RemoteTxAudioStream"
-      
-      case .audio:      notify = .audioStreamHasBeenRemoved         ; streamName = "AudioStream"
-      case .txAudio:    notify = .txAudioStreamHasBeenRemoved       ; streamName = "TxAudioStream"
-      case .micAudio:   notify = .micAudioStreamHasBeenRemoved      ; streamName = "MicAudioStream"
-      case .iq:         notify = .iqStreamHasBeenRemoved            ; streamName = "IqStream"
-      }
-      _log(streamName + " removed: id = \(id.hex)", .debug, #function, #file, #line)
-
-      // notify all observers
-      NC.post(notify, object: id as Any?)
-    }
+//    func notify(_ id: StreamId, _ type: StreamType) {
+//      var notify : NotificationType
+//      var streamName : String
+//
+//      switch type {
+//
+//      case .daxIq:      notify = .daxIqStreamHasBeenRemoved         ; streamName = "DaxIqStreaam"
+//      case .daxMic:     notify = .daxMicAudioStreamHasBeenRemoved   ; streamName = "DaxMicAudioStream"
+//      case .daxRx:      notify = .daxRxAudioStreamHasBeenRemoved    ; streamName = "DaxRxAudioStream"
+//      case .daxTx:      notify = .daxTxAudioStreamHasBeenRemoved    ; streamName = "DaxTxAudioStream"
+//      case .remoteRx:   notify = .remoteRxAudioStreamHasBeenRemoved ; streamName = "RemoteRxAudioStream"
+//      case .remoteTx:   notify = .remoteTxAudioStreamHasBeenRemoved ; streamName = "RemoteTxAudioStream"
+//
+//      case .audio:      notify = .audioStreamHasBeenRemoved         ; streamName = "AudioStream"
+//      case .txAudio:    notify = .txAudioStreamHasBeenRemoved       ; streamName = "TxAudioStream"
+//      case .micAudio:   notify = .micAudioStreamHasBeenRemoved      ; streamName = "MicAudioStream"
+//      case .iq:         notify = .iqStreamHasBeenRemoved            ; streamName = "IqStream"
+//      }
+//      _log(streamName + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+//
+//      // notify all observers
+//      NC.post(notify, object: id as Any?)
+//    }
     // ---------------------------------------------------------------------------------
    
     let keyValues = remainder.keyValuesArray()
@@ -1299,21 +1299,35 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       if radio.version.isNewApi && remainder.contains(Api.kRemoved) {
         
         // YES v3 removal, find the stream & remove it
-        if radio.daxIqStreams[id] != nil          { radio.daxIqStreams[id] = nil          ; notify(id, .daxIq)    ; return }
-        if radio.daxMicAudioStreams[id] != nil    { radio.daxMicAudioStreams[id] = nil    ; notify(id, .daxMic)   ; return }
-        if radio.daxRxAudioStreams[id] != nil     { radio.daxRxAudioStreams[id] = nil     ; notify(id, .daxRx)    ; return }
-        if radio.daxTxAudioStreams[id] != nil     { radio.daxTxAudioStreams[id] = nil     ; notify(id, .daxTx)    ; return }
-        if radio.remoteRxAudioStreams[id] != nil  { radio.remoteRxAudioStreams[id] = nil  ; notify(id, .remoteRx) ; return }
-        if radio.remoteTxAudioStreams[id] != nil  { radio.remoteTxAudioStreams[id] = nil  ; notify(id, .remoteTx) ; return }
+        if radio.daxIqStreams[id] != nil          { DaxIqStream.parseStatus(radio, keyValues, false)          ; return }
+        if radio.daxMicAudioStreams[id] != nil    { DaxMicAudioStream.parseStatus(radio, keyValues, false)    ; return }
+        if radio.daxRxAudioStreams[id] != nil     { DaxRxAudioStream.parseStatus(radio, keyValues, false)     ; return }
+        if radio.daxTxAudioStreams[id] != nil     { DaxTxAudioStream.parseStatus(radio, keyValues, false)     ; return }
+        if radio.remoteRxAudioStreams[id] != nil  { RemoteRxAudioStream.parseStatus(radio, keyValues, false)  ; return }
+        if radio.remoteTxAudioStreams[id] != nil  { RemoteTxAudioStream.parseStatus(radio, keyValues, false)  ; return }
+
+
+
+//        if radio.daxIqStreams[id] != nil          { radio.daxIqStreams[id] = nil          ; notify(id, .daxIq)    ; return }
+//        if radio.daxMicAudioStreams[id] != nil    { radio.daxMicAudioStreams[id] = nil    ; notify(id, .daxMic)   ; return }
+//        if radio.daxRxAudioStreams[id] != nil     { radio.daxRxAudioStreams[id] = nil     ; notify(id, .daxRx)    ; return }
+//        if radio.daxTxAudioStreams[id] != nil     { radio.daxTxAudioStreams[id] = nil     ; notify(id, .daxTx)    ; return }
+//        if radio.remoteRxAudioStreams[id] != nil  { radio.remoteRxAudioStreams[id] = nil  ; notify(id, .remoteRx) ; return }
+//        if radio.remoteTxAudioStreams[id] != nil  { radio.remoteTxAudioStreams[id] = nil  ; notify(id, .remoteTx) ; return }
         return
         
       } else if (radio.version.isV1 || radio.version.isV2) && remainder.contains(Api.kNotInUse) {
         
         // YES, v1 or v2 removal, find the stream & remove it
-        if radio.audioStreams[id] != nil          { radio.audioStreams[id] = nil          ; notify(id, .audio)      ; return }
-        if radio.txAudioStreams[id] != nil        { radio.txAudioStreams[id] = nil        ; notify(id, .txAudio)    ; return }
-        if radio.micAudioStreams[id] != nil       { radio.micAudioStreams[id] = nil       ; notify(id, .micAudio)   ; return }
-        if radio.iqStreams[id] != nil             { radio.iqStreams[id] = nil             ; notify(id, .iq)         ; return }
+        if radio.audioStreams[id] != nil          { AudioStream.parseStatus(radio, keyValues, false)    ; return }
+        if radio.txAudioStreams[id] != nil        { TxAudioStream.parseStatus(radio, keyValues, false)  ; return }
+        if radio.micAudioStreams[id] != nil       { MicAudioStream.parseStatus(radio, keyValues, false) ; return }
+        if radio.iqStreams[id] != nil             { IqStream.parseStatus(radio, keyValues, false)       ; return }
+
+//        if radio.audioStreams[id] != nil          { radio.audioStreams[id] = nil          ; notify(id, .audio)      ; return }
+//        if radio.txAudioStreams[id] != nil        { radio.txAudioStreams[id] = nil        ; notify(id, .txAudio)    ; return }
+//        if radio.micAudioStreams[id] != nil       { radio.micAudioStreams[id] = nil       ; notify(id, .micAudio)   ; return }
+//        if radio.iqStreams[id] != nil             { radio.iqStreams[id] = nil             ; notify(id, .iq)         ; return }
         return
       
       } else {
