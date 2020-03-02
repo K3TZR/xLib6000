@@ -72,14 +72,7 @@ public final class NetCWStream : NSObject {
       _log("NetCWStream was already requested", .error, #function, #file, #line)
       return
     }
-    
-    // check to make sure the radio is connected
-    if Api.sharedInstance.apiState != .clientConnected {
-    
-      _active = false
-      return
-    }
-    
+        
     // send the command to the radio to create the object...need to change this..
     _radio.sendCommand("stream create netcw", diagnostic: false, replyTo: updateStreamId)
     _active = true
@@ -117,8 +110,8 @@ public final class NetCWStream : NSObject {
     
     _txIndex = _txIndex + 1
     
-    let cmd = "cw ptt " + state.as1or0 + " time=0x" + timestamp + " index=\(_txIndex) client_handle=" + guiClientHandle.hex
-    
+    let cmd = "cw ptt " + state.as1or0 + " time=" + timestamp + " index=\(_txIndex) client_handle=" + guiClientHandle.hex
+      
     sendCommand(cmd)
     
     _objectQ.async {
@@ -143,18 +136,18 @@ public final class NetCWStream : NSObject {
     
     guard responseValue == "0" else {
       
-      _log("Response value != 0 for: \(command)", .error, #function, #file, #line)
+      _log("NetCWStream: Response value != 0 for: \(command)", .error, #function, #file, #line)
       _active = false
       return
     }
     
-    if let streamId = UInt32(reply, radix: 16) {
+    if let streamId = reply.streamId {
       
       self._txStreamId = streamId
       _active = true
     } else {
       
-      _log("Error parsing Stream ID (" + reply + ")", .error, #function, #file, #line)
+      _log("NetCWStream: Error parsing Stream ID (" + reply + ")", .error, #function, #file, #line)
       _active = false
     }
   }

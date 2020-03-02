@@ -233,6 +233,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       self.isGui = isGui
       self.isWan = isWan
       self.reducedDaxBw = reducedDaxBw
+      self.needsNetCwStream = needsCwStream
       connectionHandleWan = wanHandle
             
     } else {
@@ -320,6 +321,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         let port = (isWan ? radio.discoveryPacket.publicTlsPort : radio.discoveryPacket.port)
         _log("Pinger started: \(radio.discoveryPacket.nickname) @ \(radio.discoveryPacket.publicIp), port \(port) \(wanStatus)", .info, #function, #file, #line)
       }
+      
+      if needsNetCwStream {
+        radio.requestNetCWStream()
+      }
+      
       // TCP & UDP connections established, inform observers
       NC.post(.clientDidConnect, object: radio as Any?)
     }
@@ -391,8 +397,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       radio.requestSubAll()
       if radio.version.isGreaterThanV22 { radio.requestMtuLimit(1_500) }
       if radio.version.isNewApi         { radio.requestDaxBandwidthLimit(self.reducedDaxBw) }
-      
-      if needsNetCwStream               { radio.requestNetCWStream() }
     }
   }
   /// Determine if the Radio Firmware version is compatable with the API version
