@@ -105,6 +105,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public private(set) var cwx         : Cwx!
   @objc dynamic public private(set) var gps         : Gps!
   @objc dynamic public private(set) var interlock   : Interlock!
+  @objc dynamic public private(set) var netCWStream : NetCWStream!
   @objc dynamic public private(set) var transmit    : Transmit!
   @objc dynamic public private(set) var wan         : Wan!
   @objc dynamic public private(set) var waveform    : Waveform!
@@ -652,6 +653,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _hardwareVersion              : String?
   private var _radioInitialized             = false
   
+  private var _netCWStream                  : NetCWStream?
+  
   private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
   private let _log                          = Log.sharedInstance.logMessage
   
@@ -677,6 +680,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     cwx = Cwx(radio: self)
     gps = Gps(radio: self)
     interlock = Interlock(radio: self)
+    netCWStream = NetCWStream(radio: self)
     transmit = Transmit(radio: self)
     wan = Wan(radio: self)
     waveform = Waveform(radio: self)

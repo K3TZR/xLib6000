@@ -391,6 +391,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       radio.requestSubAll()
       if radio.version.isGreaterThanV22 { radio.requestMtuLimit(1_500) }
       if radio.version.isNewApi         { radio.requestDaxBandwidthLimit(self.reducedDaxBw) }
+      
+      if needsNetCwStream               { radio.requestNetCWStream() }
     }
   }
   /// Determine if the Radio Firmware version is compatable with the API version
