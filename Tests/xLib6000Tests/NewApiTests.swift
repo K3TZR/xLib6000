@@ -12,7 +12,7 @@ final class NewApiTests: XCTestCase {
   let requiredVersion   = "v3 || v2 NewApi"
   let showInfoMessages  = true
   let minPause          : UInt32 = 30_000
-
+  
   // Helper functions
   func discoverRadio(logState: Api.NSLogging = .normal) -> Radio? {
     let discovery = Discovery.sharedInstance
@@ -20,7 +20,7 @@ final class NewApiTests: XCTestCase {
     if discovery.discoveredRadios.count > 0 {
       
       Swift.print("***** Radio found: \(discovery.discoveredRadios[0].nickname) (v\(discovery.discoveredRadios[0].firmwareVersion)) @ \(discovery.discoveredRadios[0].publicIp)")
-
+      
       if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "v3Tests", isGui: connectAsGui, logState: logState) {
         sleep(2)
         
@@ -42,7 +42,7 @@ final class NewApiTests: XCTestCase {
     
     Swift.print("***** Disconnected\n")
   }
-
+  
   // ------------------------------------------------------------------------------
   // MARK: - BandSetting
   
@@ -51,24 +51,26 @@ final class NewApiTests: XCTestCase {
   func testBandSettingParse_1() {
     let type = "BandSetting"
     let id = bandSettingStatus_1.components(separatedBy: " ")[0].objectId!
-
+    
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi {
-
+      
       sleep(2)
       
       // remove (if present)
       radio!.bandSettings[id] = nil
       
+      if showInfoMessages { Swift.print("\n***** \(type) object requested") }
+      
       BandSetting.parseStatus(radio!, bandSettingStatus_1.keyValuesArray(), true)
       
       if let object = radio!.bandSettings[id] {
         
-        if showInfoMessages { Swift.print("***** \(type) object created") }
+        if showInfoMessages { Swift.print("***** \(type) object added\n") }
         
         XCTAssertEqual(object.bandName, "221", "bandName", file: #function)
         XCTAssertEqual(object.accTxReqEnabled, true, "accTxReqEnabled", file: #function)
@@ -80,12 +82,14 @@ final class NewApiTests: XCTestCase {
         
         if showInfoMessages { Swift.print("***** \(type) object parameters verified") }
         
+        if showInfoMessages { Swift.print("\n***** \(type) object removed") }
+        
         BandSetting.parseStatus(radio!, bandSettingRemove_1.keyValuesArray(), false)
         
         if radio!.bandSettings[id] == nil {
           
-          if showInfoMessages { Swift.print("***** \(type) object removed") }
-
+          if showInfoMessages { Swift.print("***** \(type) object removal confirmed\n") }
+          
         } else {
           XCTFail("***** \(type) object NOT removed *****", file: #function)
         }
@@ -97,28 +101,30 @@ final class NewApiTests: XCTestCase {
     }
     disconnect()
   }
-
+  
   private var bandSettingStatus_2 = "998 band_name=WWV rfpower=50 tunepower=10 hwalc_enabled=1 inhibit=0"
   private let bandSettingRemove_2 = "998 removed"
   func testBandSetting2Parse() {
     let type = "BandSetting"
     let id = bandSettingStatus_2.components(separatedBy: " ")[0].objectId!
-
+    
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi {
-
+      
       // remove (if present)
       radio!.bandSettings["2".objectId!] = nil
       
+      if showInfoMessages { Swift.print("\n***** \(type) object requested") }
+      
       BandSetting.parseStatus(radio!, bandSettingStatus_2.keyValuesArray(), true)
-
+      
       if let object = radio!.bandSettings[id] {
         
-        if showInfoMessages { Swift.print("***** \(type) object created") }
+        if showInfoMessages { Swift.print("***** \(type) object added\n") }
         
         XCTAssertEqual(object.bandName, "WWV", "bandName", file: #function)
         XCTAssertEqual(object.rfPower, 50, "rfPower", file: #function)
@@ -128,24 +134,26 @@ final class NewApiTests: XCTestCase {
         
         if showInfoMessages { Swift.print("***** \(type) object parameters verified") }
         
+        if showInfoMessages { Swift.print("\n***** \(type) object removed") }
+        
         BandSetting.parseStatus(radio!, bandSettingRemove_2.keyValuesArray(), false)
         
         if radio!.bandSettings[id] == nil {
           
-          if showInfoMessages { Swift.print("***** \(type) object removed") }
-
+          if showInfoMessages { Swift.print("***** \(type) object removal confirmed\n") }
+          
         } else {
-          XCTFail("***** \(type) object NOT removed *****")
+          XCTFail("***** \(type) object NOT removed *****", file: #function)
         }
       }else {
-        XCTFail("***** \(type) object NOT created *****")
+        XCTFail("***** \(type) object NOT created *****", file: #function)
       }
     }  else {
       XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
-
+  
   func testBandSetting() {
     let type = "BandSetting"
     
@@ -176,12 +184,9 @@ final class NewApiTests: XCTestCase {
       
       sleep(2)
       
-      Swift.print("Count = \(radio!.bandSettings.count)")
+      if showInfoMessages { Swift.print("\n***** Saving Existing \(type)s") }
       
       for (id, object) in radio!.bandSettings {
-        
-        if showInfoMessages { Swift.print("Saving band id = \(id), name = \(object.bandName)") }
-        
         tempArray.append( Temp(id: object.id,
                                bandName: object.bandName,
                                accTxEnabled: object.accTxEnabled,
@@ -194,11 +199,13 @@ final class NewApiTests: XCTestCase {
                                tx1Enabled: object.tx1Enabled,
                                tx2Enabled: object.tx2Enabled,
                                tx3Enabled: object.tx3Enabled
-                              )
+          )
         )
       }
       
-      if showInfoMessages { Swift.print("***** \(type) parameters saved") }
+      if showInfoMessages { Swift.print("***** \(type) saved\n") }
+      
+      if showInfoMessages { Swift.print("***** Modifying \(type)s") }
       
       for (_, object) in radio!.bandSettings {
         
@@ -222,8 +229,6 @@ final class NewApiTests: XCTestCase {
         usleep(minPause)
         object.tx3Enabled                  = false
         usleep(minPause)
-
-        if showInfoMessages { Swift.print("***** \(type) \(object.bandName) parameters modified") }
         
         XCTAssertEqual(object.accTxEnabled, false, "accTxEnabled", file: #function)
         XCTAssertEqual(object.accTxReqEnabled, false, "accTxReqEnabled", file: #function)
@@ -235,8 +240,6 @@ final class NewApiTests: XCTestCase {
         XCTAssertEqual(object.tx1Enabled, false, "tx1Enabled", file: #function)
         XCTAssertEqual(object.tx2Enabled, false, "tx2Enabled", file: #function)
         XCTAssertEqual(object.tx3Enabled, false, "tx3Enabled", file: #function)
-        
-        if showInfoMessages { Swift.print("***** \(type) \(object.bandName) parameters verified") }
         
         object.accTxEnabled                = true
         usleep(minPause)
@@ -258,8 +261,6 @@ final class NewApiTests: XCTestCase {
         usleep(minPause)
         object.tx3Enabled                  = true
         usleep(minPause)
-
-        if showInfoMessages { Swift.print("***** \(type) \(object.bandName) parameters modified") }
         
         XCTAssertEqual(object.accTxEnabled, true, "accTxEnabled", file: #function)
         XCTAssertEqual(object.accTxReqEnabled, true, "accTxReqEnabled", file: #function)
@@ -271,14 +272,15 @@ final class NewApiTests: XCTestCase {
         XCTAssertEqual(object.tx1Enabled, true, "tx1Enabled", file: #function)
         XCTAssertEqual(object.tx2Enabled, true, "tx2Enabled", file: #function)
         XCTAssertEqual(object.tx3Enabled, true, "tx3Enabled", file: #function)
-        
-        if showInfoMessages { Swift.print("***** \(type) \(object.bandName) parameters verified") }
       }
+      
+      if showInfoMessages { Swift.print("***** \(type) parameters modified & verified\n") }
+      
+      if showInfoMessages { Swift.print("***** Restoring previous \(type)s") }
+      
       for (_, entry) in tempArray.enumerated() {
         let id = entry.id
-
-        if showInfoMessages { Swift.print("Restoring band id = \(id), name = \(entry.bandName)") }
-                
+        
         radio!.bandSettings[id]!.accTxEnabled                = entry.accTxEnabled
         usleep(minPause)
         radio!.bandSettings[id]!.accTxReqEnabled             = entry.accTxReqEnabled
@@ -301,14 +303,14 @@ final class NewApiTests: XCTestCase {
         usleep(minPause)
       }
       
-      if showInfoMessages { Swift.print("***** Previous \(type) parameters restored") }
+      if showInfoMessages { Swift.print("***** Previous \(type)s restored\n") }
       
     } else {
       XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
-
+  
   // ------------------------------------------------------------------------------
   // MARK: - DaxIqStream
   
@@ -317,29 +319,37 @@ final class NewApiTests: XCTestCase {
   func testDaxIqParse() {
     let type = "DaxIqStream"
     let id = daxIqStreamStatus.components(separatedBy: " ").first!.streamId!
+    var existingObjects = false
     
     Swift.print("\n***** \(#function)" + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi {
       
       daxIqStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
-      // remove all
-      radio!.daxIqStreams.forEach( {$0.value.remove() } )
-      sleep(2)
+      if radio!.daxIqStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.daxIqStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
       if radio!.daxIqStreams.count == 0 {
         
-        if showInfoMessages { Swift.print("***** Previous \(type) object(s) removed") }
+        if showInfoMessages && existingObjects { Swift.print("***** Previous \(type) object(s) removal confirmed") }
+        
+        if showInfoMessages { Swift.print("\n***** \(type) object requested") }
         
         DaxIqStream.parseStatus(radio!, daxIqStreamStatus.keyValuesArray(), true)
         
         if radio!.daxIqStreams.count == 1 {
           if let object = radio!.daxIqStreams[id] {
             
-            if showInfoMessages { Swift.print("***** \(type) object created") }
+            if showInfoMessages { Swift.print("***** \(type) object added\n") }
             
             XCTAssertEqual(object.id, id, "id", file: #function)
             XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle!, "clientHandle", file: #function)
@@ -354,14 +364,14 @@ final class NewApiTests: XCTestCase {
             object.ip = "11.1.1.108"
             object.rate = 96_000
             
-            if showInfoMessages { Swift.print("***** \(type) object properties modified") }
+            if showInfoMessages { Swift.print("\n***** \(type) object properties modified") }
             
             XCTAssertEqual(object.id, id, "id", file: #function)
             XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle!, "clientHandle", file: #function)
             XCTAssertEqual(object.ip, "11.1.1.108", "ip", file: #function)
             XCTAssertEqual(object.rate, 96_000, "rate", file: #function)
             
-            if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
+            if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
             
           } else {
             XCTFail("***** \(type) object NOT found *****", file: #function)
@@ -377,38 +387,44 @@ final class NewApiTests: XCTestCase {
     }
     disconnect()
   }
-
+  
   func testDaxIqStream() {
     let type = "DaxIqStream"
+    var existingObjects = false
     
     Swift.print("\n***** \(#function)" + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi {
       
-      // remove all
-      radio!.iqStreams.forEach { $0.value.remove() }
-      sleep(2)
+      if radio!.daxIqStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.daxIqStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
       if radio!.daxIqStreams.count == 0 {
         
-        if showInfoMessages { Swift.print("***** Previous \(type) object(s) removed") }
+        if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmed") }
+        
+        if showInfoMessages { Swift.print("\n***** 1st \(type) object requested") }
         
         // get new
         radio!.requestDaxIqStream("3")
         sleep(2)
-        
-        if showInfoMessages { Swift.print("***** 1st \(type) object requested") }
-        
         // verify added
         if radio!.daxIqStreams.count == 1 {
           
           if let object = radio!.daxIqStreams.first?.value {
             
-            if showInfoMessages { Swift.print("***** 1st \(type) object created") }
+            if showInfoMessages { Swift.print("***** 1st \(type) object added\n") }
             
             // save params
+            let firstId = object.id
             let clientHandle  = object.clientHandle
             let channel       = object.channel
             let ip            = object.ip
@@ -418,26 +434,29 @@ final class NewApiTests: XCTestCase {
             
             if showInfoMessages { Swift.print("***** 1st \(type) object parameters saved") }
             
-            // remove all
-            radio!.daxIqStreams.forEach { $0.value.remove() }
+            if showInfoMessages { Swift.print("\n***** 1st \(type) object removed") }
+            
+            // remove it
+            radio!.daxIqStreams[firstId]!.remove()
             sleep(2)
             if radio!.daxIqStreams.count == 0 {
               
-              if showInfoMessages { Swift.print("***** 1st \(type) object removed") }
+              if showInfoMessages { Swift.print("***** 1st \(type) object removal confirmed") }
               
+              if showInfoMessages { Swift.print("\n***** 2nd \(type) object requested") }
+
               // get new
               radio!.requestDaxIqStream("3")
               sleep(2)
-              
-              if showInfoMessages { Swift.print("***** 2nd \(type) object requested") }
               
               // verify added
               if radio!.daxIqStreams.count == 1 {
                 if let object = radio!.daxIqStreams.first?.value {
                   
-                  if showInfoMessages { Swift.print("***** 2nd \(type) object created") }
+                  if showInfoMessages { Swift.print("***** 2nd \(type) object added\n") }
                   
                   // check params
+                  let secondId = object.id
                   XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
                   XCTAssertEqual(object.channel, channel, "channel", file: #function)
                   XCTAssertEqual(object.ip, ip, "ip", file: #function)
@@ -447,14 +466,25 @@ final class NewApiTests: XCTestCase {
                   
                   if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
                   
+                  if showInfoMessages { Swift.print("\n***** 2nd \(type) object removed") }
+                  
+                  // remove it
+                  radio!.daxIqStreams[secondId]!.remove()
+                  sleep(2)
+                  if radio!.daxIqStreams.count == 0 {
+                    
+                    if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
+                  } else {
+                    XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
+                  }
                 } else {
                   XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT created *****", file: #function)
+                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
+              XCTFail("***** 1st \(type) object removal FAILED *****", file: #function)
             }
           } else {
             XCTFail("***** 1st \(type) object  NOT found *****", file: #function)
@@ -465,17 +495,12 @@ final class NewApiTests: XCTestCase {
       } else {
         XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
       }
-      // remove
-      radio!.daxIqStreams.forEach { $0.value.remove() }
-      
-      if showInfoMessages { Swift.print("***** \(type) object(s) removed") }
-      
     } else {
       XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
     disconnect()
   }
-
+  
   // ------------------------------------------------------------------------------
   // MARK: - DaxMicAudioStream
   
@@ -484,33 +509,41 @@ final class NewApiTests: XCTestCase {
   func testDaxMicAudioStreamParse() {
     let type = "DaxMicAudioStream"
     let id = daxMicAudioStreamStatus.components(separatedBy: " ").first!.streamId!
+    var existingObjects = false
 
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi {
       
       daxMicAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
-      // remove all
-      radio!.daxMicAudioStreams.forEach( {$0.value.remove() } )
-      sleep(2)
+      if radio!.daxMicAudioStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.daxMicAudioStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
       if radio!.daxMicAudioStreams.count == 0 {
         
-        if showInfoMessages { Swift.print("***** Existing \(type) object(s) removed") }
+        if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmed") }
+                
+        if showInfoMessages { Swift.print("\n***** \(type) object requested") }
         
         DaxMicAudioStream.parseStatus(radio!, Array(daxMicAudioStreamStatus.keyValuesArray()), true)
         sleep(2)
         
         if let object = radio!.daxMicAudioStreams[id] {
           
-          if showInfoMessages { Swift.print("***** \(type) object created") }
+          if showInfoMessages { Swift.print("***** \(type) object added\n") }
           
           XCTAssertEqual(object.ip, "192.168.1.162", "ip", file: #function)
           
-          if showInfoMessages { Swift.print("***** \(type) object properties verified") }
+          if showInfoMessages { Swift.print("***** \(type) object properties verified\n") }
           
           object.ip = "12.2.3.218"
           
@@ -519,13 +552,13 @@ final class NewApiTests: XCTestCase {
           XCTAssertEqual(object.id, id, "id", file: #function)
           XCTAssertEqual(object.ip, "12.2.3.218", "ip", file: #function)
           
-          if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
+          if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
           
         } else {
-          XCTFail("***** \(type) object NOT created *****", file: #function)
+          XCTFail("***** \(type) object NOT added *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) *****", file: #function)
+        XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
       }
       
     } else {
@@ -537,89 +570,101 @@ final class NewApiTests: XCTestCase {
   func testDaxMicAudioStream() {
     let type = "DaxMicAudioStream"
     var clientHandle : Handle = 0
+    var existingObjects = false
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi {
       
-      // remove all
-      radio!.daxMicAudioStreams.forEach( {$0.value.remove() } )
-      sleep(2)
+      if radio!.daxMicAudioStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.daxMicAudioStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
       if radio!.daxMicAudioStreams.count == 0 {
         
-        if showInfoMessages { Swift.print("***** Previous \(type) object(s) removed") }
+        if showInfoMessages && existingObjects { Swift.print("***** Previous \(type) object(s) removal confirmed") }
+        
+        if showInfoMessages { Swift.print("\n***** 1st \(type) object requested") }
         
         // ask for new
         radio!.requestDaxMicAudioStream()
         sleep(2)
-        
-        if showInfoMessages { Swift.print("***** 1st \(type) object requested") }
-        
         // verify added
         if radio!.daxMicAudioStreams.count == 1 {
           
           if let object = radio!.daxMicAudioStreams.first?.value {
             
-            if showInfoMessages { Swift.print("***** 1st \(type) Object created") }
+            if showInfoMessages { Swift.print("***** 1st \(type) Object added\n") }
             
             // save params
-            let id = object.id
+            let firstId = object.id
             clientHandle = object.clientHandle
             
-            if showInfoMessages { Swift.print("***** \(type) object parameters saved") }
+            if showInfoMessages { Swift.print("***** 1st \(type) object parameters saved") }
+            
+            if showInfoMessages { Swift.print("\n***** 1st \(type) object removed") }
             
             // remove it
-            radio!.daxMicAudioStreams[id]!.remove() }
-          sleep(2)
-          if radio!.daxMicAudioStreams.count == 0 {
-            
-            if showInfoMessages { Swift.print("***** 1st \(type) object removed") }
-            
-            // ask new
-            radio!.requestDaxMicAudioStream()
+            radio!.daxMicAudioStreams[firstId]!.remove()
             sleep(2)
-            
-            if showInfoMessages { Swift.print("***** 2nd \(type) object requested") }
-            
-            // verify added
-            if radio!.daxMicAudioStreams.count == 1 {
-              if let object = radio!.daxMicAudioStreams.first?.value {
-                
-                if showInfoMessages { Swift.print("***** 2nd \(type) object created") }
-                
-                let id = object.id
-                
-                // check params
-                XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
-                
-                if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
-                
-                // remove it
-                radio!.daxMicAudioStreams[id]!.remove()
-                sleep(2)
-                if radio!.daxMicAudioStreams[id] == nil {
-                  if showInfoMessages { Swift.print("***** \(type) object removed") }
+            if radio!.daxMicAudioStreams.count == 0 {
+              
+              if showInfoMessages { Swift.print("***** 1st \(type) object removal confirmed") }
+                            
+              if showInfoMessages { Swift.print("\n***** 2nd \(type) object requested") }
+              
+              // ask new
+              radio!.requestDaxMicAudioStream()
+              sleep(2)
+              // verify added
+              if radio!.daxMicAudioStreams.count == 1 {
+                if let object = radio!.daxMicAudioStreams.first?.value {
+                  
+                  if showInfoMessages { Swift.print("***** 2nd \(type) object added\n") }
+                  
+                  let id = object.id
+                  
+                  // check params
+                  XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
+                  
+                  if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
+                  
+                  if showInfoMessages { Swift.print("\n***** 2nd \(type) object removed") }
+                  
+                  // remove it
+                  radio!.daxMicAudioStreams[id]!.remove()
+                  sleep(2)
+                  if radio!.daxMicAudioStreams[id] == nil {
+                    
+                    if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
+                    
+                  } else {
+                    XCTFail("***** 2nd \(type) object removal FAILED", file: #function)
+                  }
                 } else {
-                  Swift.print("***** \(type) object NOT removed")
+                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
                 }
-                
               } else {
-               XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
+                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
               }
             } else {
-              XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
+              XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
+            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT found *****", file: #function)
+          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
         }
       } else {
-        XCTFail("***** 1st \(type) object NOT added *****", file: #function)
+        XCTFail("***** Existing \(type) object(s) removal FAILED", file: #function)
       }
     } else {
       XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
@@ -635,29 +680,37 @@ final class NewApiTests: XCTestCase {
   func testDaxRxAudioParse() {
     let type = "DaxRxAudioStream"
     let id = daxRxAudioStreamStatus.components(separatedBy: " ").first!.streamId!
-
+    var existingObjects = false
+    
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi {
       
       daxRxAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
-      // remove all
-      radio!.daxRxAudioStreams.forEach( {$0.value.remove() } )
-      sleep(2)
+      if radio!.daxRxAudioStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.daxRxAudioStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
       if radio!.daxRxAudioStreams.count == 0 {
         
-        if showInfoMessages { Swift.print("***** Previous \(type) object(s) removed") }
+        if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmed") }
+        
+        if showInfoMessages { Swift.print("\n***** \(type) object requested") }
         
         DaxRxAudioStream.parseStatus(radio!, Array(daxRxAudioStreamStatus.keyValuesArray()), true)
         sleep(2)
         
         if let object = radio!.daxRxAudioStreams[id] {
           
-          if showInfoMessages { Swift.print("***** \(type) object created") }
+          if showInfoMessages { Swift.print("***** \(type) object added\n") }
           
           XCTAssertEqual(object.daxChannel, 2, "daxChannel", file: #function)
           XCTAssertEqual(object.ip, "192.168.1.162", "ip", file: #function)
@@ -676,7 +729,7 @@ final class NewApiTests: XCTestCase {
           XCTAssertEqual(object.ip, "12.2.3.218", "ip", file: #function)
           XCTAssertEqual(object.slice, radio!.slices["0".objectId!], "slice", file: #function)
           
-          if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
+          if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
           
         } else {
           XCTFail("***** \(type) object NOT created *****", file: #function)
@@ -692,61 +745,69 @@ final class NewApiTests: XCTestCase {
   
   func testDaxRxAudio() {
     let type = "DaxRxAudioStream"
-
+    var existingObjects = false
+    
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi {
       
-      // remove all
-      radio!.daxRxAudioStreams.forEach { $0.value.remove() }
-      sleep(2)
-
+      if radio!.daxRxAudioStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.daxRxAudioStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
       if radio!.daxRxAudioStreams.count == 0 {
         
-        if showInfoMessages { Swift.print("***** Previous \(type) object(s) removed") }
+        if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmed") }
+        
+        if showInfoMessages { Swift.print("\n***** 1st \(type) object requested") }
         
         // ask for new
         radio!.requestDaxRxAudioStream("2")
         sleep(2)
-        
-        if showInfoMessages { Swift.print("***** 1st \(type) object requested") }
-        
         // verify added
         if radio!.daxRxAudioStreams.count == 1 {
           
           if let object = radio!.daxRxAudioStreams.first?.value {
             
-            if showInfoMessages { Swift.print("***** 1st \(type) object created") }
+            if showInfoMessages { Swift.print("***** 1st \(type) object added\n") }
             
-            let id = object.id
-
+            let firstId = object.id
+            
             let clientHandle = object.clientHandle
             let daxChannel = object.daxChannel
             let slice = object.slice
             
             if showInfoMessages { Swift.print("***** 1st \(type) object parameters saved") }
             
+            if showInfoMessages { Swift.print("\n***** 1st \(type) object removed") }
+            
             // remove it
-            radio!.daxRxAudioStreams[id]!.remove()
+            radio!.daxRxAudioStreams[firstId]!.remove()
             sleep(2)
             if radio!.daxRxAudioStreams.count == 0 {
               
-              if showInfoMessages { Swift.print("***** 1st \(type) object removed") }
+              if showInfoMessages { Swift.print("***** 1st \(type) object removal confirmed") }
+              
+              if showInfoMessages { Swift.print("\n***** 2nd \(type) object requested") }
               
               // ask new
               radio!.requestDaxRxAudioStream( "2")
               sleep(2)
               
-              if showInfoMessages { Swift.print("***** 2nd \(type) object requested") }
-              
               // verify added
               if radio!.daxRxAudioStreams.count == 1 {
                 if let object = radio!.daxRxAudioStreams.first?.value {
                   
-                  if showInfoMessages { Swift.print("***** 2nd \(type) object created") }
+                  if showInfoMessages { Swift.print("***** 2nd \(type) object added\n") }
+                  
+                  let secondId = object.id
                   
                   // check params
                   XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
@@ -755,6 +816,190 @@ final class NewApiTests: XCTestCase {
                   
                   if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
                   
+                  if showInfoMessages { Swift.print("\n***** 2nd \(type) object removed") }
+                  
+                  // remove it
+                  radio!.daxRxAudioStreams[secondId]!.remove()
+                  sleep(2)
+                  if radio!.daxRxAudioStreams.count == 0 {
+                    
+                    if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
+                    
+                  } else {
+                    XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
+                  }
+                } else {
+                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
+                }
+              } else {
+                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
+              }
+            } else {
+              XCTFail("***** 1st \(type) object removal FAILED *****", file: #function)
+            }
+          } else {
+            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
+          }
+        } else {
+          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
+        }
+      } else {
+        XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
+      }
+    } else {
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+    }
+    disconnect()
+  }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - DaxTxAudioStream
+  
+  // Format:  <streamId, > <"type", "dax_tx"> <"client_handle", handle> <"tx", isTransmitChannel>
+  private var daxTxAudioStreamStatus = "0x0400000A type=dax_tx tx=1"
+  func testDaxTxAudioParse() {
+    let type = "DaxTxAudioStream"
+    let id = daxTxAudioStreamStatus.components(separatedBy: " ").first!.streamId!
+    var existingObjects = false
+
+    Swift.print("\n***** \(#function), " + requiredVersion)
+    
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+    guard radio != nil else { return }
+    
+    if radio!.version.isNewApi {
+      
+      daxTxAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
+      
+      if radio!.daxTxAudioStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.daxTxAudioStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
+      if radio!.daxTxAudioStreams.count == 0 {
+        
+        if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) objects removal confirmed") }
+                
+        if showInfoMessages { Swift.print("\n***** \(type) object requested") }
+        
+        DaxTxAudioStream.parseStatus(radio!, Array(daxTxAudioStreamStatus.keyValuesArray()), true)
+        sleep(2)
+        
+        if let object = radio!.daxTxAudioStreams[id] {
+          
+          if showInfoMessages { Swift.print("***** \(type) object added\n") }
+          
+          XCTAssertEqual(object.isTransmitChannel, true, "isTransmitChannel", file: #function)
+          
+          if showInfoMessages { Swift.print("***** \(type) object properties verified\n") }
+          
+          object.isTransmitChannel = false
+          
+          if showInfoMessages { Swift.print("***** \(type) object properties modified") }
+          
+          XCTAssertEqual(object.isTransmitChannel, false, "isTransmitChannel", file: #function)
+          
+          if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
+          
+        } else {
+          XCTFail("***** \(type) object NOT added *****", file: #function)
+        }
+      } else {
+        XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
+      }
+      
+    } else {
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+    }
+    disconnect()
+  }
+  
+  func testDaxTxAudio() {
+    let type = "DaxTxAudioStream"
+    var existingObjects = false
+    
+    Swift.print("\n***** \(#function), " + requiredVersion)
+    
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+    guard radio != nil else { return }
+    
+    if radio!.version.isNewApi {
+      
+      if radio!.daxTxAudioStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.daxTxAudioStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
+      if radio!.daxTxAudioStreams.count == 0 {
+        
+        if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmed") }
+        
+        if showInfoMessages { Swift.print("\n***** 1st \(type) object requested") }
+        
+        // get new
+        radio!.requestDaxTxAudioStream()
+        sleep(2)
+        
+        // verify added
+        if radio!.daxTxAudioStreams.count == 1 {
+          
+          if let object = radio!.daxTxAudioStreams.first?.value {
+            
+            if showInfoMessages { Swift.print("***** 1st \(type) object added\n") }
+            
+            // save params
+            let firstId = object.id
+            let clientHandle = object.clientHandle
+            let isTransmitChannel = object.isTransmitChannel
+            
+            if showInfoMessages { Swift.print("***** 1st \(type) object parameters saved") }
+            
+            if showInfoMessages { Swift.print("\n***** 1st \(type) object removed") }
+            
+            // remove it
+            radio!.daxTxAudioStreams[firstId]!.remove()
+            sleep(2)
+            if radio!.daxTxAudioStreams.count == 0 {
+              
+              if showInfoMessages { Swift.print("***** 1st \(type) object removal confirmed") }
+              
+              if showInfoMessages { Swift.print("\n***** 2nd \(type) object requested") }
+              
+              // get new
+              radio!.requestDaxTxAudioStream()
+              sleep(2)
+
+              // verify added
+              if radio!.daxTxAudioStreams.count == 1 {
+                if let object = radio!.daxTxAudioStreams.first?.value {
+                  
+                  if showInfoMessages { Swift.print("***** 2nd \(type) object added\n") }
+                  
+                  let secondId = object.id
+                  // check params
+                  XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
+                  XCTAssertEqual(object.isTransmitChannel, isTransmitChannel, "isTransmitChannel", file: #function)
+                  
+                  if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
+                                      
+                  if showInfoMessages { Swift.print("\n***** 2nd \(type) object removed") }
+                  
+                  // remove it
+                  radio!.daxTxAudioStreams[secondId]!.remove()
+                  sleep(2)
+                  if radio!.daxTxAudioStreams.count == 0 {
+                    
+                    if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
+                  
+                  } else {
+                    XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
+                  }
                 } else {
                   XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
                 }
@@ -773,158 +1018,6 @@ final class NewApiTests: XCTestCase {
       } else {
         XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
       }
-      // remove
-      radio!.daxRxAudioStreams.forEach { $0.value.remove() }
-      
-      if showInfoMessages { Swift.print("***** \(type) object(s) removed") }
-      
-    } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
-    }
-    disconnect()
-  }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - DaxTxAudioStream
-  
-  // Format:  <streamId, > <"type", "dax_tx"> <"client_handle", handle> <"tx", isTransmitChannel>
-  private var daxTxAudioStreamStatus = "0x0400000A type=dax_tx tx=1"
-  func testDaxTxAudioParse() {
-    let type = "DaxTxAudioStream"
-    let id = daxTxAudioStreamStatus.components(separatedBy: " ").first!.streamId!
-
-    Swift.print("\n***** \(#function), " + requiredVersion)
-    
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
-    guard radio != nil else { return }
-    
-    if radio!.version.isNewApi {
-      
-      daxTxAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
-      
-      // remove all
-      radio!.daxTxAudioStreams.forEach( {$0.value.remove() } )
-      sleep(2)
-      if radio!.daxTxAudioStreams.count == 0 {
-        
-        if showInfoMessages { Swift.print("***** Existing \(type) objects removed") }
-        
-        DaxTxAudioStream.parseStatus(radio!, Array(daxTxAudioStreamStatus.keyValuesArray()), true)
-        sleep(2)
-        
-        if let object = radio!.daxTxAudioStreams[id] {
-          
-          if showInfoMessages { Swift.print("***** \(type) object created") }
-          
-          XCTAssertEqual(object.isTransmitChannel, true, "isTransmitChannel", file: #function)
-          
-          if showInfoMessages { Swift.print("***** \(type) object properties verified") }
-          
-          object.isTransmitChannel = false
-          
-          if showInfoMessages { Swift.print("***** \(type) object properties modified") }
-          
-          XCTAssertEqual(object.isTransmitChannel, false, "isTransmitChannel", file: #function)
-          
-          if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
-          
-        } else {
-          XCTFail("***** \(type) object NOT created *****", file: #function)
-        }
-      } else {
-        XCTFail("***** Existing \(type) object(s) NOT removed *****", file: #function)
-      }
-      
-    } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
-    }
-    disconnect()
-  }
-  
-  func testDaxTxAudio() {
-    let type = "DaxTxAudioStream"
-    
-    Swift.print("\n***** \(#function), " + requiredVersion)
-    
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
-    guard radio != nil else { return }
-    
-    if radio!.version.isNewApi {
-      
-      // remove all
-      for (_, object) in radio!.daxTxAudioStreams { object.remove() }
-      sleep(2)
-      if radio!.daxTxAudioStreams.count == 0 {
-        
-        if showInfoMessages { Swift.print("***** Existing \(type) objects removed") }
-        
-        // get new
-        radio!.requestDaxTxAudioStream()
-        sleep(2)
-        
-        if showInfoMessages { Swift.print("***** 1st \(type) object requested") }
-        
-        // verify added
-        if radio!.daxTxAudioStreams.count == 1 {
-          
-          if let object = radio!.daxTxAudioStreams.first?.value {
-            
-            if showInfoMessages { Swift.print("***** 1st \(type) object created") }
-            
-            // save params
-            let clientHandle = object.clientHandle
-            let isTransmitChannel = object.isTransmitChannel
-            
-            if showInfoMessages { Swift.print("***** 1st \(type) object parameters saved") }
-            
-            // remove all
-            for (_, object) in radio!.daxTxAudioStreams { object.remove() }
-            sleep(2)
-            if radio!.audioStreams.count == 0 {
-              
-              if showInfoMessages { Swift.print("***** 1st \(type) object removed") }
-              
-              // get new
-              radio!.requestDaxTxAudioStream()
-              sleep(2)
-              
-              if showInfoMessages { Swift.print("***** 2nd \(type) object requested") }
-              
-              // verify added
-              if radio!.daxTxAudioStreams.count == 1 {
-                if let object = radio!.daxTxAudioStreams.first?.value {
-                  
-                  if showInfoMessages { Swift.print("***** 2nd \(type) object created") }
-                  
-                  // check params
-                  XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
-                  XCTAssertEqual(object.isTransmitChannel, isTransmitChannel, "isTransmitChannel", file: #function)
-                  
-                  if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
-                  
-                } else {
-                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
-                }
-              } else {
-                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
-              }
-            } else {
-              XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
-            }
-          } else {
-            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
-          }
-        } else {
-          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
-        }
-      } else {
-        XCTFail("***** Previous \(type) object(s) NOT removed *****")
-      }
-      // remove any DaxTxAudioStream
-      for (_, object) in radio!.daxTxAudioStreams { object.remove() }
-      
-      if showInfoMessages { Swift.print("***** \(type) object(s) removed") }
-      
     } else {
       XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
@@ -939,31 +1032,37 @@ final class NewApiTests: XCTestCase {
   func testRemoteRxAudioStreamParse() {
     let type = "RemoteRxAudioStream"
     let id = remoteRxAudioStreamStatus.components(separatedBy: " ").first!.streamId!
+    var existingObjects = false
     
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift]"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi {
       
       remoteRxAudioStreamStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
-      if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
-      
-      // remove all
-      radio!.remoteRxAudioStreams.forEach( {$0.value.remove() } )
-      sleep(2)
+      if radio!.remoteRxAudioStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.remoteRxAudioStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
       if radio!.remoteRxAudioStreams.count == 0 {
         
-        if showInfoMessages { Swift.print("***** Existing \(type) object(s) removal confirmed") }
+        if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmed") }
+        
+        if showInfoMessages { Swift.print("\n***** \(type) object requested") }
         
         RemoteRxAudioStream.parseStatus(radio!, Array(remoteRxAudioStreamStatus.keyValuesArray()), true)
         sleep(2)
         
         if let object = radio!.remoteRxAudioStreams[id] {
           
-          if showInfoMessages { Swift.print("\n***** \(type) object added") }
+          if showInfoMessages { Swift.print("***** \(type) object added\n") }
           
           XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle!, "clientHandle", file: #function)
           XCTAssertEqual(object.compression, "none", "compression", file: #function)
@@ -994,27 +1093,31 @@ final class NewApiTests: XCTestCase {
     }
     disconnect()
   }
-
+  
   func testRemoteRxAudioStream() {
     let type = "RemoteRxAudioStream"
-        
+    var existingObjects = false
+    
     Swift.print("\n***** \(#function), " + requiredVersion)
     
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi {
       
-      if showInfoMessages { Swift.print("\n***** Previous \(type) object(s) removed") }
-      
-      // remove all
-      radio!.remoteRxAudioStreams.forEach { $0.value.remove() }
-      sleep(2)
-      
+      if radio!.remoteRxAudioStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.remoteRxAudioStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
+
       if radio!.remoteRxAudioStreams.count == 0 {
         
-        if showInfoMessages { Swift.print("***** Previous \(type) object(s) removal confirmed\n") }
-                
+        if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmed") }
+        
         if showInfoMessages { Swift.print("\n***** 1st \(type) object requested") }
         
         // ask for new
@@ -1033,8 +1136,8 @@ final class NewApiTests: XCTestCase {
             let ip = object.ip
             
             if showInfoMessages { Swift.print("***** 1st \(type) object parameters saved") }
-                        
-            if showInfoMessages { Swift.print("***** 1st \(type) object removed") }
+            
+            if showInfoMessages { Swift.print("\n***** 1st \(type) object removed") }
             
             radio!.remoteRxAudioStreams[firstId]!.remove()
             sleep(2)
@@ -1059,13 +1162,13 @@ final class NewApiTests: XCTestCase {
                   XCTAssertEqual(object.ip, ip, file: #function)
                   
                   if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
-                                    
+                  
                   if showInfoMessages { Swift.print("\n***** 2nd \(type) object removed") }
                   
                   radio!.remoteRxAudioStreams[secondId]!.remove()
                   sleep(2)
                   if radio!.remoteRxAudioStreams.count == 0 {
-                                      
+                    
                     if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
                     
                   } else {
@@ -1094,217 +1197,238 @@ final class NewApiTests: XCTestCase {
     }
     disconnect()
   }
-
+  
   // ------------------------------------------------------------------------------
   // MARK: - RemoteTxAudioStream
   
   private var remoteTxAudioStreamStatus_1 = "0x84000000 type=remote_audio_tx compression=none ip=192.168.1.162"
   private var remoteTxAudioStreamStatus_2 = "0x84000000 type=remote_audio_tx compression=opus ip=192.168.1.162"
   func testRemoteTxParseAudioStream_1() {
-      let type = "RemoteTxAudioStream"
-      let id = remoteTxAudioStreamStatus_1.components(separatedBy: " ").first!.streamId!
-
-      Swift.print("\n***** \(#function), " + requiredVersion)
-      
-      let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
-      guard radio != nil else { return }
-      
-      if radio!.version.isNewApi {
-        
-        remoteTxAudioStreamStatus_1 += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
-        
-        // remove all
-        radio!.remoteTxAudioStreams.forEach( {$0.value.remove() } )
-        sleep(2)
-        if radio!.remoteTxAudioStreams.count == 0 {
-          
-          if showInfoMessages { Swift.print("***** Existing \(type) object(s) removed") }
-          
-          RemoteTxAudioStream.parseStatus(radio!, Array(remoteTxAudioStreamStatus_1.keyValuesArray()), true)
-          sleep(2)
-          
-          if let object = radio!.remoteTxAudioStreams[id] {
-            
-            if showInfoMessages { Swift.print("***** \(type) object created") }
-            
-            XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle!, file: #function)
-            XCTAssertEqual(object.compression, "none", file: #function)
-            XCTAssertEqual(object.ip, "192.168.1.162", file: #function)
-
-            if showInfoMessages { Swift.print("***** \(type) object properties verified") }
-            
-            object.compression = "opus"
-            object.ip = "193.169.2.163"
-
-            if showInfoMessages { Swift.print("***** \(type) object properties modified") }
-            
-            XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle!, file: #function)
-            XCTAssertEqual(object.compression, "opus", file: #function)
-            XCTAssertEqual(object.ip, "193.169.2.163", file: #function)
-
-            if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
-            
-          } else {
-            XCTFail("***** \(type) object NOT created *****", file: #function)
-          }
-        } else {
-          XCTFail("***** Existing \(type) object(s) NOT removed *****", file: #function)
-        }
-        
-      } else {
-        XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
-      }
-      disconnect()
-    }
-
-  func testRemoteTxParseAudioStream_2() {
-      let type = "RemoteTxAudioStream"
-      let id = remoteTxAudioStreamStatus_2.components(separatedBy: " ").first!.streamId!
-
-      Swift.print("\n***** \(#function), " + requiredVersion)
-      
-      let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
-      guard radio != nil else { return }
-      
-      if radio!.version.isNewApi {
-        
-        remoteTxAudioStreamStatus_2 += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
-        
-        // remove all
-        radio!.remoteTxAudioStreams.forEach( {$0.value.remove() } )
-        sleep(2)
-        if radio!.remoteTxAudioStreams.count == 0 {
-          
-          if showInfoMessages { Swift.print("***** Existing \(type) object(s) removed") }
-          
-          RemoteTxAudioStream.parseStatus(radio!, Array(remoteTxAudioStreamStatus_2.keyValuesArray()), true)
-          sleep(2)
-          
-          if let object = radio!.remoteTxAudioStreams[id] {
-            
-            if showInfoMessages { Swift.print("***** \(type) object created") }
-            
-            XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle!)
-            XCTAssertEqual(object.compression, "opus", "compression", file: #function)
-            XCTAssertEqual(object.ip, "192.168.1.162", "ip", file: #function)
-
-            if showInfoMessages { Swift.print("***** \(type) object properties verified") }
-            
-            object.compression = "none"
-            object.ip = "193.169.2.163"
-
-            if showInfoMessages { Swift.print("***** \(type) object properties modified") }
-            
-            XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle!, "clientHandle", file: #function)
-            XCTAssertEqual(object.compression, "none", "compression", file: #function)
-            XCTAssertEqual(object.ip, "193.169.2.163", "ip", file: #function)
-
-            if showInfoMessages { Swift.print("***** Modified \(type) object properties verified") }
-            
-          } else {
-            XCTFail("***** \(type) object NOT created *****", file: #function)
-          }
-        } else {
-          XCTFail("***** Existing \(type) object(s) NOT removed *****", file: #function)
-        }
-        
-      } else {
-        XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
-      }
-      disconnect()
-    }
-
-  func testRemoteTxAudioStream() {
     let type = "RemoteTxAudioStream"
+    let id = remoteTxAudioStreamStatus_1.components(separatedBy: " ").first!.streamId!
+    var existingObjects = false
     
     Swift.print("\n***** \(#function), " + requiredVersion)
+    
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+    guard radio != nil else { return }
+    
+    if radio!.version.isNewApi {
       
-    let radio = discoverRadio(logState: .limited(to: ["\(type).swift"]))
-      guard radio != nil else { return }
+      remoteTxAudioStreamStatus_1 += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
       
-      if radio!.version.isNewApi {
-        
+      if radio!.remoteTxAudioStreams.count > 0 {
+        existingObjects = true
         if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
         
-        radio!.remoteTxAudioStreams.forEach { $0.value.remove() }
+        // remove all
+        radio!.remoteTxAudioStreams.forEach( {$0.value.remove() } )
         sleep(2)
-        if radio!.remoteTxAudioStreams.count == 0 {
+      }
+      if radio!.remoteTxAudioStreams.count == 0 {
+        
+        if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmed") }
+                
+        if showInfoMessages { Swift.print("\n***** \(type) object requested") }
+        
+        RemoteTxAudioStream.parseStatus(radio!, Array(remoteTxAudioStreamStatus_1.keyValuesArray()), true)
+        sleep(2)
+        
+        if let object = radio!.remoteTxAudioStreams[id] {
+                  
+          if showInfoMessages { Swift.print("***** \(type) object added\n") }
           
-          if showInfoMessages { Swift.print("***** Existing \(type) object(s) removal confirmed") }
-                    
-          if showInfoMessages { Swift.print("\n***** 1st \(type) object requested") }
+          XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle!, file: #function)
+          XCTAssertEqual(object.compression, "none", file: #function)
+          XCTAssertEqual(object.ip, "192.168.1.162", file: #function)
           
-          radio!.requestRemoteTxAudioStream(compression: "none")
-          sleep(2)
-          if radio!.remoteTxAudioStreams.count == 1 {
-            
-            if let object = radio!.remoteTxAudioStreams.first?.value {
-              
-              if showInfoMessages { Swift.print("***** 1st \(type) object added\n") }
-              
-              let firstId = object.id
-              
-              XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle", file: #function)
-              XCTAssertEqual(object.compression, "none", "compression", file: #function)
-
-              if showInfoMessages { Swift.print("***** 1st \(type) object parameters saved") }
-              
-              if showInfoMessages { Swift.print("\n***** 1st \(type) object removed") }
-              
-              radio!.remoteTxAudioStreams[firstId]!.remove()
-              sleep(2)
-              if radio!.remoteTxAudioStreams.count == 0 {
-                
-                if showInfoMessages { Swift.print("***** 1st \(type) object removal confirmed") }
-                
-                if showInfoMessages { Swift.print("\n***** 2nd \(type) object requested") }
-                
-                radio!.requestRemoteTxAudioStream(compression: "opus")
-                sleep(2)
-                if radio!.remoteTxAudioStreams.count == 1 {
-                  if let object = radio!.remoteTxAudioStreams.first?.value {
-                    
-                    if showInfoMessages { Swift.print("***** 2nd \(type) object added") }
-                    
-                    let secondId = object.id
-                    
-                    XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle", file: #function)
-                    XCTAssertEqual(object.compression, "opus", "compression", file: #function)
-                    
-                    if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
-                    
-                    if showInfoMessages { Swift.print("\n***** 2nd \(type) object removed") }
-                    
-                    radio!.remoteTxAudioStreams[secondId]!.remove()
-                    sleep(2)
-                    if radio!.remoteTxAudioStreams.count == 0 {
-                      
-                      if showInfoMessages { Swift.print("***** 2nd \(type) object(s) removal confirmed") }
-                      
-                    } else {
-                      XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
-                    }
-                  } else {
-                    XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
-                  }
-                } else {
-                  XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
-                }
-              } else {
-                XCTFail("***** 1st \(type) object removal FAILED *****", file: #function)
-              }
-            } else {
-              XCTFail("***** 1st \(type) object NOT found *****", file: #function)
-            }
-          } else {
-            XCTFail("***** 1st \(type) object NOT added *****", file: #function)
-          }
+          if showInfoMessages { Swift.print("***** \(type) object properties verified\n") }
+          
+          object.compression = "opus"
+          object.ip = "193.169.2.163"
+          
+          if showInfoMessages { Swift.print("***** \(type) object properties modified") }
+          
+          XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle!, file: #function)
+          XCTAssertEqual(object.compression, "opus", file: #function)
+          XCTAssertEqual(object.ip, "193.169.2.163", file: #function)
+          
+          if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
+          
         } else {
-          XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
+          XCTFail("***** \(type) object NOT added *****", file: #function)
         }
       } else {
-        XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+        XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
       }
-      disconnect()
+      
+    } else {
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
     }
+    disconnect()
+  }
+  
+  func testRemoteTxParseAudioStream_2() {
+    let type = "RemoteTxAudioStream"
+    let id = remoteTxAudioStreamStatus_2.components(separatedBy: " ").first!.streamId!
+    var existingObjects = false
+
+    Swift.print("\n***** \(#function), " + requiredVersion)
+    
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+    guard radio != nil else { return }
+    
+    if radio!.version.isNewApi {
+      
+      remoteTxAudioStreamStatus_2 += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())"
+      
+      if radio!.remoteTxAudioStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.remoteTxAudioStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
+      if radio!.remoteTxAudioStreams.count == 0 {
+        
+        if showInfoMessages && existingObjects{ Swift.print("***** Existing \(type) object(s) removal confirmed") }
+                
+        if showInfoMessages { Swift.print("\n***** \(type) object requested") }
+        
+        RemoteTxAudioStream.parseStatus(radio!, Array(remoteTxAudioStreamStatus_2.keyValuesArray()), true)
+        sleep(2)
+        
+        if let object = radio!.remoteTxAudioStreams[id] {
+          
+          if showInfoMessages { Swift.print("***** \(type) object added\n") }
+          
+          XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle!)
+          XCTAssertEqual(object.compression, "opus", "compression", file: #function)
+          XCTAssertEqual(object.ip, "192.168.1.162", "ip", file: #function)
+          
+          if showInfoMessages { Swift.print("***** \(type) object properties verified\n") }
+          
+          object.compression = "none"
+          object.ip = "193.169.2.163"
+          
+          if showInfoMessages { Swift.print("***** \(type) object properties modified") }
+          
+          XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle!, "clientHandle", file: #function)
+          XCTAssertEqual(object.compression, "none", "compression", file: #function)
+          XCTAssertEqual(object.ip, "193.169.2.163", "ip", file: #function)
+          
+          if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
+          
+        } else {
+          XCTFail("***** \(type) object NOT added *****", file: #function)
+        }
+      } else {
+        XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
+      }
+      
+    } else {
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+    }
+    disconnect()
+  }
+  
+  func testRemoteTxAudioStream() {
+    let type = "RemoteTxAudioStream"
+    var existingObjects = false
+
+    Swift.print("\n***** \(#function), " + requiredVersion)
+    
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+    guard radio != nil else { return }
+    
+    if radio!.version.isNewApi {
+      
+      if radio!.remoteTxAudioStreams.count > 0 {
+        existingObjects = true
+        if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+        
+        // remove all
+        radio!.remoteTxAudioStreams.forEach( {$0.value.remove() } )
+        sleep(2)
+      }
+      if radio!.remoteTxAudioStreams.count == 0 {
+        
+        if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmed") }
+        
+        if showInfoMessages { Swift.print("\n***** 1st \(type) object requested") }
+        
+        radio!.requestRemoteTxAudioStream(compression: "none")
+        sleep(2)
+        if radio!.remoteTxAudioStreams.count == 1 {
+          
+          if let object = radio!.remoteTxAudioStreams.first?.value {
+            
+            if showInfoMessages { Swift.print("***** 1st \(type) object added\n") }
+            
+            let firstId = object.id
+            
+            XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle", file: #function)
+            XCTAssertEqual(object.compression, "none", "compression", file: #function)
+            
+            if showInfoMessages { Swift.print("***** 1st \(type) object parameters saved") }
+            
+            if showInfoMessages { Swift.print("\n***** 1st \(type) object removed") }
+            
+            radio!.remoteTxAudioStreams[firstId]!.remove()
+            sleep(2)
+            if radio!.remoteTxAudioStreams.count == 0 {
+              
+              if showInfoMessages { Swift.print("***** 1st \(type) object removal confirmed") }
+              
+              if showInfoMessages { Swift.print("\n***** 2nd \(type) object requested") }
+              
+              radio!.requestRemoteTxAudioStream(compression: "opus")
+              sleep(2)
+              if radio!.remoteTxAudioStreams.count == 1 {
+                if let object = radio!.remoteTxAudioStreams.first?.value {
+                  
+                  if showInfoMessages { Swift.print("***** 2nd \(type) object added\n") }
+                  
+                  let secondId = object.id
+                  
+                  XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle", file: #function)
+                  XCTAssertEqual(object.compression, "opus", "compression", file: #function)
+                  
+                  if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
+                  
+                  if showInfoMessages { Swift.print("\n***** 2nd \(type) object removed") }
+                  
+                  radio!.remoteTxAudioStreams[secondId]!.remove()
+                  sleep(2)
+                  if radio!.remoteTxAudioStreams.count == 0 {
+                    
+                    if showInfoMessages { Swift.print("***** 2nd \(type) object(s) removal confirmed\n") }
+                    
+                  } else {
+                    XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
+                  }
+                } else {
+                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
+                }
+              } else {
+                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
+              }
+            } else {
+              XCTFail("***** 1st \(type) object removal FAILED *****", file: #function)
+            }
+          } else {
+            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
+          }
+        } else {
+          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
+        }
+      } else {
+        XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
+      }
+    } else {
+      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+    }
+    disconnect()
+  }
 }

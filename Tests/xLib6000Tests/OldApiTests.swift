@@ -19,7 +19,7 @@ class OldApiTests: XCTestCase {
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
       
-      Swift.print("***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))")
+      Swift.print("***** Radio found: \(discovery.discoveredRadios[0].nickname) (v\(discovery.discoveredRadios[0].firmwareVersion)) @ \(discovery.discoveredRadios[0].publicIp)")
 
       if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "v2Tests", isGui: connectAsGui, logState: logState) {
         sleep(2)

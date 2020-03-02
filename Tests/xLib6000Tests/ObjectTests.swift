@@ -11,8 +11,8 @@ final class ObjectTests: XCTestCase {
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
       
-      Swift.print("***** Radio found (v\(discovery.discoveredRadios[0].firmwareVersion))")
-      
+      Swift.print("***** Radio found: \(discovery.discoveredRadios[0].nickname) (v\(discovery.discoveredRadios[0].firmwareVersion)) @ \(discovery.discoveredRadios[0].publicIp)")
+
       if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "ObjectTests", isGui: connectAsGui, logState: logState) {
         sleep(2)
         
@@ -41,17 +41,20 @@ final class ObjectTests: XCTestCase {
   ///   Format:  <Id, > <"ant", ant> <"ip", ip> <"model", model> <"port", port> <"serial_num", serialNumber>
   private var amplifierStatus = "0x12345678 ant=ANT1 ip=10.0.1.106 model=PGXL port=4123 serial_num=1234-5678-9012 state=STANDBY"
   func testAmplifierParse() {
+    let type = "Amplifier"
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Amplifier.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
+    
+    if showInfoMessages { Swift.print("\n***** \(type) requested") }
     
     Amplifier.parseStatus(radio!, amplifierStatus.keyValuesArray(), true)
     
     if let object = radio!.amplifiers["0x12345678".streamId!] {
       
-      if showInfoMessages { Swift.print("***** AMPLIFIER created") }
+      if showInfoMessages { Swift.print("***** \(type) added\n") }
       
       XCTAssertEqual(object.id, "0x12345678".handle!, file: #function)
       XCTAssertEqual(object.ant, "ANT1", "ant", file: #function)
@@ -61,7 +64,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.serialNumber, "1234-5678-9012", file: #function)
       XCTAssertEqual(object.state, "STANDBY", file: #function)
       
-      if showInfoMessages { Swift.print("***** AMPLIFIER Parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) Parameters verified\n") }
       
       object.ant = "ANT2"
       object.ip = "11.1.217"
@@ -70,7 +73,7 @@ final class ObjectTests: XCTestCase {
       object.serialNumber = "2109-8765-4321"
       object.state = "IDLE"
       
-      if showInfoMessages { Swift.print("***** AMPLIFIER Parameters modified") }
+      if showInfoMessages { Swift.print("***** \(type) Parameters modified") }
       
       XCTAssertEqual(object.id, "0x12345678".handle!, file: #function)
       XCTAssertEqual(object.ant, "ANT2", file: #function)
@@ -80,10 +83,10 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.serialNumber, "2109-8765-4321", file: #function)
       XCTAssertEqual(object.state, "IDLE", file: #function)
       
-      if showInfoMessages { Swift.print("***** Modified AMPLIFIER parameters verified") }
+      if showInfoMessages { Swift.print("***** Modified \(type) parameters verified\n") }
       
     } else {
-      XCTFail("***** AMPLIFIER NOT created *****")
+      XCTFail("***** \(type) NOT added *****", file: #function)
     }
     
     // disconnect the radio
@@ -91,7 +94,8 @@ final class ObjectTests: XCTestCase {
   }
   
   func testAmplifier() {
-    
+    let type = "Amplifier"
+
     Swift.print("\n***** \(#function) NOT implemented, NEED MORE INFORMATION ****\n")
   }
   
@@ -114,22 +118,23 @@ final class ObjectTests: XCTestCase {
     equalizerParse(.txsc)
   }
   
-  func equalizerParse(_ type: Equalizer.EqType) {
-    
-    let radio = discoverRadio(logState: .limited(to: ["Equalizer.swift"]))
+  func equalizerParse(_ eqType: Equalizer.EqType) {
+    let type = "Equalizer"
+
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    switch type {
+    switch eqType {
     case .rxsc: Equalizer.parseStatus(radio!, equalizerRxStatus.keyValuesArray(), true)
     case .txsc: Equalizer.parseStatus(radio!, equalizerTxStatus.keyValuesArray(), true)
     default:
-      XCTFail("***** Invalid EQUALIZER type - \(type.rawValue)  *****")
+      XCTFail("***** Invalid \(type) type - \(eqType.rawValue)  *****", file: #function)
       return
     }
     
-    if let object = radio!.equalizers[type] {
+    if let object = radio!.equalizers[eqType] {
       
-      if showInfoMessages { Swift.print("***** \(type.rawValue) EQUALIZER exists") }
+      if showInfoMessages { Swift.print("\n***** \(eqType.rawValue) \(type) found") }
       
       XCTAssertEqual(object.eqEnabled, false, "eqEnabled", file: #function)
       XCTAssertEqual(object.level63Hz, 0, "level63Hz", file: #function)
@@ -141,10 +146,10 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.level4000Hz, -30, "level4000Hz", file: #function)
       XCTAssertEqual(object.level8000Hz, -40, "level8000Hz", file: #function)
       
-      if showInfoMessages { Swift.print("***** Modified \(type.rawValue) EQUALIZER parameters verified\n") }
+      if showInfoMessages { Swift.print("***** \(eqType.rawValue) \(type) parameters verified\n") }
       
     } else {
-      XCTFail("***** \(type.rawValue) EQUALIZER does NOT exist *****", file: #function)
+      XCTFail("***** \(eqType.rawValue) \(type) NOT found *****", file: #function)
     }
     disconnect()
   }
@@ -162,14 +167,15 @@ final class ObjectTests: XCTestCase {
     equalizer(.txsc)
   }
   
-  func equalizer(_ type: Equalizer.EqType) {
-    
-    let radio = discoverRadio(logState: .limited(to: ["Equalizer.swift"]))
+  func equalizer(_ eqType: Equalizer.EqType) {
+    let type = "Equalizer"
+
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    if let object = radio!.equalizers[type] {
+    if let object = radio!.equalizers[eqType] {
       
-      if showInfoMessages { Swift.print("***** \(type.rawValue) EQUALIZER exists") }
+      if showInfoMessages { Swift.print("\n***** \(eqType.rawValue) \(type) found") }
       
       object.eqEnabled = true
       object.level63Hz    = 10
@@ -181,7 +187,7 @@ final class ObjectTests: XCTestCase {
       object.level4000Hz  = 40
       object.level8000Hz  = -35
       
-      if showInfoMessages { Swift.print("***** \(type.rawValue) EQUALIZER Parameters modified") }
+      if showInfoMessages { Swift.print("***** \(eqType.rawValue) \(type) Parameters modified") }
       
       XCTAssertEqual(object.eqEnabled, true, "eqEnabled", file: #function)
       XCTAssertEqual(object.level63Hz, 10, "level63Hz", file: #function)
@@ -193,7 +199,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.level4000Hz, 40, "level4000Hz", file: #function)
       XCTAssertEqual(object.level8000Hz, -35, "level8000Hz", file: #function)
       
-      if showInfoMessages { Swift.print("***** Modified \(type.rawValue) EQUALIZER parameters verified") }
+      if showInfoMessages { Swift.print("***** Modified \(eqType.rawValue) \(type) parameters verified\n") }
       
       object.eqEnabled = false
       object.level63Hz    = 0
@@ -205,7 +211,7 @@ final class ObjectTests: XCTestCase {
       object.level4000Hz  = 0
       object.level8000Hz  = 0
       
-      if showInfoMessages { Swift.print("***** \(type.rawValue) EQUALIZER Parameters zeroed") }
+      if showInfoMessages { Swift.print("***** \(eqType.rawValue) \(type) Parameters zeroed") }
       
       XCTAssertEqual(object.eqEnabled, false, "eqEnabled", file: #function)
       XCTAssertEqual(object.level63Hz, 0, "level63Hz", file: #function)
@@ -217,10 +223,10 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.level4000Hz, 0, "level4000Hz", file: #function)
       XCTAssertEqual(object.level8000Hz, 0, "level8000Hz", file: #function)
       
-      if showInfoMessages { Swift.print("***** Zeroed \(type.rawValue) EQUALIZER parameters verified") }
+      if showInfoMessages { Swift.print("***** Zeroed \(eqType.rawValue) \(type) parameters verified\n") }
       
     } else {
-      XCTFail("***** \(type.rawValue) EQUALIZER does NOT exist *****", file: #function)
+      XCTFail("***** \(eqType.rawValue) \(type) NOT found *****", file: #function)
     }
     disconnect()
   }
@@ -231,17 +237,20 @@ final class ObjectTests: XCTestCase {
   private let memoryStatus = "1 owner=K3TZR group= freq=14.100000 name= mode=USB step=100 repeater=SIMPLEX repeater_offset=0.000000 tone_mode=OFF tone_value=67.0 power=100 rx_filter_low=100 rx_filter_high=2900 highlight=0 highlight_color=0x00000000 squelch=1 squelch_level=20 rtty_mark=2 rtty_shift=170 digl_offset=2210 digu_offset=1500"
   
   func testMemoryParse() {
+    let type = "Memory"
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Memory.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
+    
+    if showInfoMessages { Swift.print("\n***** \(type) requested") }
     
     Memory.parseStatus(radio!, memoryStatus.keyValuesArray(), true)
     
     if let object = radio!.memories["1".objectId!] {
       
-      if showInfoMessages { Swift.print("***** MEMORY created") }
+      if showInfoMessages { Swift.print("***** \(type) added\n") }
       
       XCTAssertEqual(object.owner, "K3TZR", "owner", file: #function)
       XCTAssertEqual(object.group, "", "Group", file: #function)
@@ -264,7 +273,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.digitalLowerOffset, 2210, "digitalLowerOffset", file: #function)
       XCTAssertEqual(object.digitalUpperOffset, 1500, "digitalUpperOffset", file: #function)
       
-      if showInfoMessages { Swift.print("***** MEMORY Parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) Parameters verified") }
       
       object.owner = "DL3LSM"
       object.group = "X"
@@ -287,7 +296,7 @@ final class ObjectTests: XCTestCase {
       object.digitalLowerOffset = 3321
       object.digitalUpperOffset = 2612
       
-      if showInfoMessages { Swift.print("***** MEMORY Parameters modified") }
+      if showInfoMessages { Swift.print("***** \(type) Parameters modified") }
       
       XCTAssertEqual(object.owner, "DL3LSM", "owner", file: #function)
       XCTAssertEqual(object.group, "X", "group", file: #function)
@@ -310,27 +319,34 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.digitalLowerOffset, 3321, "digitalLowerOffset", file: #function)
       XCTAssertEqual(object.digitalUpperOffset, 2612, "digitalUpperOffset", file: #function)
       
-      if showInfoMessages { Swift.print("***** Modified MEMORY parameters verified") }
+      if showInfoMessages { Swift.print("***** Modified \(type) parameters verified\n") }
       
     } else {
-      XCTFail("***** MEMORY NOT created", file: #function)
+      XCTFail("***** \(type) NOT added", file: #function)
     }
     disconnect()
   }
   
   func testMemory() {
-    
+    let type = "Memory"
+    var existingObjects = false
+
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Memory.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    // remove all
-    radio!.memories.forEach( {$0.value.remove() } )
-    sleep(2)
+    if radio!.memories.count > 0 {
+      existingObjects = true
+      if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+      
+      // remove all
+      radio!.memories.forEach( {$0.value.remove() } )
+      sleep(2)
+    }
     if radio!.memories.count == 0 {
       
-      if showInfoMessages { Swift.print("***** Existing MEMORY(s) removed") }
+      if showInfoMessages && existingObjects { Swift.print("***** Existing \(type)(s) removed\n") }
             
       if showInfoMessages { Swift.print("\n***** 1st MEMORY requested") }
       
@@ -338,7 +354,7 @@ final class ObjectTests: XCTestCase {
       sleep(2)
       if radio!.memories.count == 1 {
         
-        if showInfoMessages { Swift.print("***** 1st MEMORY added\n") }
+        if showInfoMessages { Swift.print("***** 1st \(type) added\n") }
         
         if let object = radio!.memories.first?.value {
           
@@ -366,24 +382,24 @@ final class ObjectTests: XCTestCase {
           let digitalLowerOffset = object.digitalLowerOffset
           let digitalUpperOffset = object.digitalUpperOffset
           
-          if showInfoMessages { Swift.print("***** 1st MEMORY parameters saved") }
+          if showInfoMessages { Swift.print("***** 1st \(type) parameters saved") }
           
-          if showInfoMessages { Swift.print("***** 1st MEMORY removed") }
+          if showInfoMessages { Swift.print("\n***** 1st \(type) removed") }
           
           radio!.memories[firstId]!.remove()
           sleep(2)
           
           if radio!.memories.count == 0 {
             
-            if showInfoMessages { Swift.print("***** 1st MEMORY removal confirmed") }
+            if showInfoMessages { Swift.print("***** 1st \(type) removal confirmed") }
             
-            if showInfoMessages { Swift.print("\n***** 2nd MEMORY requested") }
+            if showInfoMessages { Swift.print("\n***** 2nd \(type) requested") }
             
             radio!.requestMemory()
             sleep(2)
             if radio!.memories.count == 1 {
               
-              if showInfoMessages { Swift.print("***** 2nd MEMORY added\n") }
+              if showInfoMessages { Swift.print("***** 2nd \(type) added\n") }
               
               if let object = radio!.memories.first?.value {
                 
@@ -410,7 +426,7 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.digitalLowerOffset, digitalLowerOffset, "digitalLowerOffset", file: #function)
                 XCTAssertEqual(object.digitalUpperOffset, digitalUpperOffset, "digitalUpperOffset", file: #function)
                 
-                if showInfoMessages { Swift.print("***** 2nd MEMORY parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) parameters verified") }
                 
                 object.owner = "DL3LSM"
                 object.group = "X"
@@ -433,7 +449,7 @@ final class ObjectTests: XCTestCase {
                 object.digitalLowerOffset = 3321
                 object.digitalUpperOffset = 2612
                 
-                if showInfoMessages { Swift.print("***** 2nd MEMORY parameters modified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) parameters modified") }
                 
                 XCTAssertEqual(object.owner, "DL3LSM", "owner", file: #function)
                 XCTAssertEqual(object.group, "X", "group", file: #function)
@@ -456,37 +472,37 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.digitalLowerOffset, 3321, "digitalLowerOffset", file: #function)
                 XCTAssertEqual(object.digitalUpperOffset, 2612, "digitalUpperOffset", file: #function)
                 
-                if showInfoMessages { Swift.print("***** 2nd MEMORY modified parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) modified parameters verified") }
                 
-                if showInfoMessages { Swift.print("\n***** 2nd MEMORY removed") }
+                if showInfoMessages { Swift.print("\n***** 2nd \(type) removed") }
                 
                 radio!.memories[secondId]!.remove()
                 sleep(2)
                 
                 if radio!.memories.count == 0 {
                   
-                  if showInfoMessages { Swift.print("***** 2nd MEMORY removal confirmed/n") }
+                  if showInfoMessages { Swift.print("***** 2nd \(type) removal confirmed\n") }
                   
                 } else {
-                  XCTFail("***** 2nd MEMORY removal FAILED ****/n", file: #function)
+                  XCTFail("***** 2nd \(type) removal FAILED ****/n", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd MEMORY NOT found ****/n", file: #function)
+                XCTFail("***** 2nd \(type) NOT found ****/n", file: #function)
               }
             } else {
-              XCTFail("***** 2nd MEMORY NOT created ****/n", file: #function)
+              XCTFail("***** 2nd \(type) NOT created ****/n", file: #function)
             }
           } else {
-            XCTFail("***** 1st MEMORY NOT removed ****", file: #function)
+            XCTFail("***** 1st \(type) NOT removed ****", file: #function)
           }
         } else {
-          XCTFail("***** 1st MEMORY NOT found ****/n", file: #function)
+          XCTFail("***** 1st \(type) NOT found ****/n", file: #function)
         }
       } else {
-        XCTFail("***** 1st MEMORY NOT created ****/n", file: #function)
+        XCTFail("***** 1st \(type) NOT created ****/n", file: #function)
       }      
     } else {
-      XCTFail("***** Existing MEMORY(s) NOT removed ****/n", file: #function)
+      XCTFail("***** Existing \(type)(s) NOT removed ****/n", file: #function)
     }
     disconnect()
   }
@@ -497,16 +513,20 @@ final class ObjectTests: XCTestCase {
   private let meterStatus = "1.src=COD-#1.num=1#1.nam=MICPEAK#1.low=-150.0#1.hi=20.0#1.desc=Signal strength of MIC output in CODEC#1.unit=dBFS#1.fps=40#"
   
   func testMeterParse() {
+    let type = "Meter"
+    
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Memory.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
+    
+    if showInfoMessages { Swift.print("\n***** \(type) requested") }
     
     Meter.parseStatus(radio!, meterStatus.keyValuesArray(), true)
     
     if let object = radio!.meters["1".objectId!] {
       
-      if showInfoMessages { Swift.print("***** METER created") }
+      if showInfoMessages { Swift.print("***** \(type) added\n") }
       
       XCTAssertEqual(object.source, "cod-", "source", file: #function)
       XCTAssertEqual(object.name, "micpeak", "name", file: #function)
@@ -516,7 +536,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.units, "dbfs", "units", file: #function)
       XCTAssertEqual(object.fps, 40, "fps", file: #function)
       
-      if showInfoMessages { Swift.print("***** METER Parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) Parameters verified\n") }
       
     } else {
       XCTFail("***** Meter NOT created ****", file: #function)
@@ -603,20 +623,24 @@ final class ObjectTests: XCTestCase {
   func testPanadapter() {
     let type = "Panadapter"
     var clientHandle : Handle = 0
+    var existingObjects = false
     
     Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Waterfall.swift"]))
     guard radio != nil else { disconnect() ; return }
     
-    if showInfoMessages { Swift.print("\n***** Remove existing \(type)(s)") }
-    
-    //    removeAllPanadapters(radio: radio!)
-    radio!.panadapters.forEach { $0.value.remove() ; sleep(2)}
-//    sleep(2)
+    if radio!.panadapters.count > 0 {
+      existingObjects = true
+      if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+      
+      // remove all
+      radio!.panadapters.forEach( {$0.value.remove() } )
+      sleep(2)
+    }
     if radio!.panadapters.count == 0 {
       
-      if showInfoMessages { Swift.print("***** Existing \(type)(s) removal confirmed\n") }
+      if showInfoMessages && existingObjects { Swift.print("***** Existing \(type)(s) removal confirmed\n") }
       
       if showInfoMessages { Swift.print("\n***** Request 1st \(type)") }
       
@@ -791,73 +815,81 @@ final class ObjectTests: XCTestCase {
   // ------------------------------------------------------------------------------
   // MARK: - Slice
   
-  private var sliceStatus = "0 mode=USB filter_lo=100 filter_hi=2800 agc_mode=med agc_threshold=65 agc_off_level=10 qsk=1 step=100 step_list=1,10,50,100,500,1000,2000,3000 anf=1 anf_level=33 nr=0 nr_level=25 nb=1 nb_level=50 wnb=0 wnb_level=42 apf=1 apf_level=76 squelch=1 squelch_level=22"
+  private var sliceStatus = "1 mode=USB filter_lo=100 filter_hi=2800 agc_mode=med agc_threshold=65 agc_off_level=10 qsk=1 step=100 step_list=1,10,50,100,500,1000,2000,3000 anf=1 anf_level=33 nr=0 nr_level=25 nb=1 nb_level=50 wnb=0 wnb_level=42 apf=1 apf_level=76 squelch=1 squelch_level=22 in_use=1 rf_frequency=15.000"
   func testSliceParse() {
+    let type = "Slice"
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Slice.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi { sliceStatus += " client_handle=\(Api.sharedInstance.connectionHandle!.toHex())" }
     
-    let id: ObjectId = sliceStatus.keyValuesArray()[0].key.objectId!
+    let id = sliceStatus.keyValuesArray()[0].key.objectId!
+    
+    if showInfoMessages { Swift.print("\n***** \(type) requested") }
+    
     Slice.parseStatus(radio!, sliceStatus.keyValuesArray(), true)
     sleep(2)
     
-    if let sliceObject = radio!.slices[id] {
+    if let object = radio!.slices[id] {
       
-      if showInfoMessages { Swift.print("***** SLICE created") }
+      if showInfoMessages { Swift.print("***** \(type) added\n") }
       
-      if radio!.version.isNewApi { XCTAssertEqual(sliceObject.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle", file: #function) }
-      XCTAssertEqual(sliceObject.mode, "USB", "mode", file: #function)
-      XCTAssertEqual(sliceObject.filterLow, 100, "filterLow", file: #function)
-      XCTAssertEqual(sliceObject.filterHigh, 2_800, "filterHigh", file: #function)
-      XCTAssertEqual(sliceObject.agcMode, "med", "agcMode", file: #function)
-      XCTAssertEqual(sliceObject.agcThreshold, 65, "agcThreshold", file: #function)
-      XCTAssertEqual(sliceObject.agcOffLevel, 10, "agcOffLevel", file: #function)
-      XCTAssertEqual(sliceObject.qskEnabled, true, "qskEnabled", file: #function)
-      XCTAssertEqual(sliceObject.step, 100, "step", file: #function)
-      XCTAssertEqual(sliceObject.stepList, "1,10,50,100,500,1000,2000,3000", "stepList", file: #function)
-      XCTAssertEqual(sliceObject.anfEnabled, true, "anfEnabled", file: #function)
-      XCTAssertEqual(sliceObject.anfLevel, 33, "anfLevel", file: #function)
-      XCTAssertEqual(sliceObject.nrEnabled, false, "nrEnabled", file: #function)
-      XCTAssertEqual(sliceObject.nrLevel, 25, "nrLevel", file: #function)
-      XCTAssertEqual(sliceObject.nbEnabled, true, "nbEnabled", file: #function)
-      XCTAssertEqual(sliceObject.nbLevel, 50, "nbLevel", file: #function)
-      XCTAssertEqual(sliceObject.wnbEnabled, false, "wnbEnabled", file: #function)
-      XCTAssertEqual(sliceObject.wnbLevel, 42, "wnbLevel", file: #function)
-      XCTAssertEqual(sliceObject.apfEnabled, true, "apfEnabled", file: #function)
-      XCTAssertEqual(sliceObject.apfLevel, 76, "apfLevel", file: #function)
-      XCTAssertEqual(sliceObject.squelchEnabled, true, "squelchEnabled", file: #function)
-      XCTAssertEqual(sliceObject.squelchLevel, 22, "squelchLevel", file: #function)
+      if radio!.version.isNewApi { XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle", file: #function) }
+      XCTAssertEqual(object.mode, "USB", "mode", file: #function)
+      XCTAssertEqual(object.filterLow, 100, "filterLow", file: #function)
+      XCTAssertEqual(object.filterHigh, 2_800, "filterHigh", file: #function)
+      XCTAssertEqual(object.agcMode, "med", "agcMode", file: #function)
+      XCTAssertEqual(object.agcThreshold, 65, "agcThreshold", file: #function)
+      XCTAssertEqual(object.agcOffLevel, 10, "agcOffLevel", file: #function)
+      XCTAssertEqual(object.qskEnabled, true, "qskEnabled", file: #function)
+      XCTAssertEqual(object.step, 100, "step", file: #function)
+      XCTAssertEqual(object.stepList, "1,10,50,100,500,1000,2000,3000", "stepList", file: #function)
+      XCTAssertEqual(object.anfEnabled, true, "anfEnabled", file: #function)
+      XCTAssertEqual(object.anfLevel, 33, "anfLevel", file: #function)
+      XCTAssertEqual(object.nrEnabled, false, "nrEnabled", file: #function)
+      XCTAssertEqual(object.nrLevel, 25, "nrLevel", file: #function)
+      XCTAssertEqual(object.nbEnabled, true, "nbEnabled", file: #function)
+      XCTAssertEqual(object.nbLevel, 50, "nbLevel", file: #function)
+      XCTAssertEqual(object.wnbEnabled, false, "wnbEnabled", file: #function)
+      XCTAssertEqual(object.wnbLevel, 42, "wnbLevel", file: #function)
+      XCTAssertEqual(object.apfEnabled, true, "apfEnabled", file: #function)
+      XCTAssertEqual(object.apfLevel, 76, "apfLevel", file: #function)
+      XCTAssertEqual(object.squelchEnabled, true, "squelchEnabled", file: #function)
+      XCTAssertEqual(object.squelchLevel, 22, "squelchLevel", file: #function)
       
-      if showInfoMessages { Swift.print("***** SLICE Parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) Parameters verified\n") }
       
     } else {
-      XCTFail("***** SLICE NOT created *****", file: #function)
+      XCTFail("***** \(type) NOT added *****", file: #function)
     }
-    // disconnect the radio
     disconnect()
   }
   
   func testSlice() {
+    let type = "Slice"
+    var existingObjects = false
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Slice.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    if showInfoMessages { Swift.print("\n***** Existing SLICE(s) removed") }
-    
-    // remove all
-    radio!.slices.forEach( {$0.value.remove() } )
-    sleep(2)
+    if radio!.slices.count > 0 {
+      existingObjects = true
+      if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+      
+      // remove all
+      radio!.slices.forEach( {$0.value.remove() } )
+      sleep(2)
+    }
     if radio!.slices.count == 0 {
       
-      if showInfoMessages { Swift.print("***** Existing SLICE(s) removal confirmation\n") }
+      if showInfoMessages && existingObjects { Swift.print("***** Existing \(type)(s) removal confirmation\n") }
             
-      if showInfoMessages { Swift.print("***** 1st SLICE requested") }
+      if showInfoMessages { Swift.print("***** 1st \(type) requested") }
       
       // get new
       radio!.requestSlice(frequency: 7_225_000, rxAntenna: "ANT2", mode: "USB")
@@ -868,7 +900,7 @@ final class ObjectTests: XCTestCase {
         
         if let object = radio!.slices.first?.value {
           
-          if showInfoMessages { Swift.print("***** 1st SLICE added\n") }
+          if showInfoMessages { Swift.print("***** 1st \(type) added\n") }
           
           let frequency = object.frequency
           let rxAnt = object.rxAnt
@@ -957,17 +989,17 @@ final class ObjectTests: XCTestCase {
           let xitEnabled = object.xitEnabled
           let xitOffset = object.xitOffset
           
-          if showInfoMessages { Swift.print("***** 1st SLICE parameters saved") }
+          if showInfoMessages { Swift.print("***** 1st \(type) parameters saved") }
                     
-          if showInfoMessages { Swift.print("\n***** 1st SLICE removed") }
+          if showInfoMessages { Swift.print("\n***** 1st \(type) removed") }
           
           object.remove()
           sleep(2)
           if radio!.slices.count == 0 {
             
-            if showInfoMessages { Swift.print("***** 1st SLICE removal confirmed\n") }
+            if showInfoMessages { Swift.print("***** 1st \(type) removal confirmed\n") }
                         
-            if showInfoMessages { Swift.print("***** 2nd SLICE requested") }
+            if showInfoMessages { Swift.print("***** 2nd \(type) requested") }
             
             // get new
             radio!.requestSlice(frequency: 7_225_000, rxAntenna: "ANT2", mode: "USB")
@@ -977,7 +1009,7 @@ final class ObjectTests: XCTestCase {
               
               if let object = radio!.slices.first?.value {
                 
-                if showInfoMessages { Swift.print("***** 2nd SLICE added\n") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) added\n") }
                 
                 XCTAssertEqual(object.frequency, frequency, "Frequency", file: #function)
                 XCTAssertEqual(object.rxAnt, rxAnt, "RxAntenna", file: #function)
@@ -1066,7 +1098,7 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.xitEnabled, xitEnabled, "XitEnabled", file: #function)
                 XCTAssertEqual(object.xitOffset, xitOffset, "XitOffset", file: #function)
                 
-                if showInfoMessages { Swift.print("***** 2nd SLICE parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) parameters verified\n") }
                 
                 object.frequency = 7_100_000
                 object.rxAnt = "ANT2"
@@ -1154,7 +1186,7 @@ final class ObjectTests: XCTestCase {
                 object.xitEnabled = true
                 object.xitOffset = 7
                 
-                if showInfoMessages { Swift.print("***** 2nd SLICE parameters modified") }
+                if showInfoMessages { Swift.print("\n***** 2nd \(type) parameters modified") }
                 
                 XCTAssertEqual(object.frequency, 7_100_000, "Frequency", file: #function)
                 XCTAssertEqual(object.rxAnt,  "ANT2", "RxAntenna", file: #function)
@@ -1243,38 +1275,38 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.xitEnabled, true, "XitEnabled", file: #function)
                 XCTAssertEqual(object.xitOffset, 7, "XitOffset", file: #function)
                 
-                if showInfoMessages { Swift.print("***** 2nd SLICE modified parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) modified parameters verified") }
                 
                 let id = object.id
                 
-                if showInfoMessages { Swift.print("\n***** 2nd SLICE removed") }
+                if showInfoMessages { Swift.print("\n***** 2nd \(type) removed") }
                 
                 radio!.slices[id]!.remove()
                 sleep(2)
                 if radio!.slices[id] == nil {
                   
-                  if showInfoMessages { Swift.print("***** 2nd SLICE removal confirmed\n") }
+                  if showInfoMessages { Swift.print("***** 2nd \(type) removal confirmed\n") }
                   
                 } else {
-                  XCTFail("***** 2nd SLICE NOT removed", file: #function)
+                  XCTFail("***** 2nd \(type) NOT removed", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd SLICE NOT found", file: #function)
+                XCTFail("***** 2nd \(type) NOT found", file: #function)
               }
             } else {
-              XCTFail("***** 2nd SLICE NOT created", file: #function)
+              XCTFail("***** 2nd \(type) NOT added", file: #function)
             }
           } else {
-            XCTFail("***** 1st SLICE NOT removed", file: #function)
+            XCTFail("***** 1st \(type) NOT removed", file: #function)
           }
         } else {
-          XCTFail("***** 1st SLICE NOT found", file: #function)
+          XCTFail("***** 1st \(type) NOT found", file: #function)
         }
       } else {
-        XCTFail("***** 1st SLICE NOT created", file: #function)
+        XCTFail("***** 1st \(type) NOT added", file: #function)
       }
     } else {
-      XCTFail("***** Existing SLICE(s) NOT removed", file: #function)
+      XCTFail("***** Existing \(type)(s) removal FAILED", file: #function)
     }
     disconnect()
   }
@@ -1284,126 +1316,149 @@ final class ObjectTests: XCTestCase {
   
   private var tnfStatus = "1 freq=14.26 depth=2 width=0.000100 permanent=1"
   func testTnfParse() {
-    
+    let type = "Tnf"
+
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Tnf.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     let id: ObjectId = tnfStatus.keyValuesArray()[0].key.objectId!
+    
+    if showInfoMessages { Swift.print("\n***** \(type) requested") }
+    
     Tnf.parseStatus(radio!, tnfStatus.keyValuesArray(), true)
     
     if let tnf = radio!.tnfs[id] {
       
-      if showInfoMessages { Swift.print("***** TNF created") }
+      if showInfoMessages { Swift.print("***** \(type) added\n") }
       
       XCTAssertEqual(tnf.depth, 2, "Depth", file: #function)
       XCTAssertEqual(tnf.frequency, 14_260_000, "Frequency", file: #function)
       XCTAssertEqual(tnf.permanent, true, "Permanent", file: #function)
       XCTAssertEqual(tnf.width, 100, "Width", file: #function)
       
-      if showInfoMessages { Swift.print("***** TNF parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) parameters verified\n") }
       
     } else {
-      XCTFail("***** TNF NOT created", file: #function)
+      XCTFail("***** \(type) NOT added", file: #function)
     }
     disconnect()
   }
   
   func testTnf() {
+    let type = "Tnf"
+    var existingObjects = false
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Tnf.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    // remove all
-    radio!.tnfs.forEach { $0.value.remove() }
-    sleep(2)
+    if radio!.tnfs.count > 0 {
+      existingObjects = true
+      if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+      
+      // remove all
+      radio!.tnfs.forEach( {$0.value.remove() } )
+      sleep(2)
+    }
     if radio!.tnfs.count == 0 {
       
-      if showInfoMessages { Swift.print("***** Existing TNF object(s) removed") }
-      
+      if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmation\n") }
+            
+      if showInfoMessages { Swift.print("\n***** 1st \(type) object requested") }
+
       // get new
       radio!.requestTnf(at: 14_260_000)
       sleep(2)
-      
-      if showInfoMessages { Swift.print("***** 1st TNF object requested") }
       
       // verify added
       if radio!.tnfs.count == 1 {
         if let object = radio!.tnfs.first?.value {
           
-          if showInfoMessages { Swift.print("***** 1st TNF object created") }
+          if showInfoMessages { Swift.print("***** 1st \(type) object added\n") }
           
-          let id = object.id
+          let firstId = object.id
+          
           let depth = object.depth
           let frequency = object.frequency
           let permanent = object.permanent
           let width = object.width
           
-          if showInfoMessages { Swift.print("***** 1st TNF object parameters saved") }
+          if showInfoMessages { Swift.print("***** 1st \(type) object parameters saved") }
+                    
+          if showInfoMessages { Swift.print("***** 1st \(type) object removed") }
           
-          radio!.tnfs[id]!.remove()
+          radio!.tnfs[firstId]!.remove()
           
           if radio!.tnfs.count == 0 {
             
-            if showInfoMessages { Swift.print("***** 1st TNF object removed") }
+            if showInfoMessages { Swift.print("***** 1st \(type) object removal confirmed") }
+            
+            if showInfoMessages { Swift.print("\n***** 2nd \(type) object requested") }
             
             // ask for new
             radio!.requestTnf(at: 14_260_000)
             sleep(2)
-            
-            if showInfoMessages { Swift.print("***** 2nd TNF object requested") }
-            
             // verify added
             if radio!.tnfs.count == 1 {
               if let object = radio!.tnfs.first?.value {
                 
-                if showInfoMessages { Swift.print("***** 2nd TNF object created") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) object added\n") }
+                
+                let secondId = object.id
                 
                 XCTAssertEqual(object.depth, depth, "Depth", file: #function)
                 XCTAssertEqual(object.frequency,  frequency, "Frequency", file: #function)
                 XCTAssertEqual(object.permanent, permanent, "Permanent", file: #function)
                 XCTAssertEqual(object.width, width, "Width", file: #function)
                 
-                if showInfoMessages { Swift.print("***** 2nd TNF object parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
                 
                 object.depth = Tnf.Depth.veryDeep.rawValue
                 object.frequency = 14_270_000
                 object.permanent = !permanent
                 object.width = Tnf.kWidthMax
                 
-                if showInfoMessages { Swift.print("***** 2nd TNF object parameters modified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) object parameters modified") }
                 
                 XCTAssertEqual(object.depth, Tnf.Depth.veryDeep.rawValue, "Depth", file: #function)
                 XCTAssertEqual(object.frequency,  14_270_000, "Frequency", file: #function)
                 XCTAssertEqual(object.permanent, !permanent, "Permanent", file: #function)
                 XCTAssertEqual(object.width, Tnf.kWidthMax, "Width", file: #function)
                 
-                if showInfoMessages { Swift.print("***** 2nd TNF object modified parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) object modified parameters verified\n") }
                 
+                if showInfoMessages { Swift.print("***** 2nd \(type) object removed") }
+                
+                radio!.tnfs[secondId]!.remove()
+                
+                if radio!.tnfs.count == 0 {
+                  
+                  if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
+                  
+                } else {
+                  XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
+                }
               } else {
-                XCTFail("***** 2nd TNF object NOT found *****", file: #function)
+                XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
               }
             } else {
-              XCTFail("***** 2nd TNF object NOT created *****", file: #function)
+              XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st TNF object NOT removed *****", file: #function)
+            XCTFail("***** 1st \(type) object removal FAILED *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st TNF object NOT found *****", file: #function)
+          XCTFail("***** 1st \(type) object NOT found *****", file: #function)
         }
       } else {
-        XCTFail("***** 1st TNF object NOT created *****", file: #function)
+        XCTFail("***** 1st \(type) object NOT added *****", file: #function)
       }
     } else {
-      XCTFail("***** Existing TNF object(s) NOT removed *****", file: #function)
+      XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
     }
-    // remove all
-    radio!.tnfs.forEach( {$0.value.remove() } )
-    
     disconnect()
   }
   
@@ -1412,17 +1467,18 @@ final class ObjectTests: XCTestCase {
   
   private var transmitProperties_1 = "tx_rf_power_changes_allowed=1 tune=0 show_tx_in_waterfall=0 mon_available=1 max_power_level=100"
   func testTransmit_1() {
+    let type = "Transmit"
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Transmit.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_1.keyValuesArray())
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object found") }
+      if showInfoMessages { Swift.print("\n***** \(type) object found") }
       
       XCTAssertEqual(radio!.transmit.txRfPowerChanges, true, "txRfPowerChanges", file: #function)
       XCTAssertEqual(radio!.transmit.tune, false, "tune", file: #function)
@@ -1430,13 +1486,13 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(radio!.transmit.txMonitorAvailable, true, "txMonitorAvailable", file: #function)
       XCTAssertEqual(radio!.transmit.maxPowerLevel, 100, "maxPowerLevel", file: #function)
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) object parameters verified\n") }
       
     } else if radio!.version.isNewApi {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_1.keyValuesArray())
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object found") }
+      if showInfoMessages { Swift.print("\n***** \(type)  object found") }
       
       XCTAssertEqual(radio!.transmit.txRfPowerChanges, true, "txRfPowerChanges", file: #function)
       XCTAssertEqual(radio!.transmit.tune, false, "tune", file: #function)
@@ -1444,7 +1500,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(radio!.transmit.txMonitorAvailable, true, "txMonitorAvailable", file: #function)
       XCTAssertEqual(radio!.transmit.maxPowerLevel, 100, "maxPowerLevel", file: #function)
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type)  object parameters verified\n") }
       
     }  else {
       XCTFail("Unknown Radio version (\(radio!.version.longString)", file: #function)
@@ -1454,17 +1510,18 @@ final class ObjectTests: XCTestCase {
   
   private let transmitProperties_2 = "am_carrier_level=35 compander=1 compander_level=50 break_in_delay=10 break_in=0"
   func testTransmit_2() {
+    let type = "Transmit"
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Transmit.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    if radio!.version.isV1 || radio!.version.isV2 {
+    if radio!.version.isOldApi {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_2.keyValuesArray())
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object found") }
+      if showInfoMessages { Swift.print("\n***** \(type) object found") }
       
       XCTAssertEqual(radio!.transmit.carrierLevel, 35, "carrierLevel", file: #function)
       XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled", file: #function)
@@ -1472,13 +1529,13 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(radio!.transmit.cwBreakInDelay, 10, "cwBreakInDelay", file: #function)
       XCTAssertEqual(radio!.transmit.cwBreakInEnabled, false, "cwBreakInEnabled", file: #function)
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) object parameters verified\n") }
       
     } else if radio!.version.isNewApi {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_2.keyValuesArray())
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object found") }
+      if showInfoMessages { Swift.print("\n***** \(type) object found") }
       
       XCTAssertEqual(radio!.transmit.carrierLevel, 35, "carrierLevel", file: #function)
       XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled", file: #function)
@@ -1486,7 +1543,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(radio!.transmit.cwBreakInDelay, 10, "cwBreakInDelay", file: #function)
       XCTAssertEqual(radio!.transmit.cwBreakInEnabled, false, "cwBreakInEnabled", file: #function)
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) object parameters verified\n") }
       
     }  else {
       XCTFail("Unknown Radio version (\(radio!.version.longString)", file: #function)
@@ -1497,17 +1554,18 @@ final class ObjectTests: XCTestCase {
   private let transmitProperties_3 = "freq=14.100000 rfpower=100 tunepower=10 tx_slice_mode=USB hwalc_enabled=0 inhibit=0 dax=0 sb_monitor=0 mon_gain_sb=75 mon_pan_sb=50 met_in_rx=0 am_carrier_level=100 mic_selection=MIC mic_level=40 mic_boost=1 mic_bias=0 mic_acc=0 compander=1 compander_level=70 vox_enable=0 vox_level=50 vox_delay=72 speech_processor_enable=1 speech_processor_level=0 lo=100 hi=2900 tx_filter_changes_allowed=1 tx_antenna=ANT1 pitch=600 speed=30 iambic=1 iambic_mode=1 swap_paddles=0 break_in=1 break_in_delay=41 cwl_enabled=0 sidetone=1 mon_gain_cw=80 mon_pan_cw=50 synccwx=1"
   
   func testTransmit_3() {
-    
+    let type = "Transmit"
+
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Transmit.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isV1 || radio!.version.isV2 {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_3.keyValuesArray())
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object found") }
+      if showInfoMessages { Swift.print("\n***** \(type) object found") }
       
       XCTAssertEqual(radio!.transmit.carrierLevel, 100, "carrierLevel", file: #function)
       XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled", file: #function)
@@ -1549,13 +1607,13 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(radio!.transmit.voxEnabled, false, "voxEnabled", file: #function)
       XCTAssertEqual(radio!.transmit.voxLevel, 50, "voxLevel", file: #function)
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) object parameters verified\n") }
       
     } else if radio!.version.isNewApi {
       
       radio!.transmit.parseProperties(radio!, transmitProperties_3.keyValuesArray())
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object found") }
+      if showInfoMessages { Swift.print("\n***** \(type) object found") }
       
       XCTAssertEqual(radio!.transmit.carrierLevel, 100, "carrierLevel", file: #function)
       XCTAssertEqual(radio!.transmit.companderEnabled, true, "companderEnabled", file: #function)
@@ -1597,7 +1655,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(radio!.transmit.voxEnabled, false, "voxEnabled", file: #function)
       XCTAssertEqual(radio!.transmit.voxLevel, 50, "voxLevel", file: #function)
       
-      if showInfoMessages { Swift.print("***** TRANSMIT object parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) object parameters verified\n") }
       
     }  else {
       XCTFail("Unknown Radio version (\(radio!.version.longString)", file: #function)
@@ -1609,25 +1667,27 @@ final class ObjectTests: XCTestCase {
   // MARK: - UsbCable
   
   func testUsbCableParse() {
-    
+    let type = "UsbCable"
+
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["UsbCable.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    XCTFail("NOT performed, --- FIX ME ---", file: #function)
+    XCTFail("NOT implemented, --- FIX ME ---", file: #function)
     
     disconnect()
   }
   
   func testUsbCable() {
-    
+    let type = "UsbCable"
+
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["UsbCable.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    XCTFail("NOT performed, --- FIX ME ---", file: #function)
+    XCTFail("NOT implemented, --- FIX ME ---", file: #function)
     
     disconnect()
   }
@@ -1635,7 +1695,7 @@ final class ObjectTests: XCTestCase {
   // ------------------------------------------------------------------------------
   // MARK: - Waterfall
   
-  private var waterfallStatus = "waterfall 0x42000000 x_pixels=50 center=14.100000 bandwidth=0.200000 band_zoom=0 segment_zoom=0 line_duration=100 rfgain=0 rxant=ANT1 wide=0 loopa=0 loopb=0 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 panadapter=40000000 color_gain=50 auto_black=1 black_level=20 gradient_index=1 xvtr="
+  private var waterfallStatus = "waterfall 0x42000004 x_pixels=50 center=14.100000 bandwidth=0.200000 band_zoom=0 segment_zoom=0 line_duration=100 rfgain=0 rxant=ANT1 wide=0 loopa=0 loopb=0 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 panadapter=40000000 color_gain=50 auto_black=1 black_level=20 gradient_index=1 xvtr="
   
   func removeAllWaterfalls(radio: Radio) {
     
@@ -1651,18 +1711,33 @@ final class ObjectTests: XCTestCase {
   }
   
   func testWaterfallParse() {
-    
+    let type = "Waterfall"
+    var existingObjects = false
+
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Waterfall.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Panadapter.swift"]))
     guard radio != nil else { return }
     
+    if radio!.waterfalls.count > 0 {
+      existingObjects = true
+      if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+      
+      // remove all
+      radio!.panadapters.forEach( {$0.value.remove() } )
+      sleep(2)
+    }
     let id: StreamId = waterfallStatus.keyValuesArray()[1].key.streamId!
+    
+    if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removed") }
+
+    if showInfoMessages { Swift.print("\n***** \(type) requested") }
+    
     Waterfall.parseStatus(radio!, waterfallStatus.keyValuesArray(), true)
     
     if let waterfallObject = radio!.waterfalls[id] {
       
-      if showInfoMessages { Swift.print("***** WATERFALL created") }
+      if showInfoMessages { Swift.print("***** \(type) added\n") }
       
       XCTAssertEqual(waterfallObject.autoBlackEnabled, true, "AutoBlackEnabled", file: #function)
       XCTAssertEqual(waterfallObject.blackLevel, 20, "BlackLevel", file: #function)
@@ -1671,28 +1746,34 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(waterfallObject.lineDuration, 100, "LineDuration", file: #function)
       XCTAssertEqual(waterfallObject.panadapterId, "0x40000000".streamId, "Panadapter Id", file: #function)
       
-      if showInfoMessages { Swift.print("***** WATERFALL parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) parameters verified\n") }
       
     } else {
-      XCTFail("***** WATERFALL NOT created *****", file: #function)
+      XCTFail("***** \(type) NOT added *****", file: #function)
     }
     disconnect()
   }
   
   func testWaterfall() {
     let type = "Waterfall"
-    
+    var existingObjects = false
+
     Swift.print("\n***** \(#function)")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Panadapter.swift"]))
     guard radio != nil else { return }
     
-    if showInfoMessages { Swift.print("\n***** Remove existing \(type)(s)") }
-    
-    removeAllWaterfalls(radio: radio!)
+    if radio!.waterfalls.count > 0 {
+      existingObjects = true
+      if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+      
+      // remove all
+      radio!.panadapters.forEach( {$0.value.remove() } )
+      sleep(2)
+    }
     if radio!.panadapters.count == 0 {
       
-      if showInfoMessages { Swift.print("***** Existing \(type)(s) removal confirmed\n") }
+      if showInfoMessages && existingObjects { Swift.print("***** Existing \(type)(s) removal confirmed") }
       
       if showInfoMessages { Swift.print("\n***** Request 1st \(type)") }
       
@@ -1742,7 +1823,7 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.lineDuration, lineDuration, "LineDuration", file: #function)
                 XCTAssertEqual(object.panadapterId, panadapterId, "Panadapter Id", file: #function)
                 
-                if showInfoMessages { Swift.print("***** 2nd \(type) parameters verified") }
+                if showInfoMessages { Swift.print("\n***** 2nd \(type) parameters verified") }
                 
                 let secondId = object.id
                 
@@ -1817,16 +1898,32 @@ final class ObjectTests: XCTestCase {
   }
   
   func xvtrCheck(status: String, expectedName: String) {
+    let type = "Xvtr"
+    var existingObjects = false
     
-    let radio = discoverRadio(logState: .limited(to: ["Xvtr.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     let id: XvtrId = status.keyValuesArray()[0].key.objectId!
+
+    if radio!.xvtrs.count > 0 {
+      existingObjects = true
+      if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+      
+      // remove all
+      radio!.xvtrs.forEach( {$0.value.remove() } )
+      sleep(2)
+    }
+
+    if showInfoMessages && existingObjects { Swift.print("\n***** Existing \(type) object(s) removal confirmed") }
+
+    if showInfoMessages { Swift.print("\n***** \(type) requested") }
+    
     Xvtr.parseStatus(radio!, status.keyValuesArray(), true)
     
     if let xvtrObject = radio!.xvtrs[id] {
       
-      if showInfoMessages { Swift.print("***** XVTR created") }
+      if showInfoMessages { Swift.print("***** \(type) added\n") }
       
       XCTAssertEqual(xvtrObject.ifFrequency, 28_000_000, "IfFrequency", file: #function)
       XCTAssertEqual(xvtrObject.isValid, true, "IsValid", file: #function)
@@ -1839,44 +1936,50 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(xvtrObject.rxGain, 0, "RxGain", file: #function)
       XCTAssertEqual(xvtrObject.rxOnly, true, "RxOnly", file: #function)
       
-      if showInfoMessages { Swift.print("***** XVTR parameters verified") }
+      if showInfoMessages { Swift.print("***** \(type) parameters verified") }
       
       // FIXME: ??? what is this
       //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
       
     } else {
-      XCTFail("***** XVTR NOT created *****", file: #function)
+      XCTFail("***** \(type) NOT added *****", file: #function)
     }
     disconnect()
   }
   
   func testXvtr() {
+    let type = "Xvtr"
+    var existingObjects = false
     
     Swift.print("\n***** \(#function)")
     
-    let radio = discoverRadio(logState: .limited(to: ["Xvtr.swift"]))
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    // remove all
-    for (_, object) in radio!.xvtrs { object.remove() }
-    sleep(2)
+    if radio!.xvtrs.count > 0 {
+      existingObjects = true
+      if showInfoMessages { Swift.print("\n***** Existing \(type) object(s) removed") }
+      
+      // remove all
+      radio!.xvtrs.forEach( {$0.value.remove() } )
+      sleep(2)
+    }
     if radio!.xvtrs.count == 0 {
       
-      if showInfoMessages { Swift.print("***** Existing XVTR(s) removed") }
+      if showInfoMessages && existingObjects { Swift.print("***** Existing \(type)(s) removed") }
+      
+      if showInfoMessages { Swift.print("\n***** 1st \(type) requested") }
       
       // ask for new
       radio!.requestXvtr()
       sleep(2)
-      
-      if showInfoMessages { Swift.print("***** 1st XVTR requested") }
-      
       // verify added
       if radio!.xvtrs.count == 1 {
         if let object = radio!.xvtrs["0".objectId!] {
           
-          if showInfoMessages { Swift.print("***** 1st XVTR created") }
+          if showInfoMessages { Swift.print("***** 1st \(type) added\n") }
           
-          let id = object.id
+          let firstId = object.id
           
           let isValid = object.isValid
           let preferred = object.preferred
@@ -1890,23 +1993,25 @@ final class ObjectTests: XCTestCase {
           let rxGain = object.rxGain
           let rxOnly = object.rxOnly
           
-          if showInfoMessages { Swift.print("***** 1st XVTR parameters saved") }
+          if showInfoMessages { Swift.print("***** 1st \(type) parameters saved") }
           
-          radio!.xvtrs[id]!.remove()
+          radio!.xvtrs[firstId]!.remove()
           sleep(2)
           if radio!.xvtrs.count == 0 {
+             
+            if showInfoMessages { Swift.print("\n***** 2nd \(type) requested") }
             
-            // ask for new
+           // ask for new
             radio!.requestXvtr()
             sleep(2)
-            
-            if showInfoMessages { Swift.print("***** 2nd XVTR requested") }
             
             // verify added
             if radio!.xvtrs.count == 1 {
               if let object = radio!.xvtrs.first?.value {
                 
-                if showInfoMessages { Swift.print("***** 2nd XVTR created") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) added\n") }
+                
+                let secondId = object.id
                 
                 XCTAssertEqual(object.isValid, isValid, "isValid", file: #function)
                 XCTAssertEqual(object.preferred, preferred, "Preferred", file: #function)
@@ -1920,7 +2025,7 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.rxGain, rxGain, "RxGain", file: #function)
                 XCTAssertEqual(object.rxOnly, rxOnly, "RxOnly", file: #function)
                 
-                if showInfoMessages { Swift.print("***** 2nd XVTR parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) parameters verified\n") }
                 
                 object.ifFrequency = ifFrequency + 1_000_000
                 object.loError = loError + 10
@@ -1931,7 +2036,7 @@ final class ObjectTests: XCTestCase {
                 object.rxGain = rxGain + 5
                 object.rxOnly = !rxOnly
                 
-                if showInfoMessages { Swift.print("***** 2nd XVTR parameters modified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) parameters modified") }
                 
                 XCTAssertEqual(object.isValid, false, "isValid", file: #function)
                 XCTAssertEqual(object.preferred, false, "Preferred", file: #function)
@@ -1948,25 +2053,32 @@ final class ObjectTests: XCTestCase {
                 // FIXME: ??? what is this
                 //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
                 
-                if showInfoMessages { Swift.print("***** 2nd XVTR modified parameters verified") }
+                if showInfoMessages { Swift.print("***** 2nd \(type) modified parameters verified") }
                 
+                if showInfoMessages { Swift.print("\n***** 2nd \(type) removed") }
+                
+                radio!.xvtrs[secondId]!.remove()
+                sleep(2)
+                if radio!.xvtrs[secondId] == nil {
+                  
+                  if showInfoMessages { Swift.print("***** 2nd \(type) removal confirmed\n") }
+                  
+                }
               } else {
-                XCTFail("***** 2nd XVTR NOT found *****", file: #function)
+                XCTFail("***** 2nd \(type) NOT found *****", file: #function)
               }
             } else {
-              XCTFail("***** 2nd XVTR NOT created *****", file: #function)
+              XCTFail("***** 2nd \(type) NOT added *****", file: #function)
             }
           } else {
-            XCTFail("***** 1st XVTR NOT removed *****", file: #function)
+            XCTFail("***** 1st \(type) NOT removed *****", file: #function)
           }
         } else {
-          XCTFail("***** 1st XVTR NOT created *****", file: #function)
+          XCTFail("***** 1st \(type) NOT added *****", file: #function)
         }
       } else {
-        XCTFail("***** Existing XVTR(s) NOT removed *****", file: #function)
+        XCTFail("***** Existing XVTR(s) removal FAILED *****", file: #function)
       }
-      // remove all
-      for (_, object) in radio!.xvtrs { object.remove() }
     }
     disconnect()
   }
