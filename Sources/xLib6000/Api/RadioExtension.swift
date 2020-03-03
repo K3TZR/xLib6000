@@ -85,8 +85,6 @@ extension Radio {
         
     // send the command to the radio to create the object...need to change this..
     sendCommand("stream create netcw", diagnostic: false, replyTo: netCwStream.updateStreamId)
-    netCwStream.isActive = true
-
   }
   
   public func cwKey(state: Bool, timestamp: String, guiClientHandle: Handle = 0) -> Void {
