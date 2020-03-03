@@ -19,15 +19,11 @@ public final class NetCwStream : NSObject {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  @objc dynamic public var isActive : Bool {
-    get { Api.objectQ.sync { _isActive } }
-    set { Api.objectQ.sync(flags: .barrier) { _isActive = newValue }}}
+  @objc dynamic public private(set) var isActive = false
   @objc dynamic public var txCount: Int {
     get { Api.objectQ.sync { _txCount } }
     set { Api.objectQ.sync(flags: .barrier) { _txCount = newValue }}}
-  @objc dynamic public var id: NetCwId {
-    get { Api.objectQ.sync { _id } }
-    set { Api.objectQ.sync(flags: .barrier) { _id = newValue }}}
+  @objc dynamic public private(set) var id: NetCwId = 0
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -146,14 +142,14 @@ public final class NetCwStream : NSObject {
     guard responseValue == "0" else {
       
       _log("NetCwStream: Response value != 0 for: \(command)", .error, #function, #file, #line)
-      _isActive = false
+      isActive = false
       return
     }
     
     if let streamId = reply.streamId {
       
-      self._id = streamId
-      _isActive = true
+      id = streamId
+      isActive = true
       
       _log("NetCwStream added: id = \(id.hex)", .debug, #function, #file, #line)
 
@@ -163,7 +159,7 @@ public final class NetCwStream : NSObject {
     } else {
       
       _log("NetCwStream: Error parsing Stream ID (" + reply + ")", .error, #function, #file, #line)
-      _isActive = false
+      isActive = false
     }
   }
   
@@ -213,7 +209,7 @@ public final class NetCwStream : NSObject {
   // ----------------------------------------------------------------------------
   // *** Hidden properties (Do NOT use) ***
   
-  private var _isActive  = false
-  private var _id        : NetCwId = 0
+//  private var _isActive  = false
+//  private var _id        : NetCwId = 0
   private var _txCount   = 0
 }
