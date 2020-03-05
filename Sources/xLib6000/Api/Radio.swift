@@ -63,9 +63,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   public var micAudioStreams        : [DaxMicStreamId: MicAudioStream] {
     get { Api.objectQ.sync { _micAudioStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _micAudioStreams = newValue }}}
-  public var opusStreams            : [OpusId: Opus] {
-    get { Api.objectQ.sync { _opusStreams } }
-    set { Api.objectQ.sync(flags: .barrier) { _opusStreams = newValue }}}
+  public var opusAudioStreams       : [OpusId: OpusAudioStream] {
+    get { Api.objectQ.sync { _opusAudioStreams } }
+    set { Api.objectQ.sync(flags: .barrier) { _opusAudioStreams = newValue }}}
   public var panadapters            : [PanadapterStreamId: Panadapter] {
     get { Api.objectQ.sync { _panadapters } }
     set { Api.objectQ.sync(flags: .barrier) { _panadapters = newValue }}}
@@ -629,14 +629,15 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case forced
     case wanValidationFailed   = "wan_validation_failed"
   }
-  enum StreamType : String {
+  enum StreamTypeNew : String {
     case daxIq            = "dax_iq"
     case daxMic           = "dax_mic"
     case daxRx            = "dax_rx"
     case daxTx            = "dax_tx"
     case remoteRx         = "remote_audio_rx"
     case remoteTx         = "remote_audio_tx"
-
+  }
+  enum StreamTypeOld : String {
     case audio
     case iq               = "daxiq"
     case micAudio
@@ -755,8 +756,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     daxTxAudioStreams.forEach( { NC.post(.daxTxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
     daxTxAudioStreams.removeAll()
     
-    opusStreams.forEach( { NC.post(.opusRxWillBeRemoved, object: $0.value as Any?) } )
-    opusStreams.removeAll()
+    opusAudioStreams.forEach( { NC.post(.opusAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    opusAudioStreams.removeAll()
     
     remoteRxAudioStreams.forEach( { NC.post(.remoteRxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
     remoteRxAudioStreams.removeAll()
@@ -1114,7 +1115,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .meter:          Meter.parseStatus(self, remainder.keyValuesArray(delimiter: "#"), !remainder.contains(Api.kRemoved))
     case .micAudioStream: MicAudioStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
     case .mixer:          _log("Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
-    case .opusStream:     Opus.parseStatus(self, remainder.keyValuesArray())
+    case .opusStream:     OpusAudioStream.parseStatus(self, remainder.keyValuesArray())
     case .profile:        Profile.parseStatus(self, remainder.keyValuesArray(delimiter: "="))
     case .radio:          parseProperties(self, remainder.keyValuesArray())
     case .slice:          xLib6000.Slice.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
@@ -1224,59 +1225,68 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///
   private func parseStream(_ radio: Radio, _ remainder: String) {
    
-    let keyValues = remainder.keyValuesArray()
+    let properties = remainder.keyValuesArray()
 
     // is the 1st KeyValue  a StreamId?
-    if let id = keyValues[0].key.streamId {
+    if let id = properties[0].key.streamId {
       
       // YES, is it a removal?
       if radio.version.isNewApi && remainder.contains(Api.kRemoved) {
         
-        // YES v3 removal, find the stream & remove it
-        if daxIqStreams[id] != nil          { DaxIqStream.parseStatus(self, keyValues, false)           ; return }
-        if daxMicAudioStreams[id] != nil    { DaxMicAudioStream.parseStatus(self, keyValues, false)     ; return }
-        if daxRxAudioStreams[id] != nil     { DaxRxAudioStream.parseStatus(self, keyValues, false)      ; return }
-        if daxTxAudioStreams[id] != nil     { DaxTxAudioStream.parseStatus(self, keyValues, false)      ; return }
-        if remoteRxAudioStreams[id] != nil  { RemoteRxAudioStream.parseStatus(self, keyValues, false)   ; return }
-        if remoteTxAudioStreams[id] != nil  { RemoteTxAudioStream.parseStatus(self, keyValues, false)   ; return }
+        // New Api removal, find the stream & remove it
+        if daxIqStreams[id] != nil          { DaxIqStream.parseStatus(self, properties, false)           ; return }
+        if daxMicAudioStreams[id] != nil    { DaxMicAudioStream.parseStatus(self, properties, false)     ; return }
+        if daxRxAudioStreams[id] != nil     { DaxRxAudioStream.parseStatus(self, properties, false)      ; return }
+        if daxTxAudioStreams[id] != nil     { DaxTxAudioStream.parseStatus(self, properties, false)      ; return }
+        if remoteRxAudioStreams[id] != nil  { RemoteRxAudioStream.parseStatus(self, properties, false)   ; return }
+        if remoteTxAudioStreams[id] != nil  { RemoteTxAudioStream.parseStatus(self, properties, false)   ; return }
         return
         
-      } else if (radio.version.isV1 || radio.version.isV2) && remainder.contains(Api.kNotInUse) {
+      } else if radio.version.isOldApi && remainder.contains(Api.kNotInUse) {
         
-        // YES, v1 or v2 removal, find the stream & remove it
-        if audioStreams[id] != nil          { AudioStream.parseStatus(self, keyValues, false)           ; return }
-        if txAudioStreams[id] != nil        { TxAudioStream.parseStatus(self, keyValues, false)         ; return }
-        if micAudioStreams[id] != nil       { MicAudioStream.parseStatus(self, keyValues, false)        ; return }
-        if iqStreams[id] != nil             { IqStream.parseStatus(self, keyValues, false)              ; return }
+        // Old Api removal, find the stream & remove it
+        if audioStreams[id] != nil          { AudioStream.parseStatus(self, properties, false)           ; return }
+        if txAudioStreams[id] != nil        { TxAudioStream.parseStatus(self, properties, false)         ; return }
+        if micAudioStreams[id] != nil       { MicAudioStream.parseStatus(self, properties, false)        ; return }
+        if iqStreams[id] != nil             { IqStream.parseStatus(self, properties, false)              ; return }
         return
       
       } else {
         // NOT a removal
         
-        // check for unknown Keys
-        guard let token = StreamType(rawValue: keyValues[1].value) else {
-          // log it and ignore the Key
-          _log("Unknown Stream type: \(keyValues[1].value)", .warning, #function, #file, #line)
-          return
-        }
-        
-        // pass the properties to the appropriate object for Status determination
-        switch token {
-        
-        // v3
-        case .daxIq:      DaxIqStream.parseStatus(radio, keyValues)
-        case .daxMic:     DaxMicAudioStream.parseStatus(radio, keyValues)
-        case .daxRx:      DaxRxAudioStream.parseStatus(radio, keyValues)
-        case .daxTx:      DaxTxAudioStream.parseStatus(radio, keyValues)
-        case .remoteRx:   RemoteRxAudioStream.parseStatus(radio, keyValues)
-        case .remoteTx:   RemoteTxAudioStream.parseStatus(radio, keyValues)
-        
-        // v1 or v2
-        case .audio:      break   // handled by audioStream
-        case .iq:         IqStream.parseStatus(radio, keyValues)
-        // FIXME: need to handle all v2 Iq cases
-        case .micAudio:   break   // handled by micAudioStream
-        case .txAudio:    break   // handled by txAudioStream
+        // What version of the Api?
+        if radio.version.isNewApi {
+          
+          // New Api, check for unknown Keys
+          guard let token = StreamTypeNew(rawValue: properties[1].value) else {
+            // log it and ignore the Key
+            _log("Unknown Stream type: \(properties[1].value)", .warning, #function, #file, #line)
+            return
+          }
+          switch token {
+            
+          case .daxIq:      DaxIqStream.parseStatus(radio, properties)
+          case .daxMic:     DaxMicAudioStream.parseStatus(radio, properties)
+          case .daxRx:      DaxRxAudioStream.parseStatus(radio, properties)
+          case .daxTx:      DaxTxAudioStream.parseStatus(radio, properties)
+          case .remoteRx:   RemoteRxAudioStream.parseStatus(radio, properties)
+          case .remoteTx:   RemoteTxAudioStream.parseStatus(radio, properties)
+          }
+        } else if radio.version.isOldApi {
+          
+          // Old Api, check for unknown Keys
+          guard let token = StreamTypeOld(rawValue: properties[1].key) else {
+            // log it and ignore the Key
+            _log("Unknown Stream type: \(properties[1].key)", .warning, #function, #file, #line)
+            return
+          }
+          switch token {
+            
+          case .audio:      break   // handled by audioStream
+          case .iq:         IqStream.parseStatus(radio, properties)
+          case .micAudio:   break   // handled by micAudioStream
+          case .txAudio:    break   // handled by txAudioStream
+          }
         }
       }
     }
@@ -1873,7 +1883,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           opus.vitaProcessor( vitaPacket )
         }
       } else {
-        if let opus = opusStreams[vitaPacket.streamId] {
+        if let opus = opusAudioStreams[vitaPacket.streamId] {
           
           if opus.isStreaming == false {
             opus.isStreaming = true
@@ -2080,7 +2090,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _memories               = [MemoryId: Memory]()
   private var _meters                 = [MeterId: Meter]()
   private var _micAudioStreams        = [DaxMicStreamId: MicAudioStream]()
-  private var _opusStreams            = [OpusId: Opus]()
+  private var _opusAudioStreams       = [OpusId: OpusAudioStream]()
   private var _panadapters            = [PanadapterStreamId: Panadapter]()
   private var _profiles               = [ProfileId: Profile]()
   private var _remoteRxAudioStreams   = [RemoteRxStreamId: RemoteRxAudioStream]()
