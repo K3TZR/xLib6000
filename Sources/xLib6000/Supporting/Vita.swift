@@ -439,6 +439,9 @@ public class Vita {
       case .netCW:
       self.init(packetType: .extDataWithStream, classCode: .daxAudio, streamId: streamId, tsi: .other, tsf: .sampleCount)
       
+    case .opusTxV2:
+      self.init(packetType: .extDataWithStream, classCode: .daxAudio, streamId: streamId, tsi: .other, tsf: .sampleCount)
+      
     case .opusTx:
       self.init(packetType: .extDataWithStream, classCode: .opus, streamId: streamId, tsi: .other, tsf: .sampleCount)
       
@@ -536,6 +539,7 @@ extension Vita {
   ///
   enum VitaType {
     case netCW
+    case opusTxV2
     case opusTx
     case txAudio
   }
