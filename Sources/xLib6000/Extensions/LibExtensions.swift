@@ -386,14 +386,6 @@ public extension CGFloat {
 
 // ----------------------------------------------------------------------------
 
-public enum Versions {
-  case v1
-  case v2
-  case v3
-  case v3m
-}
-
-
 /// Struct to hold a Semantic Version number
 ///     with provision for a Build Number
 ///
@@ -444,17 +436,6 @@ public struct Version {
   public var isNewApi         : Bool    { isV3 || isV2NewApi }
   public var isOldApi         : Bool    { isV1 || isV2 }
 
-  public var group            : Versions {
-    if isV1 {
-      return .v1
-    } else if isV2 {
-      return .v2
-    } else if isV3 {
-      return .v3
-    }
-    return .v3m
-  }
-  
   static func ==(lhs: Version, rhs: Version) -> Bool { lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.patch == rhs.patch }
   
   static func <(lhs: Version, rhs: Version) -> Bool {
