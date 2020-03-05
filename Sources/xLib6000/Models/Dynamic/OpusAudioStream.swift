@@ -1,5 +1,5 @@
 //
-//  Opus.swift
+//  OpusAudioStream.swift
 //  xLib6000
 //
 //  Created by Douglas Adams on 2/9/16.
@@ -18,7 +18,7 @@ public typealias OpusId = StreamId
 ///      objects periodically receive/send Opus Audio in a UDP stream.
 ///      They are collected in the opusStreams collection on the Radio object.
 ///
-public final class Opus                     : NSObject, DynamicModelWithStream {
+public final class OpusAudioStream                     : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------
   // MARK: - Static properties
@@ -41,6 +41,11 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   
   public        let id             : OpusId
   public        var isStreaming    = false
+  
+  public enum RxState {
+    case start
+    case stop
+  }
 
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
@@ -131,14 +136,37 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
     // get the Id
     if let id =  properties[0].key.streamId {
       
-      // does the object exist?
-      if  radio.opusStreams[id] == nil {
+      // is the object in use?
+      if inUse {
         
-        // NO, create a new Opus & add it to the OpusStreams collection
-        radio.opusStreams[id] = Opus(radio: radio, id: id)
+        // YES, does the object exist?
+        if  radio.opusAudioStreams[id] == nil {
+          
+          // NO, create a new Opus & add it to the OpusStreams collection
+          radio.opusAudioStreams[id] = OpusAudioStream(radio: radio, id: id)
+        }
+        // pass the remaining values to Opus for parsing
+        radio.opusAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
+      
+      } else {
+        
+        // NOTE: This code will never be called
+        //    OpusAudioStream does not send status on removal
+
+        // NO, does it exist?
+        if radio.opusAudioStreams[id] != nil {
+          
+          // YES, remove it, notify observers
+          NC.post(.opusAudioStreamWillBeRemoved, object: radio.opusAudioStreams[id] as Any?)
+          
+          // remove it immediately
+          radio.opusAudioStreams[id] = nil
+          
+          Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+          
+          NC.post(.opusAudioStreamHasBeenRemoved, object: id as Any?)
+        }
       }
-      // pass the remaining values to Opus for parsing
-      radio.opusStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
     }
   }
 
@@ -174,7 +202,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
     if _radio.interlock.state == "TRANSMITTING" {
     
       // get an OpusTx Vita
-      if _vita == nil { _vita = Vita(type: .opusTx, streamId: Opus.txStreamId) }
+      if _vita == nil { _vita = Vita(type: .opusTxV2, streamId: OpusAudioStream.txStreamId) }
     
       // create new array for payload (interleaved L/R samples)
       _vita!.payloadData = buffer
@@ -214,7 +242,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Opus token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -234,11 +262,32 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Opus
       _initialized = true
       
-      _log("Opus added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log("\(String(describing: Self.self)) added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
-      NC.post(.opusHasBeenAdded, object: self as Any?)
+      NC.post(.opusAudioStreamHasBeenAdded, object: self as Any?)
     }
+  }
+  /// Remove this Opus Audio Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove the Stream
+    _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.opusAudioStreamWillBeRemoved, object: self as Any?)
+    
+    // remove it immediately (OpusAudioStream does not send status on removal)
+
+    _radio.opusAudioStreams[id] = nil
+    
+    Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+    
+    NC.post(.opusAudioStreamHasBeenRemoved, object: id as Any?)
   }
   /// Receive Opus encoded RX audio
   ///
@@ -272,7 +321,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       
       // from a later group, jump forward
       let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
-      _log("Opus Missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+      _log(String(describing: Self.self) + " missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
 
       // Pass an error frame (count == 0) to the Opus delegate
       delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: 0) )
@@ -301,7 +350,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   ///
   private func opusCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Opus.kCmd + token.rawValue + " \(value)")
+    Api.sharedInstance.send(OpusAudioStream.kCmd + token.rawValue + " \(value)")
   }
   
   // ----------------------------------------------------------------------------

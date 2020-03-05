@@ -237,7 +237,7 @@ public final class Memory                   : NSObject, DynamicModel {
           
           radio.memories[id] = nil
           
-          Log.sharedInstance.logMessage("Memory removed: id = \(id)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id)", .debug, #function, #file, #line)
           
           NC.post(.memoryHasBeenRemoved, object: id as Any?)
         }
@@ -352,7 +352,7 @@ public final class Memory                   : NSObject, DynamicModel {
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Memory token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -386,7 +386,7 @@ public final class Memory                   : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Memory
       _initialized = true
                   
-      _log("Memory added: id = \(id)", .debug, #function, #file, #line)
+      _log(String(describing: Self.self) + " added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.memoryHasBeenAdded, object: self as Any?)

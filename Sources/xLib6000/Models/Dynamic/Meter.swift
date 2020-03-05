@@ -276,7 +276,7 @@ public final class Meter : NSObject, DynamicModel {
           
           radio.meters[id] = nil
           
-          Log.sharedInstance.logMessage("Meter removed: id = \(id)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id)", .debug, #function, #file, #line)
 
           NC.post(.meterHasBeenRemoved, object: id as Any?)
         }
@@ -327,7 +327,7 @@ public final class Meter : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: key) else {
         // log it and ignore the Key
-        _log("Unknown Meter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       
@@ -349,7 +349,7 @@ public final class Meter : NSObject, DynamicModel {
       // the Radio (hardware) has acknowledged this Meter
       _initialized = true
       
-      _log("Meter added: id = \(id)", .debug, #function, #file, #line)
+      _log(String(describing: Self.self) + " added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.meterHasBeenAdded, object: self as Any?)

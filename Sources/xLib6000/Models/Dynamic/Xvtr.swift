@@ -180,7 +180,7 @@ public final class Xvtr : NSObject, DynamicModel {
 
           radio.xvtrs[id] = nil
           
-          Log.sharedInstance.logMessage("Xvtr removed: id = \(id)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id)", .debug, #function, #file, #line)
           
           NC.post(.xvtrHasBeenRemoved, object: id as Any?)
         }
@@ -205,7 +205,7 @@ public final class Xvtr : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Xvtr token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -230,7 +230,7 @@ public final class Xvtr : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Waterfall
       _initialized = true
       
-      _log("Xvtr added: id = \(id)", .debug, #function, #file, #line)
+      _log(String(describing: Self.self) + " added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.xvtrHasBeenAdded, object: self as Any?)

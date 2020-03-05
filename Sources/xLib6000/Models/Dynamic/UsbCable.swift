@@ -212,7 +212,7 @@ public final class UsbCable : NSObject, DynamicModel {
         } else {
           
           // NO, log the error and ignore it
-          Log.sharedInstance.logMessage("Invalid UsbCable Type: \(properties[1].value)", .warning, #function, #file, #line)
+          Log.sharedInstance.logMessage(String(describing: Self.self) + " invalid Type: \(properties[1].value)", .warning, #function, #file, #line)
           return
         }
       }
@@ -229,7 +229,7 @@ public final class UsbCable : NSObject, DynamicModel {
 
         radio.usbCables[id] = nil
         
-        Log.sharedInstance.logMessage("UsbCable removed: id = \(id)", .debug, #function, #file, #line)
+        Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id)", .debug, #function, #file, #line)
         
         NC.post(.usbCableHasBeenRemoved, object: id as Any?)
       }
@@ -283,7 +283,7 @@ public final class UsbCable : NSObject, DynamicModel {
         // check for unknown Keys
         guard let token = Token(rawValue: property.key) else {
           // log it and ignore the Key
-          _log("Unknown UsbCable token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+          _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
           continue
         }
         // Known keys, in alphabetical order
@@ -322,7 +322,7 @@ public final class UsbCable : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this UsbCable
       _initialized = true
 
-      _log("UsbCable added: id = \(id)", .debug, #function, #file, #line)
+      _log(String(describing: Self.self) + " added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.usbCableHasBeenAdded, object: self as Any?)

@@ -130,13 +130,16 @@ public final class TxAudioStream : NSObject, DynamicModel {
         
       } else {
         
+        // NOTE: This code will never be called
+        //    TxAudioStream does not send status on removal
+
         // does the object exist?
         if radio.txAudioStreams[id] != nil {
           
           // YES, remove it
           radio.txAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage("TxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id.hex)", .debug, #function, #file, #line)
           
           // notify all observers
           NC.post(.txAudioStreamHasBeenRemoved, object: id as Any?)
@@ -178,13 +181,13 @@ public final class TxAudioStream : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown TxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
       switch token {
         
-      case .clientHandle: willChangeValue(for: \._clientHandle) ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
+      case .clientHandle: willChangeValue(for: \.clientHandle) ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
       case .daxTx:        willChangeValue(for: \.transmit)      ; _transmit = property.value.bValue           ; didChangeValue(for: \.transmit)
       case .inUse:        break   // included to inhibit unknown token warnings
       case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
@@ -197,7 +200,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
                   
-      _log("TxAudioStream added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log(String(describing: Self.self) + " added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)
@@ -215,9 +218,12 @@ public final class TxAudioStream : NSObject, DynamicModel {
     
     NC.post(.txAudioStreamWillBeRemoved, object: self as Any?)
     
-    // remove it immediately
+    // remove it immediately (TxAudioStream does not send status on removal)
     _radio.txAudioStreams[id] = nil
+        
+    Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id.hex)", .debug, #function, #file, #line)
     
+    // notify all observers
     NC.post(.txAudioStreamHasBeenRemoved, object: id as Any?)
   }
   

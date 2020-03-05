@@ -122,7 +122,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
           
           radio.remoteTxAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage("RemoteTxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id.hex)", .debug, #function, #file, #line)
           
           NC.post(.remoteTxAudioStreamHasBeenRemoved, object: id as Any?)
         }
@@ -165,7 +165,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown RemoteTxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -182,7 +182,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Opus
       _initialized = true
                   
-      _log("RemoteTxAudioStream added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log(String(describing: Self.self) + " added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.remoteTxAudioStreamHasBeenAdded, object: self as Any?)
