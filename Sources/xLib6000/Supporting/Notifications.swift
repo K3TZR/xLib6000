@@ -77,14 +77,17 @@ public enum NotificationType : String {
   case netCwStreamWillBeRemoved
   case netCwStreamHasBeenRemoved
   
-  case opusHasBeenAdded
-  case opusWillBeRemoved
+  case opusAudioStreamHasBeenAdded
+  case opusAudioStreamWillBeRemoved
+  case opusAudioStreamHasBeenRemoved
 
-  case opusRxHasBeenAdded
-  case opusRxWillBeRemoved
+  case opusRxAudioStreamHasBeenStarted
+  case opusRxAudioStreamWillBeStopped
+  case opusRxAudioStreamHasBeenRemoved
 
-  case opusTxHasBeenAdded
-  case opusTxWillBeRemoved
+  case opusTxAudioStreamHasBeenAdded
+  case opusTxAudioStreamWillBeRemoved
+  case opusTxAudioStreamHasBeenRemoved
 
   case panadapterHasBeenAdded
   case panadapterWillBeRemoved
