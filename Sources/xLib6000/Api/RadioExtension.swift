@@ -370,7 +370,7 @@ extension Radio {
   ///   - value:              On/Off
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func setOpusRx(state: Bool, callback: ReplyHandler? = nil) {
+  public func requestOpusRxAudioStream(state: Bool, callback: ReplyHandler? = nil) {
     
     // tell the Radio to enable Opus Rx
     Api.sharedInstance.send("remote_audio rx_on \(state.as1or0)", replyTo: callback)
