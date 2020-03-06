@@ -52,7 +52,7 @@ final class NewApiTests: XCTestCase {
     let type = "BandSetting"
     let id = bandSettingStatus_1.components(separatedBy: " ")[0].objectId!
     
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -108,7 +108,7 @@ final class NewApiTests: XCTestCase {
     let type = "BandSetting"
     let id = bandSettingStatus_2.components(separatedBy: " ")[0].objectId!
     
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -173,7 +173,7 @@ final class NewApiTests: XCTestCase {
     }
     var tempArray = [Temp]()
     
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     Swift.print("\n***** Please Wait, this test takes longer than others *****\n")
     
@@ -186,7 +186,7 @@ final class NewApiTests: XCTestCase {
       
       if showInfoMessages { Swift.print("\n***** Saving Existing \(type)s") }
       
-      for (id, object) in radio!.bandSettings {
+      for (_, object) in radio!.bandSettings {
         tempArray.append( Temp(id: object.id,
                                bandName: object.bandName,
                                accTxEnabled: object.accTxEnabled,
@@ -511,7 +511,7 @@ final class NewApiTests: XCTestCase {
     let id = daxMicAudioStreamStatus.components(separatedBy: " ").first!.streamId!
     var existingObjects = false
 
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -572,7 +572,7 @@ final class NewApiTests: XCTestCase {
     var clientHandle : Handle = 0
     var existingObjects = false
     
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -682,7 +682,7 @@ final class NewApiTests: XCTestCase {
     let id = daxRxAudioStreamStatus.components(separatedBy: " ").first!.streamId!
     var existingObjects = false
     
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -747,7 +747,7 @@ final class NewApiTests: XCTestCase {
     let type = "DaxRxAudioStream"
     var existingObjects = false
     
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -862,7 +862,7 @@ final class NewApiTests: XCTestCase {
     let id = daxTxAudioStreamStatus.components(separatedBy: " ").first!.streamId!
     var existingObjects = false
 
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -921,7 +921,7 @@ final class NewApiTests: XCTestCase {
     let type = "DaxTxAudioStream"
     var existingObjects = false
     
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1034,7 +1034,7 @@ final class NewApiTests: XCTestCase {
     let id = remoteRxAudioStreamStatus.components(separatedBy: " ").first!.streamId!
     var existingObjects = false
     
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1098,7 +1098,7 @@ final class NewApiTests: XCTestCase {
     let type = "RemoteRxAudioStream"
     var existingObjects = false
     
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1208,7 +1208,7 @@ final class NewApiTests: XCTestCase {
     let id = remoteTxAudioStreamStatus_1.components(separatedBy: " ").first!.streamId!
     var existingObjects = false
     
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1273,7 +1273,7 @@ final class NewApiTests: XCTestCase {
     let id = remoteTxAudioStreamStatus_2.components(separatedBy: " ").first!.streamId!
     var existingObjects = false
 
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1337,7 +1337,7 @@ final class NewApiTests: XCTestCase {
     let type = "RemoteTxAudioStream"
     var existingObjects = false
 
-    Swift.print("\n***** \(#function), " + requiredVersion)
+    Swift.print("\n-------------------- \(#function), " + requiredVersion + " --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }

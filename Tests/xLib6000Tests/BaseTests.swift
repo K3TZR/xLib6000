@@ -15,8 +15,8 @@ final class BaseTests: XCTestCase {
   
   func testApi() {
     
-    Swift.print("\n***** \(#function)\n")
-    
+    Swift.print("\n-------------------- \(#function) --------------------\n")
+
     let api = Api.sharedInstance
     XCTAssertNotNil(api, "\n***** Api singleton not present *****\n", file: #function)
     XCTAssertNotNil(api.tcp, "\n***** Failed to instantiate TcpManager *****\n", file: #function)
@@ -28,8 +28,8 @@ final class BaseTests: XCTestCase {
   
   func testLog() {
     
-    Swift.print("\n***** \(#function)\n")
-    
+    Swift.print("\n-------------------- \(#function) --------------------\n")
+
     let log = Log.sharedInstance
     XCTAssertNotNil(log, "\n***** Log singleton not present *****\n", file: #function)
   }
@@ -39,8 +39,8 @@ final class BaseTests: XCTestCase {
   
   func testDiscovery() {
     
-    Swift.print("\n***** \(#function)\n")
-    
+    Swift.print("\n-------------------- \(#function) --------------------\n")
+
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count == 0 {
@@ -53,8 +53,8 @@ final class BaseTests: XCTestCase {
   
   func testObjectCreation() {
     
-    Swift.print("\n***** \(#function)\n")
-    
+    Swift.print("\n-------------------- \(#function) --------------------\n")
+
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count > 0 {
@@ -108,7 +108,7 @@ final class BaseTests: XCTestCase {
       let micAudioStream = MicAudioStream(radio: radio, id: "0x45000000".streamId!)
       XCTAssertNotNil(micAudioStream, "\n***** Failed to instantiate MicAudioStream *****\n", file: #function)
       
-      let opus = Opus(radio: radio, id: "0x46000000".streamId!)
+      let opus = OpusAudioStream(radio: radio, id: "0x46000000".streamId!)
       XCTAssertNotNil(opus, "\n***** Failed to instantiate Opus *****\n", file: #function)
       
       let pan = Panadapter(radio: radio, id: "0x40000000".streamId!)

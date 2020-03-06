@@ -43,8 +43,8 @@ final class ObjectTests: XCTestCase {
   func testAmplifierParse() {
     let type = "Amplifier"
     
-    Swift.print("\n***** \(#function)")
-    
+    Swift.print("\n-------------------- \(#function) --------------------\n")
+
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
@@ -94,7 +94,7 @@ final class ObjectTests: XCTestCase {
   }
   
   func testAmplifier() {
-    let type = "Amplifier"
+//    let type = "Amplifier"
 
     Swift.print("\n***** \(#function) NOT implemented, NEED MORE INFORMATION ****\n")
   }
@@ -107,13 +107,13 @@ final class ObjectTests: XCTestCase {
   
   func testEqualizerRxParse() {
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     equalizerParse(.rxsc)
   }
   func testEqualizerTxParse() {
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     equalizerParse(.txsc)
   }
@@ -156,13 +156,13 @@ final class ObjectTests: XCTestCase {
   
   func testEqualizerRx() {
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     equalizer(.rxsc)
   }
   func testEqualizerTx() {
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     equalizer(.txsc)
   }
@@ -239,7 +239,7 @@ final class ObjectTests: XCTestCase {
   func testMemoryParse() {
     let type = "Memory"
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -331,7 +331,7 @@ final class ObjectTests: XCTestCase {
     let type = "Memory"
     var existingObjects = false
 
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -515,7 +515,7 @@ final class ObjectTests: XCTestCase {
   func testMeterParse() {
     let type = "Meter"
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -551,7 +551,7 @@ final class ObjectTests: XCTestCase {
     let type = "NetCwStream"
     var existingObjects = false
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -637,7 +637,7 @@ final class ObjectTests: XCTestCase {
     let type = "Panadapter"
     let id = panadapterStatus.components(separatedBy: " ")[1].streamId!
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Waterfall.swift"]))
     guard radio != nil else { return }
@@ -686,7 +686,7 @@ final class ObjectTests: XCTestCase {
     var clientHandle : Handle = 0
     var existingObjects = false
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Waterfall.swift"]))
     guard radio != nil else { disconnect() ; return }
@@ -867,8 +867,8 @@ final class ObjectTests: XCTestCase {
     } else {
       XCTFail("***** Existing \(type)(s) NOT removed *****", file: #function)
       
-      Swift.print("\nRemaining pan:       count = \(radio!.panadapters.count), 1st id = \(radio!.panadapters.first?.key.hex)")
-      Swift.print("Remaining waterfall: count = \(radio!.waterfalls.count), 1st id = \(radio!.waterfalls.first?.key.hex)\n")
+      Swift.print("\nRemaining pan:       count = \(radio!.panadapters.count), 1st id = \(radio!.panadapters.first?.key.hex ?? "nil")")
+      Swift.print("Remaining waterfall: count = \(radio!.waterfalls.count), 1st id = \(radio!.waterfalls.first?.key.hex ?? "nil")\n")
     }
     disconnect()
   }
@@ -880,7 +880,7 @@ final class ObjectTests: XCTestCase {
   func testSliceParse() {
     let type = "Slice"
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -933,7 +933,7 @@ final class ObjectTests: XCTestCase {
     let type = "Slice"
     var existingObjects = false
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1379,7 +1379,7 @@ final class ObjectTests: XCTestCase {
   func testTnfParse() {
     let type = "Tnf"
 
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1411,7 +1411,7 @@ final class ObjectTests: XCTestCase {
     let type = "Tnf"
     var existingObjects = false
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1530,7 +1530,7 @@ final class ObjectTests: XCTestCase {
   func testTransmit_1() {
     let type = "Transmit"
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1573,7 +1573,7 @@ final class ObjectTests: XCTestCase {
   func testTransmit_2() {
     let type = "Transmit"
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1617,7 +1617,7 @@ final class ObjectTests: XCTestCase {
   func testTransmit_3() {
     let type = "Transmit"
 
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1730,7 +1730,7 @@ final class ObjectTests: XCTestCase {
   func testUsbCableParse() {
     let type = "UsbCable"
 
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1743,7 +1743,7 @@ final class ObjectTests: XCTestCase {
   func testUsbCable() {
     let type = "UsbCable"
 
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
@@ -1775,7 +1775,7 @@ final class ObjectTests: XCTestCase {
     let type = "Waterfall"
     var existingObjects = false
 
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Panadapter.swift"]))
     guard radio != nil else { return }
@@ -1819,7 +1819,7 @@ final class ObjectTests: XCTestCase {
     let type = "Waterfall"
     var existingObjects = false
 
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Panadapter.swift"]))
     guard radio != nil else { return }
@@ -1931,8 +1931,8 @@ final class ObjectTests: XCTestCase {
       }
     }
     
-    Swift.print("\nRemaining pan:       count = \(radio!.panadapters.count), 1st id = \(radio!.panadapters.first?.key.hex)")
-    Swift.print("Remaining waterfall: count = \(radio!.waterfalls.count), 1st id = \(radio!.waterfalls.first?.key.hex)\n")
+    Swift.print("\nRemaining pan:       count = \(radio!.panadapters.count), 1st id = \(radio!.panadapters.first?.key.hex ?? "nil")")
+    Swift.print("Remaining waterfall: count = \(radio!.waterfalls.count), 1st id = \(radio!.waterfalls.first?.key.hex ?? "nil")\n")
     
     disconnect()
   }
@@ -1945,14 +1945,14 @@ final class ObjectTests: XCTestCase {
   
   func testXvtrParse() {
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     xvtrCheck(status: xvtrStatus, expectedName: "220")
   }
   
   func testXvtrName() {
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     // check that name is limited to 4 characters
     xvtrCheck(status: xvtrStatusLongName, expectedName: "1234")
@@ -2012,7 +2012,7 @@ final class ObjectTests: XCTestCase {
     let type = "Xvtr"
     var existingObjects = false
     
-    Swift.print("\n***** \(#function)")
+    Swift.print("\n-------------------- \(#function) --------------------\n")
     
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
