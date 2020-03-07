@@ -63,7 +63,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   public var micAudioStreams        : [DaxMicStreamId: MicAudioStream] {
     get { Api.objectQ.sync { _micAudioStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _micAudioStreams = newValue }}}
-  public var opusAudioStreams       : [OpusId: OpusAudioStream] {
+  public var opusAudioStreams       : [OpusStreamId: OpusAudioStream] {
     get { Api.objectQ.sync { _opusAudioStreams } }
     set { Api.objectQ.sync(flags: .barrier) { _opusAudioStreams = newValue }}}
   public var panadapters            : [PanadapterStreamId: Panadapter] {
@@ -138,11 +138,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) }}}
   @objc dynamic public var boundClientId: String? {
     get { return _boundClientId }
-    set {
-      if !_api.isGui {
-        if let uuidString = newValue {
-          bindGuiClient(uuidString)
-        }
+    set { if _boundClientId != newValue {
+      if !_api.isGui && newValue != nil {
+        _boundClientId = newValue
+        bindGuiClient(_boundClientId!)
+      }
       }
     }
   }
@@ -2090,7 +2090,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _memories               = [MemoryId: Memory]()
   private var _meters                 = [MeterId: Meter]()
   private var _micAudioStreams        = [DaxMicStreamId: MicAudioStream]()
-  private var _opusAudioStreams       = [OpusId: OpusAudioStream]()
+  private var _opusAudioStreams       = [OpusStreamId: OpusAudioStream]()
   private var _panadapters            = [PanadapterStreamId: Panadapter]()
   private var _profiles               = [ProfileId: Profile]()
   private var _remoteRxAudioStreams   = [RemoteRxStreamId: RemoteRxAudioStream]()
