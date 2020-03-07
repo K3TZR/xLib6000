@@ -233,8 +233,6 @@ extension Radio {
     sendCommand("client bind client_id=" + clientId, replyTo: callback)
 
     willChangeValue(for: \.boundClientId) ; _boundClientId = clientId ; didChangeValue(for: \.boundClientId)
-
-//    update(self, &_boundClientId, to: clientId, signal: \.boundClientId)
   }
   
   // ----------------------------------------------------------------------------
@@ -624,6 +622,14 @@ extension Radio {
   // ----------------------------------------------------------------------------
   // MARK: - Slice methods
   
+  /// Create a new Slice on a new Panadapter
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func requestSlice(callback: ReplyHandler? = nil) {
+    sendCommand("slice create", replyTo: callback)
+  }
   /// Create a new Slice
   ///
   /// - Parameters:
@@ -632,10 +638,18 @@ extension Radio {
   ///   - mode:               selected mode
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestSlice(frequency: Hz, rxAntenna: String, mode: String, callback: ReplyHandler? = nil) {
+  public func requestSlice(id: PanadapterStreamId = 0, mode: String = "", frequency: Hz = 0,  rxAntenna: String = "", usePersistence: Bool = false, callback: ReplyHandler? = nil) {
     if availableSlices > 0 {
+      
+      var cmd = "slice create"
+      if id != 0          { cmd += " pan=\(id.hex)" }
+      if frequency != 0   { cmd += " freq=\(frequency.hzToMhz)" }
+      if rxAntenna != ""  { cmd += " rxant=\(rxAntenna)" }
+      if mode != ""       { cmd += " mode=\(mode)" }
+      if usePersistence   { cmd += " load_from=PERSISTENCE" }
+      
       // tell the Radio to create a Slice
-      sendCommand("slice create " + "\(frequency.hzToMhz) \(rxAntenna) \(mode)", replyTo: callback)
+      sendCommand(cmd, replyTo: callback)
     }
   }
   /// Create a new Slice
