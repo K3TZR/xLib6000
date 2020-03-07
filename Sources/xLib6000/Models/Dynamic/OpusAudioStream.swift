@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias OpusId = StreamId
+public typealias OpusStreamId = StreamId
 
 /// Opus Class implementation
 ///
@@ -39,7 +39,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public        let id             : OpusId
+  public        let id             : OpusStreamId
   public        var isStreaming    = false
   
   public enum RxState {
@@ -179,7 +179,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   ///   - radio:        the Radio instance
   ///   - id:           an Opus Id
   ///
-  init(radio: Radio, id: OpusId) {
+  init(radio: Radio, id: OpusStreamId) {
     
     _radio = radio
     self.id = id
