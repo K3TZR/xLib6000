@@ -34,6 +34,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   static        let kTcpTimeout             = 0.5     // seconds
   static        let kNotInUse               = "in_use=0"
   static        let kRemoved                = "removed"
+  static        let kConnected              = "connected"
   static        let kDisconnected           = "disconnected"
 
   // ----------------------------------------------------------------------------
@@ -70,9 +71,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var localUDPPort : UInt16 {
     get { Api.objectQ.sync { _localUDPPort } }
     set { Api.objectQ.sync(flags: .barrier) { _localUDPPort  = newValue }}}
-  public var guiClients : [Handle:GuiClient] {
-    get { Api.objectQ.sync { _guiClients } }
-    set { Api.objectQ.sync(flags: .barrier) {_guiClients = newValue }}}
 
   public enum DisconnectReason: Equatable {
     public static func ==(lhs: Api.DisconnectReason, rhs: Api.DisconnectReason) -> Bool {
@@ -604,5 +602,4 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private var _delegate      : ApiDelegate? = nil
   private var _localIP       = "0.0.0.0"
   private var _localUDPPort  : UInt16 = 0
-  private var _guiClients    = [Handle:GuiClient]()
 }
