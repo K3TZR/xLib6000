@@ -64,7 +64,10 @@ protocol DynamicModel                       : StaticModel {
 ///   provide a method to process the Vita packets from the UDP stream
 ///
 protocol DynamicModelWithStream             : DynamicModel {
-  
+
+  var id          : StreamId  {get}
+  var isStreaming : Bool      {get set}
+
   /// Process vita packets
   ///
   /// - Parameter vitaPacket:       a Vita packet

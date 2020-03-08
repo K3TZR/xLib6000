@@ -22,8 +22,9 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public      let id         : AudioStreamId
-  
+  public let id           : AudioStreamId
+  public var isStreaming  = fals
+
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}

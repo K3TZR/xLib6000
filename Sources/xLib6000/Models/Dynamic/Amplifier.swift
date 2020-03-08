@@ -23,6 +23,7 @@ public final class Amplifier  : NSObject, DynamicModel {
   // MARK: - Public properties
   
   public let id               : AmplifierId
+  public var isStreaming      = fals
 
   @objc dynamic public var ant: String {
     get { _ant }

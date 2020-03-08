@@ -22,8 +22,9 @@ public final class TxAudioStream : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                             : TxStreamId
-  
+  public let id           : TxStreamId
+  public var isStreaming  = false
+
 
   @objc dynamic public var clientHandle: Handle {
     return _clientHandle }

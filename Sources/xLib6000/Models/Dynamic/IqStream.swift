@@ -16,13 +16,14 @@ import Accelerate
 ///      objects are added / removed by the incoming TCP messages. IqStream
 ///      objects periodically receive IQ data in a UDP stream.
 ///
-public final class IqStream : NSObject, DynamicModelWithStream {
+public final class IqStream : NSObject, DynamicModelWithStream {  
 
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public      let id           : DaxIqStreamId
-  
+  public let id           : DaxIqStreamId
+  public var isStreaming  = fals
+
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}

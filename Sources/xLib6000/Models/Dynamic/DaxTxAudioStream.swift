@@ -23,7 +23,8 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id                               : DaxTxStreamId
+  public let id           : DaxTxStreamId
+  public var isStreaming  = false
 
   @objc dynamic public var ip : String {
     get { _ip  }
