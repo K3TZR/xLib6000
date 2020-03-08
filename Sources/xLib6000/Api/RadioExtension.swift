@@ -814,7 +814,7 @@ extension Radio {
   ///   - callback:           ReplyHandler (optional)
   /// - Returns:              success / failure
   ///
-  public func requestRemoteRxAudioStream(compression: String = RemoteRxAudioStream.Compression.none.rawValue, callback: ReplyHandler? = nil) {
+  public func requestRemoteRxAudioStream(compression: String = RemoteRxAudioStream.Compression.opus.rawValue, callback: ReplyHandler? = nil) {
     
     // tell the Radio to enable Opus Rx
     sendCommand("stream create type=remote_audio_rx compression=\(compression)", replyTo: callback)
