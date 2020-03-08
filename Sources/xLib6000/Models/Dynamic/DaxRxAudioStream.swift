@@ -24,7 +24,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public let id           : DaxRxStreamId
-  public var isStreaming  = fals
+  public var isStreaming  = false
 
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }

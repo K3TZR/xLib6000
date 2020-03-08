@@ -21,7 +21,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public let id           : DaxMicStreamId
-  public var isStreaming  = fals
+  public var isStreaming  = false
 
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
