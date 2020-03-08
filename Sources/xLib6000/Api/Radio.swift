@@ -1808,119 +1808,65 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///
   public func vitaParser(_ vitaPacket: Vita) {
     
+    // embedded func for Stream handling & Logging
+    func procesStream(_ object : DynamicModelWithStream, _ name: String) {
+      object.vitaProcessor(vitaPacket)
+      if object.isStreaming == false {
+        object.isStreaming = true
+        // log the start of the stream
+        _log(String(describing: Self.self) + ": \(name) Stream started Id = \(object.id.hex)", .info, #function, #file, #line)
+      }
+    }
+    
     // Pass the stream to the appropriate object (checking for existence of the object first)
     switch (vitaPacket.classCode) {
-    // DL3LSM added calls to v3 handlers
-    case .daxAudio:
-      // Dax Slice Audio
-      if version.isNewApi {
-        if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
-          daxAudio.vitaProcessor(vitaPacket)
-        }
-      } else {
-        if let daxAudio = audioStreams[vitaPacket.streamId] {
-          daxAudio.vitaProcessor(vitaPacket)
-        }
-      }
-      // Dax Microphone Audio
-      if version.isNewApi {
-        if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
-          daxMicAudio.vitaProcessor(vitaPacket)
-        }
-      } else {
-        if let daxMicAudio = micAudioStreams[vitaPacket.streamId] {
-          daxMicAudio.vitaProcessor(vitaPacket)
-        }
-      }
-    case .daxReducedBw:
-      // Dax Audio with reduced bandwidth
-      if version.isNewApi {
-        if let daxAudio = daxRxAudioStreams[vitaPacket.streamId] {
-          daxAudio.vitaProcessor(vitaPacket)
-        }
-      } else {
-        if let daxAudio = audioStreams[vitaPacket.streamId] {
-          daxAudio.vitaProcessor(vitaPacket)
-        }
-      }
-      // Dax Microphone Audio with reduced bandwidth
-      if version.isNewApi {
-        if let daxMicAudio = daxMicAudioStreams[vitaPacket.streamId] {
-          daxMicAudio.vitaProcessor(vitaPacket)
-        }
-      } else {
-        if let daxMicAudio = micAudioStreams[vitaPacket.streamId] {
-          daxMicAudio.vitaProcessor(vitaPacket)
-        }
-      }
-    case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
-      // Dax IQ
-      if version.isNewApi {
-        if let daxIq = daxIqStreams[vitaPacket.streamId] {
-          daxIq.vitaProcessor(vitaPacket)
-        }
-      } else {
-        if let daxIq = iqStreams[vitaPacket.streamId] {
-          daxIq.vitaProcessor(vitaPacket)
-        }
-      }
-      
+    
+    // ----- ALL API Versions -----
     case .meter:
       // Meter - unlike other streams, the Meter stream contains multiple Meters
       //         and must be processed by a class method on the Meter object
       Meter.vitaProcessor(vitaPacket, radio: self)
       
-    case .opus:
-      // Opus
-      if version.isNewApi {
-        if let opus = remoteRxAudioStreams[vitaPacket.streamId] {
-          
-          if opus.isStreaming == false {
-            opus.isStreaming = true
-            // log the start of the stream
-            _log(String(describing: Self.self) + ": Remote Rx Opus Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
-          }
-          opus.vitaProcessor( vitaPacket )
-        }
-      } else {
-        if let opus = opusAudioStreams[vitaPacket.streamId] {
-          
-          if opus.isStreaming == false {
-            opus.isStreaming = true
-            // log the start of the stream
-            _log(String(describing: Self.self) + ": Opus Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
-          }
-          opus.vitaProcessor( vitaPacket )
-        }
-      }
-      
     case .panadapter:
-      // Panadapter
-      if let panadapter = panadapters[vitaPacket.streamId] {
-        
-        if panadapter.isStreaming == false {
-          panadapter.isStreaming = true
-          // log the start of the stream
-          _log(String(describing: Self.self) + ": Panadapter Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
-        }
-        panadapter.vitaProcessor(vitaPacket)
-      }
+      if let object = panadapters[vitaPacket.streamId]          { procesStream( object, object.className) }
       
     case .waterfall:
-      // Waterfall
-      if let waterfall = waterfalls[vitaPacket.streamId] {
-        
-        if waterfall.isStreaming == false {
-          waterfall.isStreaming = true
-          // log the start of the stream
-          _log(String(describing: Self.self) + ": Waterfall Stream started: Id = \(vitaPacket.streamId.hex)", .info, #function, #file, #line)
-        }
-        waterfall.vitaProcessor(vitaPacket)
-      }
+      if let object = waterfalls[vitaPacket.streamId]           { procesStream( object, object.className) }
+      
+    // ----- New API versions -----
+    case .daxAudio where version.isNewApi:
+      if let object = daxRxAudioStreams[vitaPacket.streamId]    { procesStream( object, object.className) }
+      if let object = daxMicAudioStreams[vitaPacket.streamId]   { procesStream( object, object.className) }
+      if let object = remoteRxAudioStreams[vitaPacket.streamId] { procesStream( object, object.className) }
+      
+    case .daxReducedBw where version.isNewApi:
+      if let object = daxRxAudioStreams[vitaPacket.streamId]    { procesStream( object, object.className) }
+      if let object = daxMicAudioStreams[vitaPacket.streamId]   { procesStream( object, object.className) }
+      
+    case .opus where version.isNewApi:
+      if let object = remoteRxAudioStreams[vitaPacket.streamId] { procesStream( object, object.className) }
+      
+    case .daxIq24 where version.isNewApi, .daxIq48 where version.isNewApi, .daxIq96 where version.isNewApi, .daxIq192 where version.isNewApi:
+      if let object = daxIqStreams[vitaPacket.streamId]         { procesStream( object, object.className) }
+      
+    // ----- Old API versions -----
+    case .daxAudio:
+      if let object = audioStreams[vitaPacket.streamId]         { procesStream( object, object.className) }
+      if let object = micAudioStreams[vitaPacket.streamId]      { procesStream( object, object.className) }
+      
+    case .daxReducedBw:
+      if let object = audioStreams[vitaPacket.streamId]         { procesStream( object, object.className) }
+      if let object = micAudioStreams[vitaPacket.streamId]      { procesStream( object, object.className) }
+      
+    case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
+      if let object = daxIqStreams[vitaPacket.streamId]         { procesStream( object, object.className) }
+      
+    case .opus:
+      if let object = opusAudioStreams[vitaPacket.streamId]     { procesStream( object, object.className) }
       
     default:
       // log the error
-      _log(String(describing: Self.self) + ": UDP Stream error, no object: \(vitaPacket.classCode.description()) Stream Id = \(vitaPacket.streamId.hex)", .error, #function, #file, #line)
+      _log(String(describing: Self.self) + ": Stream error, unknown Vita class code: \(vitaPacket.classCode.description()) Stream Id = \(vitaPacket.streamId.hex)", .error, #function, #file, #line)
     }
   }
   
