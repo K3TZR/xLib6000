@@ -20,11 +20,11 @@ final class ObjectTests: XCTestCase {
         
         return Api.sharedInstance.radio
       } else {
-        XCTFail("***** Failed to connect to Radio\n", file: #function)
+        XCTFail("----->>>>> Failed to connect to Radio <<<<<-----\n", file: #function)
         return nil
       }
     } else {
-      XCTFail("***** No Radio(s) found\n", file: #function)
+      XCTFail("----->>>>> No Radio(s) found <<<<<-----\n", file: #function)
       return nil
     }
   }
@@ -86,7 +86,7 @@ final class ObjectTests: XCTestCase {
       if showInfoMessages { Swift.print("***** Modified \(type) parameters verified\n") }
       
     } else {
-      XCTFail("***** \(type) NOT added *****", file: #function)
+      XCTFail("----->>>>> \(type) NOT added <<<<<-----", file: #function)
     }
     
     // disconnect the radio
@@ -96,7 +96,7 @@ final class ObjectTests: XCTestCase {
   func testAmplifier() {
 //    let type = "Amplifier"
 
-    Swift.print("\n***** \(#function) NOT implemented, NEED MORE INFORMATION ****\n")
+    XCTFail("\n----->>>>> \(#function) NOT implemented, NEED MORE INFORMATION  <<<<<-----\n")
   }
   
   // ------------------------------------------------------------------------------
@@ -128,7 +128,7 @@ final class ObjectTests: XCTestCase {
     case .rxsc: Equalizer.parseStatus(radio!, equalizerRxStatus.keyValuesArray(), true)
     case .txsc: Equalizer.parseStatus(radio!, equalizerTxStatus.keyValuesArray(), true)
     default:
-      XCTFail("***** Invalid \(type) type - \(eqType.rawValue)  *****", file: #function)
+      XCTFail("----->>>>> Invalid \(type) type - \(eqType.rawValue) <<<<<-----", file: #function)
       return
     }
     
@@ -149,7 +149,7 @@ final class ObjectTests: XCTestCase {
       if showInfoMessages { Swift.print("***** \(eqType.rawValue) \(type) parameters verified\n") }
       
     } else {
-      XCTFail("***** \(eqType.rawValue) \(type) NOT found *****", file: #function)
+      XCTFail("----->>>>> \(eqType.rawValue) \(type) NOT found <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -226,7 +226,7 @@ final class ObjectTests: XCTestCase {
       if showInfoMessages { Swift.print("***** Zeroed \(eqType.rawValue) \(type) parameters verified\n") }
       
     } else {
-      XCTFail("***** \(eqType.rawValue) \(type) NOT found *****", file: #function)
+      XCTFail("----->>>>> \(eqType.rawValue) \(type) NOT found <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -322,7 +322,7 @@ final class ObjectTests: XCTestCase {
       if showInfoMessages { Swift.print("***** Modified \(type) parameters verified\n") }
       
     } else {
-      XCTFail("***** \(type) NOT added", file: #function)
+      XCTFail("----->>>>> \(type) NOT added <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -484,25 +484,25 @@ final class ObjectTests: XCTestCase {
                   if showInfoMessages { Swift.print("***** 2nd \(type) removal confirmed\n") }
                   
                 } else {
-                  XCTFail("***** 2nd \(type) removal FAILED ****/n", file: #function)
+                  XCTFail("----->>>>> 2nd \(type) removal FAILED <<<<<-----/n", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) NOT found ****/n", file: #function)
+                XCTFail("----->>>>> 2nd \(type) NOT found <<<<<-----/n", file: #function)
               }
             } else {
-              XCTFail("***** 2nd \(type) NOT created ****/n", file: #function)
+              XCTFail("----->>>>> 2nd \(type) NOT added <<<<<-----/n", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) NOT removed ****", file: #function)
+            XCTFail("----->>>>> 1st \(type) removal FAILED <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) NOT found ****/n", file: #function)
+          XCTFail("----->>>>> 1st \(type) NOT found <<<<<-----/n", file: #function)
         }
       } else {
-        XCTFail("***** 1st \(type) NOT created ****/n", file: #function)
+        XCTFail("----->>>>> 1st \(type) NOT added <<<<<-----/n", file: #function)
       }      
     } else {
-      XCTFail("***** Existing \(type)(s) NOT removed ****/n", file: #function)
+      XCTFail("----->>>>> Existing \(type)(s) removal FAILED <<<<<-----/n", file: #function)
     }
     disconnect()
   }
@@ -539,7 +539,7 @@ final class ObjectTests: XCTestCase {
       if showInfoMessages { Swift.print("***** \(type) Parameters verified\n") }
       
     } else {
-      XCTFail("***** Meter NOT created ****", file: #function)
+      XCTFail("----->>>>> Meter NOT added <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -591,16 +591,16 @@ final class ObjectTests: XCTestCase {
             if showInfoMessages { Swift.print("***** \(type) removal confirmed\n") }
             
           } else {
-            XCTFail("***** \(type) removal FAILED *****", file: #function)
+            XCTFail("----->>>>> \(type) removal FAILED <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** \(type) StreamId invalid *****", file: #function)
+          XCTFail("----->>>>> \(type) StreamId invalid <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** \(type) NOT added *****", file: #function)
+        XCTFail("----->>>>> \(type) NOT added <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** Existing \(type) removal FAILED *****", file: #function)
+      XCTFail("----->>>>> Existing \(type) removal FAILED <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -626,9 +626,9 @@ final class ObjectTests: XCTestCase {
       
       radio.panadapters.forEach { Swift.print("Remaining Panadapter id = \($0.value.id.hex)") }
       
-      XCTFail("***** Panadapter object(s) NOT removed *****", file: #function)
+      XCTFail("----->>>>> Panadapter object(s) NOT removed <<<<<-----", file: #function)
     }
-    if radio.slices.count != 0 { XCTFail("***** Slice object(s) NOT removed *****", file: #function) }
+    if radio.slices.count != 0 { XCTFail("----->>>>> Slice object(s) removal FAILED <<<<<-----", file: #function) }
   }
   
   private let panadapterStatus = "pan 0x40000001 wnb=0 wnb_level=92 wnb_updating=0 band_zoom=0 segment_zoom=0 x_pixels=50 y_pixels=100 center=14.100000 bandwidth=0.200000 min_dbm=-125.00 max_dbm=-40.00 fps=25 average=23 weighted_average=0 rfgain=50 rxant=ANT1 wide=0 loopa=0 loopb=1 band=20 daxiq=0 daxiq_rate=0 capacity=16 available=16 waterfall=42000000 min_bw=0.004920 max_bw=14.745601 xvtr= pre= ant_list=ANT1,ANT2,RX_A,XVTR"
@@ -642,7 +642,7 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: [type + ".swift", "Waterfall.swift"]))
     guard radio != nil else { return }
     
-    if showInfoMessages { Swift.print("\n***** \(type) created") }
+    if showInfoMessages { Swift.print("\n***** \(type) added") }
     
     Panadapter.parseStatus(radio!, panadapterStatus.keyValuesArray(), true)
     
@@ -676,7 +676,7 @@ final class ObjectTests: XCTestCase {
       if showInfoMessages { Swift.print("***** \(type) Parameters verified\n") }
       
     } else {
-      XCTFail("***** \(type) NOT created *****\n", file: #function)
+      XCTFail("----->>>>> \(type) NOT added <<<<<-----\n", file: #function)
     }
     disconnect()
   }
@@ -711,7 +711,7 @@ final class ObjectTests: XCTestCase {
       if radio!.panadapters.count == 1 {
         if let object = radio!.panadapters.first?.value {
           
-          if showInfoMessages { Swift.print("***** 1st \(type) created\n") }
+          if showInfoMessages { Swift.print("***** 1st \(type) added\n") }
           
           let firstId = object.id
           
@@ -758,7 +758,7 @@ final class ObjectTests: XCTestCase {
             // verify added
             if radio!.panadapters.count == 1 {
               
-              if showInfoMessages { Swift.print("***** 2nd \(type) creation confirmed\n") }
+              if showInfoMessages { Swift.print("***** 2nd \(type) added\n") }
               
               if let object = radio!.panadapters.first?.value {
                 
@@ -850,22 +850,22 @@ final class ObjectTests: XCTestCase {
                   
                 }
               } else {
-                XCTFail("***** 2nd \(type) NOT found *****", file: #function)
+                XCTFail("----->>>>> 2nd \(type) NOT found <<<<<-----", file: #function)
               }
             } else {
-              XCTFail("***** 2nd \(type) NOT created *****", file: #function)
+              XCTFail("----->>>>> 2nd \(type) NOT added <<<<<-----", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) NOT removed *****", file: #function)
+            XCTFail("----->>>>> 1st \(type) removal FAILED <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) NOT created *****", file: #function)
+          XCTFail("----->>>>> 1st \(type) NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** 1st \(type) request FAILED *****\n", file: #function)
+        XCTFail("----->>>>> 1st \(type) request FAILED <<<<<-----\n", file: #function)
       }
     } else {
-      XCTFail("***** Existing \(type)(s) NOT removed *****", file: #function)
+      XCTFail("----->>>>> Existing \(type)(s) removal FAILED <<<<<-----", file: #function)
       
       Swift.print("\nRemaining pan:       count = \(radio!.panadapters.count), 1st id = \(radio!.panadapters.first?.key.hex ?? "nil")")
       Swift.print("Remaining waterfall: count = \(radio!.waterfalls.count), 1st id = \(radio!.waterfalls.first?.key.hex ?? "nil")\n")
@@ -924,7 +924,7 @@ final class ObjectTests: XCTestCase {
       if showInfoMessages { Swift.print("***** \(type) Parameters verified\n") }
       
     } else {
-      XCTFail("***** \(type) NOT added *****", file: #function)
+      XCTFail("----->>>>> \(type) NOT added <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -932,6 +932,7 @@ final class ObjectTests: XCTestCase {
   func testSlice() {
     let type = "Slice"
     var existingObjects = false
+    let sliceFrequency = 14_140_000
     
     Swift.print("\n-------------------- \(#function) --------------------\n")
     
@@ -948,12 +949,12 @@ final class ObjectTests: XCTestCase {
     }
     if radio!.slices.count == 0 {
       
-      if showInfoMessages && existingObjects { Swift.print("***** Existing \(type)(s) removal confirmation\n") }
+      if showInfoMessages && existingObjects { Swift.print("***** Existing \(type)(s) removal confirmed\n") }
             
       if showInfoMessages { Swift.print("***** 1st \(type) requested") }
       
       // get new
-      radio!.requestSlice(frequency: 7_225_000, rxAntenna: "ANT2", mode: "USB")
+      radio!.requestSlice(mode: "USB", frequency: sliceFrequency, rxAntenna: "ANT2")
       sleep(2)
       
       // verify added
@@ -1063,7 +1064,7 @@ final class ObjectTests: XCTestCase {
             if showInfoMessages { Swift.print("***** 2nd \(type) requested") }
             
             // get new
-            radio!.requestSlice(frequency: 7_225_000, rxAntenna: "ANT2", mode: "USB")
+            radio!.requestSlice(mode: "USB", frequency: sliceFrequency, rxAntenna: "ANT2")
             sleep(2)
             // verify added
             if radio!.slices.count == 1 {
@@ -1161,7 +1162,7 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd \(type) parameters verified\n") }
                 
-                object.frequency = 7_100_000
+                object.frequency = sliceFrequency + 10_000
                 object.rxAnt = "ANT2"
                 object.mode = "CWU"
                 
@@ -1249,7 +1250,7 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("\n***** 2nd \(type) parameters modified") }
                 
-                XCTAssertEqual(object.frequency, 7_100_000, "Frequency", file: #function)
+                XCTAssertEqual(object.frequency, sliceFrequency + 10_000, "Frequency", file: #function)
                 XCTAssertEqual(object.rxAnt,  "ANT2", "RxAntenna", file: #function)
                 XCTAssertEqual(object.mode, "CWU", "Mode", file: #function)
                 
@@ -1349,25 +1350,25 @@ final class ObjectTests: XCTestCase {
                   if showInfoMessages { Swift.print("***** 2nd \(type) removal confirmed\n") }
                   
                 } else {
-                  XCTFail("***** 2nd \(type) NOT removed", file: #function)
+                  XCTFail("----->>>>> 2nd \(type) NOT removed <<<<<-----", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) NOT found", file: #function)
+                XCTFail("----->>>>> 2nd \(type) NOT found <<<<<-----", file: #function)
               }
             } else {
-              XCTFail("***** 2nd \(type) NOT added", file: #function)
+              XCTFail("----->>>>> 2nd \(type) NOT added <<<<<-----", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) NOT removed", file: #function)
+            XCTFail("----->>>>> 1st \(type) NOT removed <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) NOT found", file: #function)
+          XCTFail("----->>>>> 1st \(type) NOT found <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** 1st \(type) NOT added", file: #function)
+        XCTFail("----->>>>> 1st \(type) NOT added <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** Existing \(type)(s) removal FAILED", file: #function)
+      XCTFail("----->>>>> Existing \(type)(s) removal FAILED <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -1375,7 +1376,7 @@ final class ObjectTests: XCTestCase {
   // ------------------------------------------------------------------------------
   // MARK: - Tnf
   
-  private var tnfStatus = "1 freq=14.26 depth=2 width=0.000100 permanent=1"
+  private var tnfStatus = "1 freq=14.16 depth=2 width=0.000100 permanent=1"
   func testTnfParse() {
     let type = "Tnf"
 
@@ -1395,14 +1396,24 @@ final class ObjectTests: XCTestCase {
       if showInfoMessages { Swift.print("***** \(type) added\n") }
       
       XCTAssertEqual(tnf.depth, 2, "Depth", file: #function)
-      XCTAssertEqual(tnf.frequency, 14_260_000, "Frequency", file: #function)
+      XCTAssertEqual(tnf.frequency, 14_160_000, "Frequency", file: #function)
       XCTAssertEqual(tnf.permanent, true, "Permanent", file: #function)
       XCTAssertEqual(tnf.width, 100, "Width", file: #function)
       
       if showInfoMessages { Swift.print("***** \(type) parameters verified\n") }
+                
+      if showInfoMessages { Swift.print("***** \(type) object removed") }
       
+      radio!.tnfs[id]!.remove()
+      if radio!.tnfs[id] == nil {
+      
+      if showInfoMessages { Swift.print("***** \(type) object removal confirmed\n") }
+      
+      } else {
+        XCTFail("----->>>>> 2nd \(type) object removal FAILED <<<<<-----", file: #function)
+      }
     } else {
-      XCTFail("***** \(type) NOT added", file: #function)
+      XCTFail("----->>>>> \(type) NOT added <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -1410,6 +1421,7 @@ final class ObjectTests: XCTestCase {
   func testTnf() {
     let type = "Tnf"
     var existingObjects = false
+    let tnfFrequency = 14_130_000
     
     Swift.print("\n-------------------- \(#function) --------------------\n")
     
@@ -1426,12 +1438,12 @@ final class ObjectTests: XCTestCase {
     }
     if radio!.tnfs.count == 0 {
       
-      if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmation\n") }
+      if showInfoMessages && existingObjects { Swift.print("***** Existing \(type) object(s) removal confirmed\n") }
             
       if showInfoMessages { Swift.print("\n***** 1st \(type) object requested") }
 
       // get new
-      radio!.requestTnf(at: 14_260_000)
+      radio!.requestTnf(at: tnfFrequency)
       sleep(2)
       
       // verify added
@@ -1460,7 +1472,7 @@ final class ObjectTests: XCTestCase {
             if showInfoMessages { Swift.print("\n***** 2nd \(type) object requested") }
             
             // ask for new
-            radio!.requestTnf(at: 14_260_000)
+            radio!.requestTnf(at: tnfFrequency)
             sleep(2)
             // verify added
             if radio!.tnfs.count == 1 {
@@ -1478,14 +1490,14 @@ final class ObjectTests: XCTestCase {
                 if showInfoMessages { Swift.print("***** 2nd \(type) object parameters verified") }
                 
                 object.depth = Tnf.Depth.veryDeep.rawValue
-                object.frequency = 14_270_000
+                object.frequency = tnfFrequency + 10_000
                 object.permanent = !permanent
                 object.width = Tnf.kWidthMax
                 
                 if showInfoMessages { Swift.print("***** 2nd \(type) object parameters modified") }
                 
                 XCTAssertEqual(object.depth, Tnf.Depth.veryDeep.rawValue, "Depth", file: #function)
-                XCTAssertEqual(object.frequency,  14_270_000, "Frequency", file: #function)
+                XCTAssertEqual(object.frequency, tnfFrequency + 10_000, "Frequency", file: #function)
                 XCTAssertEqual(object.permanent, !permanent, "Permanent", file: #function)
                 XCTAssertEqual(object.width, Tnf.kWidthMax, "Width", file: #function)
                 
@@ -1493,32 +1505,36 @@ final class ObjectTests: XCTestCase {
                 
                 if showInfoMessages { Swift.print("***** 2nd \(type) object removed") }
                 
+                sleep(2)
+                
                 radio!.tnfs[secondId]!.remove()
+                
+                sleep(2)
                 
                 if radio!.tnfs.count == 0 {
                   
                   if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
                   
                 } else {
-                  XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
+                  XCTFail("----->>>>> 2nd \(type) object removal FAILED <<<<<-----", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
+                XCTFail("----->>>>> 2nd \(type) object NOT found <<<<<-----", file: #function)
               }
             } else {
-              XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
+              XCTFail("----->>>>> 2nd \(type) object NOT added <<<<<-----", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object removal FAILED *****", file: #function)
+            XCTFail("----->>>>> 1st \(type) object removal FAILED <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT found *****", file: #function)
+          XCTFail("----->>>>> 1st \(type) object NOT found <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** 1st \(type) object NOT added *****", file: #function)
+        XCTFail("----->>>>> 1st \(type) object NOT added <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
+      XCTFail("----->>>>> Existing \(type) object(s) removal FAILED <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -1563,8 +1579,6 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** \(type)  object parameters verified\n") }
       
-    }  else {
-      XCTFail("Unknown Radio version (\(radio!.version.longString)", file: #function)
     }
     disconnect()
   }
@@ -1606,8 +1620,6 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** \(type) object parameters verified\n") }
       
-    }  else {
-      XCTFail("Unknown Radio version (\(radio!.version.longString)", file: #function)
     }
     disconnect()
   }
@@ -1718,8 +1730,6 @@ final class ObjectTests: XCTestCase {
       
       if showInfoMessages { Swift.print("***** \(type) object parameters verified\n") }
       
-    }  else {
-      XCTFail("Unknown Radio version (\(radio!.version.longString)", file: #function)
     }
     disconnect()
   }
@@ -1735,7 +1745,7 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    XCTFail("NOT implemented, --- FIX ME ---", file: #function)
+    XCTFail("----->>>>> \(type) test NOT implemented <<<<<-----", file: #function)
     
     disconnect()
   }
@@ -1748,7 +1758,7 @@ final class ObjectTests: XCTestCase {
     let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
-    XCTFail("NOT implemented, --- FIX ME ---", file: #function)
+    XCTFail("----->>>>> \(type) test NOT implemented <<<<<-----", file: #function)
     
     disconnect()
   }
@@ -1767,8 +1777,8 @@ final class ObjectTests: XCTestCase {
       panadapter.remove()
     }
     sleep(2)
-    if radio.panadapters.count != 0 { XCTFail("***** Waterfall(s) NOT removed *****", file: #function) }
-    if radio.slices.count != 0 { XCTFail("***** Slice(s) NOT removed *****", file: #function) }
+    if radio.panadapters.count != 0 { XCTFail("----->>>>> Waterfall(s) NOT removed *****", file: #function) }
+    if radio.slices.count != 0 { XCTFail("----->>>>> Slice(s) NOT removed *****", file: #function) }
   }
   
   func testWaterfallParse() {
@@ -1810,7 +1820,7 @@ final class ObjectTests: XCTestCase {
       if showInfoMessages { Swift.print("***** \(type) parameters verified\n") }
       
     } else {
-      XCTFail("***** \(type) NOT added *****", file: #function)
+      XCTFail("----->>>>> \(type) NOT added <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -1915,19 +1925,19 @@ final class ObjectTests: XCTestCase {
                   
                 }
               } else {
-                XCTFail("***** 2nd \(type) NOT found *****", file: #function)
+                XCTFail("----->>>>> 2nd \(type) NOT found <<<<<-----", file: #function)
               }
             } else {
-              XCTFail("***** 2nd \(type) NOT created *****", file: #function)
+              XCTFail("----->>>>> 2nd \(type) NOT created <<<<<-----", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) NOT removed *****", file: #function)
+            XCTFail("----->>>>> 1st \(type) NOT removed <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) NOT created *****", file: #function)
+          XCTFail("----->>>>> 1st \(type) NOT created <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Existing PANADAPTER(s) & \(type)(s) NOT removed *****", file: #function)
+        XCTFail("----->>>>> Existing PANADAPTER(s) & \(type)(s) NOT removed <<<<<-----", file: #function)
       }
     }
     
@@ -2003,7 +2013,7 @@ final class ObjectTests: XCTestCase {
       //          XCTAssertEqual(xvtrObject.twoMeterInt, 0)
       
     } else {
-      XCTFail("***** \(type) NOT added *****", file: #function)
+      XCTFail("----->>>>> \(type) NOT added <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -2126,19 +2136,19 @@ final class ObjectTests: XCTestCase {
                   
                 }
               } else {
-                XCTFail("***** 2nd \(type) NOT found *****", file: #function)
+                XCTFail("----->>>>> 2nd \(type) NOT found <<<<<-----", file: #function)
               }
             } else {
-              XCTFail("***** 2nd \(type) NOT added *****", file: #function)
+              XCTFail("----->>>>> 2nd \(type) NOT added <<<<<-----", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) NOT removed *****", file: #function)
+            XCTFail("----->>>>> 1st \(type) NOT removed <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) NOT added *****", file: #function)
+          XCTFail("----->>>>> 1st \(type) NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Existing XVTR(s) removal FAILED *****", file: #function)
+        XCTFail("----->>>>> Existing XVTR(s) removal FAILED <<<<<-----", file: #function)
       }
     }
     disconnect()

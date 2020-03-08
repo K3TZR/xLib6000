@@ -44,7 +44,7 @@ final class BaseTests: XCTestCase {
     let discovery = Discovery.sharedInstance
     sleep(2)
     if discovery.discoveredRadios.count == 0 {
-      XCTFail("***** No Radio(s) discovered *****\n", file: #function)
+      XCTFail("----->>>>> No Radio(s) discovered <<<<<-----\n", file: #function)
     }
   }
   
@@ -159,7 +159,7 @@ final class BaseTests: XCTestCase {
       let xvtr = Xvtr(radio: radio, id: "1".objectId!)
       XCTAssertNotNil(xvtr, "\n***** Failed to instantiate Xvtr *****\n", file: #function)
     } else {
-      XCTFail("***** No Radio(s) discovered *****\n", file: #function)
+      XCTFail("----->>>>> No Radio(s) discovered <<<<<-----\n", file: #function)
     }
   }
 }

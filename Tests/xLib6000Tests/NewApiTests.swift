@@ -28,11 +28,11 @@ final class NewApiTests: XCTestCase {
         
         return Api.sharedInstance.radio
       } else {
-        XCTFail("***** Failed to connect to Radio\n", file: #function)
+        XCTFail("----->>>>> Failed to connect to Radio <<<<<-----\n", file: #function)
         return nil
       }
     } else {
-      XCTFail("***** No Radio(s) found\n", file: #function)
+      XCTFail("----->>>>> No Radio(s) found <<<<<-----\n", file: #function)
       return nil
     }
   }
@@ -91,13 +91,13 @@ final class NewApiTests: XCTestCase {
           if showInfoMessages { Swift.print("***** \(type) object removal confirmed\n") }
           
         } else {
-          XCTFail("***** \(type) object NOT removed *****", file: #function)
+          XCTFail("----->>>>> \(type) object removal FAILED <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** \(type) object NOT created *****", file: #function)
+        XCTFail("----->>>>> \(type) object NOT created <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -143,13 +143,13 @@ final class NewApiTests: XCTestCase {
           if showInfoMessages { Swift.print("***** \(type) object removal confirmed\n") }
           
         } else {
-          XCTFail("***** \(type) object NOT removed *****", file: #function)
+          XCTFail("----->>>>> \(type) object removal FAILED <<<<<-----", file: #function)
         }
       }else {
-        XCTFail("***** \(type) object NOT created *****", file: #function)
+        XCTFail("----->>>>> \(type) object NOT created <<<<<-----", file: #function)
       }
     }  else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -306,7 +306,7 @@ final class NewApiTests: XCTestCase {
       if showInfoMessages { Swift.print("***** Previous \(type)s restored\n") }
       
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -374,16 +374,16 @@ final class NewApiTests: XCTestCase {
             if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
             
           } else {
-            XCTFail("***** \(type) object NOT found *****", file: #function)
+            XCTFail("----->>>>> \(type) object NOT found <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** \(type) object NOT created *****", file: #function)
+          XCTFail("----->>>>> \(type) object NOT created <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) NOT removed *****", file: #function)
+        XCTFail("----->>>>> Existing \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -475,28 +475,28 @@ final class NewApiTests: XCTestCase {
                     
                     if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
                   } else {
-                    XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
+                    XCTFail("----->>>>> 2nd \(type) object removal FAILED <<<<<-----", file: #function)
                   }
                 } else {
-                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
+                  XCTFail("----->>>>> 2nd \(type) object NOT found <<<<<-----", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
+                XCTFail("----->>>>> 2nd \(type) object NOT added <<<<<-----", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object removal FAILED *****", file: #function)
+              XCTFail("----->>>>> 1st \(type) object removal FAILED <<<<<-----", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object  NOT found *****", file: #function)
+            XCTFail("----->>>>> 1st \(type) object  NOT found <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
+          XCTFail("----->>>>> 1st \(type) object NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
+        XCTFail("----->>>>> Existing \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -555,14 +555,14 @@ final class NewApiTests: XCTestCase {
           if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
           
         } else {
-          XCTFail("***** \(type) object NOT added *****", file: #function)
+          XCTFail("----->>>>> \(type) object NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
+        XCTFail("----->>>>> Existing \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
       
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -646,28 +646,28 @@ final class NewApiTests: XCTestCase {
                     if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
                     
                   } else {
-                    XCTFail("***** 2nd \(type) object removal FAILED", file: #function)
+                    XCTFail("----->>>>> 2nd \(type) object removal FAILED <<<<<-----", file: #function)
                   }
                 } else {
-                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
+                  XCTFail("----->>>>> 2nd \(type) object NOT found <<<<<-----", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
+                XCTFail("----->>>>> 2nd \(type) object NOT added <<<<<-----", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
+              XCTFail("----->>>>> 1st \(type) object removal FAILED <<<<<-----", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
+            XCTFail("----->>>>> 1st \(type) object NOT found <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
+          XCTFail("----->>>>> 1st \(type) object NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) removal FAILED", file: #function)
+        XCTFail("----->>>>> Existing \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -732,13 +732,13 @@ final class NewApiTests: XCTestCase {
           if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
           
         } else {
-          XCTFail("***** \(type) object NOT created *****", file: #function)
+          XCTFail("----->>>>> \(type) object NOT created <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** \(type) object NOT removed *****", file: #function)
+        XCTFail("----->>>>> \(type) object removal FAILED <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -826,28 +826,28 @@ final class NewApiTests: XCTestCase {
                     if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
                     
                   } else {
-                    XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
+                    XCTFail("----->>>>> 2nd \(type) object removal FAILED *****", file: #function)
                   }
                 } else {
-                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
+                  XCTFail("----->>>>> 2nd \(type) object NOT found <<<<<-----", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
+                XCTFail("----->>>>> 2nd \(type) object NOT added <<<<<-----", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object removal FAILED *****", file: #function)
+              XCTFail("----->>>>> 1st \(type) object removal FAILED <<<<<-----", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
+            XCTFail("----->>>>> 1st \(type) object NOT found <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
+          XCTFail("----->>>>> 1st \(type) object NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
+        XCTFail("----->>>>> Existing \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -905,14 +905,14 @@ final class NewApiTests: XCTestCase {
           if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
           
         } else {
-          XCTFail("***** \(type) object NOT added *****", file: #function)
+          XCTFail("----->>>>> \(type) object NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
+        XCTFail("----->>>>> Existing \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
       
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -998,28 +998,28 @@ final class NewApiTests: XCTestCase {
                     if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
                   
                   } else {
-                    XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
+                    XCTFail("----->>>>> 2nd \(type) object removal FAILED <<<<<-----", file: #function)
                   }
                 } else {
-                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
+                  XCTFail("----->>>>> 2nd \(type) object NOT found <<<<<-----", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
+                XCTFail("----->>>>> 2nd \(type) object NOT added <<<<<-----", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
+              XCTFail("----->>>>> 1st \(type) object removal FAILED <<<<<-----", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
+            XCTFail("----->>>>> 1st \(type) object NOT found <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
+          XCTFail("----->>>>> 1st \(type) object NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
+        XCTFail("----->>>>> Existing \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     // disconnect the radio
     disconnect()
@@ -1082,14 +1082,14 @@ final class NewApiTests: XCTestCase {
           if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
           
         } else {
-          XCTFail("***** \(type) object NOT added *****", file: #function)
+          XCTFail("----->>>>> \(type) object NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
+        XCTFail("----->>>>> Existing \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
       
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -1172,28 +1172,28 @@ final class NewApiTests: XCTestCase {
                     if showInfoMessages { Swift.print("***** 2nd \(type) object removal confirmed\n") }
                     
                   } else {
-                    XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
+                    XCTFail("----->>>>> 2nd \(type) object removal FAILED <<<<<-----", file: #function)
                   }
                 } else {
-                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
+                  XCTFail("----->>>>> 2nd \(type) object NOT found <<<<<-----", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
+                XCTFail("----->>>>> 2nd \(type) object NOT added <<<<<-----", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object NOT removed *****", file: #function)
+              XCTFail("----->>>>> 1st \(type) object removal FAILED <<<<<-----", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
+            XCTFail("----->>>>> 1st \(type) object NOT found <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
+          XCTFail("----->>>>> 1st \(type) object NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
+        XCTFail("----->>>>> Previous \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -1256,14 +1256,14 @@ final class NewApiTests: XCTestCase {
           if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
           
         } else {
-          XCTFail("***** \(type) object NOT added *****", file: #function)
+          XCTFail("----->>>>> \(type) object NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
+        XCTFail("----->>>>> Existing \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
       
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -1321,14 +1321,14 @@ final class NewApiTests: XCTestCase {
           if showInfoMessages { Swift.print("***** Modified \(type) object properties verified\n") }
           
         } else {
-          XCTFail("***** \(type) object NOT added *****", file: #function)
+          XCTFail("----->>>>> \(type) object NOT added <<<<<-----", file: #function)
         }
       } else {
-        XCTFail("***** Existing \(type) object(s) removal FAILED *****", file: #function)
+        XCTFail("----->>>>> Existing \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
       
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
@@ -1406,28 +1406,28 @@ final class NewApiTests: XCTestCase {
                     if showInfoMessages { Swift.print("***** 2nd \(type) object(s) removal confirmed\n") }
                     
                   } else {
-                    XCTFail("***** 2nd \(type) object removal FAILED *****", file: #function)
+                    XCTFail("----->>>>> 2nd \(type) object removal FAILED <<<<<-----", file: #function)
                   }
                 } else {
-                  XCTFail("***** 2nd \(type) object NOT found *****", file: #function)
+                  XCTFail("----->>>>> 2nd \(type) object NOT found <<<<<-----", file: #function)
                 }
               } else {
-                XCTFail("***** 2nd \(type) object NOT added *****", file: #function)
+                XCTFail("----->>>>> 2nd \(type) object NOT added <<<<<-----", file: #function)
               }
             } else {
-              XCTFail("***** 1st \(type) object removal FAILED *****", file: #function)
+              XCTFail("----->>>>> 1st \(type) object removal FAILED <<<<<-----", file: #function)
             }
           } else {
-            XCTFail("***** 1st \(type) object NOT found *****", file: #function)
+            XCTFail("----->>>>> 1st \(type) object NOT found <<<<<-----", file: #function)
           }
         } else {
-          XCTFail("***** 1st \(type) object NOT added *****", file: #function)
+          XCTFail("----->>>>> 1st \(type) object NOT added <<<<<-----*", file: #function)
         }
       } else {
-        XCTFail("***** Previous \(type) object(s) NOT removed *****", file: #function)
+        XCTFail("----->>>>> Previous \(type) object(s) removal FAILED <<<<<-----", file: #function)
       }
     } else {
-      XCTFail("***** \(#function) skipped, requires \(requiredVersion)", file: #function)
+      XCTFail("----->>>>> \(#function) skipped, requires \(requiredVersion) <<<<<-----", file: #function)
     }
     disconnect()
   }
