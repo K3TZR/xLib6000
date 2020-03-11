@@ -415,7 +415,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Self.className() + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -458,7 +458,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Panadapter
       _initialized = true
       
-      _log(String(describing: Self.self) + " added: id = \(id.hex) center = \(center.hzToMhz), bandwidth = \(bandwidth.hzToMhz)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id.hex) center = \(center.hzToMhz), bandwidth = \(bandwidth.hzToMhz)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.panadapterHasBeenAdded, object: self as Any?)

@@ -93,7 +93,7 @@ public final class Profile                  : NSObject, StaticModel {
     // check for unknown Keys
     guard let _ = Group(rawValue: id) else {
       // log it and ignore the Key
-      Log.sharedInstance.logMessage(String(describing: Self.self) + " unknown group: \(id)", .warning, #function, #file, #line)
+      Log.sharedInstance.logMessage(Self.className() + " unknown group: \(id)", .warning, #function, #file, #line)
       return
     }
     // remove the Id from the KeyValues
@@ -147,7 +147,7 @@ public final class Profile                  : NSObject, StaticModel {
     // check for unknown Keys
     guard let token = Token(rawValue: properties[0].key) else {
       // log it and ignore the Key
-      _log(String(describing: Self.self) + " unknown token: \(properties[0].key) = \(properties[0].value)", .warning, #function, #file, #line)
+      _log(Self.className() + " unknown token: \(properties[0].key) = \(properties[0].value)", .warning, #function, #file, #line)
       return
     }
     // Known keys, in alphabetical order
@@ -169,7 +169,7 @@ public final class Profile                  : NSObject, StaticModel {
       // YES, the Radio (hardware) has acknowledged this Panadapter
       _initialized = true
       
-      _log(String(describing: Self.self) + " added: id = \(id)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.profileHasBeenAdded, object: self as Any?)

@@ -132,7 +132,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
           
           radio.micAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
 
           NC.post(.micAudioStreamHasBeenRemoved, object: id as Any?)
         }
@@ -173,7 +173,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Self.className() + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -191,7 +191,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
-      _log(String(describing: Self.self) + " added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.micAudioStreamHasBeenAdded, object: self as Any?)
@@ -272,7 +272,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      _log(String(describing: Self.self) + " missing packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .debug, #function, #file, #line)
+      _log(Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .debug, #function, #file, #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1

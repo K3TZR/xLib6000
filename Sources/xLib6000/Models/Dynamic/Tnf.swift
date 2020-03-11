@@ -145,7 +145,7 @@ public final class Tnf : NSObject, DynamicModel {
 
           radio.tnfs[id]  = nil
           
-          Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id)", .debug, #function, #file, #line)
 
           NC.post(.tnfHasBeenRemoved, object: id as Any?)
         }
@@ -170,7 +170,7 @@ public final class Tnf : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Self.className() + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -187,7 +187,7 @@ public final class Tnf : NSObject, DynamicModel {
         // YES, the Radio (hardware) has acknowledged this Tnf
         _initialized = true
         
-        _log(String(describing: Self.self) + " added: id = \(id)", .debug, #function, #file, #line)
+        _log(Self.className() + " added: id = \(id)", .debug, #function, #file, #line)
 
         // notify all observers
         NC.post(.tnfHasBeenAdded, object: self as Any?)
@@ -213,7 +213,7 @@ public final class Tnf : NSObject, DynamicModel {
     // remove the Tnf
     _radio.tnfs[id] = nil
 
-    _log(String(describing: Self.self) + " removed: id = \(id)", .debug, #function, #file, #line)
+    _log(Self.className() + " removed: id = \(id)", .debug, #function, #file, #line)
 
     NC.post(.tnfHasBeenRemoved, object: id as Any?)
   }

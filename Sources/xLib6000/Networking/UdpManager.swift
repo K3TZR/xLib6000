@@ -125,7 +125,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       } catch {
         
         // We didn't get the port we wanted
-        _log(String(describing: Self.self) + ": Unable to bind to UDP port \(portToUse)", .info, #function, #file, #line)
+        _log(Self.className() + ": Unable to bind to UDP port \(portToUse)", .info, #function, #file, #line)
 
         // try the next Port Number
         portToUse += 1
@@ -147,7 +147,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       
       _udpBound = true
       
-      _log(String(describing: Self.self) + ": UDP Receive port = \(_udpRcvPort), Send port = \(_udpSendPort)", .info, #function, #file, #line)
+      _log(Self.className() + ": UDP receive port: \(_udpRcvPort), Send port: \(_udpSendPort)", .info, #function, #file, #line)
 
       // if a Wan connection, register
       if isWan { register(clientHandle: clientHandle) }
@@ -164,7 +164,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       
     } catch let error {
       // read error
-      _log(String(describing: Self.self) + ": UDP Begin receiving error - \(error.localizedDescription)", .error, #function, #file, #line)
+      _log(Self.className() + ": UDP Begin receiving error - \(error.localizedDescription)", .error, #function, #file, #line)
     }
   }
   /// Unbind from the UDP port
@@ -188,7 +188,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
     
     guard clientHandle != nil else {
       // should not happen
-      _log(String(describing: Self.self) + ": No client handle in register UDP", .error, #function, #file, #line)
+      _log(Self.className() + ": No client handle in register UDP", .error, #function, #file, #line)
 
       return
     }
@@ -204,7 +204,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
         // pause
         usleep(self.kRegistrationDelay)
       }
-      self._log(String(describing: Self.self) + ": SmartLink - register UDP successful", .info, #function, #file, #line)
+      self._log(Self.className() + ": SmartLink - register UDP successful", .info, #function, #file, #line)
 
 //      // as long as connected after Registration
 //      while self._udpSocket != nil && self._udpBound {
@@ -263,13 +263,13 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
         case .ifData, .extData, .ifContext, .extContext:
           
           // log the error
-          self?._log(String(describing: Self.self) + ": Unexpected packetType - \(vita.packetType.rawValue)", .warning, #function, #file, #line)
+          self?._log(Self.className() + ": Unexpected packetType - \(vita.packetType.rawValue)", .warning, #function, #file, #line)
         }
         
       } else {
         
         // log the error
-        self?._log(String(describing: Self.self) + ": Unable to decode received packet", .warning, #function, #file, #line)
+        self?._log(Self.className() + ": Unable to decode received packet", .warning, #function, #file, #line)
       }
       
 //      let vitaHeader : VitaHeader

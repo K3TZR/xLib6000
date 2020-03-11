@@ -193,7 +193,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Self.className() + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -218,7 +218,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Stream
       _initialized = true
                   
-      _log(String(describing: Self.self) + " added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.iqStreamHasBeenAdded, object: self as Any?)
@@ -240,7 +240,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
     // remove it immediately (IqStream does not send status on removal)
     _radio.iqStreams[id] = nil
     
-    Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+    Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
 
     NC.post(.iqStreamHasBeenRemoved, object: id as Any?)
   }
@@ -299,7 +299,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      _log(String(describing: Self.self) + " missing packet(s), rcvdSeq: \(vita.sequence), != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
+      _log(Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence), != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1

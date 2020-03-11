@@ -365,10 +365,10 @@ extension Radio {
   /// Turn Opus Rx On/Off
   ///
   /// - Parameters:
-  ///   - value:              On/Off
+  ///   - value:              Start / Stop
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func requestOpusRxAudioStream(state: Bool, callback: ReplyHandler? = nil) {
+  public func startStopOpusRxAudioStream(state: Bool, callback: ReplyHandler? = nil) {
     
     // tell the Radio to enable Opus Rx
     Api.sharedInstance.send("remote_audio rx_on \(state.as1or0)", replyTo: callback)

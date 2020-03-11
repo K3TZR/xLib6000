@@ -30,9 +30,6 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   public static let isInterleaved           = true
   public static let application             = 2049
   
-//  public static let kOpus                   = "opus"
-//  public static let kUncompressed           = "none"
-
   public enum Compression : String {
     case opus
     case none
@@ -129,7 +126,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
           
           radio.remoteRxAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage(String(describing: Self.self) + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
           
           NC.post(.remoteRxAudioStreamHasBeenRemoved, object: id as Any?)
         }
@@ -172,7 +169,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(String(describing: Self.self) + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log(Self.className() + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -189,7 +186,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this RxRemoteAudioStream
       _initialized = true
                   
-      _log(String(describing: Self.self) + " added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.remoteRxAudioStreamHasBeenAdded, object: self as Any?)
@@ -244,7 +241,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       
       // from a later group, jump forward
       let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
-      _log(String(describing: Self.self) + " missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+      _log(Self.className() + " missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
 
       // Pass an error frame (count == 0) to the Opus delegate
       delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: 0) )

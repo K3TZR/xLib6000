@@ -51,7 +51,7 @@ public final class Log {
     
     // pass the entry to the delegate (if any)
     if delegate != nil {
-      delegate!.logMessage(msg, level, function, file, line, Api.kName)
+      delegate!.logMessage(msg, level, function, file, line)
     
     } else {
       let state = Api.sharedInstance.nsLogState
