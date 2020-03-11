@@ -1171,22 +1171,23 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         }
         
       } else {
+        // guard that the message has my API Handle
+        guard _api.connectionHandle! == handle else { return }
+
         // pre V3
         // is it In Use?
         if inUse {
-          
-          // guard that the message has my API Handle
-          guard _api.connectionHandle! == handle else { return }
-          
+                    
           // YES, Finish the UDP initialization & set the API state
           _api.clientConnected(radio)
           
         } else {
           // pre V3 API
           if properties[2].key == "forced" {
-            // FIXME: Handle the disconnect?
             // NO, Disconnected
             _log(Self.className() + ": Disconnect, forced = \(properties[2].value)", .info, #function, #file, #line)
+
+            NC.post(.clientDidDisconnect, object: handle as Any?)
           }
         }
       }
