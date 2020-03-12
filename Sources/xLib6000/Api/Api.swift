@@ -47,8 +47,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   }
   public        var nsLogState              : NSLogging = .normal
   
-  public        var apiState                : Api.State! {
-    didSet { _log(Self.className() + " Api state = \(apiState.rawValue)", .debug, #function, #file, #line)}}
+  public        var apiState                : Api.State!
   public        var connectionHandle        : Handle?
   public        var connectionHandleWan     = ""
   public        var isGui                   = true
