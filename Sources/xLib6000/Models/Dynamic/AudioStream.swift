@@ -12,11 +12,24 @@ public typealias AudioStreamId = StreamId
 
 /// AudioStream Class implementation
 ///
-///      creates an AudioStream instance to be used by a Client to support the
-///      processing of a stream of Audio from the Radio to the client. AudioStream
-///      objects are added / removed by the incoming TCP messages. AudioStream
-///      objects periodically receive Audio in a UDP stream.
+///       creates an AudioStream instance to be used by a Client to support the
+///       processing of a stream of Audio from the Radio to the client. AudioStream
+///       objects are added / removed by the incoming TCP messages. AudioStream
+///       objects periodically receive Audio in a UDP stream.
 ///
+
+/// STATUS
+///     Old Api
+///
+///       Reviewed Flexlib 2.4.9 source, incorporated all properties and most features
+///       Removed properties not found in Flexlib.
+///       Error counting not implemented
+///       Reply handler approach not used, status messages provide the same functionality
+///        ** Fully functional **
+///
+///     New Api
+///       ** Unused **
+
 public final class AudioStream : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------
@@ -29,16 +42,16 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
 
-  @objc dynamic public var clientHandle: Handle {
-    return _clientHandle }
+//  @objc dynamic public var clientHandle: Handle {
+//    return _clientHandle }
   
   @objc dynamic public var daxChannel: Int {
     get { _daxChannel }
     set { if _daxChannel != newValue { _daxChannel = newValue ; _slice = _radio.findSlice(using: _daxChannel) }}}
   
-  @objc dynamic public var daxClients: Int {
-    get { _daxClients  }
-    set { if _daxClients != newValue { _daxClients = newValue }}}
+//  @objc dynamic public var daxClients: Int {
+//    get { _daxClients  }
+//    set { if _daxClients != newValue { _daxClients = newValue }}}
 
   @objc dynamic public var ip: String {
     get { _ip }
@@ -61,15 +74,15 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
     
-  var _clientHandle : Handle {
-    get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+//  var _clientHandle : Handle {
+//    get { Api.objectQ.sync { __clientHandle } }
+//    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
   var _daxChannel : Int {
     get { Api.objectQ.sync { __daxChannel } }
     set { Api.objectQ.sync(flags: .barrier) {__daxChannel = newValue }}}
-  var _daxClients : Int {
-    get { Api.objectQ.sync { __daxClients } }
-    set { Api.objectQ.sync(flags: .barrier) {__daxClients = newValue }}}
+//  var _daxClients : Int {
+//    get { Api.objectQ.sync { __daxClients } }
+//    set { Api.objectQ.sync(flags: .barrier) {__daxClients = newValue }}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
     set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
@@ -84,9 +97,9 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     set { Api.objectQ.sync(flags: .barrier) {__slice = newValue }}}
 
   internal enum Token: String {
-    case clientHandle = "client_handle"
+//    case clientHandle = "client_handle"
     case daxChannel   = "dax"
-    case daxClients   = "dax_clients"
+//    case daxClients   = "dax_clients"
     case inUse        = "in_use"
     case ip
     case port
@@ -192,9 +205,9 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
+//      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
       case .daxChannel:   willChangeValue(for: \.daxChannel)    ; _daxChannel = property.value.iValue         ; didChangeValue(for: \.daxChannel)
-      case .daxClients:   willChangeValue(for: \.daxClients)    ; _daxClients = property.value .iValue        ; didChangeValue(for: \.daxClients)
+//      case .daxClients:   willChangeValue(for: \.daxClients)    ; _daxClients = property.value .iValue        ; didChangeValue(for: \.daxClients)
       case .inUse:        break   // included to inhibit unknown token warnings
       case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
       case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue               ; didChangeValue(for: \.port)
@@ -313,9 +326,9 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   
   private var _delegate     : StreamHandler? = nil
 
-  private var __clientHandle  : Handle = 0
+//  private var __clientHandle  : Handle = 0
   private var __daxChannel  = 0
-  private var __daxClients  = 0
+//  private var __daxClients  = 0
   private var __ip          = ""
   private var __port        = 0
   private var __rxGain      = 50
