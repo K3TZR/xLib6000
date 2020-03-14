@@ -12,11 +12,20 @@ public typealias TnfId = ObjectId
 
 /// TNF Class implementation
 ///
-///      creates a Tnf instance to be used by a Client to support the
-///      rendering of a Tnf. Tnf objects are added, removed and
-///      updated by the incoming TCP messages. They are collected in the
-///      tnfs collection on the Radio object.
+///       creates a Tnf instance to be used by a Client to support the
+///       rendering of a Tnf. Tnf objects are added, removed and
+///       updated by the incoming TCP messages. They are collected in the
+///       tnfs collection on the Radio object.
 ///
+/// STATUS
+///     Old Api
+///
+///       Reviewed Flexlib 2.4.9 source, incorporated all properties and features
+///       ** Fully functional **
+///
+///     New Api
+///       ** Fully functional **
+
 public final class Tnf : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
