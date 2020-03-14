@@ -12,12 +12,25 @@ public typealias WaterfallStreamId = StreamId
 
 /// Waterfall Class implementation
 ///
-///      creates a Waterfall instance to be used by a Client to support the
-///      processing of a Waterfall. Waterfall objects are added / removed by the
-///      incoming TCP messages. Waterfall objects periodically receive Waterfall
-///      data in a UDP stream. They are collected in the waterfalls collection
-///      on the Radio object.
+///       creates a Waterfall instance to be used by a Client to support the
+///       processing of a Waterfall. Waterfall objects are added / removed by the
+///       incoming TCP messages. Waterfall objects periodically receive Waterfall
+///       data in a UDP stream. They are collected in the waterfalls collection
+///       on the Radio object.
 ///
+
+/// STATUS
+///     Old Api
+///
+///       Reviewed Flexlib 2.4.9 source, incorporated all properties and most features
+///       Reply handler approach not used, status messages provide the same functionality
+///       Error counting not implemented
+///       Contains NewApi feature(s) - clientHandle property
+///       ** Fully functional **
+///
+///     New Api
+///       ** Fully functional **
+
 public final class Waterfall : NSObject, DynamicModelWithStream {
   
   // ----------------------------------------------------------------------------
@@ -90,13 +103,15 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
 
   
   enum Token : String {
+    case clientHandle         = "client_handle"   // New Api only
+
     // on Waterfall
     case autoBlackEnabled     = "auto_black"
     case blackLevel           = "black_level"
-    case clientHandle         = "client_handle"
     case colorGain            = "color_gain"
     case gradientIndex        = "gradient_index"
     case lineDuration         = "line_duration"
+    
     // unused here
     case available
     case band
