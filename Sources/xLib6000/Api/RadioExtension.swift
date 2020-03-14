@@ -437,7 +437,22 @@ extension Radio {
     // return the first one
     return selectedPanadapters[0]
   }
-  
+  /// Find the Panadapter for a DaxIqChannel
+  ///
+  /// - Parameters:
+  ///   - daxIqChannel:   a Dax channel number
+  /// - Returns:          a Panadapter id (or nil)
+  ///
+  public func findPanadapterId(using channel: Int) -> PanadapterStreamId? {
+    
+    // find the Panadapters with the specified Channel (if any)
+    let selectedPanadapters = panadapters.values.filter { $0.daxIqChannel == channel }
+    guard selectedPanadapters.count >= 1 else { return nil }
+    
+    // return the first one
+    return selectedPanadapters[0].id
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Radio methods
   
