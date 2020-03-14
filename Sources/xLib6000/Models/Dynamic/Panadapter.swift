@@ -13,12 +13,25 @@ public typealias PanadapterStreamId = StreamId
 
 /// Panadapter implementation
 ///
-///      creates a Panadapter instance to be used by a Client to support the
-///      processing of a Panadapter. Panadapter objects are added / removed by the
-///      incoming TCP messages. Panadapter objects periodically receive Panadapter
-///      data in a UDP stream. They are collected in the panadapters
-///      collection on the Radio object.
+///       creates a Panadapter instance to be used by a Client to support the
+///       processing of a Panadapter. Panadapter objects are added / removed by the
+///       incoming TCP messages. Panadapter objects periodically receive Panadapter
+///       data in a UDP stream. They are collected in the panadapters
+///       collection on the Radio object.
 ///
+
+/// STATUS
+///     Old Api
+///
+///       Reviewed Flexlib 2.4.9 source, incorporated all properties and most features
+///       Reply handler approach not used, status messages provide the same functionality
+///       Error counting not implemented
+///       Contains NewApi feature(s) - clientHandle property
+///       ** Fully functional **
+///
+///     New Api
+///       ** Fully functional **
+
 public final class Panadapter               : NSObject, DynamicModelWithStream {
   
   // ----------------------------------------------------------------------------
@@ -42,14 +55,15 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @objc dynamic public var band: String {
     get { _band }
     set { if _band != newValue { _band = newValue ; panadapterSet( .band, newValue) }}}
+
+  // FIXME: Where does autoCenter come from?
+  
   @objc dynamic public var bandwidth: Hz {
     get { _bandwidth }
     set { if _bandwidth != newValue { _bandwidth = newValue ; panadapterSet( .bandwidth, newValue.hzToMhz + " autocenter=1") }}}
   @objc dynamic public var bandZoomEnabled: Bool {
     get { _bandZoomEnabled }
     set { if _bandZoomEnabled != newValue { _bandZoomEnabled = newValue ; panadapterSet( .bandZoomEnabled, newValue.as1or0) }}}
-  // FIXME: Where does autoCenter come from?
-  
   @objc dynamic public var center: Hz {
     get { _center }
     set { if _center != newValue { _center = newValue ; panadapterSet( .center, newValue.hzToMhz) }}}
@@ -550,6 +564,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   
   private var _delegate                     : StreamHandler? = nil
 
+  private var __clientHandle                : Handle = 0      // New Api only
+
   private var __antList                     = [String]()
   private var __autoCenterEnabled           = false
   private var __average                     = 0
@@ -557,7 +573,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private var __bandwidth                   : Hz = 0
   private var __bandZoomEnabled             = false
   private var __center                      : Hz = 0
-  private var __clientHandle                : Handle = 0
   private var __daxIqChannel                = 0
   private var __fps                         = 0
   private var __loopAEnabled                = false
