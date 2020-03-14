@@ -21,7 +21,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("1.2.4")    // temp fix for lack of Package Tag visibility
+  public static let kVersion                = Version("1.2.5")    // temp fix for lack of Package Tag visibility
   public static let kVersionSupported       = Version("3.1.8")
 
   public static let kBundleIdentifier       = "net.k3tzr." + Api.kName
@@ -45,18 +45,18 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case limited (to: [String])
     case none
   }
-  public        var nsLogState              : NSLogging = .normal
+  public var nsLogState              : NSLogging = .normal
   
-  public        var apiState                : Api.State!
-  public        var connectionHandle        : Handle?
-  public        var connectionHandleWan     = ""
-  public        var isGui                   = true
-  public        var isWan                   = false
-  public        var reducedDaxBw            = false
-  public        var needsNetCwStream        = false
-  public        var testerDelegate          : ApiDelegate?
-  public        var testerModeEnabled       = false
-  public        var pingerEnabled           = true
+  public var apiState                : Api.State!
+  public var connectionHandle        : Handle?
+  public var connectionHandleWan     = ""
+  public var isGui                   = true
+  public var isWan                   = false
+  public var reducedDaxBw            = false
+  public var needsNetCwStream        = false
+  public var testerDelegate          : ApiDelegate?
+  public var testerModeEnabled       = false
+  public var pingerEnabled           = true
 
   public var radio        : Radio? {
     get { Api.objectQ.sync { _radio } }
@@ -64,7 +64,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var delegate     : ApiDelegate? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-  public var localIP : String {
+  public var localIP      : String {
     get { Api.objectQ.sync { _localIP } }
     set { Api.objectQ.sync(flags: .barrier) { _localIP  = newValue }}}
   public var localUDPPort : UInt16 {

@@ -56,7 +56,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  var _channel      : Int {
+  var _channel : Int {
     get { Api.objectQ.sync { __channel } }
     set { Api.objectQ.sync(flags: .barrier) {__channel = newValue }}}
   var _clientHandle : Handle {
@@ -88,10 +88,10 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private      var _initialized       = false       // True if initialized by Radio hardware
+  private      var _initialized       = false
   private      let _log               = Log.sharedInstance.logMessage
   public       let _radio             : Radio
-  private      var _rxSeq             : Int?              // Rx sequence number
+  private      var _rxSeq             : Int?
 
   private      var _kOneOverZeroDBfs  : Float = 1.0 / pow(2.0, 15.0)
   

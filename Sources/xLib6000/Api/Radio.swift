@@ -118,26 +118,26 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
   // Shadowed properties that send commands
   @objc dynamic public var apfEnabled: Bool {
-    get {  return _apfEnabled }
+    get { _apfEnabled }
     set { if _apfEnabled != newValue { _apfEnabled = newValue ; apfCmd( .mode, newValue.as1or0) }}}
   @objc dynamic public var apfQFactor: Int {
-    get {  return _apfQFactor }
+    get { _apfQFactor }
     set { if _apfQFactor != newValue { _apfQFactor = newValue ; apfCmd( .qFactor, newValue) }}}
   @objc dynamic public var apfGain: Int {
-    get {  return _apfGain }
+    get { _apfGain }
     set { if _apfGain != newValue { _apfGain = newValue ; apfCmd( .gain, newValue) }}}
   // FIXME: command for backlight
   @objc dynamic public var backlight: Int {
-    get {  return _backlight }
+    get { _backlight }
     set { if _backlight != newValue { _backlight = newValue  }}}
   @objc dynamic public var bandPersistenceEnabled: Bool {
-    get {  return _bandPersistenceEnabled }
+    get { _bandPersistenceEnabled }
     set { if _bandPersistenceEnabled != newValue { _bandPersistenceEnabled = newValue ; radioSetCmd( .bandPersistenceEnabled, newValue.as1or0) }}}
   @objc dynamic public var binauralRxEnabled: Bool {
-    get {  return _binauralRxEnabled }
+    get { _binauralRxEnabled }
     set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) }}}
   @objc dynamic public var boundClientId: String? {
-    get { return _boundClientId }
+    get { _boundClientId }
     set { if _boundClientId != newValue {
       if !_api.isGui && newValue != nil {
         _boundClientId = newValue
@@ -147,52 +147,52 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
   }
   @objc dynamic public var calFreq: Hz {
-    get {  return _calFreq }
+    get { _calFreq }
     set { if _calFreq != newValue { _calFreq = newValue ; radioSetCmd( .calFreq, newValue.hzToMhz) }}}
   @objc dynamic public var callsign: String {
-    get {  return _callsign }
+    get { _callsign }
     set { if _callsign != newValue { _callsign = newValue ; radioCmd( .callsign, newValue) }}}
   @objc dynamic public var enforcePrivateIpEnabled: Bool {
-    get {  return _enforcePrivateIpEnabled }
+    get { _enforcePrivateIpEnabled }
     set { if _enforcePrivateIpEnabled != newValue { _enforcePrivateIpEnabled = newValue ; radioSetCmd( .enforcePrivateIpEnabled, newValue.as1or0) }}}
   @objc dynamic public var filterCwAutoEnabled: Bool {
-    get {  return _filterCwAutoEnabled }
+    get { _filterCwAutoEnabled }
     set { if _filterCwAutoEnabled != newValue { _filterCwAutoEnabled = newValue ; radioFilterCmd( .cw, .autoLevel, newValue.as1or0) }}}
   @objc dynamic public var filterDigitalAutoEnabled: Bool {
-    get {  return _filterDigitalAutoEnabled }
+    get { _filterDigitalAutoEnabled }
     set { if _filterDigitalAutoEnabled != newValue { _filterDigitalAutoEnabled = newValue ; radioFilterCmd( .digital, .autoLevel, newValue.as1or0) }}}
   @objc dynamic public var filterVoiceAutoEnabled: Bool {
-    get {  return _filterVoiceAutoEnabled }
+    get { _filterVoiceAutoEnabled }
     set { if _filterVoiceAutoEnabled != newValue { _filterVoiceAutoEnabled = newValue ; radioFilterCmd( .voice, .autoLevel, newValue.as1or0) }}}
   @objc dynamic public var filterCwLevel: Int {
-    get {  return _filterCwLevel }
+    get { _filterCwLevel }
     set { if _filterCwLevel != newValue { _filterCwLevel = newValue ; radioFilterCmd( .cw, .level, newValue) }}}
   @objc dynamic public var filterDigitalLevel: Int {
-    get {  return _filterDigitalLevel }
+    get { _filterDigitalLevel }
     set { if _filterDigitalLevel != newValue { _filterDigitalLevel = newValue ; radioFilterCmd( .digital, .level, newValue) }}}
   @objc dynamic public var filterVoiceLevel: Int {
-    get {  return _filterVoiceLevel }
+    get { _filterVoiceLevel }
     set { if _filterVoiceLevel != newValue { _filterVoiceLevel = newValue ; radioFilterCmd( .voice, .level, newValue) }}}
   @objc dynamic public var freqErrorPpb: Int {
-    get {  return _freqErrorPpb }
+    get { _freqErrorPpb }
     set { if _freqErrorPpb != newValue { _freqErrorPpb = newValue ; radioSetCmd( .freqErrorPpb, newValue) }}}
   @objc dynamic public var frontSpeakerMute: Bool {
-    get {  return _frontSpeakerMute }
+    get { _frontSpeakerMute }
     set { if _frontSpeakerMute != newValue { _frontSpeakerMute = newValue ; radioSetCmd( .frontSpeakerMute, newValue.as1or0) }}}
   @objc dynamic public var fullDuplexEnabled: Bool {
-    get {  return _fullDuplexEnabled }
+    get { _fullDuplexEnabled }
     set { if _fullDuplexEnabled != newValue { _fullDuplexEnabled = newValue ; radioSetCmd( .fullDuplexEnabled, newValue.as1or0) }}}
   @objc dynamic public var headphoneGain: Int {
-    get {  return _headphoneGain }
+    get { _headphoneGain }
     set { if _headphoneGain != newValue { _headphoneGain = newValue ; mixerCmd( "headphone gain", newValue) }}}
   @objc dynamic public var headphoneMute: Bool {
-    get {  return _headphoneMute }
+    get { _headphoneMute }
     set { if _headphoneMute != newValue { _headphoneMute = newValue; mixerCmd( "headphone mute", newValue.as1or0) }}}
   @objc dynamic public var lineoutGain: Int {
-    get {  return _lineoutGain }
+    get { _lineoutGain }
     set { if _lineoutGain != newValue { _lineoutGain = newValue ; mixerCmd( "lineout gain", newValue) }}}
   @objc dynamic public var lineoutMute: Bool {
-    get {  return _lineoutMute }
+    get { _lineoutMute }
     set { if _lineoutMute != newValue { _lineoutMute = newValue ; mixerCmd( "lineout mute", newValue.as1or0) }}}
   @objc dynamic public var mox: Bool {
     get { _mox }
@@ -201,34 +201,34 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     get { _muteLocalAudio }
     set { if _muteLocalAudio != newValue { _muteLocalAudio = newValue ; radioSetCmd( "mute_local_audio", newValue.as1or0) }}}
   @objc dynamic public var nickname: String {
-    get {  return _nickname }
+    get { _nickname }
     set { if _nickname != newValue { _nickname = newValue ; radioCmd("name", newValue) }}}
   @objc dynamic public var radioScreenSaver: String {
-    get {  return _radioScreenSaver }
+    get { _radioScreenSaver }
     set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ; radioCmd("screensaver", newValue) }}}
   @objc dynamic public var remoteOnEnabled: Bool {
-    get {  return _remoteOnEnabled }
+    get { _remoteOnEnabled }
     set { if _remoteOnEnabled != newValue { _remoteOnEnabled = newValue ; radioSetCmd( .remoteOnEnabled, newValue.as1or0) }}}
   @objc dynamic public var rttyMark: Int {
-    get {  return _rttyMark }
+    get { _rttyMark }
     set { if _rttyMark != newValue { _rttyMark = newValue ; radioSetCmd( .rttyMark, newValue) }}}
   @objc dynamic public var snapTuneEnabled: Bool {
-    get {  return _snapTuneEnabled }
+    get { _snapTuneEnabled }
     set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; radioSetCmd( .snapTuneEnabled, newValue.as1or0) }}}
   @objc dynamic public var startCalibration: Bool {
     get { _startCalibration }
     set { if _startCalibration != newValue { _startCalibration = newValue ; if newValue { radioCmd("pll_start", "") } }}}
   @objc dynamic public var staticGateway: String {
-    get {  return _staticGateway }
+    get { _staticGateway }
     set { if _staticGateway != newValue { _staticGateway = newValue }}}
   @objc dynamic public var staticIp: String {
-    get {  return _staticIp }
+    get { _staticIp }
     set { if _staticIp != newValue { _staticIp = newValue }}}
   @objc dynamic public var staticNetmask: String {
-    get {  return _staticNetmask }
+    get { _staticNetmask }
     set { if _staticNetmask != newValue { _staticNetmask = newValue }}}
   @objc dynamic public var tnfsEnabled: Bool {
-    get {  return _tnfsEnabled }
+    get { _tnfsEnabled }
     set { if _tnfsEnabled != newValue { _tnfsEnabled = newValue ; radioSetCmd( .tnfsEnabled, newValue.asTrueFalse) }}}
   
   @objc dynamic public var atuPresent           : Bool    { _atuPresent }
