@@ -12,22 +12,30 @@ public typealias AmplifierId = Handle
 
 /// Amplifier Class implementation
 ///
-///      creates an Amplifier instance to be used by a Client to support the
-///      control of an external Amplifier. Amplifier objects are added, removed and
-///      updated by the incoming TCP messages. They are collected in the amplifiers
-///      collection on the Radio object.
+///       creates an Amplifier instance to be used by a Client to support the
+///       control of an external Amplifier. Amplifier objects are added, removed and
+///       updated by the incoming TCP messages. They are collected in the amplifiers
+///       collection on the Radio object.
 ///
+
+/// STATUS
+///     Old Api
+///
+///       Reviewed Flexlib 3.1.8 source, incorporated all properties and most features
+///       ** Need usage and status message examples in order to become fully functional **
+///
+
 public final class Amplifier  : NSObject, DynamicModel {
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public let id               : AmplifierId
-  public var isStreaming      = false
 
   @objc dynamic public var ant: String {
     get { _ant }
     set { if _ant != newValue { _ant = newValue ; amplifierCmd(.ant, newValue) }}}
+  @objc dynamic public var handle: Handle { _handle }
   @objc dynamic public var ip: String {
     get { _ip }
     set { if _ip != newValue { _ip = newValue ; amplifierCmd(.ip, newValue) }}}
@@ -40,9 +48,7 @@ public final class Amplifier  : NSObject, DynamicModel {
   @objc dynamic public var serialNumber: String {
     get { _serialNumber }
     set { if _serialNumber != newValue { _serialNumber = newValue ; amplifierCmd( .serialNumber, newValue) } } }
-  @objc dynamic public var state: String {
-    get { _state }
-    set { if _state != newValue { _state = newValue } } }
+  @objc dynamic public var state: String { _state }
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -50,6 +56,9 @@ public final class Amplifier  : NSObject, DynamicModel {
   var _ant : String {
     get { Api.objectQ.sync { __ant } }
     set { Api.objectQ.sync(flags: .barrier) {__ant = newValue }}}
+  var _handle : Handle {
+    get { Api.objectQ.sync { __handle } }
+    set { Api.objectQ.sync(flags: .barrier) {__handle = newValue }}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
     set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
@@ -68,6 +77,7 @@ public final class Amplifier  : NSObject, DynamicModel {
 
   enum Token : String {
     case ant
+    case handle
     case ip
     case model
     case port
@@ -83,11 +93,13 @@ public final class Amplifier  : NSObject, DynamicModel {
     case standby    = "STANDBY"
     case transmitA  = "TRANSMIT_A"
     case transmitB  = "TRANSMIT_B"
+    case unknown    = "UNKNOWN"
   }
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _antennaDict  = [String:String]()
   private var _initialized  = false
   private let _log          = Log.sharedInstance.logMessage
   private let _radio        : Radio
@@ -183,12 +195,13 @@ public final class Amplifier  : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
-      case .ant:          willChangeValue(for: \.ant)           ; _ant = property.value           ; didChangeValue(for: \.ant)
-      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value            ; didChangeValue(for: \.ip)
-      case .model:        willChangeValue(for: \.model)         ; _model = property.value         ; didChangeValue(for: \.model)
-      case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue   ; didChangeValue(for: \.port)
-      case .serialNumber: willChangeValue(for: \.serialNumber)  ; _serialNumber = property.value  ; didChangeValue(for: \.serialNumber)
-      case .state:        willChangeValue(for: \.state)         ; _state = property.value         ; didChangeValue(for: \.state)
+      case .ant:          willChangeValue(for: \.ant)           ; _ant = property.value                 ; didChangeValue(for: \.ant)  ; _antennaDict = parseAntennaSettings( _ant)
+      case .handle:       willChangeValue(for: \.handle)        ; _handle = property.value.handle ?? 0  ; didChangeValue(for: \.handle)
+      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                  ; didChangeValue(for: \.ip)
+      case .model:        willChangeValue(for: \.model)         ; _model = property.value               ; didChangeValue(for: \.model)
+      case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue         ; didChangeValue(for: \.port)
+      case .serialNumber: willChangeValue(for: \.serialNumber)  ; _serialNumber = property.value        ; didChangeValue(for: \.serialNumber)
+      case .state:        willChangeValue(for: \.state)         ; _state = property.value               ; didChangeValue(for: \.state)
       }
     }
     // is the Amplifier initialized?
@@ -217,6 +230,14 @@ public final class Amplifier  : NSObject, DynamicModel {
     // notify all observers
     NC.post(.amplifierWillBeRemoved, object: self as Any?)
   }
+  /// Returns the name of the output associated with an antenna
+  ///
+  /// - Parameter antenna: a radio antenna port name
+  ///
+  public func outputConfiguredForAntenna(_ antenna: String) -> String? {
+    return _antennaDict[antenna]
+  }
+
   /// Change the Amplifier Mode
   ///
   /// - Parameters:
@@ -231,6 +252,23 @@ public final class Amplifier  : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
 
+  /// Parse a list of antenna pairs
+  /// - Parameter settings:     the list
+  ///
+  private func parseAntennaSettings(_ settings: String) -> [String:String] {
+    var antDict = [String:String]()
+    
+    // pairs are comma delimited
+    let pairs = settings.split(separator: ",")
+    // each setting is <ant:ant>
+    for setting in pairs {
+      if !setting.contains(":") { continue }
+      let parts = setting.split(separator: ":")
+      if parts.count != 2 {continue }
+      antDict[String(parts[0])] = String(parts[1])
+    }
+    return antDict
+  }
   /// Set an Amplifier property on the Radio
   ///
   /// - Parameters:
@@ -245,6 +283,7 @@ public final class Amplifier  : NSObject, DynamicModel {
   // *** Hidden properties (Do NOT use) ***
   
   private var __ant           = ""
+  private var __handle        : Handle = 0
   private var __ip            = ""
   private var __model         = ""
   private var __port          = 0
