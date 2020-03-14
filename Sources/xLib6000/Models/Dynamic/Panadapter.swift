@@ -489,7 +489,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     _radio.sendCommand("display panafall remove \(id.hex)", replyTo: callback)
     
     // notify all observers
-    NC.post(.panadapterWillBeRemoved, object: self as Any?)
+//    NC.post(.panadapterWillBeRemoved, object: self as Any?)
   }
   /// Process the Panadapter Vita struct
   ///

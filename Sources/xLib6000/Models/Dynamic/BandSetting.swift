@@ -267,7 +267,7 @@ public final class BandSetting                : NSObject, DynamicModel {
     _radio.sendCommand("transmit band remove " + "\(id)", replyTo: callback)
     
     // notify all observers
-    NC.post(.bandSettingWillBeRemoved, object: self as Any?)
+//    NC.post(.bandSettingWillBeRemoved, object: self as Any?)
   }
   
   // ----------------------------------------------------------------------------

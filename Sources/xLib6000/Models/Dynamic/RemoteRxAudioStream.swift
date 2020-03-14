@@ -203,7 +203,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
 
     // notify all observers
-    NC.post(.remoteRxAudioStreamWillBeRemoved, object: self as Any?)
+//    NC.post(.remoteRxAudioStreamWillBeRemoved, object: self as Any?)
   }
   
   // ------------------------------------------------------------------------------

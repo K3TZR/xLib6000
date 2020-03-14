@@ -207,7 +207,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
     
     // notify all observers
-    NC.post(.daxTxAudioStreamWillBeRemoved, object: self as Any?)
+//    NC.post(.daxTxAudioStreamWillBeRemoved, object: self as Any?)
   }
     
     // ------------------------------------------------------------------------------

@@ -241,7 +241,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
     
     // notify all observers
-    NC.post(.audioStreamWillBeRemoved, object: self as Any?)
+//    NC.post(.audioStreamWillBeRemoved, object: self as Any?)
   }
 
   // ------------------------------------------------------------------------------

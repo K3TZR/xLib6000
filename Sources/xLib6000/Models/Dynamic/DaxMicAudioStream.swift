@@ -207,7 +207,7 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
 
     // notify all observers
-    NC.post(.daxMicAudioStreamWillBeRemoved, object: self as Any?)
+//    NC.post(.daxMicAudioStreamWillBeRemoved, object: self as Any?)
   }
 
   // ------------------------------------------------------------------------------

@@ -245,7 +245,7 @@ public final class Xvtr : NSObject, DynamicModel {
     _radio.sendCommand("xvtr remove " + "\(id)", replyTo: callback)
     
     // notify all observers
-    NC.post(.xvtrWillBeRemoved, object: self as Any?)
+//    NC.post(.xvtrWillBeRemoved, object: self as Any?)
   }
   
   // ----------------------------------------------------------------------------

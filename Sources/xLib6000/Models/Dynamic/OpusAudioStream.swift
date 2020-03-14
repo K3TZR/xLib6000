@@ -282,7 +282,6 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
     NC.post(.opusAudioStreamWillBeRemoved, object: self as Any?)
     
     // remove it immediately (OpusAudioStream does not send status on removal)
-
     _radio.opusAudioStreams[id] = nil
     
     Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)

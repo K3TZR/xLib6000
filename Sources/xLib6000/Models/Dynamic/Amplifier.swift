@@ -228,7 +228,7 @@ public final class Amplifier  : NSObject, DynamicModel {
     _radio.sendCommand("amplifier remove " + "\(id.hex)", replyTo: callback)
     
     // notify all observers
-    NC.post(.amplifierWillBeRemoved, object: self as Any?)
+//    NC.post(.amplifierWillBeRemoved, object: self as Any?)
   }
   /// Returns the name of the output associated with an antenna
   ///
