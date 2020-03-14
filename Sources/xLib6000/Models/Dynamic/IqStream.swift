@@ -11,11 +11,23 @@ import Accelerate
 
 /// IqStream Class implementation
 ///
-///      creates an IqStream instance to be used by a Client to support the
-///      processing of a stream of IQ data from the Radio to the client. IqStream
-///      objects are added / removed by the incoming TCP messages. IqStream
-///      objects periodically receive IQ data in a UDP stream.
+///       creates an IqStream instance to be used by a Client to support the
+///       processing of a stream of IQ data from the Radio to the client. IqStream
+///       objects are added / removed by the incoming TCP messages. IqStream
+///       objects periodically receive IQ data in a UDP stream.
 ///
+
+/// STATUS
+///     Old Api
+///
+///       Reviewed Flexlib 2.4.9 source, incorporated all properties and most features
+///       Reply handler approach not used, status messages provide the same functionality
+///       Error counting not implemented
+///       ** Fully functional **
+///
+///     New Api
+///       ** Unused **
+
 public final class IqStream : NSObject, DynamicModelWithStream {  
 
   // ------------------------------------------------------------------------------
@@ -42,7 +54,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   
   @objc dynamic public var available    : Int     { _available }
   @objc dynamic public var capacity     : Int     { _capacity }
-  @objc dynamic public var clientHandle : Handle  { _clientHandle }
+//  @objc dynamic public var clientHandle : Handle  { _clientHandle }
   @objc dynamic public var daxIqChannel : Int     { _daxIqChannel }
   @objc dynamic public var ip           : String  { _ip }
   @objc dynamic public var port         : Int     { _port  }
@@ -60,12 +72,12 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   var _capacity : Int {
     get { Api.objectQ.sync { __capacity } }
     set { Api.objectQ.sync(flags: .barrier) {__capacity = newValue }}}
-  var _clientHandle : Handle {
-    get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+//  var _clientHandle : Handle {
+//    get { Api.objectQ.sync { __clientHandle } }
+//    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
   var _daxIqChannel : Int {
     get { Api.objectQ.sync { __daxIqChannel } }
-    set { Api.objectQ.sync(flags: .barrier) {__daxIqChannel = newValue }}}
+    set { Api.objectQ.sync(flags: .barrier) {__daxIqChannel = newValue ; _pan = _radio.findPanadapterId(using: _daxIqChannel) ?? 0 }}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
     set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
@@ -85,7 +97,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   enum Token: String {
     case available
     case capacity
-    case clientHandle           = "client_handle"
+//    case clientHandle           = "client_handle"
     case daxIqChannel           = "daxiq"
     case daxIqRate              = "daxiq_rate"
     case inUse                  = "in_use"
@@ -201,7 +213,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
         
       case .available:    willChangeValue(for: \.available)     ; _available = property.value.iValue          ; didChangeValue(for: \.available)
       case .capacity:     willChangeValue(for: \.capacity)      ; _capacity = property.value.iValue           ; didChangeValue(for: \.capacity)
-      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
+//      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
       case .daxIqChannel: willChangeValue(for: \.daxIqChannel)  ; _daxIqChannel = property.value.iValue       ; didChangeValue(for: \.daxIqChannel)
       case .daxIqRate:    willChangeValue(for: \.rate)          ; _rate = property.value.iValue               ; didChangeValue(for: \.rate)
       case .inUse:        break   // included to inhibit unknown token warnings
@@ -329,7 +341,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
 
   private var __available     = 0
   private var __capacity      = 0
-  private var __clientHandle  : Handle = 0
+//  private var __clientHandle  : Handle = 0
   private var __daxIqChannel  = 0
   private var __inUse         = false
   private var __ip            = ""
