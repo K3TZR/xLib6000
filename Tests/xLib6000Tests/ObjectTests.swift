@@ -71,7 +71,6 @@ final class ObjectTests: XCTestCase {
       object.model = "QIYM"
       object.port = 3214
       object.serialNumber = "2109-8765-4321"
-      object.state = "IDLE"
       
       if showInfoMessages { Swift.print("***** \(type) Parameters modified") }
       
@@ -81,7 +80,7 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.model, "QIYM", file: #function)
       XCTAssertEqual(object.port, 3214, file: #function)
       XCTAssertEqual(object.serialNumber, "2109-8765-4321", file: #function)
-      XCTAssertEqual(object.state, "IDLE", file: #function)
+      XCTAssertEqual(object.state, "STANDBY", file: #function)
       
       if showInfoMessages { Swift.print("***** Modified \(type) parameters verified\n") }
       
@@ -264,8 +263,8 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.toneValue, 67.0, "toneValue", file: #function)
       XCTAssertEqual(object.filterLow, 100, "filterLow", file: #function)
       XCTAssertEqual(object.filterHigh, 2_900, "filterHigh", file: #function)
-      XCTAssertEqual(object.highlight, false, "highlight", file: #function)
-      XCTAssertEqual(object.highlightColor, "0x00000000".streamId, "highlightColor", file: #function)
+//      XCTAssertEqual(object.highlight, false, "highlight", file: #function)
+//      XCTAssertEqual(object.highlightColor, "0x00000000".streamId, "highlightColor", file: #function)
       XCTAssertEqual(object.squelchEnabled, true, "squelchEnabled", file: #function)
       XCTAssertEqual(object.squelchLevel, 20, "squelchLevel", file: #function)
       XCTAssertEqual(object.rttyMark, 2, "rttyMark", file: #function)
@@ -287,8 +286,8 @@ final class ObjectTests: XCTestCase {
       object.toneValue = 76.0
       object.filterLow = 200
       object.filterHigh = 3_000
-      object.highlight = true
-      object.highlightColor = "0x01010101".streamId!
+//      object.highlight = true
+//      object.highlightColor = "0x01010101".streamId!
       object.squelchEnabled = false
       object.squelchLevel = 19
       object.rttyMark = 3
@@ -310,8 +309,8 @@ final class ObjectTests: XCTestCase {
       XCTAssertEqual(object.toneValue, 76.0, "toneValue", file: #function)
       XCTAssertEqual(object.filterLow, 200, "filterLow", file: #function)
       XCTAssertEqual(object.filterHigh, 3_000, "filterHigh", file: #function)
-      XCTAssertEqual(object.highlight, true, "highlight", file: #function)
-      XCTAssertEqual(object.highlightColor, "0x01010101".streamId, "highlightColor", file: #function)
+//      XCTAssertEqual(object.highlight, true, "highlight", file: #function)
+//      XCTAssertEqual(object.highlightColor, "0x01010101".streamId, "highlightColor", file: #function)
       XCTAssertEqual(object.squelchEnabled, false, "squelchEnabled", file: #function)
       XCTAssertEqual(object.squelchLevel, 19, "squelchLevel", file: #function)
       XCTAssertEqual(object.rttyMark, 3, "rttyMark", file: #function)
@@ -373,8 +372,8 @@ final class ObjectTests: XCTestCase {
           let toneValue = object.toneValue
           let filterLow = object.filterLow
           let filterHigh = object.filterHigh
-          let highlight = object.highlight
-          let highlightColor = object.highlightColor
+//          let highlight = object.highlight
+//          let highlightColor = object.highlightColor
           let squelchEnabled = object.squelchEnabled
           let squelchLevel = object.squelchLevel
           let rttyMark = object.rttyMark
@@ -417,8 +416,8 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.toneValue, toneValue, "toneValue", file: #function)
                 XCTAssertEqual(object.filterLow, filterLow, "filterLow", file: #function)
                 XCTAssertEqual(object.filterHigh, filterHigh, "filterHigh", file: #function)
-                XCTAssertEqual(object.highlight, highlight, "highlight", file: #function)
-                XCTAssertEqual(object.highlightColor, highlightColor, "highlightColor", file: #function)
+//                XCTAssertEqual(object.highlight, highlight, "highlight", file: #function)
+//                XCTAssertEqual(object.highlightColor, highlightColor, "highlightColor", file: #function)
                 XCTAssertEqual(object.squelchEnabled, squelchEnabled, "squelchEnabled", file: #function)
                 XCTAssertEqual(object.squelchLevel, squelchLevel, "squelchLevel", file: #function)
                 XCTAssertEqual(object.rttyMark, rttyMark, "rttyMark", file: #function)
@@ -440,8 +439,8 @@ final class ObjectTests: XCTestCase {
                 object.toneValue = 76.0
                 object.filterLow = 200
                 object.filterHigh = 3_000
-                object.highlight = true
-                object.highlightColor = "0x01010101".streamId!
+//                object.highlight = true
+//                object.highlightColor = "0x01010101".streamId!
                 object.squelchEnabled = false
                 object.squelchLevel = 19
                 object.rttyMark = 3
@@ -463,8 +462,8 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.toneValue, 76.0, "toneValue", file: #function)
                 XCTAssertEqual(object.filterLow, 200, "filterLow", file: #function)
                 XCTAssertEqual(object.filterHigh, 3_000, "filterHigh", file: #function)
-                XCTAssertEqual(object.highlight, true, "highlight", file: #function)
-                XCTAssertEqual(object.highlightColor, "0x01010101".streamId, "highlightColor", file: #function)
+//                XCTAssertEqual(object.highlight, true, "highlight", file: #function)
+//                XCTAssertEqual(object.highlightColor, "0x01010101".streamId, "highlightColor", file: #function)
                 XCTAssertEqual(object.squelchEnabled, false, "squelchEnabled", file: #function)
                 XCTAssertEqual(object.squelchLevel, 19, "squelchLevel", file: #function)
                 XCTAssertEqual(object.rttyMark, 3, "rttyMark", file: #function)

@@ -129,7 +129,7 @@ class OldApiTests: XCTestCase {
           if let object = radio!.audioStreams.first?.value {
             
             let firstId = object.id
-            let clientHandle = object.clientHandle
+//            let clientHandle = object.clientHandle
             let daxChannel = object.daxChannel
             let ip = object.ip
             let port = object.port
@@ -157,7 +157,7 @@ class OldApiTests: XCTestCase {
                   
                   if showInfoMessages { Swift.print("***** 2nd \(type) object added\n") }
                   
-                  XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
+//                  XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
                   XCTAssertEqual(object.daxChannel, daxChannel, "daxChannel", file: #function)
                   XCTAssertEqual(object.ip, ip, "ip", file: #function)
                   XCTAssertEqual(object.port, port, "port", file: #function)
@@ -174,7 +174,7 @@ class OldApiTests: XCTestCase {
                   
                   if showInfoMessages { Swift.print("\n***** 2nd \(type) object parameters modified") }
                   
-                  XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
+//                  XCTAssertEqual(object.clientHandle, clientHandle, "clientHandle", file: #function)
                   XCTAssertEqual(object.daxChannel, 4, "daxChannel", file: #function)
                   XCTAssertEqual(object.ip, "12.2.3.218", "ip", file: #function)
                   XCTAssertEqual(object.port, 4214, "port", file: #function)
@@ -384,6 +384,7 @@ class OldApiTests: XCTestCase {
             
             let available     = object.available
             let capacity      = object.capacity
+            let channel       = object.daxIqChannel
             let pan           = object.pan
             let rate          = object.rate
             
@@ -414,6 +415,7 @@ class OldApiTests: XCTestCase {
                   
                   XCTAssertEqual(object.available, available, "available", file: #function)
                   XCTAssertEqual(object.capacity, capacity, "capacity", file: #function)
+                  XCTAssertEqual(object.daxIqChannel, channel, "channel", file: #function)
                   XCTAssertEqual(object.pan, pan, "pan", file: #function)
                   XCTAssertEqual(object.rate, rate, "rate", file: #function)
                   
@@ -425,6 +427,7 @@ class OldApiTests: XCTestCase {
                   
                   XCTAssertEqual(object.available, available, "available", file: #function)
                   XCTAssertEqual(object.capacity, capacity, "capacity", file: #function)
+                  XCTAssertEqual(object.daxIqChannel, channel, "channel", file: #function)
                   XCTAssertEqual(object.pan, pan, "pan", file: #function)
                   XCTAssertEqual(object.rate, rate * 2, "rate", file: #function)
                   
