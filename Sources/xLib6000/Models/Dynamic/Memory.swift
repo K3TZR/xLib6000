@@ -12,11 +12,20 @@ public typealias MemoryId = ObjectId
 
 /// Memory Class implementation
 ///
-///      creates a Memory instance to be used by a Client to support the
-///      processing of a Memory. Memory objects are added, removed and
-///      updated by the incoming TCP messages. They are collected in the
-///      memories collection on the Radio object.
+///       creates a Memory instance to be used by a Client to support the
+///       processing of a Memory. Memory objects are added, removed and
+///       updated by the incoming TCP messages. They are collected in the
+///       memories collection on the Radio object.
 ///
+
+/// STATUS
+///     Old Api
+///
+///       Reviewed Flexlib 2.4.9 source, incorporated all properties and most features
+///       Reply handler approach not used, status messages provide the same functionality
+///       ** Fully functional **
+///
+
 public final class Memory                   : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
@@ -42,12 +51,12 @@ public final class Memory                   : NSObject, DynamicModel {
   @objc dynamic public var group: String {
     get { _group }
     set { let value = newValue.replacingSpaces() ; if _group != value { _group = value ; memCmd( .group, newValue) }}}
-  @objc dynamic public var highlight: Bool {
-    get { _highlight }
-    set { if _highlight != newValue { _highlight = newValue }}}
-  @objc dynamic public var highlightColor: UInt32 {
-    get { _highlightColor }
-    set { if _highlightColor != newValue { _highlightColor = newValue }}}
+//  @objc dynamic public var highlight: Bool {
+//    get { _highlight }
+//    set { if _highlight != newValue { _highlight = newValue }}}
+//  @objc dynamic public var highlightColor: UInt32 {
+//    get { _highlightColor }
+//    set { if _highlightColor != newValue { _highlightColor = newValue }}}
   @objc dynamic public var mode: String {
     get { _mode }
     set { if _mode != newValue { _mode = newValue ; memCmd( .mode, newValue) }}}
@@ -119,12 +128,12 @@ public final class Memory                   : NSObject, DynamicModel {
   var _group: String {
     get { Api.objectQ.sync { __group } }
     set { Api.objectQ.sync(flags: .barrier) { __group = newValue }}}
-  var _highlight: Bool {
-    get { Api.objectQ.sync { __highlight } }
-    set { Api.objectQ.sync(flags: .barrier) { __highlight = newValue }}}
-  var _highlightColor: UInt32 {
-    get { Api.objectQ.sync { __highlightColor } }
-    set { Api.objectQ.sync(flags: .barrier) { __highlightColor = newValue }}}
+//  var _highlight: Bool {
+//    get { Api.objectQ.sync { __highlight } }
+//    set { Api.objectQ.sync(flags: .barrier) { __highlight = newValue }}}
+//  var _highlightColor: UInt32 {
+//    get { Api.objectQ.sync { __highlightColor } }
+//    set { Api.objectQ.sync(flags: .barrier) { __highlightColor = newValue }}}
   var _mode: String {
     get { Api.objectQ.sync { __mode } }
     set { Api.objectQ.sync(flags: .barrier) { __mode = newValue }}}
@@ -361,8 +370,8 @@ public final class Memory                   : NSObject, DynamicModel {
         case .digitalUpperOffset:       willChangeValue(for: \.digitalUpperOffset)  ; _digitalUpperOffset = property.value.iValue         ; didChangeValue(for: \.digitalUpperOffset)
         case .frequency:                willChangeValue(for: \.frequency)           ; _frequency = property.value.mhzToHz                 ; didChangeValue(for: \.frequency)
         case .group:                    willChangeValue(for: \.group)               ; _group = property.value.replacingSpaces()           ; didChangeValue(for: \.group)
-        case .highlight:                willChangeValue(for: \.highlight)           ; _highlight = property.value.bValue                  ; didChangeValue(for: \.highlight)
-        case .highlightColor:           willChangeValue(for: \.highlightColor)      ; _highlightColor = property.value.uValue32           ; didChangeValue(for: \.highlightColor)
+        case .highlight:                break   // ignored here
+        case .highlightColor:           break   // ignored here
         case .mode:                     willChangeValue(for: \.mode)                ; _mode = property.value.replacingSpaces()            ; didChangeValue(for: \.mode)
         case .name:                     willChangeValue(for: \.name)                ; _name = property.value.replacingSpaces()            ; didChangeValue(for: \.name)
         case .owner:                    willChangeValue(for: \.owner)               ; _owner = property.value.replacingSpaces()           ; didChangeValue(for: \.owner)
@@ -413,12 +422,6 @@ public final class Memory                   : NSObject, DynamicModel {
     
     // notify all observers
     NC.post(.memoryWillBeRemoved, object: self as Any?)
-  }
-  /// Select a Memory
-  ///
-  public func select() {
-    
-    _radio.sendCommand("memory apply " + "\(id)")
   }
   
   // ----------------------------------------------------------------------------
