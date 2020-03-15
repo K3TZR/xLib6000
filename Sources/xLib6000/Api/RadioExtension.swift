@@ -426,31 +426,17 @@ extension Radio {
   ///
   /// - Parameters:
   ///   - daxIqChannel:   a Dax channel number
-  /// - Returns:          a Panadapter reference (or nil)
-  ///
-  public func findPanadapter(using channel: Int) -> Panadapter? {
-    
-    // find the Panadapters with the specified Channel (if any)
-    let selectedPanadapters = panadapters.values.filter { $0.daxIqChannel == channel }
-    guard selectedPanadapters.count >= 1 else { return nil }
-    
-    // return the first one
-    return selectedPanadapters[0]
-  }
-  /// Find the Panadapter for a DaxIqChannel
-  ///
-  /// - Parameters:
-  ///   - daxIqChannel:   a Dax channel number
   /// - Returns:          a Panadapter id (or nil)
   ///
   public func findPanadapterId(using channel: Int) -> PanadapterStreamId? {
-    
+  
     // find the Panadapters with the specified Channel (if any)
-    let selectedPanadapters = panadapters.values.filter { $0.daxIqChannel == channel }
-    guard selectedPanadapters.count >= 1 else { return nil }
-    
-    // return the first one
-    return selectedPanadapters[0].id
+    for (id, panadapter) in panadapters where panadapter.daxIqChannel == channel {
+      // return the first one
+      return id
+    }
+    // none found
+    return nil
   }
 
   // ----------------------------------------------------------------------------
