@@ -21,7 +21,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("1.2.5")    // temp fix for lack of Package Tag visibility
   public static let kVersionSupported       = Version("3.1.8")
 
   public static let kBundleIdentifier       = "net.k3tzr." + Api.kName
