@@ -407,7 +407,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
     if Api.kVersionSupported < radioVersion  {
       _log(Self.className() + " Radio may need to be downgraded: Radio version = \(radioVersion.longString), API supports version = \(Api.kVersionSupported.string)", .warning, #function, #file, #line)
-      NC.post(.radioDowngrade, object: [Api.kVersion, radioVersion])
+      NC.post(.radioDowngrade, object: [Api.kVersionSupported.string, radioVersion])
     }
   }
   /// Reply handler for the "client ip" command
