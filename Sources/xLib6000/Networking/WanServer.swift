@@ -221,6 +221,8 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // send a command to SmartLink to request a connection to the specified Radio
     let command = "application connect serial" + "=\(radioSerial)" + " hole_punch_port" + "=\(String(holePunchPort))"
     sendCommand(command)
+    
+    _log("Connect Message sent to SmartLink server", .debug, #function, #file, #line)
   }
   /// Disconnect users
   ///
@@ -234,7 +236,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       return
     }
     // send a command to SmartLink to request disconnection from the specified Radio
-    sendCommand(Self.className() + ": application disconnect_users serial" + "=\(radioSerial)" )
+    sendCommand("application disconnect_users serial" + "=\(radioSerial)" )
   }
   /// Test connection
   ///
@@ -248,7 +250,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       return
     }
     // send a command to SmartLink to test the connection for the specified Radio
-    sendCommand(Self.className() + ": application test_connection serial" + "=\(radioSerial)" )
+    sendCommand("application test_connection serial" + "=\(radioSerial)" )
   }
 
   // ------------------------------------------------------------------------------
