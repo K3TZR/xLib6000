@@ -7,9 +7,9 @@
 
 ### Built on:
 
-*  macOS 10.15.3 (Deployment Target of macOS 10.11)
-*  Xcode 11.3.1 (11C504)
-*  Swift 5.1.3
+*  macOS 10.15.4
+*  Xcode 11.4 (11E146)
+*  Swift 5.2
 
 
 ## Usage
@@ -42,3 +42,28 @@ Flex Radios can have one of four different version groups:
 [![CocoaAsyncSocket](https://img.shields.io/badge/CocoaAsyncSocket-v7.6.3-informational)](https://github.com/robbiehanson/CocoaAsyncSocket)
 
 CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
+
+
+## 1.2.8 Release Notes
+
+TCP Timeout increased from 0.5 to 2.0 seconds
+Addressed Xcode 11.4 warnings regarding “dangling pointers”
+Wanserver - added parsing of guiClients for SmartLink connections
+Wanserver - suppress warning messages due to “Received” msg on SmartLink Test
+Api.connect(…) - added pendingDisconnect param to support disconnect options
+
+
+
+Tests executed:
+
+v3.1.8 - all passed except:
+  oldApiTests - n/a
+  TestUsbCable, testUsbCableParse - not implemented
+  testAmplifier - not implemented
+  testRemoteTxAudioStream - uncompressed does not work
+
+V2.4.9 - all passed except:
+  newApiTests - n/a
+  TestUsbCable, testUsbCableParse - not implemented
+  testAmplifier - not implemented
+

@@ -161,67 +161,68 @@ public final class Meter : NSObject, DynamicModel {
     // NOTE:  there is a bug in the Radio (as of v2.2.8) that sends
     //        multiple copies of meters, this code ignores the duplicates
     
-    let payloadPtr = UnsafeRawPointer(vita.payloadData)
-    
-    // four bytes per Meter
-    let numberOfMeters = Int(vita.payloadSize / 4)
-    
-    // pointer to the first Meter number / Meter value pair
-    let ptr16 = payloadPtr.bindMemory(to: UInt16.self, capacity: 2)
-    
-    // for each meter in the Meters packet
-    for i in 0..<numberOfMeters {
+    vita.payloadData.withUnsafeBytes { (payloadPtr) in
       
-      // get the Meter id and the Meter value
-      let id: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
-      let value: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: (2 * i) + 1).pointee)
+      // four bytes per Meter
+      let numberOfMeters = Int(vita.payloadSize / 4)
       
-      // is this a duplicate?
-      if !meterIds.contains(id) {
+      // pointer to the first Meter number / Meter value pair
+      let ptr16 = payloadPtr.bindMemory(to: UInt16.self)
+      
+      // for each meter in the Meters packet
+      for i in 0..<numberOfMeters {
         
-        // NO, add it to the list
-        meterIds.append(id)
+        // get the Meter id and the Meter value
+        let id: UInt16 = CFSwapInt16BigToHost(ptr16[2 * i])
+        let value: UInt16 = CFSwapInt16BigToHost(ptr16[(2 * i) + 1])
         
-        // find the meter (if present) & update it
-        //        if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", number)] {
-        if let meter = radio.meters[id] {
-          //          meter.streamHandler( value)
+        // is this a duplicate?
+        if !meterIds.contains(id) {
           
-          let newValue = Int16(bitPattern: value)
+          // NO, add it to the list
+          meterIds.append(id)
           
-          let previousValue = meter.value
-          
-          // check for unknown Units
-          guard let token = Units(rawValue: meter.units) else {
-            //      // log it and ignore it
-            //      _log("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", .warning, #function, #file, #line)
-            return
-          }
-          var adjNewValue: Float = 0.0
-          switch token {
+          // find the meter (if present) & update it
+          //        if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", number)] {
+          if let meter = radio.meters[id] {
+            //          meter.streamHandler( value)
             
-          case .db, .dbm, .dbfs, .swr:
-            adjNewValue = Float(exactly: newValue)! / kDbDbmDbfsSwrDenom
+            let newValue = Int16(bitPattern: value)
             
-          case .volts, .amps:
-            var denom :Float = 256.0
-            if radio.version.major == 1 && radio.version.minor <= 10 {
-              denom = 1024.0
+            let previousValue = meter.value
+            
+            // check for unknown Units
+            guard let token = Units(rawValue: meter.units) else {
+              //      // log it and ignore it
+              //      _log("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", .warning, #function, #file, #line)
+              return
             }
-            adjNewValue = Float(exactly: newValue)! / denom
-            
-          case .degc, .degf:
-            adjNewValue = Float(exactly: newValue)! / kDegDenom
-            
-          case .rpm, .watts, .percent, .none:
-            adjNewValue = Float(exactly: newValue)!
-          }
-          // did it change?
-          if adjNewValue != previousValue {
-            meter.value = adjNewValue
-            
-            // notify all observers
-            NC.post(.meterUpdated, object: meter as Any?)
+            var adjNewValue: Float = 0.0
+            switch token {
+              
+            case .db, .dbm, .dbfs, .swr:
+              adjNewValue = Float(exactly: newValue)! / kDbDbmDbfsSwrDenom
+              
+            case .volts, .amps:
+              var denom :Float = 256.0
+              if radio.version.major == 1 && radio.version.minor <= 10 {
+                denom = 1024.0
+              }
+              adjNewValue = Float(exactly: newValue)! / denom
+              
+            case .degc, .degf:
+              adjNewValue = Float(exactly: newValue)! / kDegDenom
+              
+            case .rpm, .watts, .percent, .none:
+              adjNewValue = Float(exactly: newValue)!
+            }
+            // did it change?
+            if adjNewValue != previousValue {
+              meter.value = adjNewValue
+              
+              // notify all observers
+              NC.post(.meterUpdated, object: meter as Any?)
+            }
           }
         }
       }

@@ -32,7 +32,7 @@ public struct AudioStreamFrame {
   ///   - payload:        pointer to a Vita packet payload
   ///   - numberOfBytes:  number of bytes in the payload
   ///
-  public init(payload: UnsafeRawPointer, numberOfBytes: Int) {
+  public init(payload: UnsafeRawBufferPointer, numberOfBytes: Int) {
     
     // 4 byte each for left and right sample (4 * 2)
     self.samples = numberOfBytes / (4 * 2)
@@ -47,7 +47,7 @@ public struct AudioStreamFrame {
   ///   - payload:          pointer to a Vita packet payload
   ///   - numberOfSamples:  number of samples (L/R) needed
   ///
-  public init(payload: UnsafeRawPointer, numberOfSamples: Int) {
+  public init(payload: UnsafeRawBufferPointer, numberOfSamples: Int) {
     
     // 4 byte each for left and right sample (4 * 2)
     self.samples = numberOfSamples
@@ -81,7 +81,7 @@ public struct IqStreamFrame {
   ///   - payload:        pointer to a Vita packet payload
   ///   - numberOfBytes:  number of bytes in the payload
   ///
-  public init(payload: UnsafeRawPointer, numberOfBytes: Int) {
+  public init(payload: UnsafeRawBufferPointer, numberOfBytes: Int) {
     
     // 4 byte each for left and right sample (4 * 2)
     self.samples = numberOfBytes / (4 * 2)
@@ -112,11 +112,11 @@ public struct MicAudioStreamFrame {
   ///   - payload:        pointer to a Vita packet payload
   ///   - numberOfWords:  number of 32-bit Words in the payload
   ///
-  public init(payload: UnsafeRawPointer, numberOfBytes: Int) {
-    
+  public init(payload: UnsafeRawBufferPointer, numberOfBytes: Int) {
+
     // 4 byte each for left and right sample (4 * 2)
     self.samples = numberOfBytes / (4 * 2)
-    
+
     // allocate the samples arrays
     self.leftAudio = [Float](repeating: 0, count: samples)
     self.rightAudio = [Float](repeating: 0, count: samples)
@@ -127,11 +127,11 @@ public struct MicAudioStreamFrame {
   ///   - payload:          pointer to a Vita packet payload
   ///   - numberOfSamples:  number of samples (L/R) needed
   ///
-  public init(payload: UnsafeRawPointer, numberOfSamples: Int) {
-    
+  public init(payload: UnsafeRawBufferPointer, numberOfSamples: Int) {
+
     // 4 byte each for left and right sample (4 * 2)
     self.samples = numberOfSamples
-    
+
     // allocate the samples arrays
     self.leftAudio = [Float](repeating: 0, count: samples)
     self.rightAudio = [Float](repeating: 0, count: samples)

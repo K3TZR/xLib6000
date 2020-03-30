@@ -30,7 +30,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public static let kNoError                = "0"
 
   static        let objectQ                 = DispatchQueue(label: Api.kName + ".objectQ", attributes: [.concurrent])
-  static        let kTcpTimeout             = 0.5     // seconds
+  static        let kTcpTimeout             = 2.0     // seconds
   static        let kNotInUse               = "in_use=0"
   static        let kRemoved                = "removed"
   static        let kConnected              = "connected"
@@ -207,7 +207,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       wanHandle: String = "",
                       reducedDaxBw: Bool = false,
                       logState: NSLogging = .normal,
-                      needsCwStream: Bool = false) -> Bool {
+                      needsCwStream: Bool = false,
+                      pendingDisconnect: Handle? = nil) -> Bool {
 
     self.nsLogState = logState
     
@@ -219,6 +220,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
     // attempt to connect to the Radio
     if tcp.connect(discoveryPacket, isWan: isWan) {
+      
+      if let handle = pendingDisconnect { tcp.send("client disconnect " + handle.hex) }
       
       // Connected, check the versions
       checkVersion(discoveryPacket)

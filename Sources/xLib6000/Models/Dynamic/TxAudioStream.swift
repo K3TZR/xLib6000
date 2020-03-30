@@ -252,60 +252,62 @@ public final class TxAudioStream : NSObject, DynamicModel {
     let kNumberOfChannels = 2       // 2 channels
     
     // create new array for payload (interleaved L/R samples)
-    let payloadData = [UInt8](repeating: 0, count: kMaxSamplesToSend * kNumberOfChannels * MemoryLayout<Float>.size)
+    var payloadData = [UInt8](repeating: 0, count: kMaxSamplesToSend * kNumberOfChannels * MemoryLayout<Float>.size)
     
     // get a raw pointer to the start of the payload
     let payloadPtr = UnsafeMutableRawPointer(mutating: payloadData)
-    
-    // get a pointer to 32-bit chunks in the payload
-    let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
-    
-    // get a pointer to Float chunks in the payload
-    let floatPtr = payloadPtr.bindMemory(to: Float.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
-    
-    var samplesSent = 0
-    while samplesSent < samples {
+//    payloadData.withUnsafeMutableBytes { (payloadPtr) in
       
-      // how many samples this iteration? (kMaxSamplesToSend or remainder if < kMaxSamplesToSend)
-      let numSamplesToSend = min(kMaxSamplesToSend, samples - samplesSent)
-      let numFloatsToSend = numSamplesToSend * kNumberOfChannels
+      // get a pointer to 32-bit chunks in the payload
+      let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
       
-      // interleave the payload & scale with tx gain
-      for i in 0..<numSamplesToSend {                                         // TODO: use Accelerate
-        floatPtr.advanced(by: 2 * i).pointee = left[i + samplesSent] * _txGainScalar
-        floatPtr.advanced(by: (2 * i) + 1).pointee = left[i + samplesSent] * _txGainScalar
+      // get a pointer to Float chunks in the payload
+      let floatPtr = payloadPtr.bindMemory(to: Float.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
+      
+      var samplesSent = 0
+      while samplesSent < samples {
         
-        //        payload[(2 * i)] = left[i + samplesSent] * _txGainScalar
-        //        payload[(2 * i) + 1] = right[i + samplesSent] * _txGainScalar
-      }
-      
-      // swap endianess of the samples
-      for i in 0..<numFloatsToSend {
-        wordsPtr.advanced(by: i).pointee = CFSwapInt32HostToBig(wordsPtr.advanced(by: i).pointee)
-      }
-      
-      _vita!.payloadData = payloadData
-      
-      // set the length of the packet
-      _vita!.payloadSize = numFloatsToSend * MemoryLayout<UInt32>.size            // 32-Bit L/R samples
-      _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size
-      
-      // set the sequence number
-      _vita!.sequence = _txSeq
-      
-      // encode the Vita class as data and send to radio
-      if let data = Vita.encodeAsData(_vita!) {
+        // how many samples this iteration? (kMaxSamplesToSend or remainder if < kMaxSamplesToSend)
+        let numSamplesToSend = min(kMaxSamplesToSend, samples - samplesSent)
+        let numFloatsToSend = numSamplesToSend * kNumberOfChannels
         
-        // send packet to radio
-        //        _api.sendVitaData(data)
-        _radio.sendVita(data)
+        // interleave the payload & scale with tx gain
+        for i in 0..<numSamplesToSend {                                         // TODO: use Accelerate
+          floatPtr[2 * i] = left[i + samplesSent] * _txGainScalar
+          floatPtr[(2 * i) + 1] = left[i + samplesSent] * _txGainScalar
+          
+          //        payload[(2 * i)] = left[i + samplesSent] * _txGainScalar
+          //        payload[(2 * i) + 1] = right[i + samplesSent] * _txGainScalar
+        }
+        
+        // swap endianess of the samples
+        for i in 0..<numFloatsToSend {
+          wordsPtr[i] = CFSwapInt32HostToBig(wordsPtr[i])
+        }
+        
+        _vita!.payloadData = payloadData
+        
+        // set the length of the packet
+        _vita!.payloadSize = numFloatsToSend * MemoryLayout<UInt32>.size            // 32-Bit L/R samples
+        _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size
+        
+        // set the sequence number
+        _vita!.sequence = _txSeq
+        
+        // encode the Vita class as data and send to radio
+        if let data = Vita.encodeAsData(_vita!) {
+          
+          // send packet to radio
+          //        _api.sendVitaData(data)
+          _radio.sendVita(data)
+        }
+        // increment the sequence number (mod 16)
+        _txSeq = (_txSeq + 1) % 16
+        
+        // adjust the samples sent
+        samplesSent += numSamplesToSend
       }
-      // increment the sequence number (mod 16)
-      _txSeq = (_txSeq + 1) % 16
-      
-      // adjust the samples sent
-      samplesSent += numSamplesToSend
-    }
+//    }
     return true
   }
 

@@ -243,52 +243,54 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
     // if there is a delegate, process the Panadapter stream
     if let delegate = delegate {
       
-      let payloadPtr = UnsafeRawPointer(vita.payloadData)
-      
-      // initialize a data frame
-      var dataFrame = IqStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
-      
-      dataFrame.daxIqChannel = channel
-      
-      // get a pointer to the data in the payload
-      let wordsPtr = payloadPtr.bindMemory(to: Float32.self, capacity: dataFrame.samples * 2)
-      
-      // allocate temporary data arrays
-      var dataLeft = [Float32](repeating: 0, count: dataFrame.samples)
-      var dataRight = [Float32](repeating: 0, count: dataFrame.samples)
-      
-      // FIXME: is there a better way
-      // de-interleave the data
-      for i in 0..<dataFrame.samples {
+      //      let payloadPtr = UnsafeRawPointer(vita.payloadData)
+      vita.payloadData.withUnsafeBytes { (payloadPtr) in
         
-        dataLeft[i] = wordsPtr.advanced(by: (2*i)).pointee
-        dataRight[i] = wordsPtr.advanced(by: (2*i) + 1).pointee
+        // initialize a data frame
+        var dataFrame = IqStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
+        
+        dataFrame.daxIqChannel = channel
+        
+        // get a pointer to the data in the payload
+        let wordsPtr = payloadPtr.bindMemory(to: Float32.self)
+        
+        // allocate temporary data arrays
+        var dataLeft = [Float32](repeating: 0, count: dataFrame.samples)
+        var dataRight = [Float32](repeating: 0, count: dataFrame.samples)
+        
+        // FIXME: is there a better way
+        // de-interleave the data
+        for i in 0..<dataFrame.samples {
+          
+          dataLeft[i] = wordsPtr[2*i]
+          dataRight[i] = wordsPtr[(2*i) + 1]
+        }
+        
+        // copy & normalize the data
+        vDSP_vsmul(&dataLeft, 1, &_kOneOverZeroDBfs, &(dataFrame.realSamples), 1, vDSP_Length(dataFrame.samples))
+        vDSP_vsmul(&dataRight, 1, &_kOneOverZeroDBfs, &(dataFrame.imagSamples), 1, vDSP_Length(dataFrame.samples))
+        
+        // Pass the data frame to this AudioSream's delegate
+        delegate.streamHandler(dataFrame)
       }
       
-      // copy & normalize the data
-      vDSP_vsmul(&dataLeft, 1, &_kOneOverZeroDBfs, &(dataFrame.realSamples), 1, vDSP_Length(dataFrame.samples))
-      vDSP_vsmul(&dataRight, 1, &_kOneOverZeroDBfs, &(dataFrame.imagSamples), 1, vDSP_Length(dataFrame.samples))
+      // calculate the next Sequence Number
+      let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
       
-      // Pass the data frame to this AudioSream's delegate
-      delegate.streamHandler(dataFrame)
-    }
-    
-    // calculate the next Sequence Number
-    let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
-    
-    // is the received Sequence Number correct?
-    if vita.sequence != expectedSequenceNumber {
-      
-      // NO, log the issue
-      _log( "Missing IqStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
-      _rxSeq = nil
-      rxLostPacketCount += 1
-    } else {
-      
-      _rxSeq = expectedSequenceNumber
+      // is the received Sequence Number correct?
+      if vita.sequence != expectedSequenceNumber {
+        
+        // NO, log the issue
+        _log( "Missing IqStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
+        _rxSeq = nil
+        rxLostPacketCount += 1
+      } else {
+        
+        _rxSeq = expectedSequenceNumber
+      }
     }
   }
-  
+
   // ----------------------------------------------------------------------------
   // *** Hidden properties (Do NOT use) ***
   

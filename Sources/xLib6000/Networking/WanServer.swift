@@ -93,6 +93,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   private enum Token: String {
     case application
     case radio
+    case Received
   }
   private enum ApplicationToken: String {
     case info
@@ -277,7 +278,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // Check for unknown Message Types
     guard let token = Token(rawValue: msgType)  else {
       // log it and ignore the message
-      _log(Self.className() + ": Unknown Message token: \(msg)", .warning, #function, #file, #line)
+      _log(Self.className() + ": Unknown Message token: \(msgType), msg = \(msg)", .warning, #function, #file, #line)
       return
     }
     // which primary message type?
@@ -285,6 +286,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     case .application:        parseApplication(remainder)
     case .radio:              parseRadio(remainder)
+    case .Received:           break   // eliminates warning message on Test connection
     }
   }
   /// Parse a received "application" message
@@ -546,10 +548,45 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
         discoveredRadio.localInterfaceIP = localAddr
       }
       
+      // populate the guiClients property
+      discoveredRadio.guiClients = parseGuiClients( handles: discoveredRadio.guiClientHandles, programs: discoveredRadio.guiClientPrograms, stations: discoveredRadio.guiClientStations)
+      
       wanRadioList.append(discoveredRadio)
     }
     // delegate call
     _delegate?.wanRadioListReceived(wanRadioList: wanRadioList)
+  }
+  /// Parse GuiClient info
+  ///
+  /// - Parameters:
+  ///   - handles:          comma separated list of handles
+  ///   - programs:         comma separated list of programs
+  ///   - stations:         comma separated list of stations
+  /// - Returns:            an array of GuiClientx
+  ///
+  func parseGuiClients(handles: String, programs: String, stations: String) -> [GuiClient] {
+    var guiClients = [GuiClient]()
+    
+    // guard that all values are non-empty
+    guard handles != "" else { return guiClients }
+    
+    // separate the values
+    let handlesArray = handles.components(separatedBy: ",")
+    let programsArray = programs.components(separatedBy: ",")
+    let stationsArray = stations.components(separatedBy: ",")
+    
+    // guard that there is at least one value and there are an equal number of values
+    guard handlesArray.count == programsArray.count && programsArray.count == stationsArray.count else { return guiClients }
+    
+    // parse into the GuiClient struct
+    for i in 0..<handlesArray.count {
+      
+      // create a new GuiClient
+      guiClients.append( GuiClient(handle:   handlesArray[i].handle!,
+                                   program:  programsArray[i],
+                                   station:  stationsArray[i].replacingOccurrences(of: "\007f", with: " ")))
+    }
+    return guiClients
   }
   /// Parse a Test Connection result
   ///

@@ -54,7 +54,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   
   @objc dynamic public var available    : Int     { _available }
   @objc dynamic public var capacity     : Int     { _capacity }
-//  @objc dynamic public var clientHandle : Handle  { _clientHandle }
+  @objc dynamic public var clientHandle : Handle  { _clientHandle }
   @objc dynamic public var daxIqChannel : Int     { _daxIqChannel }
   @objc dynamic public var ip           : String  { _ip }
   @objc dynamic public var port         : Int     { _port  }
@@ -72,12 +72,12 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   var _capacity : Int {
     get { Api.objectQ.sync { __capacity } }
     set { Api.objectQ.sync(flags: .barrier) {__capacity = newValue }}}
-//  var _clientHandle : Handle {
-//    get { Api.objectQ.sync { __clientHandle } }
-//    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+  var _clientHandle : Handle {
+    get { Api.objectQ.sync { __clientHandle } }
+    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
   var _daxIqChannel : Int {
     get { Api.objectQ.sync { __daxIqChannel } }
-    set { Api.objectQ.sync(flags: .barrier) {__daxIqChannel = newValue ; _pan = _radio.findPanadapterId(using: _daxIqChannel) ?? 0 }}}
+    set { Api.objectQ.sync(flags: .barrier) {__daxIqChannel = newValue }}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
     set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
@@ -97,7 +97,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   enum Token: String {
     case available
     case capacity
-//    case clientHandle           = "client_handle"
+    case clientHandle           = "client_handle"
     case daxIqChannel           = "daxiq"
     case daxIqRate              = "daxiq_rate"
     case inUse                  = "in_use"
@@ -213,7 +213,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
         
       case .available:    willChangeValue(for: \.available)     ; _available = property.value.iValue          ; didChangeValue(for: \.available)
       case .capacity:     willChangeValue(for: \.capacity)      ; _capacity = property.value.iValue           ; didChangeValue(for: \.capacity)
-//      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
+      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
       case .daxIqChannel: willChangeValue(for: \.daxIqChannel)  ; _daxIqChannel = property.value.iValue       ; didChangeValue(for: \.daxIqChannel)
       case .daxIqRate:    willChangeValue(for: \.rate)          ; _rate = property.value.iValue               ; didChangeValue(for: \.rate)
       case .inUse:        break   // included to inhibit unknown token warnings
@@ -229,6 +229,8 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       
       // YES, the Radio (hardware) has acknowledged this Stream
       _initialized = true
+      
+      _pan = _radio.findPanadapterId(using: _daxIqChannel) ?? 0
                   
       _log(Self.className() + " added: id = \(id.hex)", .debug, #function, #file, #line)
 
@@ -274,50 +276,50 @@ public final class IqStream : NSObject, DynamicModelWithStream {
     // if there is a delegate, process the Panadapter stream
     if let delegate = delegate {
       
-      let payloadPtr = UnsafeRawPointer(vita.payloadData)
-      
-      // initialize a data frame
-      var dataFrame = IqStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
-      
-      dataFrame.daxIqChannel = self.daxIqChannel
-      
-      // get a pointer to the data in the payload
-      let wordsPtr = payloadPtr.bindMemory(to: Float32.self, capacity: dataFrame.samples * 2)
-      
-      // allocate temporary data arrays
-      var dataLeft = [Float32](repeating: 0, count: dataFrame.samples)
-      var dataRight = [Float32](repeating: 0, count: dataFrame.samples)
-      
-      // FIXME: is there a better way
-      // de-interleave the data
-      for i in 0..<dataFrame.samples {
+      vita.payloadData.withUnsafeBytes { (payloadPtr) in
+        // initialize a data frame
+        var dataFrame = IqStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
         
-        dataLeft[i] = wordsPtr.advanced(by: (2*i)).pointee
-        dataRight[i] = wordsPtr.advanced(by: (2*i) + 1).pointee
+        dataFrame.daxIqChannel = self.daxIqChannel
+        
+        // get a pointer to the data in the payload
+        let wordsPtr = payloadPtr.bindMemory(to: Float32.self)
+        
+        // allocate temporary data arrays
+        var dataLeft = [Float32](repeating: 0, count: dataFrame.samples)
+        var dataRight = [Float32](repeating: 0, count: dataFrame.samples)
+        
+        // FIXME: is there a better way
+        // de-interleave the data
+        for i in 0..<dataFrame.samples {
+          
+          dataLeft[i] = wordsPtr[2*i]
+          dataRight[i] = wordsPtr[(2*i) + 1]
+        }
+        
+        // copy & normalize the data
+        vDSP_vsmul(&dataLeft, 1, &_kOneOverZeroDBfs, &(dataFrame.realSamples), 1, vDSP_Length(dataFrame.samples))
+        vDSP_vsmul(&dataRight, 1, &_kOneOverZeroDBfs, &(dataFrame.imagSamples), 1, vDSP_Length(dataFrame.samples))
+        
+        // Pass the data frame to this AudioSream's delegate
+        delegate.streamHandler(dataFrame)
       }
       
-      // copy & normalize the data
-      vDSP_vsmul(&dataLeft, 1, &_kOneOverZeroDBfs, &(dataFrame.realSamples), 1, vDSP_Length(dataFrame.samples))
-      vDSP_vsmul(&dataRight, 1, &_kOneOverZeroDBfs, &(dataFrame.imagSamples), 1, vDSP_Length(dataFrame.samples))
+      // calculate the next Sequence Number
+      let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
       
-      // Pass the data frame to this AudioSream's delegate
-      delegate.streamHandler(dataFrame)
-    }
-    
-    // calculate the next Sequence Number
-    let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
-    
-    // is the received Sequence Number correct?
-    if vita.sequence != expectedSequenceNumber {
-      
-      // NO, log the issue
-      _log(Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence), != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
-
-      _rxSeq = nil
-      rxLostPacketCount += 1
-    } else {
-      
-      _rxSeq = expectedSequenceNumber
+      // is the received Sequence Number correct?
+      if vita.sequence != expectedSequenceNumber {
+        
+        // NO, log the issue
+        _log(Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence), != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
+        
+        _rxSeq = nil
+        rxLostPacketCount += 1
+      } else {
+        
+        _rxSeq = expectedSequenceNumber
+      }
     }
   }
   
@@ -341,7 +343,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
 
   private var __available     = 0
   private var __capacity      = 0
-//  private var __clientHandle  : Handle = 0
+  private var __clientHandle  : Handle = 0
   private var __daxIqChannel  = 0
   private var __inUse         = false
   private var __ip            = ""

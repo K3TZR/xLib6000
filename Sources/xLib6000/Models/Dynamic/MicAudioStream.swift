@@ -228,57 +228,58 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
     // if there is a delegate, process the Mic Audio stream
     if let delegate = delegate {
       
-      let payloadPtr = UnsafeRawPointer(vita.payloadData)
-      
-      // initialize a data frame
-      var dataFrame = MicAudioStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
-      
-      // get a pointer to the data in the payload
-      let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: dataFrame.samples * 2)
-      
-      // allocate temporary data arrays
-      var dataLeft = [UInt32](repeating: 0, count: dataFrame.samples)
-      var dataRight = [UInt32](repeating: 0, count: dataFrame.samples)
-      
-      // swap endianess on the bytes
-      // for each sample if we are dealing with DAX audio
-      
-      // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
-      for i in 0..<dataFrame.samples {
+      vita.payloadData.withUnsafeBytes { (payloadPtr) in
         
-        dataLeft[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+0).pointee)
-        dataRight[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+1).pointee)
-      }
-      // copy the data as is -- it is already floating point
-      memcpy(&(dataFrame.leftAudio), &dataLeft, dataFrame.samples * 4)
-      memcpy(&(dataFrame.rightAudio), &dataRight, dataFrame.samples * 4)
-      
-      // scale with rx gain
-      let scale = self._micGainScalar
-      for i in 0..<dataFrame.samples {
+        // initialize a data frame
+        var dataFrame = MicAudioStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
         
-        dataFrame.leftAudio[i] = dataFrame.leftAudio[i] * scale
-        dataFrame.rightAudio[i] = dataFrame.rightAudio[i] * scale
+        // get a pointer to the data in the payload
+        let wordsPtr = payloadPtr.bindMemory(to: UInt32.self)
+        
+        // allocate temporary data arrays
+        var dataLeft = [UInt32](repeating: 0, count: dataFrame.samples)
+        var dataRight = [UInt32](repeating: 0, count: dataFrame.samples)
+        
+        // swap endianess on the bytes
+        // for each sample if we are dealing with DAX audio
+        
+        // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
+        for i in 0..<dataFrame.samples {
+          
+          dataLeft[i] = CFSwapInt32BigToHost(wordsPtr[2*i])
+          dataRight[i] = CFSwapInt32BigToHost(wordsPtr[(2*i) + 1])
+        }
+        // copy the data as is -- it is already floating point
+        memcpy(&(dataFrame.leftAudio), &dataLeft, dataFrame.samples * 4)
+        memcpy(&(dataFrame.rightAudio), &dataRight, dataFrame.samples * 4)
+        
+        // scale with rx gain
+        let scale = self._micGainScalar
+        for i in 0..<dataFrame.samples {
+          
+          dataFrame.leftAudio[i] = dataFrame.leftAudio[i] * scale
+          dataFrame.rightAudio[i] = dataFrame.rightAudio[i] * scale
+        }
+        
+        // Pass the data frame to this AudioSream's delegate
+        delegate.streamHandler(dataFrame)
       }
       
-      // Pass the data frame to this AudioSream's delegate
-      delegate.streamHandler(dataFrame)
-    }
-    
-    // calculate the next Sequence Number
-    let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
-    
-    // is the received Sequence Number correct?
-    if vita.sequence != expectedSequenceNumber {
+      // calculate the next Sequence Number
+      let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
       
-      // NO, log the issue
-      _log(Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .debug, #function, #file, #line)
-
-      _rxSeq = nil
-      rxLostPacketCount += 1
-    } else {
-      
-      _rxSeq = expectedSequenceNumber
+      // is the received Sequence Number correct?
+      if vita.sequence != expectedSequenceNumber {
+        
+        // NO, log the issue
+        _log(Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .debug, #function, #file, #line)
+        
+        _rxSeq = nil
+        rxLostPacketCount += 1
+      } else {
+        
+        _rxSeq = expectedSequenceNumber
+      }
     }
   }
   

@@ -223,94 +223,93 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   ///   - vitaPacket:         a Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    
     var dataFrame: MicAudioStreamFrame?
     
-    // if there is a delegate, process the Mic Audio stream
     if let delegate = delegate {
-         
-         let payloadPtr = UnsafeRawPointer(vita.payloadData)
-         
-         // initialize a data frame
-         if vita.classCode == .daxReducedBw {
-           
-           let samples = vita.payloadSize / 2    // payload is Int16 mono
-           dataFrame = MicAudioStreamFrame(payload: payloadPtr, numberOfSamples: samples)
-         } else {          // .daxAudio
-           
-           let samples = vita.payloadSize / (4 * 2)   // payload is Float (4 Byte) stereo
-           dataFrame = MicAudioStreamFrame(payload: payloadPtr, numberOfSamples: samples)
-         }
-         
-         if dataFrame == nil { return }
-         
-         if vita.classCode == .daxReducedBw {
-           
-           //Int16 Mono Samples
-           let oneOverMax: Float = 1.0 / Float(Int16.max)
-           
-           // get a pointer to the data in the payload
-           let wordsPtr = payloadPtr.bindMemory(to: Int16.self, capacity: dataFrame!.samples)
-           
-           // allocate temporary data arrays
-           var dataLeft = [Float](repeating: 0, count: dataFrame!.samples)
-           var dataRight = [Float](repeating: 0, count: dataFrame!.samples)
-           
-           // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
-           for i in 0..<dataFrame!.samples {
-             
-             let uIntVal = CFSwapInt16BigToHost(UInt16(bitPattern: wordsPtr.advanced(by: i).pointee))
-             let intVal = Int16(bitPattern: uIntVal)
-             
-             let floatVal = Float(intVal) * oneOverMax
-             
-             dataLeft[i] = floatVal
-             dataRight[i] = floatVal
-           }
-           
-           // copy the data as is -- it is already floating point
-           memcpy(&(dataFrame!.leftAudio), &dataLeft, dataFrame!.samples * 4)
-           memcpy(&(dataFrame!.rightAudio), &dataRight, dataFrame!.samples * 4)
-         } else {          // .daxAudio
-           
-           // 32-bit Float stereo samples
-           // get a pointer to the data in the payload
-           let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: dataFrame!.samples * 2)
-           
-           // allocate temporary data arrays
-           var dataLeft = [UInt32](repeating: 0, count: dataFrame!.samples)
-           var dataRight = [UInt32](repeating: 0, count: dataFrame!.samples)
-           
-           // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
-           for i in 0..<dataFrame!.samples {
-             
-             dataLeft[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+0).pointee)
-             dataRight[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+1).pointee)
-           }
-           
-           // copy the data as is -- it is already floating point
-           memcpy(&(dataFrame!.leftAudio), &dataLeft, dataFrame!.samples * 4)
-           memcpy(&(dataFrame!.rightAudio), &dataRight, dataFrame!.samples * 4)
-         }
-    
-         // Pass the data frame to this AudioSream's delegate
-         delegate.streamHandler(dataFrame)
-       }
-    
-    // calculate the next Sequence Number
-    let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
-    
-    // is the received Sequence Number correct?
-    if vita.sequence != expectedSequenceNumber {
       
-      // NO, log the issue
-      _log( Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
-
-      _rxSeq = nil
-      rxLostPacketCount += 1
-    } else {
+      vita.payloadData.withUnsafeBytes { (payloadPtr) in
+        
+        // initialize a data frame
+        if vita.classCode == .daxReducedBw {
+          
+          let samples = vita.payloadSize / 2    // payload is Int16 mono
+          dataFrame = MicAudioStreamFrame(payload: payloadPtr, numberOfSamples: samples)
+        } else {          // .daxAudio
+          
+          let samples = vita.payloadSize / (4 * 2)   // payload is Float (4 Byte) stereo
+          dataFrame = MicAudioStreamFrame(payload: payloadPtr, numberOfSamples: samples)
+        }
+        
+        if dataFrame == nil { return }
+        
+        if vita.classCode == .daxReducedBw {
+          
+          //Int16 Mono Samples
+          let oneOverMax: Float = 1.0 / Float(Int16.max)
+          
+          // get a pointer to the data in the payload
+          let wordsPtr = payloadPtr.bindMemory(to: Int16.self)
+          
+          // allocate temporary data arrays
+          var dataLeft = [Float](repeating: 0, count: dataFrame!.samples)
+          var dataRight = [Float](repeating: 0, count: dataFrame!.samples)
+          
+          // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
+          for i in 0..<dataFrame!.samples {
+            
+            let uIntVal = CFSwapInt16BigToHost(UInt16(bitPattern: wordsPtr[i]))
+            let intVal = Int16(bitPattern: uIntVal)
+            
+            let floatVal = Float(intVal) * oneOverMax
+            
+            dataLeft[i] = floatVal
+            dataRight[i] = floatVal
+          }
+          
+          // copy the data as is -- it is already floating point
+          memcpy(&(dataFrame!.leftAudio), &dataLeft, dataFrame!.samples * 4)
+          memcpy(&(dataFrame!.rightAudio), &dataRight, dataFrame!.samples * 4)
+        } else {          // .daxAudio
+          
+          // 32-bit Float stereo samples
+          // get a pointer to the data in the payload
+          let wordsPtr = payloadPtr.bindMemory(to: UInt32.self)
+          
+          // allocate temporary data arrays
+          var dataLeft = [UInt32](repeating: 0, count: dataFrame!.samples)
+          var dataRight = [UInt32](repeating: 0, count: dataFrame!.samples)
+          
+          // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
+          for i in 0..<dataFrame!.samples {
+            
+            dataLeft[i] = CFSwapInt32BigToHost(wordsPtr[2*i])
+            dataRight[i] = CFSwapInt32BigToHost(wordsPtr[(2*i) + 1])
+          }
+          
+          // copy the data as is -- it is already floating point
+          memcpy(&(dataFrame!.leftAudio), &dataLeft, dataFrame!.samples * 4)
+          memcpy(&(dataFrame!.rightAudio), &dataRight, dataFrame!.samples * 4)
+        }
+        
+        // Pass the data frame to this AudioSream's delegate
+        delegate.streamHandler(dataFrame)
+      }
       
-      _rxSeq = expectedSequenceNumber
+      // calculate the next Sequence Number
+      let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
+      
+      // is the received Sequence Number correct?
+      if vita.sequence != expectedSequenceNumber {
+        
+        // NO, log the issue
+        _log( Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
+        
+        _rxSeq = nil
+        rxLostPacketCount += 1
+      } else {
+        
+        _rxSeq = expectedSequenceNumber
+      }
     }
   }
   
