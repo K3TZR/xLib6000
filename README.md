@@ -44,7 +44,7 @@ Flex Radios can have one of four different version groups:
 CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
 
 
-## 1.2.8 Release Notes
+## 1.2.9 Release Notes
 
 * TCP Timeout increased from 0.5 to 2.0 seconds
 * Addressed Xcode 11.4 warnings regarding “dangling pointers”
