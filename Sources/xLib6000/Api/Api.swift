@@ -512,13 +512,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         return
       }
     }
-    // if another Gui client connected, disconnect it
-    if radio?.discoveryPacket.status == "In_Use" && isGui {
-      
-      send("client disconnect")
-      _log(Self.className() + " client disconnect sent", .info, #function, #file, #line)
-      sleep(1)
-    }
   }
 
   func didDisconnect(host: String, port: UInt16, error: String) {
