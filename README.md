@@ -44,13 +44,9 @@ Flex Radios can have one of four different version groups:
 CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
 
 
-## 1.2.9 Release Notes
+## 1.2.10 Release Notes
 
-* TCP Timeout increased from 0.5 to 2.0 seconds
-* Addressed Xcode 11.4 warnings regarding “dangling pointers”
-* Wanserver - added parsing of guiClients for SmartLink connections
-* Wanserver - suppress warning messages due to “Received” msg on SmartLink Test
-* Api.connect(…) - added pendingDisconnect param to support disconnect options
+* Options for Multiflex connections (correction to support this)
 
 
 Tests executed:
