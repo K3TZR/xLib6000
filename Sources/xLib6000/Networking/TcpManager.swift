@@ -79,7 +79,7 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   ///   - isWan:                  enable WAN connection
   /// - Returns:                  success / failure
   ///
-  func connect(_ selectedRadio: DiscoveryStruct, isWan: Bool) -> Bool {
+  func connect(_ selectedRadio: DiscoveryPacket, isWan: Bool) -> Bool {
     var portToUse = 0
     var localInterface: String?
     var success = true

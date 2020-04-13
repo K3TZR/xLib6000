@@ -182,7 +182,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Opus
       _initialized = true
                   
-      _log(Self.className() + " added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.remoteTxAudioStreamHasBeenAdded, object: self as Any?)

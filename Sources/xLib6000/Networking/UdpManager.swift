@@ -92,7 +92,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   ///   - isWan:              Wan enabled
   ///   - clientHandle:       handle
   ///
-  func bind(selectedRadio: DiscoveryStruct, isWan: Bool, clientHandle: Handle? = nil) -> Bool {
+  func bind(selectedRadio: DiscoveryPacket, isWan: Bool, clientHandle: Handle? = nil) -> Bool {
     
     var success               = false
     var portToUse             : UInt16 = 0

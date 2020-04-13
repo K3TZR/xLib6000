@@ -198,7 +198,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     - needsCwStream:        cleint application needs the network cw stream
   /// - Returns:                  Success / Failure
   ///
-  public func connect(_ discoveryPacket: DiscoveryStruct,
+  public func connect(_ discoveryPacket: DiscoveryPacket,
                       clientStation: String = "",
                       programName: String,
                       clientId: String? = nil,
@@ -207,8 +207,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       wanHandle: String = "",
                       reducedDaxBw: Bool = false,
                       logState: NSLogging = .normal,
-                      needsCwStream: Bool = false,
-                      pendingDisconnect: Handle? = nil) -> Bool {
+                      needsCwStream: Bool = false) -> Bool {
 
     self.nsLogState = logState
     
@@ -220,8 +219,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
     // attempt to connect to the Radio
     if tcp.connect(discoveryPacket, isWan: isWan) {
-      
-      if let handle = pendingDisconnect { tcp.send("client disconnect " + handle.hex) }
       
       // Connected, check the versions
       checkVersion(discoveryPacket)
@@ -269,6 +266,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
     // the radio (if any)) has been removed, inform observers
     NC.post(.radioHasBeenRemoved, object: nil)
+  }
+  
+  public func sendDisconnect(_ handle: Handle) {
+    send("client disconnect " + handle.hex)
   }
   
   // ----------------------------------------------------------------------------
@@ -403,7 +404,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameters:
   ///   - selectedRadio:      a RadioParameters struct
   ///
-  private func checkVersion(_ selectedRadio: DiscoveryStruct) {
+  private func checkVersion(_ selectedRadio: DiscoveryPacket) {
     
     // get the Radio Version
     let radioVersion = Version(selectedRadio.firmwareVersion)

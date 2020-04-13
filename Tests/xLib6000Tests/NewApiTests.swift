@@ -104,7 +104,7 @@ final class NewApiTests: XCTestCase {
   
   private var bandSettingStatus_2 = "998 band_name=WWV rfpower=50 tunepower=10 hwalc_enabled=1 inhibit=0"
   private let bandSettingRemove_2 = "998 removed"
-  func testBandSetting2Parse() {
+  func testBandSettingParse_2() {
     let type = "BandSetting"
     let id = bandSettingStatus_2.components(separatedBy: " ")[0].objectId!
     

@@ -793,9 +793,9 @@ extension Radio {
   public func getTransmitSliceForClientId(_ guiClientId: String) -> xLib6000.Slice? {
     
     // find the GUI client for the ID
-    if let myGuiClient = findGuiClient(with: guiClientId) {
+    if let handle = findGuiClientHandle(for: guiClientId) {
       // find the Slices with the specified Channel (if any)
-      let filteredSlices = slices.values.filter { $0.txEnabled && $0.clientHandle == myGuiClient.handle }
+      let filteredSlices = slices.values.filter { $0.txEnabled && $0.clientHandle == handle }
       guard filteredSlices.count >= 1 else { return nil }
       
       // return the first one
@@ -805,6 +805,104 @@ extension Radio {
     return nil
   }
   
+  // ----------------------------------------------------------------------------
+  // MARK: -  GuiClient methods
+  
+  /// Find a GuiClient  by Handle
+  /// - Parameters:
+  ///   - handle:             a Handle
+  /// - Returns:              a GuiClient or nil
+  ///
+  public func findGuiClient(for handle: Handle) -> GuiClient? {
+    
+    for (i, radioPacket) in Discovery.sharedInstance.discoveredRadios.enumerated() {
+      
+      for (_, guiClient) in Discovery.sharedInstance.discoveredRadios[i].guiClients.enumerated() where guiClient.handle == handle {
+        return guiClient
+      }
+    }
+    
+    return nil
+  }
+  /// Find a GuiClient handle by Client Id
+  /// - Parameters:
+  ///   - clientId:           a Client Id
+  /// - Returns:              a Handle or nil
+  ///
+  public func findGuiClientHandle(for clientId: String) -> Handle? {
+    
+    for guiClient in discoveryPacket.guiClients where guiClient.clientId == clientId {
+      return guiClient.handle
+    }
+    return nil
+  }
+  
+  public func guiClientUpdate(handle: Handle, clientId: String, program: String, station: String, isLocalPtt: Bool, isThisClient: Bool) {
+    
+    // is it an existing entry?
+    if let index = index(of: handle) {
+      // YES, update it
+      Discovery.sharedInstance.discoveredRadios[index.0].guiClients[index.1].clientId = clientId
+      Discovery.sharedInstance.discoveredRadios[index.0].guiClients[index.1].program = program
+      Discovery.sharedInstance.discoveredRadios[index.0].guiClients[index.1].station = station
+      Discovery.sharedInstance.discoveredRadios[index.0].guiClients[index.1].isLocalPtt = isLocalPtt
+      Discovery.sharedInstance.discoveredRadios[index.0].guiClients[index.1].isThisClient = isThisClient
+
+      Log.sharedInstance.logMessage("\(Discovery.sharedInstance.discoveredRadios[index.0].nickname), GuiClient updated: \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
+      NC.post(.guiClientHasBeenUpdated, object: station as Any?)
+    
+    } else {
+      // NO, add it
+      if let radioIndex = radioIndex(of: discoveryPacket.serialNumber) {
+        let guiClient = GuiClient(clientId: clientId,
+                                  handle: handle,
+                                  program: program,
+                                  station: station,
+                                  isLocalPtt: isLocalPtt,
+                                  isThisClient: isThisClient)
+        Discovery.sharedInstance.discoveredRadios[radioIndex].guiClients.append(guiClient)
+
+        Log.sharedInstance.logMessage("\(Discovery.sharedInstance.discoveredRadios[radioIndex].nickname), GuiClient added:   \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenAdded, object: station as Any?)
+
+        Log.sharedInstance.logMessage("\(Discovery.sharedInstance.discoveredRadios[radioIndex].nickname), GuiClient updated: \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenUpdated, object: station as Any?)
+      }
+    }
+  }
+  
+//  public func guiClientRemove(_ handle: Handle) {
+//
+//    if let index = index(of: handle) {
+//
+//      let station = Discovery.sharedInstance.discoveredRadios[index.0].guiClients[index.1].station
+//      let radio = Discovery.sharedInstance.discoveredRadios[index.0].nickname
+//      let clientId = Discovery.sharedInstance.discoveredRadios[index.0].guiClients[index.1].clientId
+//      Discovery.sharedInstance.discoveredRadios[index.0].guiClients.remove(at: index.1)
+//
+//      Log.sharedInstance.logMessage("\(radio), GuiClient removed: \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
+//
+//      NC.post(.guiClientHasBeenRemoved, object: station as Any?)
+//    }
+//  }
+
+  private func index(of handle: Handle) -> (Int, Int)? {
+
+    for (i, _) in Discovery.sharedInstance.discoveredRadios.enumerated() {
+      for (j, guiClient) in Discovery.sharedInstance.discoveredRadios[i].guiClients.enumerated() where guiClient.handle == handle {
+        return (i, j)
+      }
+    }
+    return nil
+  }
+  private func radioIndex(of serialNumber: String) -> Int? {
+
+    for (i, radioPacket) in Discovery.sharedInstance.discoveredRadios.enumerated() where radioPacket.serialNumber == serialNumber{
+      return i
+    }
+    return nil
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: -  RemoteRxAudioStream methods
   

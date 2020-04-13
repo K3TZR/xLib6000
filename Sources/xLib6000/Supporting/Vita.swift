@@ -303,13 +303,13 @@ public class Vita {
   ///
   /// - Returns:        a RadioParameters struct (or nil)
   ///
-  public class func parseDiscovery(_ vita: Vita) -> DiscoveryStruct? {
+  public class func parseDiscovery(_ vita: Vita) -> DiscoveryPacket? {
 
     // is this a Discovery packet?
     if vita.classIdPresent && vita.classCode == .discovery {
       
       // YES, create a minimal DiscoveredRadio with now as "lastSeen"
-      var discoveredRadio = DiscoveryStruct()
+      let discoveredRadio = DiscoveryPacket()
 
       // Payload is a series of strings of the form <key=value> separated by ' ' (space)
       var payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
@@ -367,54 +367,11 @@ public class Vita {
       // is it a valid Discovery packet?
       if discoveredRadio.publicIp != "" && discoveredRadio.port != 0 && discoveredRadio.model != "" && discoveredRadio.serialNumber != "" {
         
-        // YES, populate the guiClients property
-        discoveredRadio.guiClients = parseGuiClients( handles: discoveredRadio.guiClientHandles, programs: discoveredRadio.guiClientPrograms, stations: discoveredRadio.guiClientStations)
-        
-        // return the Discovered radio
+        // YES, return the Discovered radio
         return discoveredRadio
       }
     }
     // Not a Discovery packet
-    return nil
-  }
-  /// Parse GuiClient info
-  ///
-  /// - Parameters:
-  ///   - handles:          comma separated list of handles
-  ///   - programs:         comma separated list of programs
-  ///   - stations:         comma separated list of stations
-  /// - Returns:            an array of GuiClientx
-  ///
-  class func parseGuiClients(handles: String, programs: String, stations: String) -> [GuiClient] {
-    var guiClients = [GuiClient]()
-    
-    // guard that all values are non-empty
-    guard handles != "" else { return guiClients }
-    
-    // separate the values
-    let handlesArray = handles.components(separatedBy: ",")
-    let programsArray = programs.components(separatedBy: ",")
-    let stationsArray = stations.components(separatedBy: ",")
-    
-    // guard that there is at least one value and there are an equal number of values
-    guard handlesArray.count == programsArray.count && programsArray.count == stationsArray.count else { return guiClients }
-    
-    // parse into the GuiClient struct
-    for i in 0..<handlesArray.count {
-      
-      // create a new GuiClient
-      guiClients.append( GuiClient(handle:   handlesArray[i].handle!,
-                                   program:  programsArray[i],
-                                   station:  stationsArray[i].replacingOccurrences(of: "\007f", with: " ")))
-    }
-    return guiClients
-  }
-  
-  class func findHandle(_ handle: Handle, in clients: [GuiClient]) -> Int? {
-    
-    for i in 0..<clients.count {
-      if handle == clients[i].handle { return i }
-    }
     return nil
   }
 

@@ -456,12 +456,12 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // separate list into its components
     let radioMessages = msg.components(separatedBy: "|")
     
-    var wanRadioList = [DiscoveryStruct]()
+    var wanRadioList = [DiscoveryPacket]()
     
     for message in radioMessages where message != "" {
       
       // create a minimal DiscoveredRadio with now as "lastSeen"
-      var discoveredRadio = DiscoveryStruct()
+      let discoveredRadio = DiscoveryPacket()
       
       var publicTlsPortToUse = -1
       var publicUdpPortToUse = -1
@@ -549,7 +549,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       }
       
       // populate the guiClients property
-      discoveredRadio.guiClients = parseGuiClients( handles: discoveredRadio.guiClientHandles, programs: discoveredRadio.guiClientPrograms, stations: discoveredRadio.guiClientStations)
+//      discoveredRadio.guiClients = parseGuiClients( handles: discoveredRadio.guiClientHandles, programs: discoveredRadio.guiClientPrograms, stations: discoveredRadio.guiClientStations)
       
       wanRadioList.append(discoveredRadio)
     }

@@ -189,9 +189,9 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       case .type:         break  // included to inhibit unknown token warnings
       case .slice:
         // do we have a good reference to the GUI Client?
-        if let gui = _radio.findGuiClient(with: _radio.boundClientId ?? "") {
+        if let handle = _radio.findGuiClientHandle(for: _radio.boundClientId ?? "") {
           // YES,
-          let slice = _radio.findSlice(letter: property.value, guiClientHandle: gui.handle)
+          let slice = _radio.findSlice(letter: property.value, guiClientHandle: handle)
           willChangeValue(for: \.slice)  ; _slice = slice  ; didChangeValue(for: \.slice)
           let gain = _rxGain
           _rxGain = 0
@@ -209,7 +209,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
-      _log(Self.className() + " added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.daxRxAudioStreamHasBeenAdded, object: self as Any?)

@@ -190,7 +190,7 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
-      _log(Self.className() + " added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.daxMicAudioStreamHasBeenAdded, object: self as Any?)

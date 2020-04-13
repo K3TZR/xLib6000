@@ -264,7 +264,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public var softwareVersion      : String  { _softwareVersion }
   @objc dynamic public var tcxoPresent          : Bool    { _tcxoPresent }
   
-  public               var discoveryPacket      : DiscoveryStruct
+  public               var discoveryPacket      : DiscoveryPacket {
+    didSet { Swift.print("radio.discoveryPacket changed = \(discoveryPacket)") }
+  }
   public               let version              : Version
   public private(set)  var sliceErrors          = [String]()  // milliHz
   public private(set)  var uptime               = 0
@@ -666,7 +668,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   /// - Parameters:
   ///   - api:        an Api instance
   ///
-  public init(_ discoveryPacket: DiscoveryStruct, api: Api) {
+  public init(_ discoveryPacket: DiscoveryPacket, api: Api) {
     
     self.discoveryPacket = discoveryPacket
     _api = api
@@ -842,31 +844,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
-  private func removeGuiClient(with handle: Handle) -> Bool {
-    
-    // find the GuiClient
-    for (i, guiClient) in discoveryPacket.guiClients.enumerated() {
-      if guiClient.handle == handle {
-        discoveryPacket.guiClients.remove(at: i)
-        return true
-      }
-    }
-    // none found
-    return false
-  }
-  private func updateGuiClient(with handle: Handle, updatedGuiClient: GuiClient) {
-    
-    // find the GuiClient
-    for (i, guiClient) in discoveryPacket.guiClients.enumerated() {
-      if guiClient.handle == handle {
-        discoveryPacket.guiClients.remove(at: i)
-        discoveryPacket.guiClients.append(updatedGuiClient)
-        return
-      }
-    }
-  }
   private func parseV3Connection(properties: KeyValuesArray, handle: Handle) {
-    var clientId : String?
+    var clientId : String? = nil
     var program = ""
     var station = ""
     var isLocalPtt = false
@@ -890,75 +869,23 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         isLocalPtt = property.value.bValue
         
       case .program:
-        program = property.value
+        program = property.value.trimmingCharacters(in: .whitespaces)
         
       case .station:
-        station = property.value.replacingOccurrences(of: "\u{007f}", with: " ")
+        station = property.value.replacingOccurrences(of: "\u{007f}", with: " ").trimmingCharacters(in: .whitespaces)
       }
     }
-    
-    if clientId == nil || clientId == "" {
-      return
-    }
-    
-    var guiClient = findGuiClient(with: handle)
-    
-    // is there a Gui Client with this handle?
-    //    may have been added by Discovery (without a ClientId)
-    if guiClient != nil {
-      // YES, update it
-      guiClient!.clientId = clientId
-      guiClient!.program = program
-      guiClient!.station = station
-      guiClient!.isLocalPtt = isLocalPtt
-      guiClient!.isThisClient = (_api.connectionHandle! == handle)
-      
-      updateGuiClient(with: handle, updatedGuiClient: guiClient!)
-      
-      // notify all observers
-      NC.post(.guiClientHasBeenUpdated, object: guiClient as Any?)
-    } else {
-      // NO, add one
-      guiClient = GuiClient(handle: handle,
-                            clientId: clientId,
-                            program: program,
-                            station: station,
-                            isLocalPtt: isLocalPtt,
-                            isThisClient: (_api.connectionHandle! == handle))
-      
-      discoveryPacket.guiClients.append(guiClient!)
+    guard station != "" && program != "" && clientId != nil else { return }
 
-      // notify all observers
-      NC.post(.guiClientHasBeenAdded, object: guiClient as Any?)
-    }
-  }
-
-  // TODO: move this to the public section
-  public func findGuiClient(with handle: Handle) -> GuiClient? {
-    
-    // find an existing GuiClient
-    for guiClient in discoveryPacket.guiClients {
-      
-      if guiClient.handle == handle {
-        return guiClient
-      }
-    }
-    // none found
-    return nil
+    // update the GuiClient
+    guiClientUpdate(handle: handle,
+                    clientId: clientId!,
+                    program: program,
+                    station: station,
+                    isLocalPtt: isLocalPtt,
+                    isThisClient: _api.connectionHandle! == handle)
   }
   
-  // TODO: move this to the public section
-  public func findGuiClient(with clientId: String) -> GuiClient? {
-    
-    // find an existing GuiClient
-    for guiClient in discoveryPacket.guiClients where guiClient.clientId == clientId {
-      
-      return guiClient
-    }
-    // none found
-    return nil
-  }
-
   private func parseV3Disconnection(properties: KeyValuesArray, handle: Handle) {
     var duplicateClientId = false
     var forced = false
@@ -988,9 +915,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       if handle == _api.connectionHandle && (duplicateClientId || forced || wanValidationFailed) {
         _log(Self.className() + ": Disconnected with: \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , .warning, #function, #file, #line)
         NC.post(.clientDidDisconnect, object: handle as Any?)
-      }
-      if removeGuiClient(with: handle) {
-        NC.post(.guiClientHasBeenRemoved, object: handle as Any?)
       }
     }
   }

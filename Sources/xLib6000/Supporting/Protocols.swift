@@ -204,7 +204,7 @@ public protocol WanServerDelegate           : class {
   
   /// Received radio list from server
   ///
-  func wanRadioListReceived(wanRadioList: [DiscoveryStruct])
+  func wanRadioListReceived(wanRadioList: [DiscoveryPacket])
   
   /// Received user settings from server
   ///
