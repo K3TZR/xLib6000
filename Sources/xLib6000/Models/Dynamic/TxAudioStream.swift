@@ -252,7 +252,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
     let kNumberOfChannels = 2       // 2 channels
     
     // create new array for payload (interleaved L/R samples)
-    var payloadData = [UInt8](repeating: 0, count: kMaxSamplesToSend * kNumberOfChannels * MemoryLayout<Float>.size)
+    let payloadData = [UInt8](repeating: 0, count: kMaxSamplesToSend * kNumberOfChannels * MemoryLayout<Float>.size)
     
     // get a raw pointer to the start of the payload
     let payloadPtr = UnsafeMutableRawPointer(mutating: payloadData)

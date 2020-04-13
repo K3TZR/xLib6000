@@ -29,8 +29,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     get { Api.objectQ.sync { _discoveredRadios } }
     set { Api.objectQ.sync(flags: .barrier) { _discoveredRadios = newValue }}}
 
-  public var guiClients = [GuiClient]()
-
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
@@ -178,6 +176,9 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
+  /// Parse the csv fields in a Discovery packet
+  /// - Parameter packet:       the packet to parse
+  ///
   private func parseGuiClientsFromDiscovery(_ packet: DiscoveryPacket) {
     
     guard packet.guiClientPrograms != "" && packet.guiClientStations != "" && packet.guiClientHandles != "" else { return }
@@ -199,52 +200,58 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     }
     return
   }
-  
-  private func scanGuiClients(_ newPacket: DiscoveryPacket, _ oldPacket: DiscoveryPacket, _ index: Int?) {
+  /// Process GuiClient data in Discovery packet
+  /// - Parameters:
+  ///   - newPacket:        a newly received packet
+  ///   - oldPacket:        the previous packet, to be updated
+  ///
+  private func scanGuiClients(_ newPacket: DiscoveryPacket, _ oldPacket: DiscoveryPacket) {
     
-    if let radioIndex = index {
+    // for each old GuiClient
+    for i in (0..<oldPacket.guiClients.count).reversed() {
       
-      // for each old GuiClient
-      for i in (0..<oldPacket.guiClients.count).reversed() {
+      // is it in the new list (i.e. same handle)?
+      if !newPacket.guiClients.contains(oldPacket.guiClients[i]) {
         
-        // is it in the new list (i.e. same handle)?
-        if !newPacket.guiClients.contains(oldPacket.guiClients[i]) {
-          
-          // NO, remove it
-          let handle = oldPacket.guiClients[i].handle
-          let station = oldPacket.guiClients[i].station
-          let program = oldPacket.guiClients[i].program
-          Discovery.sharedInstance.discoveredRadios[radioIndex].guiClients.remove(at: i)
-          
-          Log.sharedInstance.logMessage("Known radio  ,\(newPacket.nickname), GuiClient removed: \(handle.hex), \(station), \(program)", .debug, #function, #file, #line)
-          NC.post(.guiClientHasBeenRemoved, object: station as Any?)
-        }
-//        else {
-//          // YES, update it
-//          Discovery.sharedInstance.discoveredRadios[radioIndex].guiClients[i].handle = newPacket.guiClients[i].handle
-//          Discovery.sharedInstance.discoveredRadios[radioIndex].guiClients[i].program = newPacket.guiClients[i].program
-//          Discovery.sharedInstance.discoveredRadios[radioIndex].guiClients[i].station = newPacket.guiClients[i].station
-//          Discovery.sharedInstance.discoveredRadios[radioIndex].guiClients[i].clientId = newPacket.guiClients[i].clientId
-//        }
-      }
-      // for each new GuiClient
-      for i in 0..<newPacket.guiClients.count {
+        // NO, remove it
+        let handle = oldPacket.guiClients[i].handle
+        let station = oldPacket.guiClients[i].station
+        let program = oldPacket.guiClients[i].program
+        oldPacket.guiClients.remove(at: i)
         
-        // is it in the old list (i.e. same handle)?
-        if !oldPacket.guiClients.contains(newPacket.guiClients[i]) {
-          if newPacket.guiClients[i].station.trimmingCharacters(in: .whitespaces) != "" && newPacket.guiClients[i].program.trimmingCharacters(in: .whitespaces) != "" {
-            // NO, add it
-            Discovery.sharedInstance.discoveredRadios[radioIndex].guiClients.append(newPacket.guiClients[i])
-            
-            Log.sharedInstance.logMessage("Known radio  ,\(newPacket.nickname), GuiClient added:   \(newPacket.guiClients[i].handle.hex), \(newPacket.guiClients[i].station), \(newPacket.guiClients[i].program)", .debug, #function, #file, #line)
-            NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i].station as Any?)
-          }
-        }
+        Log.sharedInstance.logMessage("Known radio  ,\(newPacket.nickname), GuiClient removed: \(handle.hex), \(station), \(program)", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenRemoved, object: station as Any?)
       }
-      Discovery.sharedInstance.discoveredRadios[radioIndex].status = newPacket.status
     }
+    // for each new GuiClient
+    for i in 0..<newPacket.guiClients.count {
+      
+      // is it in the old list (i.e. same handle)?
+      if !oldPacket.guiClients.contains(newPacket.guiClients[i]) {
+        if newPacket.guiClients[i].station.trimmingCharacters(in: .whitespaces) != "" && newPacket.guiClients[i].program.trimmingCharacters(in: .whitespaces) != "" {
+          // NO, add it
+          oldPacket.guiClients.append(newPacket.guiClients[i])
+          
+          Log.sharedInstance.logMessage("Known radio  ,\(newPacket.nickname), GuiClient added:   \(newPacket.guiClients[i].handle.hex), \(newPacket.guiClients[i].station), \(newPacket.guiClients[i].program)", .debug, #function, #file, #line)
+          NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i].station as Any?)
+        }
+      }
+    }
+    oldPacket.status = newPacket.status
   }
-  
+  /// Find a radio's Discovery packet
+  /// - Parameter serialNumber:     a radio serial number
+  /// - Returns:                    the index of the radio in Discovered Radios
+  ///
+  private func findRadioPacket(with serialNumber: String) -> Int? {
+    
+    // is the Radio already in the discoveredRadios array?
+    for (i, packet) in discoveredRadios.enumerated() {
+      if packet.serialNumber == serialNumber { return i }
+    }
+    return nil
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - GCDAsyncUdp delegate method
   
@@ -258,48 +265,38 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   ///   - address:        the Address of the sender
   ///   - filterContext:  the FilterContext
   ///
-    @objc public func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
-      
-      // VITA encoded Discovery packet?
-      guard let vita = Vita.decodeFrom(data: data) else { return }
-      
-      // parse vita to obtain a DiscoveryPacket
-      guard let newPacket = Vita.parseDiscovery(vita) else { return }
-
-      // parse the packet to populate its GuiClients
-      parseGuiClientsFromDiscovery(newPacket)
-
-      // is there a previous packet with the same serialNumber?
-      if let radioIndex = findRadioPacket(with: newPacket.serialNumber) {
-        // known radio
-        scanGuiClients(newPacket, discoveredRadios[radioIndex], radioIndex)
-
-      } else {
-        // unknown radio, add it
-        discoveredRadios.append(newPacket)
-
-        for i in 0..<newPacket.guiClients.count {
-          Log.sharedInstance.logMessage("Unknown radio, \(newPacket.nickname), GuiClient added:   \(newPacket.guiClients[i].handle.hex), \(newPacket.guiClients[i].station), \(newPacket.guiClients[i].program)", .debug, #function, #file, #line)
-          NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i].station as Any?)
-        }
-        // log Radio addition
-        Log.sharedInstance.logMessage("Unknown Radio added: \(newPacket.nickname)", .debug, #function, #file, #line)
-
-        // notify observers of Radio addition
-        NC.post(.discoveredRadios, object: discoveredRadios as Any?)
-      }
-    }
+  @objc public func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
     
-    private func findRadioPacket(with serialNumber: String) -> Int? {
+    // VITA encoded Discovery packet?
+    guard let vita = Vita.decodeFrom(data: data) else { return }
+    
+    // parse vita to obtain a DiscoveryPacket
+    guard let newPacket = Vita.parseDiscovery(vita) else { return }
+    
+    // parse the packet to populate its GuiClients
+    parseGuiClientsFromDiscovery(newPacket)
+    
+    // is there a previous packet with the same serialNumber?
+    if let radioIndex = findRadioPacket(with: newPacket.serialNumber) {
+      // known radio
+      scanGuiClients(newPacket, discoveredRadios[radioIndex])
       
-      // is the Radio already in the discoveredRadios array?
-      for (i, packet) in discoveredRadios.enumerated() {
-        if packet.serialNumber == serialNumber { return i }
+    } else {
+      // unknown radio, add it
+      discoveredRadios.append(newPacket)
+      
+      for i in 0..<newPacket.guiClients.count {
+        Log.sharedInstance.logMessage("Unknown radio, \(newPacket.nickname), GuiClient added:   \(newPacket.guiClients[i].handle.hex), \(newPacket.guiClients[i].station), \(newPacket.guiClients[i].program)", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i].station as Any?)
       }
-      return nil
+      // log Radio addition
+      Log.sharedInstance.logMessage("Unknown Radio added: \(newPacket.nickname)", .debug, #function, #file, #line)
+      
+      // notify observers of Radio addition
+      NC.post(.discoveredRadios, object: discoveredRadios as Any?)
     }
   }
-
+}
   
 /// GuiClient Class implementation
 ///
@@ -318,23 +315,6 @@ public struct GuiClient       : Equatable {
   public var isLocalPtt       : Bool = false
   public var isThisClient     : Bool = false
   
-//  init(handle: Handle,
-//       program: String,
-//       station: String,
-//       clientId: String? = nil,
-//       isAvailable: Bool = false,
-//       isLocalPtt: Bool = false,
-//       isThisClient: Bool = false) {
-//
-//    self.handle = handle
-//    self.program = program
-//    self.station = station
-//    self.clientId = clientId
-//    self.isAvailable = isAvailable
-//    self.isLocalPtt = isLocalPtt
-//    self.isThisClient = isThisClient
-//  }
-  
   public static func ==(lhs: GuiClient, rhs: GuiClient) -> Bool {
     
     if lhs.handle   != rhs.handle   { return false }
@@ -348,7 +328,7 @@ public struct GuiClient       : Equatable {
   }
 }
 
-/// DiscoveryStruct Struct implementation
+/// DiscoveryPacket class implementation
 ///
 ///     A class therefore a "reference" type
 ///     Equatable by serial number

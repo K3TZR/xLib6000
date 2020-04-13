@@ -189,7 +189,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       case .type:         break  // included to inhibit unknown token warnings
       case .slice:
         // do we have a good reference to the GUI Client?
-        if let handle = _radio.findGuiClientHandle(for: _radio.boundClientId ?? "") {
+        if let handle = _radio.findHandle(for: _radio.boundClientId) {
           // YES,
           let slice = _radio.findSlice(letter: property.value, guiClientHandle: handle)
           willChangeValue(for: \.slice)  ; _slice = slice  ; didChangeValue(for: \.slice)
