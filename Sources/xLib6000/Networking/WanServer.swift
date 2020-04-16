@@ -51,8 +51,8 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let pingQ                          = DispatchQueue(label: Api.kName + ".WanServer.pingQ")
-  static let socketQ                        = DispatchQueue(label: Api.kName + ".WanServer.socketQ")
+  static let pingQ    = DispatchQueue(label: Api.kName + ".WanServer.pingQ")
+  static let socketQ  = DispatchQueue(label: Api.kName + ".WanServer.socketQ")
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -73,22 +73,22 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private weak  var _delegate               : WanServerDelegate?
-  private       let _log                    = Log.sharedInstance.logMessage
+  private weak  var _delegate       : WanServerDelegate?
+  private       let _log            = Log.sharedInstance.logMessage
 
-  private let _api                          = Api.sharedInstance
-  private var _appName                      = ""
-  private var _currentHost                  = ""
-  private var _currentPort                  : UInt16 = 0
-  private var _platform                     = ""
-  private var _ping                         = false
-  private var _pingTimer                    : DispatchSourceTimer?
-  private var _timeout                      = 0.0                // seconds
-  private var _tlsSocket                    : GCDAsyncSocket!
-  private var _token                        = ""
+  private let _api                  = Api.sharedInstance
+  private var _appName              = ""
+  private var _currentHost          = ""
+  private var _currentPort          : UInt16 = 0
+  private var _platform             = ""
+  private var _ping                 = false
+  private var _pingTimer            : DispatchSourceTimer?
+  private var _timeout              = 0.0                // seconds
+  private var _tlsSocket            : GCDAsyncSocket!
+  private var _token                = ""
 
-  private let kHostName                     = "smartlink.flexradio.com"
-  private let kHostPort                     = 443
+  private let kHostName             = "smartlink.flexradio.com"
+  private let kHostPort             = 443
 
   private enum Token: String {
     case application
@@ -216,14 +216,13 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      _log("sendConnectMessageForRadio, Not connected", .warning, #function, #file, #line)
+      _log(Self.className() + ": sendConnectMessageForRadio, Not connected", .warning, #function, #file, #line)
       return
     }
     // send a command to SmartLink to request a connection to the specified Radio
-    let command = "application connect serial" + "=\(radioSerial)" + " hole_punch_port" + "=\(String(holePunchPort))"
-    sendCommand(command)
+    sendTlsCommand("application connect serial" + "=\(radioSerial)" + " hole_punch_port" + "=\(String(holePunchPort))")
     
-    _log("Connect Message sent to SmartLink server", .debug, #function, #file, #line)
+    _log(Self.className() + ": Connect Message sent to SmartLink server", .debug, #function, #file, #line)
   }
   /// Disconnect users
   ///
@@ -237,7 +236,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       return
     }
     // send a command to SmartLink to request disconnection from the specified Radio
-    sendCommand("application disconnect_users serial" + "=\(radioSerial)" )
+    sendTlsCommand("application disconnect_users serial" + "=\(radioSerial)" )
   }
   /// Test connection
   ///
@@ -251,7 +250,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       return
     }
     // send a command to SmartLink to test the connection for the specified Radio
-    sendCommand("application test_connection serial" + "=\(radioSerial)" )
+    sendTlsCommand("application test_connection serial" + "=\(radioSerial)" )
   }
 
   // ------------------------------------------------------------------------------
@@ -556,38 +555,6 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // delegate call
     _delegate?.wanRadioListReceived(wanRadioList: wanRadioList)
   }
-  /// Parse GuiClient info
-  ///
-  /// - Parameters:
-  ///   - handles:          comma separated list of handles
-  ///   - programs:         comma separated list of programs
-  ///   - stations:         comma separated list of stations
-  /// - Returns:            an array of GuiClientx
-  ///
-  func parseGuiClients(handles: String, programs: String, stations: String) -> [GuiClient] {
-    var guiClients = [GuiClient]()
-    
-    // guard that all values are non-empty
-    guard handles != "" else { return guiClients }
-    
-    // separate the values
-    let handlesArray = handles.components(separatedBy: ",")
-    let programsArray = programs.components(separatedBy: ",")
-    let stationsArray = stations.components(separatedBy: ",")
-    
-    // guard that there is at least one value and there are an equal number of values
-    guard handlesArray.count == programsArray.count && programsArray.count == stationsArray.count else { return guiClients }
-    
-    // parse into the GuiClient struct
-    for i in 0..<handlesArray.count {
-      
-      // create a new GuiClient
-      guiClients.append( GuiClient(handle:   handlesArray[i].handle!,
-                                   program:  programsArray[i],
-                                   station:  stationsArray[i].replacingOccurrences(of: "\007f", with: " ")))
-    }
-    return guiClients
-  }
   /// Parse a Test Connection result
   ///
   /// - Parameter properties:         a KeyValuesArray
@@ -639,7 +606,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     _pingTimer?.setEventHandler { [ unowned self] in
       
       // send another Ping
-      self.sendCommand("ping from client")
+      self.sendTlsCommand("ping from client")
     }
     // start the timer
     _pingTimer?.resume()
@@ -659,7 +626,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   /// - Parameter cmd:                command text
   ///
-  private func sendCommand(_ cmd: String) {
+  private func sendTlsCommand(_ cmd: String) {
     
     // send the specified command to the SmartLink server using TLS
     let command = cmd + "\n"
@@ -669,7 +636,73 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - GCDAsyncSocket Delegate methods
   //      Note: all are called on the _socketQ
-  
+  //
+  //      1. A TCP connection is opened to the SmartLink server
+  //      2. A TLS connection is then initiated over the TCP connection
+  //      3. The TLS connection "secures" and is now ready for use
+  //
+  //      If a TLS negotiation fails (invalid certificate, etc) then the socket will immediately close,
+  //      and the socketDidDisconnect:withError: delegate method will be called with an error code.
+  //
+
+  /// Called after the TCP/IP connection has been established
+  ///
+  /// - Parameters:
+  ///   - sock:               the socket
+  ///   - host:               the host
+  ///   - port:               the port
+  ///
+  @objc public func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
+    
+    // Connected to the SmartLink server, save the ip & port
+    _currentHost = sock.connectedHost ?? ""
+    _currentPort = sock.connectedPort
+    
+    _log(Self.className() + ": SmartLink Server \(_currentHost), port \(_currentPort): Connected", .info, #function, #file, #line)
+
+    // initiate a secure (TLS) connection to the SmartLink server
+    var tlsSettings = [String : NSObject]()
+    tlsSettings[kCFStreamSSLPeerName as String] = kHostName as NSObject
+    _tlsSocket.startTLS(tlsSettings)
+    
+    // start pinging (if needed)
+    if _ping { startPinging() }
+    
+    _isConnected = true
+  }
+  /// Called after the socket has successfully completed SSL/TLS negotiation
+  ///
+  ///       This method is not called unless you use the provided startTLS method.
+  ///
+  /// - Parameter sock:           the socket
+  ///
+  @objc public func socketDidSecure(_ sock: GCDAsyncSocket) {
+    
+    _log(Self.className() + ": SmartLink server TLS connection: Did Secure", .info, #function, #file, #line)
+
+    // register the Application / token pair with the SmartLink server
+    sendTlsCommand("application register name" + "=\(_appName)" + " platform" + "=\(_platform)" + " token" + "=\(_token)")
+    
+    // start reading
+    readNext()
+  }
+  /// Called when data has been read from the TCP/IP connection
+  /// - Parameters:
+  ///   - sock:                 the socket data was received on
+  ///   - data:                 the Data
+  ///   - tag:                  the Tag associated with this receipt
+  ///
+  @objc public func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
+    
+    // get the bytes that were read
+    let msg = String(data: data, encoding: .ascii)!
+    
+    // trigger the next read
+    readNext()
+    
+    // process the message
+    parseMsg(msg)
+  }
   /// Called when the TCP/IP connection has been disconnected
   ///
   /// - Parameters:
@@ -687,73 +720,6 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     _isConnected = false
     _currentHost = ""
     _currentPort = 0
-  }
-  /// Called after the TCP/IP connection has been established
-  ///
-  /// - Parameters:
-  ///   - sock:               the socket
-  ///   - host:               the host
-  ///   - port:               the port
-  ///
-  @objc public func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
-    
-    // Connected to the SmartLink server, save the ip & port
-    _currentHost = sock.connectedHost ?? ""
-    _currentPort = sock.connectedPort
-    
-    _log(Self.className() + ": SmartLink Server \(_currentHost), port \(_currentPort): Connected", .info, #function, #file, #line)
-
-    // start a secure (TLS) connection to the SmartLink server
-    var tlsSettings = [String : NSObject]()
-    tlsSettings[kCFStreamSSLPeerName as String] = kHostName as NSObject
-    _tlsSocket.startTLS(tlsSettings)
-    
-    // start pinging (if needed)
-    if _ping { startPinging() }
-    
-    _isConnected = true
-  }
-  /// Called when data has been read from the TCP/IP connection
-  ///
-  /// - Parameters:
-  ///   - sock:                 the socket data was received on
-  ///   - data:                 the Data
-  ///   - tag:                  the Tag associated with this receipt
-  ///
-  @objc public func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
-    
-    // get the bytes that were read
-    let msg = String(data: data, encoding: .ascii)!
-    
-    // trigger the next read
-    readNext()
-    
-    // process the message
-    parseMsg(msg)
-  }
-  /**
-   * Called after the socket has successfully completed SSL/TLS negotiation.
-   * This method is not called unless you use the provided startTLS method.
-   *
-   * If a SSL/TLS negotiation fails (invalid certificate, etc) then the socket will immediately close,
-   * and the socketDidDisconnect:withError: delegate method will be called with the specific SSL error code.
-   **/
-  /// Called after the socket has successfully completed SSL/TLS negotiation
-  ///
-  /// - Parameter sock:           the socket
-  ///
-  @objc public func socketDidSecure(_ sock: GCDAsyncSocket) {
-    
-    // starting the communication with the server over TLS
-    let command = "application register name" + "=\(_appName)" + " platform" + "=\(_platform)" + " token" + "=\(_token)"
-    
-    _log(Self.className() + ": SmartLink server \"Did Secure\": TLS connection", .info, #function, #file, #line)
-
-    // register the Application / token pair with the SmartLink server
-    sendCommand(command)
-    
-    // start reading
-    readNext()
   }
   
   // ----------------------------------------------------------------------------

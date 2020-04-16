@@ -183,11 +183,14 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     
     guard packet.guiClientPrograms != "" && packet.guiClientStations != "" && packet.guiClientHandles != "" else { return }
     
-    let programs = packet.guiClientPrograms.components(separatedBy: ",")
-    let stations = packet.guiClientStations.components(separatedBy: ",")
-    let handles = packet.guiClientHandles.components(separatedBy: ",")
+    let programs  = packet.guiClientPrograms.components(separatedBy: ",")
+    let stations  = packet.guiClientStations.components(separatedBy: ",")
+    let handles   = packet.guiClientHandles.components(separatedBy: ",")
+    let hosts     = packet.guiClientHosts.components(separatedBy: ",")
+    let ips       = packet.guiClientIps.components(separatedBy: ",")
 
-    guard programs.count == stations.count && programs.count == handles.count && stations.count == handles.count else { return }
+    
+    guard programs.count == stations.count && programs.count == handles.count && stations.count == handles.count && hosts.count == handles.count && ips.count == handles.count else { return }
     
     for i in 0..<handles.count {
       
@@ -195,7 +198,9 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         
         packet.guiClients.append( GuiClient(handle: handle,
                                      program: programs[i],
-                                     station: stations[i].replacingOccurrences(of: "\u{007f}", with: " ")))
+                                     station: stations[i].replacingOccurrences(of: "\u{007f}", with: " "),
+                                     host: hosts[i],
+                                     ip: ips[i]))
       }
     }
     return
@@ -237,7 +242,21 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         }
       }
     }
-    oldPacket.status = newPacket.status
+    updateOldPacket(oldPacket, newPacket)
+  }
+  /// Update the existing packet with the changeable fields from the current packet
+  /// - Parameters:
+  ///   - oldPacket:        the existing packet
+  ///   - newPacket:        the new packet
+  ///
+  private func updateOldPacket(_ oldPacket: DiscoveryPacket, _ newPacket: DiscoveryPacket) {
+
+    oldPacket.status                = newPacket.status
+    oldPacket.availableClients      = newPacket.availableClients
+    oldPacket.availablePanadapters  = newPacket.availablePanadapters
+    oldPacket.availableSlices       = newPacket.availableSlices
+    oldPacket.inUseHost             = newPacket.inUseHost
+    oldPacket.inUseIp               = newPacket.inUseIp
   }
   /// Find a radio's Discovery packet
   /// - Parameter serialNumber:     a radio serial number
@@ -310,6 +329,8 @@ public struct GuiClient       : Equatable {
   public var handle           : Handle
   public var program          : String
   public var station          : String
+  public var host             : String = ""
+  public var ip               : String = ""
 
   public var isAvailable      : Bool = false
   public var isLocalPtt       : Bool = false
@@ -348,9 +369,9 @@ public class DiscoveryPacket : Equatable {
   public var firmwareVersion                = ""                            // Radio firmware version (e.g. 2.4.9)
   public var fpcMac                         = ""                            // ??
   public var guiClients                     = [GuiClient]()
-  public var guiClientHandles               : String = ""
-  public var guiClientPrograms              : String = ""
-  public var guiClientStations              : String = ""
+  public var guiClientHandles               = ""
+  public var guiClientPrograms              = ""
+  public var guiClientStations              = ""
   public var guiClientHosts                 = ""
   public var guiClientIps                   = ""
   public var inUseHost                      = ""                            // -- Deprecated --

@@ -541,3 +541,44 @@ struct BarrierClamped<Element: Comparable> {
 //  property.pointee = value
 //  object.didChangeValue(for: keyPath)
 //}
+
+/// Compare the properties of two instances of the same class
+/// - Parameters:
+///   - lhs:          one instance
+///   - rhs:          another instance
+///   - ignoring:     property names to ignore
+///
+public func compare<T>(_ a: T, to b: T, ignoring: [String] ) {
+  
+  func printProperty(_ label: String, _ bValue: Any, _ aValue: Any) {
+    Swift.print(label.padding(toLength: 25, withPad: " ", startingAt: 0) + ": " + "\(aValue)".padding(toLength: 25, withPad: " ", startingAt: 0) + " -> " +  "\(bValue)".padding(toLength: 25, withPad: " ", startingAt: 0))
+  }
+  
+  for aProperty in Mirror(reflecting: a).children {
+    
+    if !ignoring.contains( aProperty.label!) {
+      
+      for bProperty in Mirror(reflecting: b).children where bProperty.label == aProperty.label {
+        
+        if let value = bProperty.value as? String {
+          if value != aProperty.value as? String { printProperty(aProperty.label!, bProperty.value, aProperty.value) }
+          
+        } else if let value = bProperty.value as? Int {
+          if value != aProperty.value as? Int { printProperty(aProperty.label!, bProperty.value, aProperty.value) }
+          
+        } else if let value = bProperty.value as? Float {
+            if value != aProperty.value as? Float { printProperty(aProperty.label!, bProperty.value, aProperty.value) }
+            
+        } else if let value = bProperty.value as? Bool {
+          if value != aProperty.value as? Bool { printProperty(aProperty.label!, bProperty.value, aProperty.value) }
+          
+        } else if let value = bProperty.value as? Date {
+          if value != aProperty.value as? Date { printProperty(aProperty.label!, bProperty.value, aProperty.value) }
+          
+        } else {
+          Swift.print("aProperty.label >\(aProperty.label!)< has unknown type")
+        }
+      }
+    }
+  }
+}

@@ -271,6 +271,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public func sendDisconnect(_ handle: Handle) {
     send("client disconnect " + handle.hex)
   }
+
+  public func sendDisconnectAll() {
+    send("client disconnect")
+  }
+
+  public func sendDisconnectWan(_ serialNumber: String) {
+    send("application disconnect_users serial" + "=\(serialNumber)" )
+  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal methods
