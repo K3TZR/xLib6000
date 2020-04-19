@@ -665,38 +665,48 @@ public class PanadapterFrame {
   ///
   public func accumulate(version: Version, vita: Vita, expectedFrame: inout Int) -> Bool {
     
-    let payloadPtr = UnsafeRawPointer(vita.payloadData)
+//    let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
     if version.isGreaterThanV22 {
       // 2.3.x or greater
       // Bins are just beyond the payload
       _byteOffsetToBins = MemoryLayout<PayloadHeader>.size
+            
+      vita.payloadData.withUnsafeBytes { ptr in
+        
+        // map the payload to the New Payload struct
+        let hdr = ptr.bindMemory(to: PayloadHeader.self)
+
+        startingBin = Int(CFSwapInt16BigToHost(hdr[0].startingBin))
+        numberOfBins = Int(CFSwapInt16BigToHost(hdr[0].numberOfBins))
+        binSize = Int(CFSwapInt16BigToHost(hdr[0].binSize))
+        totalBins = Int(CFSwapInt16BigToHost(hdr[0].totalBins))
+        receivedFrame = Int(CFSwapInt32BigToHost(hdr[0].frameIndex))
+      }
       
-      // map the payload to the New Payload struct
-      let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
-      
-      // byte swap and convert each payload component
-      startingBin = Int(CFSwapInt16BigToHost(p.pointee.startingBin))
-      numberOfBins = Int(CFSwapInt16BigToHost(p.pointee.numberOfBins))
-      binSize = Int(CFSwapInt16BigToHost(p.pointee.binSize))
-      totalBins = Int(CFSwapInt16BigToHost(p.pointee.totalBins))
-      receivedFrame = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
       
     } else {
       // pre 2.3.x
       // Bins are just beyond the payload
       _byteOffsetToBins = MemoryLayout<PayloadHeaderOld>.size
       
-      // map the payload to the Old Payload struct
-      let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
-      
-      // byte swap and convert each payload component
-      startingBin = Int(CFSwapInt32BigToHost(p.pointee.startingBin))
-      numberOfBins = Int(CFSwapInt32BigToHost(p.pointee.numberOfBins))
-      binSize = Int(CFSwapInt32BigToHost(p.pointee.binSize))
-      totalBins = numberOfBins
-      receivedFrame = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
+      vita.payloadData.withUnsafeBytes { ptr in
+        
+        // map the payload to the New Payload struct
+        let hdr = ptr.bindMemory(to: PayloadHeaderOld.self)
+        
+        // byte swap and convert each payload component
+        startingBin = Int(CFSwapInt32BigToHost(hdr[0].startingBin))
+        numberOfBins = Int(CFSwapInt32BigToHost(hdr[0].numberOfBins))
+        binSize = Int(CFSwapInt32BigToHost(hdr[0].binSize))
+        totalBins = numberOfBins
+        receivedFrame = Int(CFSwapInt32BigToHost(hdr[0].frameIndex))
+      }
     }
+    // validate the packet (could be incomplete at startup)
+    if totalBins == 0 { return false }
+    if startingBin + numberOfBins > totalBins { return false }
+
     // initial frame?
     if expectedFrame == -1 { expectedFrame = receivedFrame }
     
@@ -704,25 +714,23 @@ public class PanadapterFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log("Ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Panadapter: Ignored frame(s), expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       return false
       
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
-      _log("Missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Panadapter: Missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       expectedFrame = received
       fallthrough
       
     default:
       // received == expected
-      // get a pointer to the Bins in the payload
-      let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
-      
-      // Swap the byte ordering of the data & place it in the bins
-      for i in 0..<numberOfBins {
-        bins[i+startingBin] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
+      vita.payloadData.withUnsafeBytes { ptr in
+        // Swap the byte ordering of the data & place it in the bins
+        for i in 0..<numberOfBins {
+          bins[i+startingBin] = CFSwapInt16BigToHost( ptr.load(fromByteOffset: _byteOffsetToBins + (2 * i), as: UInt16.self) )
+        }
       }
-      
       // reset the count if the entire frame has been accumulated
       if startingBin + numberOfBins == totalBins { numberOfBins = totalBins  ; expectedFrame += 1 }
     }

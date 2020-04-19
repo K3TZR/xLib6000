@@ -325,7 +325,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         
         _pinger = Pinger(tcpManager: tcp, pingQ: _pingQ)
 
-        let wanStatus = isWan ? "REMOTE" : "LOCAL"
+        let wanStatus = isWan ? "SMARTLINK" : "LOCAL"
         let port = (isWan ? radio.discoveryPacket.publicTlsPort : radio.discoveryPacket.port)
         _log(Self.className() + " Pinger started: \(radio.discoveryPacket.nickname) @ \(radio.discoveryPacket.publicIp), port: \(port) (\(wanStatus))", .info, #function, #file, #line)
       }
@@ -491,7 +491,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     apiState = .tcpConnected
     
     // log it
-    let wanStatus = isWan ? "REMOTE" : "LOCAL"
+    let wanStatus = isWan ? "SMARTLINK" : "LOCAL"
     let guiStatus = isGui ? "(GUI) " : ""
     _log(Self.className() + " TCP connected to: \(host), port: \(port) \(guiStatus)(\(wanStatus))", .info, #function, #file, #line)
 

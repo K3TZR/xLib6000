@@ -293,7 +293,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   ///
   func vitaProcessor(_ vita: Vita) {
     
-    // convert the Vita struct and accumulate a WaterfallFrame
+    // convert the Vita struct and accumulate a WaterfallFrame    
     if _waterfallframes[_index].accumulate(version: _radio.version, vita: vita, expectedFrame: &packetFrame) {
 
       // save the auto black level
@@ -408,48 +408,56 @@ public class WaterfallFrame {
   ///
   public func accumulate(version: Version, vita: Vita, expectedFrame: inout Int) -> Bool {
     
-    let payloadPtr = UnsafeRawPointer(vita.payloadData)
+//    let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
     if version.isGreaterThanV22 {
       // 2.3.x or greater
-      // map the payload to the New Payload struct
-      let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
-      
-      // 2.3.x or greater
       // Bins are just beyond the payload
       _byteOffsetToBins = MemoryLayout<PayloadHeader>.size
-      
-      // byte swap and convert each payload component
-      firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
-      binBandwidth = CGFloat(CFSwapInt64BigToHost(p.pointee.binBandwidth)) / 1.048576E6
-      lineDuration = Int( CFSwapInt32BigToHost(p.pointee.lineDuration) )
-      numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
-      height = Int( CFSwapInt16BigToHost(p.pointee.height) )
-      receivedFrame = Int( CFSwapInt32BigToHost(p.pointee.receivedFrame) )
-      autoBlackLevel = CFSwapInt32BigToHost(p.pointee.autoBlackLevel)
-      totalBins = Int( CFSwapInt16BigToHost(p.pointee.totalBins) )
-      startingBin = Int( CFSwapInt16BigToHost(p.pointee.firstBin) )
+
+      vita.payloadData.withUnsafeBytes { ptr in
+        
+        // map the payload to the New Payload struct
+        let hdr = ptr.bindMemory(to: PayloadHeader.self)
+        
+        // byte swap and convert each payload component
+        firstBinFreq = CGFloat(CFSwapInt64BigToHost(hdr[0].firstBinFreq)) / 1.048576E6
+        binBandwidth = CGFloat(CFSwapInt64BigToHost(hdr[0].binBandwidth)) / 1.048576E6
+        lineDuration = Int( CFSwapInt32BigToHost(hdr[0].lineDuration) )
+        numberOfBins = Int( CFSwapInt16BigToHost(hdr[0].numberOfBins) )
+        height = Int( CFSwapInt16BigToHost(hdr[0].height) )
+        receivedFrame = Int( CFSwapInt32BigToHost(hdr[0].receivedFrame) )
+        autoBlackLevel = CFSwapInt32BigToHost(hdr[0].autoBlackLevel)
+        totalBins = Int( CFSwapInt16BigToHost(hdr[0].totalBins) )
+        startingBin = Int( CFSwapInt16BigToHost(hdr[0].firstBin) )
+      }
       
     } else {
-      // pre 2.3.x
-      // map the payload to the Old Payload struct
-      let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
-      
       // pre 2.3.x
       // Bins are just beyond the payload
       _byteOffsetToBins = MemoryLayout<PayloadHeaderOld>.size
       
-      // byte swap and convert each payload component
-      firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
-      binBandwidth = CGFloat(CFSwapInt64BigToHost(p.pointee.binBandwidth)) / 1.048576E6
-      lineDuration = Int( CFSwapInt32BigToHost(p.pointee.lineDuration) )
-      numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
-      height = Int( CFSwapInt16BigToHost(p.pointee.lineHeight) )
-      receivedFrame = Int( CFSwapInt32BigToHost(p.pointee.receivedFrame) )
-      autoBlackLevel = CFSwapInt32BigToHost(p.pointee.autoBlackLevel)
-      totalBins = numberOfBins
-      startingBin = 0
+      vita.payloadData.withUnsafeBytes { ptr in
+        
+        // map the payload to the New Payload struct
+        let hdr = ptr.bindMemory(to: PayloadHeaderOld.self)
+        
+        // byte swap and convert each payload component
+        firstBinFreq = CGFloat(CFSwapInt64BigToHost(hdr[0].firstBinFreq)) / 1.048576E6
+        binBandwidth = CGFloat(CFSwapInt64BigToHost(hdr[0].binBandwidth)) / 1.048576E6
+        lineDuration = Int( CFSwapInt32BigToHost(hdr[0].lineDuration) )
+        numberOfBins = Int( CFSwapInt16BigToHost(hdr[0].numberOfBins) )
+        height = Int( CFSwapInt16BigToHost(hdr[0].lineHeight) )
+        receivedFrame = Int( CFSwapInt32BigToHost(hdr[0].receivedFrame) )
+        autoBlackLevel = CFSwapInt32BigToHost(hdr[0].autoBlackLevel)
+        totalBins = numberOfBins
+        startingBin = 0
+      }
     }
+    // validate the packet (could be incomplete at startup)
+    if totalBins == 0 { return false }
+    if startingBin + numberOfBins > totalBins { return false }
+
     // initial frame?
     if expectedFrame == -1 { expectedFrame = receivedFrame }
     
@@ -457,25 +465,23 @@ public class WaterfallFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log("Waterfall ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Waterfall: Ignored frame(s), expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       return false
       
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
-      _log("Waterfall missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Waterfall: Missing frame(s), expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       expectedFrame = received
       fallthrough
       
     default:
       // received == expected
-      // get a pointer to the Bins in the payload
-      let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
-      
-      // Swap the byte ordering of the data & place it in the bins
-      for i in 0..<numberOfBins {
-        bins[i+startingBin] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
-      }
-
+      vita.payloadData.withUnsafeBytes { ptr in
+        // Swap the byte ordering of the data & place it in the bins
+        for i in 0..<numberOfBins {
+          bins[i+startingBin] = CFSwapInt16BigToHost( ptr.load(fromByteOffset: _byteOffsetToBins + (2 * i), as: UInt16.self) )
+        }
+      }      
       // reset the count if the entire frame has been accumulated
       if startingBin + numberOfBins == totalBins { numberOfBins = totalBins  ; expectedFrame += 1 }
     }

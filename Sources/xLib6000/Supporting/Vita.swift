@@ -332,34 +332,42 @@ public class Vita {
         
         switch token {
           
-        case .availableClients:           discoveredRadio.availableClients = property.value.iValue
-        case .availablePanadapters:       discoveredRadio.availablePanadapters = property.value.iValue
-        case .availableSlices:            discoveredRadio.availableSlices = property.value.iValue
+        case .availableClients:           discoveredRadio.availableClients = property.value.iValue      // newApi only
+        case .availablePanadapters:       discoveredRadio.availablePanadapters = property.value.iValue  // newApi only
+        case .availableSlices:            discoveredRadio.availableSlices = property.value.iValue       // newApi only
         case .callsign:                   discoveredRadio.callsign = property.value
-        case .discoveryVersion:           discoveredRadio.discoveryVersion = property.value
+        case .discoveryVersion:           discoveredRadio.discoveryVersion = property.value             // local only
         case .firmwareVersion:            discoveredRadio.firmwareVersion = property.value
-        case .fpcMac:                     discoveredRadio.fpcMac = property.value
-        case .guiClientHandles:           discoveredRadio.guiClientHandles = property.value
-        case .guiClientHosts:             discoveredRadio.guiClientHosts = property.value
-        case .guiClientIps:               discoveredRadio.guiClientIps = property.value
-        case .guiClientPrograms:          discoveredRadio.guiClientPrograms = property.value
-        case .guiClientStations:          discoveredRadio.guiClientStations = property.value
-        case .inUseHost:                  discoveredRadio.inUseHost = property.value
-        case .inUseIp:                    discoveredRadio.inUseIp = property.value
-        case .licensedClients:            discoveredRadio.licensedClients = property.value.iValue
+        case .fpcMac:                     discoveredRadio.fpcMac = property.value                       // local only
+        case .guiClientHandles:           discoveredRadio.guiClientHandles = property.value             // newApi only
+        case .guiClientHosts:             discoveredRadio.guiClientHosts = property.value               // newApi only
+        case .guiClientIps:               discoveredRadio.guiClientIps = property.value                 // newApi only
+        case .guiClientPrograms:          discoveredRadio.guiClientPrograms = property.value            // newApi only
+        case .guiClientStations:          discoveredRadio.guiClientStations = property.value            // newApi only
+        case .inUseHostLOCAL:             discoveredRadio.inUseHost = property.value                    // deprecated in newApi
+        case .inUseIpLOCAL:               discoveredRadio.inUseIp = property.value                      // deprecated in newApi
+        case .licensedClients:            discoveredRadio.licensedClients = property.value.iValue       // newApi only
         case .maxLicensedVersion:         discoveredRadio.maxLicensedVersion = property.value
-        case .maxPanadapters:             discoveredRadio.maxPanadapters = property.value.iValue
-        case .maxSlices:                  discoveredRadio.maxSlices = property.value.iValue
+        case .maxPanadapters:             discoveredRadio.maxPanadapters = property.value.iValue        // newApi only
+        case .maxSlices:                  discoveredRadio.maxSlices = property.value.iValue             // newApi only
         case .model:                      discoveredRadio.model = property.value
-        case .nickname:                   discoveredRadio.nickname = property.value
+        case .nicknameLOCAL:              discoveredRadio.nickname = property.value
         case .port:                       discoveredRadio.port = property.value.iValue
-        case .publicIp:                   discoveredRadio.publicIp = property.value
+        case .publicIpLOCAL:              discoveredRadio.publicIp = property.value
+        case .publicTlsPort:              discoveredRadio.publicTlsPort = property.value.iValue         // smartlink only
+        case .publicUdpPort:              discoveredRadio.publicUdpPort = property.value.iValue         // smartlink only
+        case .publicUpnpTlsPort:          discoveredRadio.publicUpnpTlsPort = property.value.iValue     // smartlink only
+        case .publicUpnpUdpPort:          discoveredRadio.publicUpnpUdpPort = property.value.iValue     // smartlink only
         case .radioLicenseId:             discoveredRadio.radioLicenseId = property.value
         case .requiresAdditionalLicense:  discoveredRadio.requiresAdditionalLicense = property.value.bValue
         case .serialNumber:               discoveredRadio.serialNumber = property.value
         case .status:                     discoveredRadio.status = property.value
-        case .wanConnected:               discoveredRadio.wanConnected = property.value.bValue
+        case .upnpSupported:              discoveredRadio.upnpSupported = property.value.bValue         // smartlink only
+        case .wanConnected:               discoveredRadio.wanConnected = property.value.bValue          // local only
           
+        // present to suppress log warning, should never occur
+        case .inUseHostSMARTLINK, .inUseIpSMARTLINK, .nicknameSMARTLINK, .publicIpSMARTLINK:    break
+
         // satisfy the switch statement, not a real token
         case .lastSeen:                   break
         }
@@ -502,36 +510,52 @@ extension Vita {
   }
   /// Discovery properties
   ///
-  enum DiscoveryToken : String {            // Discovery Tokens
-    case availableClients                   = "available_clients"
-    case availablePanadapters               = "available_panadapters"
-    case availableSlices                    = "available_slices"
+  public enum DiscoveryToken : String {            // Discovery Tokens
+    case lastSeen                           = "last_seen"                   // not a real token
+
+    case availableClients                   = "available_clients"           // newApi, local only
+    case availablePanadapters               = "available_panadapters"       // newApi, local only
+    case availableSlices                    = "available_slices"            // newApi, local only
     case callsign
-    case discoveryVersion                   = "discovery_protocol_version"
+    case discoveryVersion                   = "discovery_protocol_version"  // local only
     case firmwareVersion                    = "version"
-    case fpcMac                             = "fpc_mac"
-    case guiClientHandles                   = "gui_client_handles"
-    case guiClientHosts                     = "gui_client_hosts"
-    case guiClientIps                       = "gui_client_ips"
-    case guiClientPrograms                  = "gui_client_programs"
-    case guiClientStations                  = "gui_client_stations"
-    case inUseHost                          = "inuse_host"
-    case inUseIp                            = "inuse_ip"
-    case licensedClients                    = "licensed_clients"
+    case fpcMac                             = "fpc_mac"                     // local only
+    case guiClientHandles                   = "gui_client_handles"          // newApi
+    case guiClientHosts                     = "gui_client_hosts"            // newApi
+    case guiClientIps                       = "gui_client_ips"              // newApi
+    case guiClientPrograms                  = "gui_client_programs"         // newApi
+    case guiClientStations                  = "gui_client_stations"         // newApi
+
+    case inUseHostLOCAL                     = "inuse_host"                  // deprecated -- local only
+    case inUseHostSMARTLINK                 = "inusehost"                   // deprecated -- smartlink only
+
+    case inUseIpLOCAL                       = "inuse_ip"                    // deprecated -- local only
+    case inUseIpSMARTLINK                   = "inuseip"                     // deprecated -- smartlink only
+
+    case licensedClients                    = "licensed_clients"            // newApi, local only
     case maxLicensedVersion                 = "max_licensed_version"
-    case maxPanadapters                     = "max_panadapters"
-    case maxSlices                          = "max_slices"
+    case maxPanadapters                     = "max_panadapters"             // newApi, local only
+    case maxSlices                          = "max_slices"                  // newApi, local only
     case model
-    case nickname                           = "nickname"
-    case port
-    case publicIp                           = "ip"
-    case radioLicenseId                     = "radio_license_id"
+
+    case nicknameLOCAL                      = "nickname"                    // local only
+    case nicknameSMARTLINK                  = "radio_name"                  // smartlink only
+
+    case port                                                               // local only
+
+    case publicIpLOCAL                      = "ip"                          // local only
+    case publicIpSMARTLINK                  = "public_ip"                   // smartlink only
+
+    case publicTlsPort                      = "public_tls_port"             // smartlink only
+    case publicUdpPort                      = "public_udp_port"             // smartlink only
+    case publicUpnpTlsPort                  = "public_upnp_tls_port"        // smartlink only
+    case publicUpnpUdpPort                  = "public_upnp_udp_port"        // smartlink only
     case requiresAdditionalLicense          = "requires_additional_license"
+    case radioLicenseId                     = "radio_license_id"
     case serialNumber                       = "serial"
     case status
-    case wanConnected                       = "wan_connected"
-    
-    case lastSeen   // not a real token
+    case upnpSupported                      = "upnp_supported"              // smartlink only
+    case wanConnected                       = "wan_connected"               // Local only
   }
   /// Packet Types
   ///

@@ -98,13 +98,18 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
           // check the timestamps of the Discovered radios
           for i in 0..<self.discoveredRadios.count {
             
-            let interval = abs(self.discoveredRadios[i].lastSeen.timeIntervalSinceNow)
-            
-            // is it past expiration?
-            if interval > notSeenInterval {
+            if !self.discoveredRadios[i].isWan {
               
-              // YES, add to the delete list
-              deleteList.append(i)
+              let interval = abs(self.discoveredRadios[i].lastSeen.timeIntervalSinceNow)
+              
+              // is it past expiration?
+              if interval > notSeenInterval {                
+                
+//                Swift.print("Delete @ Index = \(i), interval = \(interval)")
+                
+                // YES, add to the delete list
+                deleteList.append(i)
+              }
             }
           }
           // are there any deletions?
@@ -112,6 +117,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
             
             // YES, remove the Radio(s)
             for index in deleteList.reversed() {
+              
               // remove a Radio
               self.discoveredRadios.remove(at: index)
             }
@@ -172,7 +178,44 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     // send the current list of radios to all observers
     NC.post(.discoveredRadios, object: self.discoveredRadios as Any?)
   }
+  
+  
+  
+  
+  public func processPacket(_ newPacket: DiscoveryPacket) {
+    
+    // parse the packet to populate its GuiClients
+    parseGuiClientsFromDiscovery(newPacket)
+    
+    // is there a previous packet with the same serialNumber and isWan?
+    if let radioIndex = findRadioPacket(with: newPacket) {
+//      Swift.print("KNOWN RADIO, Count now  = \(discoveredRadios.count)")
 
+      // known radio
+      scanGuiClients(newPacket, discoveredRadios[radioIndex])
+
+    } else {
+      // unknown radio, add it
+      discoveredRadios.append(newPacket)
+
+//      Swift.print("UNKNOWN RADIO, Count now  = \(discoveredRadios.count)")
+      
+      for i in 0..<newPacket.guiClients.count {
+        Log.sharedInstance.logMessage("\(newPacket.nickname), GuiClient added:   \(newPacket.guiClients[i].handle.hex), \(newPacket.guiClients[i].station), \(newPacket.guiClients[i].program)", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i].station as Any?)
+      }
+      // log Radio addition
+      Log.sharedInstance.logMessage("Radio added: \(newPacket.nickname), isWan = \(newPacket.isWan)", .debug, #function, #file, #line)
+      
+      // notify observers of Radio addition
+      NC.post(.discoveredRadios, object: discoveredRadios as Any?)
+    }
+  }
+
+  
+  
+  
+  
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
@@ -224,7 +267,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         let program = oldPacket.guiClients[i].program
         oldPacket.guiClients.remove(at: i)
         
-        Log.sharedInstance.logMessage("Known radio  ,\(newPacket.nickname), GuiClient removed: \(handle.hex), \(station), \(program)", .debug, #function, #file, #line)
+        Log.sharedInstance.logMessage("\(newPacket.nickname), GuiClient removed: \(handle.hex), \(station), \(program)", .debug, #function, #file, #line)
         NC.post(.guiClientHasBeenRemoved, object: station as Any?)
       }
     }
@@ -237,7 +280,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
           // NO, add it
           oldPacket.guiClients.append(newPacket.guiClients[i])
           
-          Log.sharedInstance.logMessage("Known radio  ,\(newPacket.nickname), GuiClient added:   \(newPacket.guiClients[i].handle.hex), \(newPacket.guiClients[i].station), \(newPacket.guiClients[i].program)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("\(newPacket.nickname), GuiClient added:   \(newPacket.guiClients[i].handle.hex), \(newPacket.guiClients[i].station), \(newPacket.guiClients[i].program)", .debug, #function, #file, #line)
           NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i].station as Any?)
         }
       }
@@ -257,23 +300,24 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     oldPacket.availableSlices       = newPacket.availableSlices
     oldPacket.inUseHost             = newPacket.inUseHost
     oldPacket.inUseIp               = newPacket.inUseIp
+    oldPacket.isWan                 = newPacket.isWan
   }
   /// Find a radio's Discovery packet
   /// - Parameter serialNumber:     a radio serial number
   /// - Returns:                    the index of the radio in Discovered Radios
   ///
-  private func findRadioPacket(with serialNumber: String) -> Int? {
+  private func findRadioPacket(with newPacket: DiscoveryPacket) -> Int? {
     
     // is the Radio already in the discoveredRadios array?
-    for (i, packet) in discoveredRadios.enumerated() {
-      if packet.serialNumber == serialNumber { return i }
+    for (i, existingPacket) in discoveredRadios.enumerated() {
+      if existingPacket.serialNumber == newPacket.serialNumber && existingPacket.isWan == newPacket.isWan { return i }
     }
     return nil
   }
 
   // ----------------------------------------------------------------------------
   // MARK: - GCDAsyncUdp delegate method
-  
+    
   /// The Socket received data
   ///
   ///   GCDAsyncUdpSocket delegate method, executes on the udpReceiveQ
@@ -292,31 +336,13 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     // parse vita to obtain a DiscoveryPacket
     guard let newPacket = Vita.parseDiscovery(vita) else { return }
     
-    // parse the packet to populate its GuiClients
-    parseGuiClientsFromDiscovery(newPacket)
-    
-    // is there a previous packet with the same serialNumber?
-    if let radioIndex = findRadioPacket(with: newPacket.serialNumber) {
-      // known radio
-      scanGuiClients(newPacket, discoveredRadios[radioIndex])
-      
-    } else {
-      // unknown radio, add it
-      discoveredRadios.append(newPacket)
-      
-      for i in 0..<newPacket.guiClients.count {
-        Log.sharedInstance.logMessage("Unknown radio, \(newPacket.nickname), GuiClient added:   \(newPacket.guiClients[i].handle.hex), \(newPacket.guiClients[i].station), \(newPacket.guiClients[i].program)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i].station as Any?)
-      }
-      // log Radio addition
-      Log.sharedInstance.logMessage("Unknown Radio added: \(newPacket.nickname)", .debug, #function, #file, #line)
-      
-      // notify observers of Radio addition
-      NC.post(.discoveredRadios, object: discoveredRadios as Any?)
-    }
+//    Swift.print("BEFORE Discovery packet processed, Count = \(discoveredRadios.count)")
+
+    processPacket(newPacket)
+
+//    Swift.print("AFTER Discovery packet processed, Count = \(discoveredRadios.count)")
   }
 }
-  
 /// GuiClient Class implementation
 ///
 ///     A struct therefore a "value" type
@@ -359,44 +385,53 @@ public class DiscoveryPacket : Equatable {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var lastSeen                       = Date()                        // data/time last broadcast from Radio
+  public var lastSeen                       = Date()
   
-  public var availableClients               = 0
-  public var availablePanadapters           = 0
-  public var availableSlices                = 0
-  public var callsign                       = ""                            // user assigned call sign
-  public var discoveryVersion               = ""                            // e.g. 2.0.0.1
-  public var firmwareVersion                = ""                            // Radio firmware version (e.g. 2.4.9)
-  public var fpcMac                         = ""                            // ??
+  public var availableClients               = 0                   // newAPI, Local only
+  public var availablePanadapters           = 0                   // newAPI, Local only
+  public var availableSlices                = 0                   // newAPI, Local only
+  public var callsign                       = ""
+  public var discoveryVersion               = ""                  // Local only
+  public var firmwareVersion                = ""
+  public var fpcMac                         = ""                  // Local only
   public var guiClients                     = [GuiClient]()
-  public var guiClientHandles               = ""
-  public var guiClientPrograms              = ""
-  public var guiClientStations              = ""
-  public var guiClientHosts                 = ""
-  public var guiClientIps                   = ""
-  public var inUseHost                      = ""                            // -- Deprecated --
-  public var inUseIp                        = ""                            // -- Deprecated --
-  public var isPortForwardOn                = false
-  public var licensedClients                = 0
-  public var localInterfaceIP               = ""
-  public var lowBandwidthConnect            = false
-  public var maxLicensedVersion             = ""                            // Highest licensed version
-  public var maxPanadapters                 = 0                             //
-  public var maxSlices                      = 0                             //
-  public var model                          = ""                            // Radio model (e.g. FLEX-6500)
-  public var negotiatedHolePunchPort        = -1
-  public var nickname                       = ""                            // user assigned Radio name
-  public var port                           = -1                            // port # broadcast received on
-  public var publicIp                       = ""                            // IP Address (dotted decimal)
-  public var publicTlsPort                  = -1
-  public var publicUdpPort                  = -1
-  public var radioLicenseId                 = ""                            // The current License of the Radio
-  public var requiresAdditionalLicense      = false                         // License needed?
-  public var requiresHolePunch              = false
-  public var serialNumber                   = ""                            // serial number
-  public var status                         = ""                            // available, in_use, connected, update, etc.
-  public var upnpSupported                  = false
-  public var wanConnected                   = false
+  public var guiClientHandles               = ""                  // newAPI only
+  public var guiClientPrograms              = ""                  // newAPI only
+  public var guiClientStations              = ""                  // newAPI only
+  public var guiClientHosts                 = ""                  // newAPI only
+  public var guiClientIps                   = ""                  // newAPI only
+  public var inUseHost                      = ""                  // deprecated -- 2 spellings
+  public var inUseIp                        = ""                  // deprecated -- 2 spellings
+  public var licensedClients                = 0                   // newAPI, Local only
+  public var maxLicensedVersion             = ""
+  public var maxPanadapters                 = 0                   // newAPI, Local only
+  public var maxSlices                      = 0                   // newAPI, Local only
+  public var model                          = ""
+  public var nickname                       = ""                  // 2 spellings
+  public var port                           = -1                  // Local only
+  public var publicIp                       = ""                  // 2 spellings
+  public var publicTlsPort                  = -1                  // SmartLink only
+  public var publicUdpPort                  = -1                  // SmartLink only
+  public var publicUpnpTlsPort              = -1                  // SmartLink only
+  public var publicUpnpUdpPort              = -1                  // SmartLink only
+  public var radioLicenseId                 = ""
+  public var requiresAdditionalLicense      = false
+  public var serialNumber                   = ""
+  public var status                         = ""
+  public var upnpSupported                  = false               // SmartLink only
+  public var wanConnected                   = false               // Local only
+  
+
+  
+  // FIXME: Not really part of the DiscoveryPacket
+  public var isPortForwardOn                = false               // ????
+  public var isWan                          = false
+  public var localInterfaceIP               = ""                  // ????
+  public var lowBandwidthConnect            = false               // ????
+  public var negotiatedHolePunchPort        = -1                  // ????
+  public var requiresHolePunch              = false               // ????
+  public var wanHandle                      = ""               
+
   
   public var description : String {
     return """
@@ -426,7 +461,7 @@ public class DiscoveryPacket : Equatable {
   public static func ==(lhs: DiscoveryPacket, rhs: DiscoveryPacket) -> Bool {
     
     // same serial number
-    return lhs.serialNumber == rhs.serialNumber
+    return lhs.serialNumber == rhs.serialNumber && lhs.isWan == rhs.isWan
   }
 }
 
