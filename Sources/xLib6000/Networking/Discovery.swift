@@ -178,10 +178,9 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     // send the current list of radios to all observers
     NC.post(.discoveredRadios, object: self.discoveredRadios as Any?)
   }
-  
-  
-  
-  
+  /// Process a DiscoveryPacket
+  /// - Parameter newPacket: the packet
+  ///
   public func processPacket(_ newPacket: DiscoveryPacket) {
     
     // parse the packet to populate its GuiClients
@@ -189,7 +188,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     
     // is there a previous packet with the same serialNumber and isWan?
     if let radioIndex = findRadioPacket(with: newPacket) {
-//      Swift.print("KNOWN RADIO, Count now  = \(discoveredRadios.count)")
 
       // known radio
       scanGuiClients(newPacket, discoveredRadios[radioIndex])
@@ -198,8 +196,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       // unknown radio, add it
       discoveredRadios.append(newPacket)
 
-//      Swift.print("UNKNOWN RADIO, Count now  = \(discoveredRadios.count)")
-      
       for i in 0..<newPacket.guiClients.count {
         Log.sharedInstance.logMessage("\(newPacket.nickname), GuiClient added:   \(newPacket.guiClients[i].handle.hex), \(newPacket.guiClients[i].station), \(newPacket.guiClients[i].program)", .debug, #function, #file, #line)
         NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i].station as Any?)
@@ -211,10 +207,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       NC.post(.discoveredRadios, object: discoveredRadios as Any?)
     }
   }
-
-  
-  
-  
   
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
@@ -231,7 +223,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     let handles   = packet.guiClientHandles.components(separatedBy: ",")
     let hosts     = packet.guiClientHosts.components(separatedBy: ",")
     let ips       = packet.guiClientIps.components(separatedBy: ",")
-
     
     guard programs.count == stations.count && programs.count == handles.count && stations.count == handles.count && hosts.count == handles.count && ips.count == handles.count else { return }
     
@@ -310,6 +301,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     
     // is the Radio already in the discoveredRadios array?
     for (i, existingPacket) in discoveredRadios.enumerated() {
+      // by serialNumber & isWan (same radio can be visible both locally and via SmartLink)
       if existingPacket.serialNumber == newPacket.serialNumber && existingPacket.isWan == newPacket.isWan { return i }
     }
     return nil

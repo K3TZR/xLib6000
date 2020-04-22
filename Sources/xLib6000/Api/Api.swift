@@ -105,6 +105,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private var _lowBandwidthConnect          = false
   private var _pinger                       : Pinger?
   private var _programName                  = ""
+  private var _isBeingDisconnected          = false
 
   // GCD Serial Queues
   private let _parseQ                       = DispatchQueue(label: Api.kName + ".parseQ", qos: .userInteractive)
@@ -207,9 +208,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       wanHandle: String = "",
                       reducedDaxBw: Bool = false,
                       logState: NSLogging = .normal,
-                      needsCwStream: Bool = false) -> Bool {
+                      needsCwStream: Bool = false,
+                      disconnect: Bool = false) -> Bool {
 
     self.nsLogState = logState
+    _isBeingDisconnected = disconnect
     
     // must be in the Disconnected state to connect
     guard apiState == .disconnected else { return false }
@@ -226,7 +229,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _programName = programName
       _clientId = clientId
       _clientStation = clientStation
-      self.isGui = isGui
+      self.isGui = (_isBeingDisconnected ? false : isGui)
       self.isWan = isWan
       self.reducedDaxBw = reducedDaxBw
       self.needsNetCwStream = needsCwStream
@@ -243,6 +246,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameter reason:         a reason code
   ///
   public func disconnect(reason: DisconnectReason = .normal) {
+    
+    // stop all streams
+    delegate = nil
     
     // stop pinging (if active)
     if _pinger != nil {
@@ -268,16 +274,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     NC.post(.radioHasBeenRemoved, object: nil)
   }
   
-  public func sendDisconnect(_ handle: Handle) {
-    send("client disconnect " + handle.hex)
-  }
-
-  public func sendDisconnectAll() {
-    send("client disconnect")
-  }
-
-  public func sendDisconnectWan(_ serialNumber: String) {
-    send("application disconnect_users serial" + "=\(serialNumber)" )
+  public func disconnectClient(packet: DiscoveryPacket, guiClientIndex: Int) {
+   
+    if packet.isWan {
+      send("application disconnect_users serial" + "=\(packet.serialNumber)" )
+    
+    } else {
+      send("client disconnect " + packet.guiClients[guiClientIndex].handle.hex)
+    }
   }
   
   // ----------------------------------------------------------------------------
@@ -336,6 +340,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // TCP & UDP connections established, inform observers
       NC.post(.clientDidConnect, object: radio as Any?)
+      
+      if _isBeingDisconnected {
+        send("client disconnect")
+        
+        sleep(1)
+        disconnect()
+        sleep(1)
+      }
     }
     
     _log(Self.className() + " Client connected", .info, #function, #file, #line)
@@ -492,7 +504,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     // log it
     let wanStatus = isWan ? "SMARTLINK" : "LOCAL"
-    let guiStatus = isGui ? "(GUI) " : ""
+    let guiStatus = isGui ? "(GUI) " : "(NON-GUI)"
     _log(Self.className() + " TCP connected to: \(host), port: \(port) \(guiStatus)(\(wanStatus))", .info, #function, #file, #line)
 
     // a tcp connection has been established, inform observers

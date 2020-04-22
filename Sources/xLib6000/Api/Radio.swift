@@ -939,7 +939,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     let msgText = components[1]
     
     // log it
-    _log(Self.className() + ": \(msgText)", flexErrorLevel(errorCode: components[0]), #function, #file, #line)
+    _log(Self.className() + " Msg: \(msgText)", flexErrorLevel(errorCode: components[0]), #function, #file, #line)
     
     // FIXME: Take action on some/all errors?
   }
