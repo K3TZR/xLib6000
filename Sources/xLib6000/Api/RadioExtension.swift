@@ -844,7 +844,7 @@ extension Radio {
       discoveryPacket.guiClients[index].isThisClient = isThisClient
 
       Log.sharedInstance.logMessage("\(discoveryPacket.nickname), GuiClient updated: \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
-      NC.post(.guiClientHasBeenUpdated, object: station as Any?)
+      NC.post(.guiClientHasBeenUpdated, object: discoveryPacket.guiClients[index] as Any?)
     
     } else {
       // NO, add it
@@ -857,10 +857,10 @@ extension Radio {
       discoveryPacket.guiClients.append(guiClient)
       
       Log.sharedInstance.logMessage("\(discoveryPacket.nickname), GuiClient added:   \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
-      NC.post(.guiClientHasBeenAdded, object: station as Any?)
+      NC.post(.guiClientHasBeenAdded, object: guiClient as Any?)
       
       Log.sharedInstance.logMessage("\(discoveryPacket.nickname), GuiClient updated: \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
-      NC.post(.guiClientHasBeenUpdated, object: station as Any?)
+      NC.post(.guiClientHasBeenUpdated, object: guiClient as Any?)
     }
   }
   

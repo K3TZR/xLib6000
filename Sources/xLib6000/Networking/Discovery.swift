@@ -198,7 +198,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
 
       for i in 0..<newPacket.guiClients.count {
         Log.sharedInstance.logMessage("\(newPacket.nickname), GuiClient added:   \(newPacket.guiClients[i].handle.hex), \(newPacket.guiClients[i].station), \(newPacket.guiClients[i].program)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i].station as Any?)
+        NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i] as Any?)
       }
       // log Radio addition
       Log.sharedInstance.logMessage("Radio added: \(newPacket.nickname), isWan = \(newPacket.isWan)", .debug, #function, #file, #line)
@@ -256,10 +256,10 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         let handle = oldPacket.guiClients[i].handle
         let station = oldPacket.guiClients[i].station
         let program = oldPacket.guiClients[i].program
-        oldPacket.guiClients.remove(at: i)
+        let removed = oldPacket.guiClients.remove(at: i)
         
         Log.sharedInstance.logMessage("\(newPacket.nickname), GuiClient removed: \(handle.hex), \(station), \(program)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenRemoved, object: station as Any?)
+        NC.post(.guiClientHasBeenRemoved, object: removed as Any?)
       }
     }
     // for each new GuiClient
@@ -272,7 +272,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
           oldPacket.guiClients.append(newPacket.guiClients[i])
           
           Log.sharedInstance.logMessage("\(newPacket.nickname), GuiClient added:   \(newPacket.guiClients[i].handle.hex), \(newPacket.guiClients[i].station), \(newPacket.guiClients[i].program)", .debug, #function, #file, #line)
-          NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i].station as Any?)
+          NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients[i] as Any?)
         }
       }
     }
