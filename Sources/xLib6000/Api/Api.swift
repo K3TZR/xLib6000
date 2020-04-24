@@ -44,6 +44,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case limited (to: [String])
     case none
   }
+  public enum PendingDisconnect: Equatable {
+    case none
+    case oldApi
+    case newApi (handle: Handle)
+  }
+  
   public var nsLogState              : NSLogging = .normal
   
   public var apiState                : Api.State!
@@ -59,10 +65,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   public var radio        : Radio? {
     get { Api.objectQ.sync { _radio } }
-    set { Api.objectQ.sync(flags: .barrier) {_radio = newValue }}}
+    set { Api.objectQ.sync(flags: .barrier) { _radio = newValue }}}
   public var delegate     : ApiDelegate? {
     get { Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
+    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue }}}
   public var localIP      : String {
     get { Api.objectQ.sync { _localIP } }
     set { Api.objectQ.sync(flags: .barrier) { _localIP  = newValue }}}
@@ -105,7 +111,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private var _lowBandwidthConnect          = false
   private var _pinger                       : Pinger?
   private var _programName                  = ""
-  private var _isBeingDisconnected          = false
+  private var _hasPendingDisconnect         : PendingDisconnect = .none
 
   // GCD Serial Queues
   private let _parseQ                       = DispatchQueue(label: Api.kName + ".parseQ", qos: .userInteractive)
@@ -209,10 +215,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       reducedDaxBw: Bool = false,
                       logState: NSLogging = .normal,
                       needsCwStream: Bool = false,
-                      disconnect: Bool = false) -> Bool {
+                      pendingDisconnect: PendingDisconnect = .none) -> Bool {
 
     self.nsLogState = logState
-    _isBeingDisconnected = disconnect
+    
+    _hasPendingDisconnect = pendingDisconnect
     
     // must be in the Disconnected state to connect
     guard apiState == .disconnected else { return false }
@@ -229,7 +236,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _programName = programName
       _clientId = clientId
       _clientStation = clientStation
-      self.isGui = (_isBeingDisconnected ? false : isGui)
+      self.isGui = (_hasPendingDisconnect == .oldApi ? false : isGui)
       self.isWan = isWan
       self.reducedDaxBw = reducedDaxBw
       self.needsNetCwStream = needsCwStream
@@ -273,14 +280,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // the radio (if any)) has been removed, inform observers
     NC.post(.radioHasBeenRemoved, object: nil)
   }
-  
-  public func disconnectClient(packet: DiscoveryPacket, guiClientIndex: Int) {
+
+  public func disconnectClient(packet: DiscoveryPacket, handle: Handle) {
    
     if packet.isWan {
       send("application disconnect_users serial" + "=\(packet.serialNumber)" )
     
     } else {
-      send("client disconnect " + packet.guiClients[guiClientIndex].handle.hex)
+      send("client disconnect \(handle.hex)")
     }
   }
   
@@ -341,13 +348,16 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // TCP & UDP connections established, inform observers
       NC.post(.clientDidConnect, object: radio as Any?)
       
-      if _isBeingDisconnected {
-        send("client disconnect")
-        
-        sleep(1)
-        disconnect()
-        sleep(1)
+      // is there a pending disconnect?
+      switch _hasPendingDisconnect {
+      case .none:               return                                    // NO
+      case .oldApi:             send("client disconnect")                 // YES, disconnect all clients
+      case .newApi(let handle): send("client disconnect \(handle.hex)") ; return   // YES, disconnect a specific client
       }
+      // give it time to happen, then disconnect the Tester
+      sleep(1)
+      disconnect()
+      sleep(1)
     }
     
     _log(Self.className() + " Client connected", .info, #function, #file, #line)

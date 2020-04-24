@@ -118,6 +118,9 @@ public enum NotificationType : String {
 
   case sliceMeterHasBeenAdded
   case sliceMeterWillBeRemoved
+  
+  case smartlinkLogOn
+  case smartlinkLogOff
 
   case tcpDidConnect
   case tcpDidDisconnect

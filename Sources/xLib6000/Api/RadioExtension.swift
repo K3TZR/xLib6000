@@ -817,8 +817,8 @@ extension Radio {
     
     guard clientId != nil else { return nil }
     
-    for guiClient in discoveryPacket.guiClients where guiClient.clientId == clientId {
-      return guiClient.handle
+    for (handle, guiClient) in discoveryPacket.guiClients where guiClient.clientId == clientId {
+      return handle
     }
     return nil
   }
@@ -834,44 +834,17 @@ extension Radio {
   ///
   public func guiClientUpdate(handle: Handle, clientId: String, program: String, station: String, isLocalPtt: Bool, isThisClient: Bool) {
     
-    // is it an existing entry?
-    if let index = findIndex(of: handle) {
-      // YES, update it
-      discoveryPacket.guiClients[index].clientId = clientId
-      discoveryPacket.guiClients[index].program = program
-      discoveryPacket.guiClients[index].station = station
-      discoveryPacket.guiClients[index].isLocalPtt = isLocalPtt
-      discoveryPacket.guiClients[index].isThisClient = isThisClient
-
-      Log.sharedInstance.logMessage("\(discoveryPacket.nickname), GuiClient updated: \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
-      NC.post(.guiClientHasBeenUpdated, object: discoveryPacket.guiClients[index] as Any?)
+    let guiClient = GuiClient(clientId: clientId, program: program, station: station, isLocalPtt: isLocalPtt, isThisClient: isThisClient)
     
-    } else {
-      // NO, add it
-      let guiClient = GuiClient(clientId: clientId,
-                                handle: handle,
-                                program: program,
-                                station: station,
-                                isLocalPtt: isLocalPtt,
-                                isThisClient: isThisClient)
-      discoveryPacket.guiClients.append(guiClient)
-      
+    if discoveryPacket.guiClients.updateValue(guiClient, forKey: handle) == nil {
+      // NEW
       Log.sharedInstance.logMessage("\(discoveryPacket.nickname), GuiClient added:   \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
       NC.post(.guiClientHasBeenAdded, object: guiClient as Any?)
-      
-      Log.sharedInstance.logMessage("\(discoveryPacket.nickname), GuiClient updated: \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
-      NC.post(.guiClientHasBeenUpdated, object: guiClient as Any?)
     }
+    Log.sharedInstance.logMessage("\(discoveryPacket.nickname), GuiClient updated: \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
+    NC.post(.guiClientHasBeenUpdated, object: guiClient as Any?)
   }
   
-  private func findIndex(of handle: Handle) -> Int? {
-
-      for (i, guiClient) in discoveryPacket.guiClients.enumerated() where guiClient.handle == handle {
-        return i
-      }
-    return nil
-  }
-
   // ----------------------------------------------------------------------------
   // MARK: -  RemoteRxAudioStream methods
   
