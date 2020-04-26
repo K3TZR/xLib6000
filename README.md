@@ -43,11 +43,6 @@ CocoaAsyncSocket is embedded in this project as source code. It provides TCP and
 
 ## 1.2.11 Release Notes
 
-* resizing Waterfall causes a crash
-* Xvtr preferences not implemented yet
-* Mac Audio working
-* Profiles preference window working
-* Unified Local / SmartLink radio picker
 
 
 Tests executed:
