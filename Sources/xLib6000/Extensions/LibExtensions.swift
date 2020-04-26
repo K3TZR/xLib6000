@@ -483,7 +483,7 @@ public func isForThisClient(_ properties: KeyValuesArray, connectionHandle: Hand
   guard connectionHandle != nil else { return false }
   
   // allow a Tester app to see all Streams
-  guard Api.sharedInstance.testerModeEnabled == true else { return true }
+  guard Api.sharedInstance.testerModeEnabled == false else { return true }
   
   // find the handle property
   for property in properties.dropFirst(2) where property.key == "client_handle" {

@@ -41,9 +41,13 @@ Flex Radios can have one of four different version groups:
 CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
 
 
-## 1.2.10 Release Notes
+## 1.2.11 Release Notes
 
-* Options for Multiflex connections (correction to support this)
+* resizing Waterfall causes a crash
+* Xvtr preferences not implemented yet
+* Mac Audio working
+* Profiles preference window working
+* Unified Local / SmartLink radio picker
 
 
 Tests executed:

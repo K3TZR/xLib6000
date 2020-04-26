@@ -102,6 +102,9 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "remote_audio_rx"> <"compression", "none"|"opus"> <"client_handle", handle> <"ip", ip>
     
+    // is it for this client?
+    guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
+
     // get the Id
     if let id =  properties[0].key.streamId {
       
@@ -118,6 +121,10 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
         radio.remoteRxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(2)) )
       
       } else {
+
+        // NOTE: This code will never be called
+        //    remoteRxAudioStream does not send status on removal
+
         // NO, does it exist?
         if radio.remoteRxAudioStreams[id] != nil {
           
@@ -203,7 +210,14 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
 
     // notify all observers
-//    NC.post(.remoteRxAudioStreamWillBeRemoved, object: self as Any?)
+    NC.post(.remoteRxAudioStreamWillBeRemoved, object: self as Any?)
+
+    // remove it immediately (remoteRxAudioStream does not send status on removal)
+    _radio.remoteRxAudioStreams[id] = nil
+    
+    Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+    
+    NC.post(.remoteRxAudioStreamHasBeenRemoved, object: id as Any?)
   }
   
   // ------------------------------------------------------------------------------

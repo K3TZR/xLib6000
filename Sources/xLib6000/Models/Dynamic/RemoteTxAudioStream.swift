@@ -98,6 +98,9 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "remote_audio_tx"> <"compression", "1"|"0"> <"client_handle", handle> <"ip", value>
     
+    // is it for this client?
+    guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
+
     // get the Id
     if let id =  properties[0].key.streamId {
       

@@ -50,6 +50,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case newApi (handle: Handle)
   }
   
+  public var hasPendingDisconnect    : PendingDisconnect = .none
   public var nsLogState              : NSLogging = .normal
   
   public var apiState                : Api.State!
@@ -63,13 +64,13 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var testerModeEnabled       = false
   public var pingerEnabled           = true
 
-  public var radio        : Radio? {
+  @objc dynamic public var radio : Radio? {
     get { Api.objectQ.sync { _radio } }
     set { Api.objectQ.sync(flags: .barrier) { _radio = newValue }}}
-  public var delegate     : ApiDelegate? {
+  public var delegate : ApiDelegate? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue }}}
-  public var localIP      : String {
+  public var localIP : String {
     get { Api.objectQ.sync { _localIP } }
     set { Api.objectQ.sync(flags: .barrier) { _localIP  = newValue }}}
   public var localUDPPort : UInt16 {
@@ -111,7 +112,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private var _lowBandwidthConnect          = false
   private var _pinger                       : Pinger?
   private var _programName                  = ""
-  private var _hasPendingDisconnect         : PendingDisconnect = .none
 
   // GCD Serial Queues
   private let _parseQ                       = DispatchQueue(label: Api.kName + ".parseQ", qos: .userInteractive)
@@ -219,7 +219,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
     self.nsLogState = logState
     
-    _hasPendingDisconnect = pendingDisconnect
+    hasPendingDisconnect = pendingDisconnect
     
     // must be in the Disconnected state to connect
     guard apiState == .disconnected else { return false }
@@ -236,7 +236,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _programName = programName
       _clientId = clientId
       _clientStation = clientStation
-      self.isGui = (_hasPendingDisconnect == .oldApi ? false : isGui)
+      self.isGui = (hasPendingDisconnect == .oldApi ? false : isGui)
       self.isWan = isWan
       self.reducedDaxBw = reducedDaxBw
       self.needsNetCwStream = needsCwStream
@@ -349,7 +349,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       NC.post(.clientDidConnect, object: radio as Any?)
       
       // is there a pending disconnect?
-      switch _hasPendingDisconnect {
+      switch hasPendingDisconnect {
       case .none:               return                                    // NO
       case .oldApi:             send("client disconnect")                 // YES, disconnect all clients
       case .newApi(let handle): send("client disconnect \(handle.hex)") ; return   // YES, disconnect a specific client
@@ -401,32 +401,34 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     if let radio = radio {
       
-      // gui clientId
-      if isGui {
-
-        if radio.version.isNewApi && _clientId != nil   {
-          send("client gui " + _clientId!)
-        } else {
-          send("client gui")
+      if hasPendingDisconnect != .oldApi {
+        // gui clientId
+        if isGui {
+          
+          if radio.version.isNewApi && _clientId != nil   {
+            send("client gui " + _clientId!)
+          } else {
+            send("client gui")
+          }
         }
-      }      
-      
-      send("client program " + _programName)
-      if radio.version.isNewApi && isGui                       { send("client station " + _clientStation) }
-      if radio.version.isNewApi && !isGui && _clientId != nil  { radio.bindGuiClient(_clientId!) }
-
-      if _lowBandwidthConnect           { radio.requestLowBandwidthConnect() }
-      radio.requestInfo()
-      radio.requestVersion()
-      radio.requestAntennaList()
-      radio.requestMicList()
-      radio.requestGlobalProfile()
-      radio.requestTxProfile()
-      radio.requestMicProfile()
-      radio.requestDisplayProfile()
-      radio.requestSubAll()
-      if radio.version.isGreaterThanV22 { radio.requestMtuLimit(1_500) }
-      if radio.version.isNewApi         { radio.requestDaxBandwidthLimit(self.reducedDaxBw) }
+        
+        send("client program " + _programName)
+        if radio.version.isNewApi && isGui                       { send("client station " + _clientStation) }
+        if radio.version.isNewApi && !isGui && _clientId != nil  { radio.bindGuiClient(_clientId!) }
+        
+        if _lowBandwidthConnect           { radio.requestLowBandwidthConnect() }
+        radio.requestInfo()
+        radio.requestVersion()
+        radio.requestAntennaList()
+        radio.requestMicList()
+        radio.requestGlobalProfile()
+        radio.requestTxProfile()
+        radio.requestMicProfile()
+        radio.requestDisplayProfile()
+        radio.requestSubAll()
+        if radio.version.isGreaterThanV22 { radio.requestMtuLimit(1_500) }
+        if radio.version.isNewApi         { radio.requestDaxBandwidthLimit(self.reducedDaxBw) }
+      }
     }
   }
   /// Determine if the Radio Firmware version is compatable with the API version
