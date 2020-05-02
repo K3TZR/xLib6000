@@ -264,12 +264,19 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public var softwareVersion      : String  { _softwareVersion }
   @objc dynamic public var tcxoPresent          : Bool    { _tcxoPresent }
   
-  public               var discoveryPacket      : DiscoveryPacket {
-    didSet { Swift.print("radio.discoveryPacket changed = \(discoveryPacket)") }
-  }
+  public               var discoveryPacket      : DiscoveryPacket
   public               let version              : Version
   public private(set)  var sliceErrors          = [String]()  // milliHz
   public private(set)  var uptime               = 0
+  public private(set)  var radioType            : RadioType? = .flex6700
+
+  public enum RadioType : String {
+    case flex6300 = "flex-6300"
+    case flex6400 = "flex-6400"
+    case flex6500 = "flex-6500"
+    case flex6600 = "flex-6600"
+    case flex6700 = "flex-6700"
+  }
 
   public struct FilterSpec {
     var filterHigh      : Int
@@ -676,6 +683,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     super.init()
     
     _api.delegate = self
+    radioType = RadioType(rawValue: discoveryPacket.model.lowercased())
     
     // initialize the static models (only one of each is ever created)
     atu = Atu(radio: self)
