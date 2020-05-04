@@ -284,6 +284,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public func disconnectClient(packet: DiscoveryPacket, handle: Handle) {
    
     if packet.isWan {
+      
+      // FIXME: Does this need to be a TLS send?
+      
       send("application disconnect_users serial" + "=\(packet.serialNumber)" )
     
     } else {

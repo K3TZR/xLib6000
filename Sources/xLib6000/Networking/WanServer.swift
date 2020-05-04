@@ -89,6 +89,10 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
 
   private let kHostName             = "smartlink.flexradio.com"
   private let kHostPort             = 443
+  private let kRegisterTag          = 1
+  private let kAppConnectTag        = 2
+  private let kAppDisconnectTag     = 3
+  private let kTestTag              = 4
 
   private enum Token: String {
     case application
@@ -129,7 +133,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
   
-  public init(delegate: WanServerDelegate?, timeout: Double = 0.5) {
+  public init(delegate: WanServerDelegate?, timeout: Double = 5.0) {
     
     _timeout = timeout
     _delegate = delegate
@@ -166,9 +170,11 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // try to connect
     do {
       try _tlsSocket.connect(toHost: kHostName, onPort: UInt16(kHostPort), withTimeout: _timeout)
+      _log(Self.className() + ": SmartLink server connection initiated", .debug, #function, #file, #line)
+    
     } catch _ {
       success = false
-      _log(Self.className() + ": SmartLink server connection failed", .debug, #function, #file, #line)
+      _log(Self.className() + ": SmartLink server connection FAILED", .debug, #function, #file, #line)
     }    
     return success
   }
@@ -186,13 +192,11 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      _log(Self.className() + ": sendConnectMessageForRadio, Not connected", .warning, #function, #file, #line)
+      _log(Self.className() + ": Connect Message NOT sent to SmartLink server, Not connected", .warning, #function, #file, #line)
       return
     }
     // send a command to SmartLink to request a connection to the specified Radio
-    sendTlsCommand("application connect serial" + "=\(packet.serialNumber)" + " hole_punch_port" + "=\(packet.negotiatedHolePunchPort))", timeout: -1)
-    
-    _log(Self.className() + ": Connect Message sent to SmartLink server", .debug, #function, #file, #line)
+    sendTlsCommand("application connect serial" + "=\(packet.serialNumber)" + " hole_punch_port" + "=\(packet.negotiatedHolePunchPort))", timeout: _timeout, tag: kAppConnectTag)
   }
   /// Disconnect users
   ///
@@ -206,7 +210,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       return
     }
     // send a command to SmartLink to request disconnection from the specified Radio
-    sendTlsCommand("application disconnect_users serial" + "=\(packet.serialNumber)" , timeout: -1)
+    sendTlsCommand("application disconnect_users serial" + "=\(packet.serialNumber)" , timeout: _timeout, tag: kAppDisconnectTag)
   }
   /// Test connection
   ///
@@ -222,7 +226,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       return
     }
     // send a command to SmartLink to test the connection for the specified Radio
-    sendTlsCommand("application test_connection serial" + "=\(packet.serialNumber)", timeout: -1 )
+    sendTlsCommand("application test_connection serial" + "=\(packet.serialNumber)", timeout: _timeout , tag: kTestTag)
   }
 
   // ------------------------------------------------------------------------------
@@ -238,6 +242,8 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     let msg = text.trimmingCharacters(in: .whitespacesAndNewlines)
     
+    _log(Self.className() + ": SmartLink server Msg received:\n--->>>\(msg)<<<---", .debug, #function, #file, #line)
+
     // find the space & get the primary msgType
     let spaceIndex = msg.firstIndex(of: " ")!
     let msgType = String(msg[..<spaceIndex])
@@ -605,11 +611,13 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   /// - Parameter cmd:                command text
   ///
-  private func sendTlsCommand(_ cmd: String, timeout: TimeInterval) {
+  private func sendTlsCommand(_ cmd: String, timeout: TimeInterval, tag: Int = 0) {
     
     // send the specified command to the SmartLink server using TLS
     let command = cmd + "\n"
-    
+
+    _log(Self.className() + ": TLS cmd sent:\n--->>>\(cmd)<<<---", .debug, #function, #file, #line)
+
     _tlsSocket.write(command.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withTimeout: timeout, tag: 0)
   }
   
@@ -645,6 +653,8 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     tlsSettings[kCFStreamSSLPeerName as String] = kHostName as NSObject
     _tlsSocket.startTLS(tlsSettings)
     
+    _log(Self.className() + ": SmartLink Server TLS connection: requested", .info, #function, #file, #line)
+
     // start pinging (if needed)
     if _ping { startPinging() }
     
@@ -658,10 +668,10 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   @objc public func socketDidSecure(_ sock: GCDAsyncSocket) {
     
-    _log(Self.className() + ": SmartLink server TLS connection: Did Secure", .info, #function, #file, #line)
+    _log(Self.className() + ": SmartLink server TLS connection: secured", .info, #function, #file, #line)
 
     // register the Application / token pair with the SmartLink server
-    sendTlsCommand("application register name" + "=\(_appName)" + " platform" + "=\(_platform)" + " token" + "=\(_token)", timeout: -1)
+    sendTlsCommand("application register name" + "=\(_appName)" + " platform" + "=\(_platform)" + " token" + "=\(_token)", timeout: _timeout, tag: kRegisterTag)
     
     // start reading
     readNext()
@@ -679,6 +689,8 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     // trigger the next read
     readNext()
+    
+//    _log(Self.className() + ": SmartLink server data received: Tag \(tag)", .info, #function, #file, #line)
     
     // process the message
     parseMsg(msg)
@@ -700,6 +712,27 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     _isConnected = false
     _currentHost = ""
     _currentPort = 0
+  }
+  
+  
+  /// Called when a socket write times out
+  /// - Parameters:
+  ///   - sock:         the socket
+  ///   - tag:          the tag (if any)
+  ///   - elapsed:      the time since the write started
+  ///   - length:       number of bytes written
+  /// - Returns:        additional time to allocate
+  ///
+  @objc public func socket(_ sock: GCDAsyncSocket, shouldTimeoutWriteWithTag tag: Int, elapsed: TimeInterval, bytesDone length: UInt) -> TimeInterval {
+    _log(Self.className() + ": SmartLink Server \(_currentHost), port \(_currentPort): Write timeout", .warning, #function, #file, #line)
+  
+    return 0
+  }
+  
+  @objc public func socket(_ sock: GCDAsyncSocket, shouldTimeoutReadWithTag tag: Int, elapsed: TimeInterval, bytesDone length: UInt) -> TimeInterval {
+    _log(Self.className() + ": SmartLink Server \(_currentHost), port \(_currentPort): Read timeout", .warning, #function, #file, #line)
+    
+    return 30.0
   }
   
   // ----------------------------------------------------------------------------
