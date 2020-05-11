@@ -39,18 +39,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
-  public enum NSLogging {
-    case normal
-    case limited (to: [String])
-    case none
-  }
-  public enum PendingDisconnect: Equatable {
-    case none
-    case oldApi
-    case newApi (handle: Handle)
-  }
-  
-  public var hasPendingDisconnect    : PendingDisconnect = .none
   public var nsLogState              : NSLogging = .normal
   
   public var apiState                : Api.State!
@@ -58,8 +46,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var connectionHandleWan     = ""
   public var isGui                   = true
   public var isWan                   = false
-  public var reducedDaxBw            = false
   public var needsNetCwStream        = false
+  public var reducedDaxBw            = false
   public var testerDelegate          : ApiDelegate?
   public var testerModeEnabled       = false
   public var pingerEnabled           = true
@@ -97,6 +85,51 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case disconnected
     case update
   }
+  public struct ApiConnectionParams {
+    public var packet            : DiscoveryPacket
+    public var station           : String
+    public var program           : String
+    public var clientId          : String?
+    public var isGui             : Bool
+    public var wanHandle         : String
+    public var reducedDaxBw      : Bool
+    public var logState          : NSLogging
+    public var needsCwStream     : Bool
+    public var pendingDisconnect : PendingDisconnect
+    
+    public init(packet            : DiscoveryPacket,
+                station           : String = "",
+                program           : String = "",
+                clientId          : String? = nil,
+                isGui             : Bool = true,
+                wanHandle         : String = "",
+                reducedDaxBw      : Bool = false,
+                logState          : NSLogging = .normal,
+                needsCwStream     : Bool = false,
+                pendingDisconnect : PendingDisconnect = .none) {
+      self.packet = packet
+      self.station = station
+      self.program = program
+      self.clientId = clientId
+      self.isGui = isGui
+      self.wanHandle = wanHandle
+      self.reducedDaxBw = reducedDaxBw
+      self.logState = logState
+      self.needsCwStream = needsCwStream
+      self.pendingDisconnect = pendingDisconnect
+    }
+  }
+
+  public enum NSLogging {
+    case normal
+    case limited (to: [String])
+    case none
+  }
+  public enum PendingDisconnect: Equatable {
+    case none
+    case oldApi
+    case newApi (handle: Handle)
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -110,6 +143,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private var _clientId                     : String?
   private var _clientStation                = ""
   private var _lowBandwidthConnect          = false
+  private var _params                       : ApiConnectionParams!
   private var _pinger                       : Pinger?
   private var _programName                  = ""
 
@@ -193,51 +227,60 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     for all subsequent connections (if the Client has persisted the ClientId)
   ///
   /// - Parameters:
-  ///     - discoveryPacket:      a DiscoveredRadio struct for the desired Radio
-  ///     - clientStation:        the name of the Station using this library (V3 only)
-  ///     - clientName:           the name of the Client using this library
+  ///     - packet:               a DiscoveredRadio struct for the desired Radio
+  ///     - station:              the name of the Station using this library (V3 only)
+  ///     - program:              the name of the Client app using this library
   ///     - clientId:             a UUID String (if any) (V3 only)
   ///     - isGui:                whether this is a GUI connection
-  ///     - isWan:                whether this is a Wan connection
   ///     - wanHandle:            Wan Handle (if any)
   ///     - reducedDaxBw:         Use reduced bandwidth for Dax
-  ///     - suppressNSLog:        Suppress NSLogs when no Log delegate
+  ///     - logState:             Suppress NSLogs when no Log delegate
   ///     - needsCwStream:        cleint application needs the network cw stream
+  ///     - pendingDisconnect:    perform a disconnect before connecting
   /// - Returns:                  Success / Failure
   ///
-  public func connect(_ discoveryPacket: DiscoveryPacket,
-                      clientStation: String = "",
-                      programName: String,
-                      clientId: String? = nil,
-                      isGui: Bool = true,
-                      isWan: Bool = false,
-                      wanHandle: String = "",
-                      reducedDaxBw: Bool = false,
-                      logState: NSLogging = .normal,
-                      needsCwStream: Bool = false,
-                      pendingDisconnect: PendingDisconnect = .none) -> Bool {
+  
+  public func connect(_ packet          : DiscoveryPacket,
+                      station           : String = "",
+                      program           : String,
+                      clientId          : String? = nil,
+                      isGui             : Bool = true,
+                      wanHandle         : String = "",
+                      reducedDaxBw      : Bool = false,
+                      logState          : NSLogging = .normal,
+                      needsCwStream     : Bool = false,
+                      pendingDisconnect : PendingDisconnect = .none) -> Bool {
 
+    // save the connection parameters
+    _params = ApiConnectionParams(packet            : packet,
+                                  station           : station,
+                                  program           : program,
+                                  clientId          : clientId,
+                                  isGui             : isGui,
+                                  wanHandle         : wanHandle,
+                                  reducedDaxBw      : reducedDaxBw,
+                                  logState          : logState,
+                                  needsCwStream     : needsCwStream,
+                                  pendingDisconnect : pendingDisconnect)
     self.nsLogState = logState
-    
-    hasPendingDisconnect = pendingDisconnect
     
     // must be in the Disconnected state to connect
     guard apiState == .disconnected else { return false }
         
     // Create a Radio class
-    radio = Radio(discoveryPacket, api: self)
+    radio = Radio(packet, api: self)
 
     // attempt to connect to the Radio
-    if tcp.connect(discoveryPacket, isWan: isWan) {
+    if tcp.connect(packet) {
       
       // Connected, check the versions
-      checkVersion(discoveryPacket)
+      checkVersion(packet)
       
-      _programName = programName
+      _programName = program
       _clientId = clientId
-      _clientStation = clientStation
-      self.isGui = (hasPendingDisconnect == .oldApi ? false : isGui)
-      self.isWan = isWan
+      _clientStation = station
+      self.isGui = (pendingDisconnect == .none ? isGui : false)
+      self.isWan = packet.isWan
       self.reducedDaxBw = reducedDaxBw
       self.needsNetCwStream = needsCwStream
       connectionHandleWan = wanHandle
@@ -253,7 +296,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameter reason:         a reason code
   ///
   public func disconnect(reason: DisconnectReason = .normal) {
-    
+    let name = radio?.discoveryPacket.nickname ?? "Unknown"
+
+    _log(Self.className() + " Disconnect initiated: \(name)", .debug, #function, #file, #line)
+
     // stop all streams
     delegate = nil
     
@@ -261,7 +307,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     if _pinger != nil {
       _pinger = nil
       
-      _log(Self.className() + " Pinger stopped", .info, #function, #file, #line)
+      _log(Self.className() + " Pinger stopped: \(name)", .info, #function, #file, #line)
     }
     // the radio (if any) will be removed, inform observers
     if radio != nil { NC.post(.radioWillBeRemoved, object: radio as Any?) }
@@ -273,12 +319,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // unbind UDP
       udp.unbind()
     }
-    
     // remove the Radio
     radio = nil
 
     // the radio (if any)) has been removed, inform observers
-    NC.post(.radioHasBeenRemoved, object: nil)
+    NC.post(.radioHasBeenRemoved, object: name)
   }
 
   public func disconnectClient(packet: DiscoveryPacket, handle: Handle) {
@@ -322,6 +367,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // code to be executed after an IP Address has been obtained
     func connectionCompletion() {
       
+      _log(Self.className() + " Connection completed: \(radio.discoveryPacket.nickname)", .debug, #function, #file, #line)
+
       // send the initial commands
       sendCommands()
       
@@ -352,18 +399,32 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       NC.post(.clientDidConnect, object: radio as Any?)
       
       // is there a pending disconnect?
-      switch hasPendingDisconnect {
+      switch _params.pendingDisconnect {
       case .none:               return                                    // NO
-      case .oldApi:             send("client disconnect")                 // YES, disconnect all clients
-      case .newApi(let handle): send("client disconnect \(handle.hex)") ; return   // YES, disconnect a specific client
+      case .oldApi:
+        send("client disconnect")                 // YES, disconnect all clients
+      case .newApi(let handle):
+        send("client disconnect \(handle.hex)")   // YES, disconnect a specific client
       }
-      // give it time to happen, then disconnect the Tester
+      // give it time to happen, then disconnect
       sleep(1)
       disconnect()
       sleep(1)
+      
+      // now do the pending connection
+      connect(_params.packet,
+              station           : _params.station,
+              program           : _params.program,
+              clientId          : _params.clientId,
+              isGui             : _params.isGui,
+              wanHandle         : _params.wanHandle,
+              reducedDaxBw      : _params.reducedDaxBw,
+              logState          : _params.logState,
+              needsCwStream     : _params.needsCwStream,
+              pendingDisconnect : .none)
     }
     
-    _log(Self.className() + " Client connected", .info, #function, #file, #line)
+    _log(Self.className() + " Client connected: \(radio.discoveryPacket.nickname)", .info, #function, #file, #line)
     
     // could this be a remote connection?
     if radio.version.major >= 2 {
@@ -404,7 +465,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     if let radio = radio {
       
-      if hasPendingDisconnect != .oldApi {
+      if _params.pendingDisconnect != .oldApi {
         // gui clientId
         if isGui {
           

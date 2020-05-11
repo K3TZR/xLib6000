@@ -6,7 +6,7 @@
 //  Copyright © 2018 Douglas Adams. All rights reserved.
 //
 
-import Foundation
+import Cocoa
 
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
@@ -196,25 +196,4 @@ protocol UdpManagerDelegate                 : class {
   /// - Parameter vita:             a Vita packet
   ///
   func udpStreamHandler(_ vita: Vita)
-}
-
-/// Delegate protocol for the WanServer class
-///
-public protocol WanServerDelegate           : class {
-  
-  /// Received radio list from server
-  ///
-  func wanRadioListReceived(wanRadioList: [DiscoveryPacket])
-  
-  /// Received user settings from server
-  ///
-  func wanUserSettings(_ userSettings: WanUserSettings)
-  
-  /// Radio is ready to connect
-  ///
-  func wanRadioConnectReady(handle: String, serial: String)
-  
-  /// Received Wan test results
-  ///
-  func wanTestConnectionResultsReceived(results: WanTestConnectionResults)
 }

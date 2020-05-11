@@ -21,7 +21,7 @@ class OldApiTests: XCTestCase {
       
       Swift.print("***** Radio found: \(discovery.discoveredRadios[0].nickname) (v\(discovery.discoveredRadios[0].firmwareVersion)) @ \(discovery.discoveredRadios[0].publicIp)")
 
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], programName: "v2Tests", isGui: connectAsGui, logState: logState) {
+      if Api.sharedInstance.connect(discovery.discoveredRadios[0], program: "v2Tests", isGui: connectAsGui, logState: logState) {
         sleep(2)
         
         Swift.print("***** Connected")

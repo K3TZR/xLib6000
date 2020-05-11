@@ -921,7 +921,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         wanValidationFailed = property.value.bValue
       }
       if handle == _api.connectionHandle && (duplicateClientId || forced || wanValidationFailed) {
-        _log(Self.className() + ": Disconnected with: \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , .warning, #function, #file, #line)
+        
+        _log(Self.className() + ": \(discoveryPacket.nickname) Disconnected: reason = \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , .warning, #function, #file, #line)
         NC.post(.clientDidDisconnect, object: handle as Any?)
       }
     }
