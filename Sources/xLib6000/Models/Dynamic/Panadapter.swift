@@ -70,6 +70,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   @objc dynamic public var daxIqChannel: Int {
     get { _daxIqChannel }
     set { if _daxIqChannel != newValue { _daxIqChannel = newValue ; panadapterSet( .daxIqChannel, newValue) }}}
+  @objc dynamic public var fillLevel: Int {
+    get { _fillLevel }
+    set { if _fillLevel != newValue { _fillLevel = newValue }}}
   @objc dynamic public var fps: Int {
     get { _fps }
     set { if _fps != newValue { _fps = newValue ; panadapterSet( .fps, newValue) }}}
@@ -171,6 +174,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   var _daxIqChannel: Int {
     get { Api.objectQ.sync { __daxIqChannel } }
     set { Api.objectQ.sync(flags: .barrier) { __daxIqChannel = newValue }}}
+  var _fillLevel: Int {
+    get { Api.objectQ.sync { __fillLevel } }
+    set { Api.objectQ.sync(flags: .barrier) { __fillLevel = newValue }}}
   var _fps: Int {
     get { Api.objectQ.sync { __fps } }
     set { Api.objectQ.sync(flags: .barrier) { __fps = newValue }}}
@@ -574,6 +580,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private var __bandZoomEnabled             = false
   private var __center                      : Hz = 0
   private var __daxIqChannel                = 0
+  private var __fillLevel                   = 1
   private var __fps                         = 0
   private var __loopAEnabled                = false
   private var __loopBEnabled                = false

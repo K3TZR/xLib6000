@@ -296,7 +296,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameter reason:         a reason code
   ///
   public func disconnect(reason: DisconnectReason = .normal) {
-    let name = radio?.discoveryPacket.nickname ?? "Unknown"
+    let name = radio?.packet.nickname ?? "Unknown"
 
     _log(Self.className() + " Disconnect initiated: \(name)", .debug, #function, #file, #line)
 
@@ -367,7 +367,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // code to be executed after an IP Address has been obtained
     func connectionCompletion() {
       
-      _log(Self.className() + " Connection completed: \(radio.discoveryPacket.nickname)", .debug, #function, #file, #line)
+      _log(Self.className() + " Connection completed: \(radio.packet.nickname)", .debug, #function, #file, #line)
 
       // send the initial commands
       sendCommands()
@@ -375,7 +375,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // set the streaming UDP port
       if isWan {
         // Wan, establish a UDP port for the Data Streams
-        _ = udp.bind(selectedRadio: radio.discoveryPacket, isWan: true, clientHandle: connectionHandle)
+        _ = udp.bind(packet: radio.packet, clientHandle: connectionHandle)
         
       } else {
         // Local
@@ -387,8 +387,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         _pinger = Pinger(tcpManager: tcp, pingQ: _pingQ)
 
         let wanStatus = isWan ? "SMARTLINK" : "LOCAL"
-        let port = (isWan ? radio.discoveryPacket.publicTlsPort : radio.discoveryPacket.port)
-        _log(Self.className() + " Pinger started: \(radio.discoveryPacket.nickname) @ \(radio.discoveryPacket.publicIp), port: \(port) (\(wanStatus))", .info, #function, #file, #line)
+        let port = (isWan ? radio.packet.publicTlsPort : radio.packet.port)
+        _log(Self.className() + " Pinger started: \(radio.packet.nickname) @ \(radio.packet.publicIp), port: \(port) (\(wanStatus))", .info, #function, #file, #line)
       }
       
       if needsNetCwStream {
@@ -424,7 +424,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
               pendingDisconnect : .none)
     }
     
-    _log(Self.className() + " Client connected: \(radio.discoveryPacket.nickname)", .info, #function, #file, #line)
+    _log(Self.className() + " Client connected: \(radio.packet.nickname)", .info, #function, #file, #line)
     
     // could this be a remote connection?
     if radio.version.major >= 2 {
@@ -500,10 +500,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameters:
   ///   - selectedRadio:      a RadioParameters struct
   ///
-  private func checkVersion(_ selectedRadio: DiscoveryPacket) {
+  private func checkVersion(_ packet: DiscoveryPacket) {
     
     // get the Radio Version
-    let radioVersion = Version(selectedRadio.firmwareVersion)
+    let radioVersion = Version(packet.firmwareVersion)
 
     if Api.kVersionSupported < radioVersion  {
       _log(Self.className() + " Radio may need to be downgraded: Radio version = \(radioVersion.longString), API supports version = \(Api.kVersionSupported.string)", .warning, #function, #file, #line)
@@ -598,7 +598,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     } else {
       
       // bind a UDP port for the Streams
-      guard udp.bind(selectedRadio: radio!.discoveryPacket, isWan: isWan) else {
+      guard udp.bind(packet: radio!.packet) else {
         
         // Bind failed, disconnect
         tcp.disconnect()

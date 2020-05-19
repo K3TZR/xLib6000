@@ -817,12 +817,24 @@ extension Radio {
     
     guard clientId != nil else { return nil }
     
-    for (handle, guiClient) in discoveryPacket.guiClients where guiClient.clientId == clientId {
+    for (handle, guiClient) in packet.guiClients where guiClient.clientId == clientId {
       return handle
     }
     return nil
   }
-  
+  /// Find a ClientId  by Station
+  /// - Parameters:
+  ///   - station:            a Station
+  /// - Returns:              a ClientId or nil
+  ///
+  public func findClientId(for station: String) -> String? {
+    
+    for (_, client) in packet.guiClients {
+      if client.station == station { return client.clientId }
+    }
+    return nil
+  }
+
   /// Update / Add a GuiClient entry
   /// - Parameters:
   ///   - handle:         a handle
@@ -834,15 +846,23 @@ extension Radio {
   ///
   public func guiClientUpdate(handle: Handle, clientId: String, program: String, station: String, isLocalPtt: Bool, isThisClient: Bool) {
     
-    let guiClient = GuiClient(clientId: clientId, program: program, station: station, isLocalPtt: isLocalPtt, isThisClient: isThisClient)
-    
-    if discoveryPacket.guiClients.updateValue(guiClient, forKey: handle) == nil {
-      // NEW
-      Log.sharedInstance.logMessage("\(discoveryPacket.nickname), GuiClient added:   \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
-      NC.post(.guiClientHasBeenAdded, object: guiClient as Any?)
+    if packet.guiClients[handle] == nil {
+      // Add
+      packet.guiClients[handle] = GuiClient(clientId: clientId, program: program, station: station, isLocalPtt: isLocalPtt, isThisClient: isThisClient)
+
+      Log.sharedInstance.logMessage("\(packet.nickname), GuiClient added:   \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
+      NC.post(.guiClientHasBeenAdded, object: packet.guiClients[handle] as Any?)
     }
-    Log.sharedInstance.logMessage("\(discoveryPacket.nickname), GuiClient updated: \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
-    NC.post(.guiClientHasBeenUpdated, object: guiClient as Any?)
+    
+    // Update
+    packet.guiClients[handle]!.clientId = clientId
+    packet.guiClients[handle]!.program = program
+    packet.guiClients[handle]!.station = station
+    packet.guiClients[handle]!.isLocalPtt = isLocalPtt
+    packet.guiClients[handle]!.isThisClient = isThisClient
+
+    Log.sharedInstance.logMessage("\(packet.nickname), GuiClient updated: \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
+    NC.post(.guiClientHasBeenUpdated, object: packet.guiClients[handle]! as Any?)
   }
   
   // ----------------------------------------------------------------------------

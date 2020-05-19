@@ -257,25 +257,27 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public var radioModel           : String  { _radioModel }
   @objc dynamic public var radioOptions         : String  { _radioOptions }
   @objc dynamic public var region               : String  { _region }
-  @objc dynamic public var serialNumber         : String  { discoveryPacket.serialNumber }
+  @objc dynamic public var serialNumber         : String  { packet.serialNumber }
   @objc dynamic public var setting              : String  { _setting }
   @objc dynamic public var smartSdrMB           : String  { _smartSdrMB }
   @objc dynamic public var state                : String  { _state }
   @objc dynamic public var softwareVersion      : String  { _softwareVersion }
   @objc dynamic public var tcxoPresent          : Bool    { _tcxoPresent }
   
-  public               var discoveryPacket      : DiscoveryPacket
+  public               var packet               : DiscoveryPacket
   public               let version              : Version
   public private(set)  var sliceErrors          = [String]()  // milliHz
   public private(set)  var uptime               = 0
   public private(set)  var radioType            : RadioType? = .flex6700
 
   public enum RadioType : String {
-    case flex6300 = "flex-6300"
-    case flex6400 = "flex-6400"
-    case flex6500 = "flex-6500"
-    case flex6600 = "flex-6600"
-    case flex6700 = "flex-6700"
+    case flex6300   = "flex-6300"
+    case flex6400   = "flex-6400"
+    case flex6400m  = "flex-6400m"
+    case flex6500   = "flex-6500"
+    case flex6600   = "flex-6600"
+    case flex6600m  = "flex-6600m"
+    case flex6700   = "flex-6700"
   }
 
   public struct FilterSpec {
@@ -675,15 +677,16 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   /// - Parameters:
   ///   - api:        an Api instance
   ///
-  public init(_ discoveryPacket: DiscoveryPacket, api: Api) {
+  public init(_ packet: DiscoveryPacket, api: Api) {
     
-    self.discoveryPacket = discoveryPacket
+    self.packet = packet
     _api = api
-    version = Version(discoveryPacket.firmwareVersion)
+    version = Version(packet.firmwareVersion)
     super.init()
     
     _api.delegate = self
-    radioType = RadioType(rawValue: discoveryPacket.model.lowercased())
+    radioType = RadioType(rawValue: packet.model.lowercased())
+    if radioType == nil { _log(Self.className() + ": Unknown RadioType: \(packet.model)", .warning, #function, #file, #line) }
     
     // initialize the static models (only one of each is ever created)
     atu = Atu(radio: self)
@@ -922,7 +925,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
       if handle == _api.connectionHandle && (duplicateClientId || forced || wanValidationFailed) {
         
-        _log(Self.className() + ": \(discoveryPacket.nickname) Disconnected: reason = \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , .warning, #function, #file, #line)
+        _log(Self.className() + ": \(packet.nickname) Disconnected: reason = \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , .warning, #function, #file, #line)
         NC.post(.clientDidDisconnect, object: handle as Any?)
       }
     }

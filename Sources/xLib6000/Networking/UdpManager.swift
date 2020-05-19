@@ -89,26 +89,25 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   ///
   /// - Parameters:
   ///   - selectedRadio:      a DiscoveredRadio struct
-  ///   - isWan:              Wan enabled
   ///   - clientHandle:       handle
   ///
-  func bind(selectedRadio: DiscoveryPacket, isWan: Bool, clientHandle: Handle? = nil) -> Bool {
+  func bind(packet: DiscoveryPacket, clientHandle: Handle? = nil) -> Bool {
     
     var success               = false
     var portToUse             : UInt16 = 0
     var tries                 = kMaxBindAttempts
     
     // identify the port
-    switch (isWan, selectedRadio.requiresHolePunch) {
+    switch (packet.isWan, packet.requiresHolePunch) {
       
     case (true, true):        // isWan w/hole punch
-      portToUse = UInt16(selectedRadio.negotiatedHolePunchPort)
-      _udpSendPort = UInt16(selectedRadio.negotiatedHolePunchPort)
+      portToUse = UInt16(packet.negotiatedHolePunchPort)
+      _udpSendPort = UInt16(packet.negotiatedHolePunchPort)
       tries = 1  // isWan w/hole punch
 
     case (true, false):       // isWan
-      portToUse = UInt16(selectedRadio.publicUdpPort)
-      _udpSendPort = UInt16(selectedRadio.publicUdpPort)
+      portToUse = UInt16(packet.publicUdpPort)
+      _udpSendPort = UInt16(packet.publicUdpPort)
 
     default:                  // local
       portToUse = _udpRcvPort
@@ -140,7 +139,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       _udpRcvPort = portToUse
       
       // save the ip address
-      _udpSendIP = selectedRadio.publicIp
+      _udpSendIP = packet.publicIp
       
       // change the state
       _delegate?.didBind(port: _udpRcvPort)
@@ -150,7 +149,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       _log(Self.className() + ": UDP receive port: \(_udpRcvPort), Send port: \(_udpSendPort)", .info, #function, #file, #line)
 
       // if a Wan connection, register
-      if isWan { register(clientHandle: clientHandle) }
+      if packet.isWan { register(clientHandle: clientHandle) }
     }
     return success
   }
