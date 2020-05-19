@@ -111,16 +111,16 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_iq"> <"daxiq_channel", channel> <"pan", panStreamId> <"daxiq_rate", rate> <"client_handle", handle>
 
-    // is it for this client?
-    guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
-
     // get the Id
     if let id =  properties[0].key.streamId {
       
       // is the object in use?
       if inUse {
         
-        // YES, does it exist?
+        // YES, is it for this client?
+        guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
+
+        // does it exist?
         if radio.daxIqStreams[id] == nil {
           
           // create a new object & add it to the collection

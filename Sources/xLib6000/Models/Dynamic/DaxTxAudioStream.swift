@@ -103,16 +103,16 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_tx"> <"client_handle", handle> <"tx", isTransmitChannel>
     
-    // is it for this client?
-    guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
-
     // get the Id
     if let id =  properties[0].key.streamId {
       
       // is the object in use?
       if inUse {
         
-        // YES, does it exist?
+        // YES, is it for this client?
+        guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
+
+        // does it exist?
         if radio.daxTxAudioStreams[id] == nil {
           
           // NO, create a new object & add it to the collection

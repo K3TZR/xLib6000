@@ -393,8 +393,10 @@ final class NewApiTests: XCTestCase {
     var existingObjects = false
     
     Swift.print("\n***** \(#function)" + requiredVersion)
-    
-    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+
+    let radio = discoverRadio(logState: .normal)
+
+//    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
     guard radio != nil else { return }
     
     if radio!.version.isNewApi {
@@ -439,6 +441,7 @@ final class NewApiTests: XCTestCase {
             // remove it
             radio!.daxIqStreams[firstId]!.remove()
             sleep(2)
+            
             if radio!.daxIqStreams.count == 0 {
               
               if showInfoMessages { Swift.print("***** 1st \(type) object removal confirmed") }

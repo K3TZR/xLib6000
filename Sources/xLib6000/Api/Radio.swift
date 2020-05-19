@@ -1164,7 +1164,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
    
     let properties = remainder.keyValuesArray()
 
-    // is the 1st KeyValue  a StreamId?
+    // is the 1st KeyValue a StreamId?
     if let id = properties[0].key.streamId {
       
       // YES, is it a removal?

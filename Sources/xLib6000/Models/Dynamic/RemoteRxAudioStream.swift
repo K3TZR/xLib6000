@@ -102,16 +102,16 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
     // Format:  <streamId, > <"type", "remote_audio_rx"> <"compression", "none"|"opus"> <"client_handle", handle> <"ip", ip>
     
-    // is it for this client?
-    guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
-
     // get the Id
     if let id =  properties[0].key.streamId {
       
       // is the object in use?
       if inUse {
         
-        // YES, does it exist?        
+        // YES, is it for this client?
+        guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
+
+        // does it exist?
         if radio.remoteRxAudioStreams[id] == nil {
           
           // create a new object & add it to the collection
