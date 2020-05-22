@@ -260,7 +260,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     
     for i in 0..<handles.count {
       
-      if let handle = handles[i].handle {
+      if let handle = handles[i].handle, stations[i] != "" {
         
         packet.guiClients[handle] = GuiClient(program: programs[i],
                                               station: stations[i].replacingOccurrences(of: "\u{007f}", with: " "),

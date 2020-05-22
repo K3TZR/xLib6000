@@ -806,6 +806,15 @@ extension Radio {
   }
   
   // ----------------------------------------------------------------------------
+  // MARK: -  RemoteRxAudioStream methods
+  
+  public func remoteRxAudioStreamRemove(for clientHandle: Handle) {
+    for (_, stream) in remoteRxAudioStreams where stream.clientHandle == clientHandle {
+      stream.remove()
+    }
+  }
+  
+  // ----------------------------------------------------------------------------
   // MARK: -  GuiClient methods
   
   /// Find a GuiClient handle by Client Id
