@@ -738,7 +738,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   
   /// Remove all Radio objects
   ///
-  public func removeAll() {
+  public func removeAllObjects() {
     
     // ----- remove all objects -----
     //      NOTE: order is important

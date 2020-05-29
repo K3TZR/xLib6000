@@ -176,6 +176,18 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       _timeoutTimer.resume()
     }
   }
+  
+  public func defaultFound(_ defaultString: String?) -> DiscoveryPacket? {
+ 
+    let components = defaultString!.split(separator: ".")
+    if components.count == 2 {
+      let isWan = (components[0] == "wan")
+      return discoveredRadios.first(where: { $0.serialNumber == components[1] && $0.isWan == isWan} )
+    }
+    return nil
+  }
+  
+  
   /// force a Notification containing a list of current radios
   ///
   public func updateDiscoveredRadios() {
@@ -194,6 +206,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     for i in deleteList.reversed() {
       discoveredRadios.remove(at: i)
     }
+    updateDiscoveredRadios()
   }
   /// Process a DiscoveryPacket
   /// - Parameter newPacket: the packet
@@ -233,7 +246,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       discoveredRadios.append(newPacket)
 
       // log Radio addition
-      _log("Radio added: \(newPacket.nickname) v\(newPacket.firmwareVersion) \(newPacket.isWan ? "SMARTLINK" : "LOCAL")", .debug, #function, #file, #line)
+      _log("Radio discovered: \(newPacket.nickname) v\(newPacket.firmwareVersion) \(newPacket.isWan ? "SMARTLINK" : "LOCAL")", .debug, #function, #file, #line)
       
       // notify observers of Radio addition
       NC.post(.discoveredRadios, object: discoveredRadios as Any?)
@@ -288,6 +301,10 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         
         _log("GuiClient removed: \(oldPacket.nickname), \(oldPacket.isWan ? "SMARTLINK" : "LOCAL"), \(handle.hex), \(oldGuiClient.station), \(oldGuiClient.program)", .debug, #function, #file, #line)
         NC.post(.guiClientHasBeenRemoved, object: oldPacket.guiClients[handle] as Any?)
+      
+      } else {
+        // YES, it should be updated
+        oldPacket.guiClients[handle] = newPacket.guiClients[handle]
       }
     }
     // identify any added guiClients

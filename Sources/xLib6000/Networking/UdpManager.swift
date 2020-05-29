@@ -119,12 +119,13 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       do {
         try _udpSocket.bind(toPort: portToUse)
         
+        _log(Self.className() + ": UDP bound to port \(portToUse)", .info, #function, #file, #line)
         success = true
         
       } catch {
         
         // We didn't get the port we wanted
-        _log(Self.className() + ": Unable to bind to UDP port \(portToUse)", .info, #function, #file, #line)
+        _log(Self.className() + ": UDP FAILED to bind to port \(portToUse)", .info, #function, #file, #line)
 
         // try the next Port Number
         portToUse += 1
@@ -174,6 +175,8 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
     
     // tell the receive socket to close
     _udpSocket.close()
+    
+    udpSuccessfulRegistration = false
     
     // notify the delegate
     _delegate?.didUnbind()

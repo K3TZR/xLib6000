@@ -278,7 +278,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     let msg = text.trimmingCharacters(in: .whitespacesAndNewlines)
     
-    _log(Self.className() + ": SmartLink msg received--->>>\(msg)<<<---", .debug, #function, #file, #line)
+//    _log(Self.className() + ": SmartLink msg received--->>>\(msg)<<<---", .debug, #function, #file, #line)
 
     // find the space & get the primary msgType
     let spaceIndex = msg.firstIndex(of: " ")!
@@ -648,7 +648,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // send the specified command to the SmartLink server using TLS
     let command = cmd + "\n"
 
-    if !cmd.hasPrefix("ping") { _log(Self.className() + ": TLS cmd sent--->>>\(cmd)<<<---", .debug, #function, #file, #line) }
+//    if !cmd.hasPrefix("ping") { _log(Self.className() + ": TLS cmd sent--->>>\(cmd)<<<---", .debug, #function, #file, #line) }
 
     _tlsSocket.write(command.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withTimeout: timeout, tag: 0)
   }
