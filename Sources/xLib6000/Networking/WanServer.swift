@@ -203,12 +203,12 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // try to connect
     do {
       try _tlsSocket.connect(toHost: kHostName, onPort: UInt16(kHostPort), withTimeout: _timeout)
-      _log(Self.className() + ": SmartLink server connection successful", .debug, #function, #file, #line)
+      _log(Self.className() + ": SmartLink server connection successful", .info, #function, #file, #line)
       NC.post(.smartLinkLogon, object: nil)
       
     } catch _ {
       success = false
-      _log(Self.className() + ": SmartLink server connection FAILED", .debug, #function, #file, #line)
+      _log(Self.className() + ": SmartLink server connection FAILED", .error, #function, #file, #line)
     }    
     return success
   }
@@ -678,14 +678,14 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     _currentHost = sock.connectedHost ?? ""
     _currentPort = sock.connectedPort
     
-    _log(Self.className() + ": SmartLink Server \(_currentHost), port \(_currentPort): Connected", .info, #function, #file, #line)
+    _log(Self.className() + ": SmartLink Server \(_currentHost), port \(_currentPort): Connected", .debug, #function, #file, #line)
 
     // initiate a secure (TLS) connection to the SmartLink server
     var tlsSettings = [String : NSObject]()
     tlsSettings[kCFStreamSSLPeerName as String] = kHostName as NSObject
     _tlsSocket.startTLS(tlsSettings)
     
-    _log(Self.className() + ": SmartLink Server TLS connection: requested", .info, #function, #file, #line)
+    _log(Self.className() + ": SmartLink Server TLS connection: requested", .debug, #function, #file, #line)
 
 
     _isConnected = true
@@ -698,7 +698,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   @objc public func socketDidSecure(_ sock: GCDAsyncSocket) {
     
-    _log(Self.className() + ": SmartLink server TLS connection: secured", .info, #function, #file, #line)
+    _log(Self.className() + ": SmartLink server TLS connection: secured", .debug, #function, #file, #line)
 
     // start pinging SmartLink server (if needed)
     if _ping { startPinging() }

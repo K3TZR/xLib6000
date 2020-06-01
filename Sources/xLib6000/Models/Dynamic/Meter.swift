@@ -350,7 +350,7 @@ public final class Meter : NSObject, DynamicModel {
       // the Radio (hardware) has acknowledged this Meter
       _initialized = true
       
-      _log(Self.className() + " added: id = \(id)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id), \(name)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.meterHasBeenAdded, object: self as Any?)

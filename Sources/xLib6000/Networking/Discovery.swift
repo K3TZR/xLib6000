@@ -246,7 +246,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       discoveredRadios.append(newPacket)
 
       // log Radio addition
-      _log("Radio discovered: \(newPacket.nickname) v\(newPacket.firmwareVersion) \(newPacket.isWan ? "SMARTLINK" : "LOCAL")", .debug, #function, #file, #line)
+      _log("Radio discovered: \(newPacket.nickname) v\(newPacket.firmwareVersion) \(newPacket.isWan ? "SMARTLINK" : "LOCAL")", .info, #function, #file, #line)
       
       // notify observers of Radio addition
       NC.post(.discoveredRadios, object: discoveredRadios as Any?)
