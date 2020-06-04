@@ -280,7 +280,7 @@ public final class Amplifier  : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __ant           = ""
   private var __handle        : Handle = 0

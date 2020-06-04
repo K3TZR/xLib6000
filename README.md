@@ -41,6 +41,16 @@ Flex Radios can have one of four different version groups:
 CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
 
 
+## 1.3.1 Release Notes
+
+* correction for blank GuiClient "station"
+* added remoteRxAudioStreamRemove() func
+* added updating of known GuiClients
+* added defaultFound() func
+* many minor corrections / edits
+* added WanHasBeenAdded notification
+
+
 ## 1.3.0 Release Notes
 
 * corrected "isForThisClient" functionality in all streams"

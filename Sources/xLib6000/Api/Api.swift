@@ -687,7 +687,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var _radio         : Radio? = nil
   private var _delegate      : ApiDelegate? = nil

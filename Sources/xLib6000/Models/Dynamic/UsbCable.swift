@@ -356,7 +356,7 @@ public final class UsbCable : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __autoReport  = false
   private var __band        = ""

@@ -259,7 +259,7 @@ public final class Equalizer : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __eqEnabled     = false
   private var __level63Hz     = 0

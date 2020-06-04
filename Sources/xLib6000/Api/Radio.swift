@@ -1872,7 +1872,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   // A
   private var __apfEnabled                  = false                         // auto-peaking filter enable

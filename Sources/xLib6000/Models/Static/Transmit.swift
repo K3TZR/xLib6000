@@ -536,7 +536,7 @@ public final class Transmit : NSObject, StaticModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __carrierLevel                = 0
   private var __companderEnabled            = false

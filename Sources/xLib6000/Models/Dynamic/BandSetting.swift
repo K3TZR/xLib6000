@@ -295,7 +295,7 @@ public final class BandSetting                : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __accTxEnabled                = false
   private var __accTxReqEnabled             = false

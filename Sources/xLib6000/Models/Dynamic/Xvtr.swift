@@ -262,7 +262,7 @@ public final class Xvtr : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __ifFrequency : Hz = 0
   private var __isValid     = false

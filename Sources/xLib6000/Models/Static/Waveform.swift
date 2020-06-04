@@ -82,7 +82,7 @@ public final class Waveform : NSObject, StaticModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __waveformList = ""
 }

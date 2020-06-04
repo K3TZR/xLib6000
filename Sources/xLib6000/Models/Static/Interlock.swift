@@ -280,7 +280,7 @@ public final class Interlock : NSObject, StaticModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __accTxEnabled      = false
   private var __accTxDelay        = 0

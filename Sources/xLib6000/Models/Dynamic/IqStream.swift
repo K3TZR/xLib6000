@@ -337,7 +337,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var _delegate        : StreamHandler? = nil
 

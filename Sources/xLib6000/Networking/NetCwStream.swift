@@ -207,7 +207,7 @@ public final class NetCwStream : NSObject {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
 //  private var _isActive  = false
 //  private var _id        : NetCwId = 0

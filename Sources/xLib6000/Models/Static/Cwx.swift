@@ -339,7 +339,7 @@ public final class Cwx : NSObject, StaticModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __breakInDelay = 0
   private var __qskEnabled = false

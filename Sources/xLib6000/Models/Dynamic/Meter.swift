@@ -358,7 +358,7 @@ public final class Meter : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var _desc     = ""
   private var _fps      = 0

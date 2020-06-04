@@ -499,16 +499,14 @@ public func isForThisClient(_ properties: KeyValuesArray, connectionHandle: Hand
 ///
 public struct Barrier<Element> {
   private var _value      : Element
-  private let _q          : DispatchQueue
 
   public var wrappedValue: Element {
-    get { _q.sync { _value }}
+    get { Api.objectQ.sync { _value }}
     set { Api.objectQ.sync(flags: .barrier) { _value = newValue }}
   }
   
-  init(_ value: Element, _ queue: DispatchQueue) {
-    _q = queue
-    _value = value
+  public init(wrappedValue: Element) {
+    _value = wrappedValue
   }
 }
 

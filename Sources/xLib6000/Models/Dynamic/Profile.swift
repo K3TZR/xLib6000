@@ -217,7 +217,7 @@ public final class Profile                  : NSObject, StaticModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __list           = [ProfileName]()
   private var __selection      : ProfileId = ""

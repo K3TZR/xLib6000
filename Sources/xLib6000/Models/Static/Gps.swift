@@ -171,7 +171,7 @@ public final class Gps : NSObject, StaticModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __altitude        = ""
   private var __frequencyError  : Double = 0.0

@@ -317,7 +317,7 @@ public final class Tnf : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __depth      : UInt = Depth.normal.rawValue
   private var __frequency  : Hz = 0

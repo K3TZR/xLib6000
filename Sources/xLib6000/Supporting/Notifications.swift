@@ -145,6 +145,8 @@ public enum NotificationType : String {
   case usbCableWillBeRemoved
   case usbCableHasBeenRemoved
 
+  case wanHasBeenAdded
+  
   case waterfallHasBeenAdded
   case waterfallWillBeRemoved
   case waterfallHasBeenRemoved

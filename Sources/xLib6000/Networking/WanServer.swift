@@ -765,7 +765,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __isConnected         = false
   private var __sslClientPublicIp   = ""

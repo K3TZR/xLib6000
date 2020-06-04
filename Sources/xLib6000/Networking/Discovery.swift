@@ -402,50 +402,50 @@ public class DiscoveryPacket : Equatable {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var lastSeen                       = Date()
+  @Barrier public var lastSeen: Date = Date()
   
-  public var availableClients               = 0                   // newAPI, Local only
-  public var availablePanadapters           = 0                   // newAPI, Local only
-  public var availableSlices                = 0                   // newAPI, Local only
-  public var callsign                       = ""
-  public var discoveryVersion               = ""                  // Local only
-  public var firmwareVersion                = ""
-  public var fpcMac                         = ""                  // Local only
-  public var guiClients                     = [Handle: GuiClient]()   // newAPI
-  public var guiClientHandles               = ""                  // newAPI only
-  public var guiClientPrograms              = ""                  // newAPI only
-  public var guiClientStations              = ""                  // newAPI only
-  public var guiClientHosts                 = ""                  // newAPI only
-  public var guiClientIps                   = ""                  // newAPI only
-  public var inUseHost                      = ""                  // deprecated -- 2 spellings
-  public var inUseIp                        = ""                  // deprecated -- 2 spellings
-  public var licensedClients                = 0                   // newAPI, Local only
-  public var maxLicensedVersion             = ""
-  public var maxPanadapters                 = 0                   // newAPI, Local only
-  public var maxSlices                      = 0                   // newAPI, Local only
-  public var model                          = ""
-  public var nickname                       = ""                  // 2 spellings
-  public var port                           = -1                  // Local only
-  public var publicIp                       = ""                  // 2 spellings
-  public var publicTlsPort                  = -1                  // SmartLink only
-  public var publicUdpPort                  = -1                  // SmartLink only
-  public var publicUpnpTlsPort              = -1                  // SmartLink only
-  public var publicUpnpUdpPort              = -1                  // SmartLink only
-  public var radioLicenseId                 = ""
-  public var requiresAdditionalLicense      = false
-  public var serialNumber                   = ""
-  public var status                         = ""
-  public var upnpSupported                  = false               // SmartLink only
-  public var wanConnected                   = false               // Local only
+  @Barrier public var availableClients: Int = 0
+  @Barrier public var availablePanadapters: Int = 0
+  @Barrier public var availableSlices: Int = 0
+  @Barrier public var callsign: String = ""
+  @Barrier public var discoveryVersion: String = ""
+  @Barrier public var firmwareVersion: String = ""
+  @Barrier public var fpcMac: String = ""
+  @Barrier public var guiClients: [Handle: GuiClient] = [Handle: GuiClient]()
+  @Barrier public var guiClientHandles: String = ""
+  @Barrier public var guiClientPrograms: String = ""
+  @Barrier public var guiClientStations: String = ""
+  @Barrier public var guiClientHosts: String = ""
+  @Barrier public var guiClientIps: String = ""
+  @Barrier public var inUseHost: String = ""
+  @Barrier public var inUseIp: String = ""
+  @Barrier public var licensedClients: Int = 0
+  @Barrier public var maxLicensedVersion: String = ""
+  @Barrier public var maxPanadapters: Int = 0
+  @Barrier public var maxSlices: Int = 0
+  @Barrier public var model: String = ""
+  @Barrier public var nickname: String = ""
+  @Barrier public var port: Int = -1
+  @Barrier public var publicIp: String = ""
+  @Barrier public var publicTlsPort: Int = -1
+  @Barrier public var publicUdpPort: Int = -1
+  @Barrier public var publicUpnpTlsPort: Int = -1
+  @Barrier public var publicUpnpUdpPort: Int = -1
+  @Barrier public var radioLicenseId: String = ""
+  @Barrier public var requiresAdditionalLicense: Bool = false
+  @Barrier public var serialNumber: String = ""
+  @Barrier public var status: String = ""
+  @Barrier public var upnpSupported: Bool = false
+  @Barrier public var wanConnected: Bool = false
   
   // FIXME: Not really part of the DiscoveryPacket
-  public var isPortForwardOn                = false               // ????
-  public var isWan                          = false
-  public var localInterfaceIP               = ""                  // ????
-  public var lowBandwidthConnect            = false               // ????
-  public var negotiatedHolePunchPort        = -1                  // ????
-  public var requiresHolePunch              = false               // ????
-  public var wanHandle                      = ""               
+  @Barrier public var isPortForwardOn: Bool = false
+  @Barrier public var isWan: Bool = false
+  @Barrier public var localInterfaceIP: String = ""
+  @Barrier public var lowBandwidthConnect: Bool = false
+  @Barrier public var negotiatedHolePunchPort: Int = -1
+  @Barrier public var requiresHolePunch: Bool = false
+  @Barrier public var wanHandle: String = ""
 
   public var description : String {
     return """
@@ -468,5 +468,54 @@ public class DiscoveryPacket : Equatable {
     // same serial number
     return lhs.serialNumber == rhs.serialNumber && lhs.isWan == rhs.isWan
   }
+
+  
+  // ----------------------------------------------------------------------------
+  // *** Backing properties (Do NOT use) ***
+  
+//  public var _lastSeen                       = Date()
+//
+//  public var _availableClients               = 0                   // newAPI, Local only
+//  public var _availablePanadapters           = 0                   // newAPI, Local only
+//  public var _availableSlices                = 0                   // newAPI, Local only
+//  public var _callsign                       = ""
+//  public var _discoveryVersion               = ""                  // Local only
+//  public var _firmwareVersion                = ""
+//  public var _fpcMac                         = ""                  // Local only
+//  public var _guiClients                     = [Handle: GuiClient]()   // newAPI
+//  public var _guiClientHandles               = ""                  // newAPI only
+//  public var _guiClientPrograms              = ""                  // newAPI only
+//  public var _guiClientStations              = ""                  // newAPI only
+//  public var _guiClientHosts                 = ""                  // newAPI only
+//  public var _guiClientIps                   = ""                  // newAPI only
+//  public var _inUseHost                      = ""                  // deprecated -- 2 spellings
+//  public var _inUseIp                        = ""                  // deprecated -- 2 spellings
+//  public var _licensedClients                = 0                   // newAPI, Local only
+//  public var _maxLicensedVersion             = ""
+//  public var _maxPanadapters                 = 0                   // newAPI, Local only
+//  public var _maxSlices                      = 0                   // newAPI, Local only
+//  public var _model                          = ""
+//  public var _nickname                       = ""                  // 2 spellings
+//  public var _port                           = -1                  // Local only
+//  public var _publicIp                       = ""                  // 2 spellings
+//  public var _publicTlsPort                  = -1                  // SmartLink only
+//  public var _publicUdpPort                  = -1                  // SmartLink only
+//  public var _publicUpnpTlsPort              = -1                  // SmartLink only
+//  public var _publicUpnpUdpPort              = -1                  // SmartLink only
+//  public var _radioLicenseId                 = ""
+//  public var _requiresAdditionalLicense      = false
+//  public var _serialNumber                   = ""
+//  public var _status                         = ""
+//  public var _upnpSupported                  = false               // SmartLink only
+//  public var _wanConnected                   = false               // Local only
+//
+//  // FIXME: Not really part of the DiscoveryPacket
+//  public var _isPortForwardOn                = false               // ????
+//  public var _isWan                          = false
+//  public var _localInterfaceIP               = ""                  // ????
+//  public var _lowBandwidthConnect            = false               // ????
+//  public var _negotiatedHolePunchPort        = -1                  // ????
+//  public var _requiresHolePunch              = false               // ????
+//  public var _wanHandle                      = ""
 }
 

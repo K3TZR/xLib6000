@@ -32,6 +32,8 @@ public final class Wan : NSObject, StaticModel {
     get { Api.objectQ.sync { __serverConnected } }
     set { Api.objectQ.sync(flags: .barrier) {__serverConnected = newValue }}}
 
+  private var _initialized  = false
+
   enum Token: String {
     case serverConnected    = "server_connected"
     case radioAuthenticated = "radio_authenticated"
@@ -84,10 +86,21 @@ public final class Wan : NSObject, StaticModel {
       case .radioAuthenticated: willChangeValue(for: \.radioAuthenticated)  ; _radioAuthenticated = property.value.bValue ; didChangeValue(for: \.radioAuthenticated)
       }
     }
+    // is it initialized?
+    if !_initialized {
+
+      // YES, the Radio (hardware) has acknowledged it
+      _initialized = true
+
+      _log(Self.className() + " added: ServerConnected = \(_serverConnected), RadioAuthenticated = \(_radioAuthenticated)", .debug, #function, #file, #line)
+
+      // notify all observers
+      NC.post(.wanHasBeenAdded, object: self as Any?)
+    }
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __radioAuthenticated  = false
   private var __serverConnected     = false

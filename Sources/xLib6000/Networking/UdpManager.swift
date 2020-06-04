@@ -275,7 +275,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var _udpSuccessfulRegistration = false
 }

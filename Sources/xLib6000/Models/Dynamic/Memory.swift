@@ -438,7 +438,7 @@ public final class Memory                   : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __digitalLowerOffset          = 0
   private var __digitalUpperOffset          = 0

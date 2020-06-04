@@ -1046,7 +1046,7 @@ public final class Slice  : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __active                  = false
   private var __agcMode                 = AgcMode.off.rawValue

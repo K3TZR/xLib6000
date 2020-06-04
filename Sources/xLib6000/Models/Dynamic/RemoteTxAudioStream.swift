@@ -243,7 +243,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var _delegate      : StreamHandler? = nil
 

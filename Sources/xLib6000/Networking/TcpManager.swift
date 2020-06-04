@@ -261,7 +261,7 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   }
   
   // ----------------------------------------------------------------------------
-  // *** Hidden properties (Do NOT use) ***
+  // *** Backing properties (Do NOT use) ***
   
   private var __isWan   = false
   private var __seqNum  : UInt = 0
