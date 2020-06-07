@@ -120,9 +120,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
         // NO, does it exist?
         if radio.remoteTxAudioStreams[id] != nil {
           
-          // YES, remove it, notify observers
-          NC.post(.remoteTxAudioStreamWillBeRemoved, object: radio.remoteTxAudioStreams[id] as Any?)
-          
+          // YES, remove it
           radio.remoteTxAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
@@ -202,7 +200,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
 
     // notify all observers
-//    NC.post(.remoteTxAudioStreamWillBeRemoved, object: self as Any?)
+    NC.post(.remoteTxAudioStreamWillBeRemoved, object: self as Any?)
   }
   
   // ------------------------------------------------------------------------------

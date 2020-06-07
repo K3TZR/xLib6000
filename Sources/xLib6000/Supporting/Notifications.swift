@@ -64,11 +64,27 @@ public enum NotificationType : String {
   case memoryWillBeRemoved
   case memoryHasBeenRemoved
 
-  case meterHasBeenAdded
-  case meterWillBeRemoved
-  case meterHasBeenRemoved
+  case meterAdded
+  case sliceMeterAdded
+  case txMeterAdded
+  case paramMeterAdded
+  case pcwMeterAdded
+  case cwMeterAdded
+
   case meterUpdated
-  
+  case sliceMeterUpdated
+  case txMeterUpdated
+  case paramMeterUpdated
+  case pcwMeterUpdated
+  case cwMeterUpdated
+
+  case meterRemoved
+  case sliceMeterRemoved
+  case txMeterRemoved
+  case paramMeterRemoved
+  case pcwMeterRemoved
+  case cwMeterRemoved
+
   case micAudioStreamHasBeenAdded
   case micAudioStreamWillBeRemoved
   case micAudioStreamHasBeenRemoved

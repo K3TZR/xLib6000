@@ -218,14 +218,6 @@ public final class TxAudioStream : NSObject, DynamicModel {
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
     
     NC.post(.txAudioStreamWillBeRemoved, object: self as Any?)
-    
-    // remove it immediately (TxAudioStream does not send status on removal)
-    _radio.txAudioStreams[id] = nil
-        
-    Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
-    
-    // notify all observers
-    NC.post(.txAudioStreamHasBeenRemoved, object: id as Any?)
   }
   
   // ----------------------------------------------------------------------------

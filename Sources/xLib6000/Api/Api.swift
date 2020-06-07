@@ -43,9 +43,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
   public var apiState                : Api.State!
   public var connectionHandle        : Handle?
-  public var connectionHandleWan     = ""
+//  public var connectionHandleWan     = ""
   public var isGui                   = true
-  public var isWan                   = false
+//  public var isWan                   = false
   public var needsNetCwStream        = false
   public var reducedDaxBw            = false
   public var testerDelegate          : ApiDelegate?
@@ -280,10 +280,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _clientId = clientId
       _clientStation = station
       self.isGui = (pendingDisconnect == .none ? isGui : false)
-      self.isWan = packet.isWan
       self.reducedDaxBw = reducedDaxBw
       self.needsNetCwStream = needsCwStream
-      connectionHandleWan = wanHandle
             
     } else {
       // Failed to connect
@@ -373,7 +371,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       sendCommands()
       
       // set the streaming UDP port
-      if isWan {
+      if radio.packet.isWan {
         // Wan, establish a UDP port for the Data Streams
         _ = udp.bind(packet: radio.packet, clientHandle: connectionHandle)
         
@@ -386,8 +384,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         
         _pinger = Pinger(tcpManager: tcp, pingQ: _pingQ)
 
-        let wanStatus = isWan ? "SMARTLINK" : "LOCAL"
-        let port = (isWan ? radio.packet.publicTlsPort : radio.packet.port)
+        let wanStatus = radio.packet.isWan ? "SMARTLINK" : "LOCAL"
+        let port = (radio.packet.isWan ? radio.packet.publicTlsPort : radio.packet.port)
         _log(Self.className() + " Pinger started: \(radio.packet.nickname) @ \(radio.packet.publicIp), port: \(port) (\(wanStatus))", .info, #function, #file, #line)
       }
       
@@ -579,7 +577,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     apiState = .tcpConnected
     
     // log it
-    let wanStatus = isWan ? "SMARTLINK" : "LOCAL"
+    let wanStatus = radio!.packet.isWan ? "SMARTLINK" : "LOCAL"
     let guiStatus = isGui ? "(GUI) " : "(NON-GUI)"
     _log(Self.className() + " TCP connected to: \(host), port: \(port) \(guiStatus)(\(wanStatus))", .info, #function, #file, #line)
 
@@ -588,12 +586,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     tcp.readNext()
     
-    if isWan {
+    if radio!.packet.isWan {
       
       // ask the Radio to validate
-      send("wan validate handle=" + connectionHandleWan, replyTo: nil)
+      send("wan validate handle=" + radio!.packet.wanHandle, replyTo: nil)
       
-      _log(Self.className() + " Wan validate handle: \(connectionHandleWan)", .debug, #function, #file, #line)
+      _log(Self.className() + " Wan validate handle: \(radio!.packet.wanHandle)", .debug, #function, #file, #line)
 
     } else {
       
@@ -661,7 +659,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     udp.beginReceiving()
     
     // if WAN connection reset the state to .clientConnected as the true connection state
-    if isWan { apiState = .clientConnected }
+    if radio!.packet.isWan { apiState = .clientConnected }
   }
   /// Respond to a UDP unbind event
   ///

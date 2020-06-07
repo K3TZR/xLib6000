@@ -156,12 +156,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
         // does it exist?
         if radio.iqStreams[id] != nil {
           
-          // NOTE: This code will never be called
-          //    IqStream does not send status on removal
-
-          // YES, remove it, notify observers
-          NC.post(.iqStreamWillBeRemoved, object: radio.iqStreams[id] as Any?)
-          
+          // YES, remove it
           radio.iqStreams[id] = nil
           
           Log.sharedInstance.logMessage("IqStream removed: id = \(id.hex)", .debug, #function, #file, #line)
@@ -250,13 +245,6 @@ public final class IqStream : NSObject, DynamicModelWithStream {
     
     // notify all observers
     NC.post(.iqStreamWillBeRemoved, object: self as Any?)
-    
-    // remove it immediately (IqStream does not send status on removal)
-    _radio.iqStreams[id] = nil
-    
-    Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
-
-    NC.post(.iqStreamHasBeenRemoved, object: id as Any?)
   }
 
   // ------------------------------------------------------------------------------

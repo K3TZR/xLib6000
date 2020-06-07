@@ -220,8 +220,28 @@ public final class Meter : NSObject, DynamicModel {
             if adjNewValue != previousValue {
               meter.value = adjNewValue
               
-              // notify all observers
-              NC.post(.meterUpdated, object: meter as Any?)
+              // notify appropriate observers
+              switch meter.name {
+              // specific cases
+              case Meter.ShortName.signalPassband.rawValue:
+                NC.post(.sliceMeterUpdated, object: meter as Any?)
+              
+              case Meter.ShortName.powerForward.rawValue, Meter.ShortName.swr.rawValue:
+                NC.post(.txMeterUpdated, object: meter as Any?)
+              
+              case Meter.ShortName.temperaturePa.rawValue, Meter.ShortName.voltageAfterFuse.rawValue:
+                NC.post(.paramMeterUpdated, object: meter as Any?)
+              
+              case Meter.ShortName.microphoneAverage.rawValue, Meter.ShortName.microphonePeak.rawValue, Meter.ShortName.postClipper.rawValue:
+                NC.post(.pcwMeterUpdated, object: meter as Any?)
+              
+              case Meter.ShortName.voltageHwAlc.rawValue:
+                  NC.post(.cwMeterUpdated, object: meter as Any?)
+
+              // non-specific case
+              default:
+                NC.post(.meterUpdated, object: meter as Any?)
+              }
             }
           }
         }
@@ -271,15 +291,34 @@ public final class Meter : NSObject, DynamicModel {
         
         // does it exist?
         if radio.meters[id] != nil {
-          
-          // YES, remove it, notify observers
-          NC.post(.meterWillBeRemoved, object: radio.meters[id] as Any?)
-          
+
+          let name = radio.meters[id]!.name
           radio.meters[id] = nil
           
           Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id)", .debug, #function, #file, #line)
 
-          NC.post(.meterHasBeenRemoved, object: id as Any?)
+          // notify appropriate observers
+          switch name {
+          // specific cases
+          case Meter.ShortName.signalPassband.rawValue:
+            NC.post(.sliceMeterRemoved, object: id as Any?)
+          
+          case Meter.ShortName.powerForward.rawValue, Meter.ShortName.swr.rawValue:
+            NC.post(.txMeterRemoved, object: id as Any?)
+          
+          case Meter.ShortName.temperaturePa.rawValue, Meter.ShortName.voltageAfterFuse.rawValue:
+            NC.post(.paramMeterRemoved, object: id as Any?)
+          
+          case Meter.ShortName.microphoneAverage.rawValue, Meter.ShortName.microphonePeak.rawValue, Meter.ShortName.postClipper.rawValue:
+            NC.post(.pcwMeterRemoved, object: id as Any?)
+          
+          case Meter.ShortName.voltageHwAlc.rawValue:
+              NC.post(.cwMeterRemoved, object: id as Any?)
+
+          // non-specific case
+          default:
+            NC.post(.meterRemoved, object: id as Any?)
+          }
         }
       }
     }
@@ -352,8 +391,28 @@ public final class Meter : NSObject, DynamicModel {
       
       _log(Self.className() + " added: id = \(id), \(name)", .debug, #function, #file, #line)
 
-      // notify all observers
-      NC.post(.meterHasBeenAdded, object: self as Any?)
+      // notify appropriate observers
+      switch name {
+      // specific cases
+//      case Meter.ShortName.signalPassband.rawValue:
+//        NC.post(.sliceMeterAdded, object: self as Any?)
+      
+      case Meter.ShortName.powerForward.rawValue, Meter.ShortName.swr.rawValue:
+        NC.post(.txMeterAdded, object: self as Any?)
+      
+      case Meter.ShortName.temperaturePa.rawValue, Meter.ShortName.voltageAfterFuse.rawValue:
+        NC.post(.paramMeterAdded, object: self as Any?)
+      
+      case Meter.ShortName.microphoneAverage.rawValue, Meter.ShortName.microphonePeak.rawValue, Meter.ShortName.postClipper.rawValue:
+        NC.post(.pcwMeterAdded, object: self as Any?)
+      
+      case Meter.ShortName.voltageHwAlc.rawValue:
+          NC.post(.cwMeterAdded, object: self as Any?)
+
+      // non-specific case
+      default:
+        NC.post(.meterAdded, object: self as Any?)
+      }
     }
   }
   

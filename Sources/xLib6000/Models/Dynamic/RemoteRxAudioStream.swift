@@ -122,15 +122,10 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
       
       } else {
 
-        // NOTE: This code will never be called
-        //    remoteRxAudioStream does not send status on removal
-
         // NO, does it exist?
         if radio.remoteRxAudioStreams[id] != nil {
           
-          // YES, remove it, notify observers
-          NC.post(.remoteRxAudioStreamWillBeRemoved, object: radio.remoteRxAudioStreams[id] as Any?)
-          
+          // YES, remove it
           radio.remoteRxAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
@@ -211,13 +206,6 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
 
     // notify all observers
     NC.post(.remoteRxAudioStreamWillBeRemoved, object: self as Any?)
-
-    // remove it immediately (remoteRxAudioStream does not send status on removal)
-    _radio.remoteRxAudioStreams[id] = nil
-    
-    Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
-    
-    NC.post(.remoteRxAudioStreamHasBeenRemoved, object: id as Any?)
   }
   
   // ------------------------------------------------------------------------------

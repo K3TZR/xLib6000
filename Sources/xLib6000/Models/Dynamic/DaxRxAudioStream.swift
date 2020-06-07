@@ -134,9 +134,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
         // NO, does it exist?
         if radio.daxRxAudioStreams[id] != nil {
           
-          // YES, remove it, notify observers
-          NC.post(.daxRxAudioStreamWillBeRemoved, object: radio.daxRxAudioStreams[id] as Any?)
-          
+          // YES, remove it
           radio.daxRxAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
@@ -229,7 +227,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
     
     // notify all observers
-//    NC.post(.daxRxAudioStreamWillBeRemoved, object: self as Any?)
+    NC.post(.daxRxAudioStreamWillBeRemoved, object: self as Any?)
   }
 
   // ------------------------------------------------------------------------------
