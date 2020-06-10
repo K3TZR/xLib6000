@@ -302,9 +302,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         _log("GuiClient removed: \(oldPacket.nickname), \(oldPacket.isWan ? "SMARTLINK" : "LOCAL"), \(handle.hex), \(oldGuiClient.station), \(oldGuiClient.program)", .debug, #function, #file, #line)
         NC.post(.guiClientHasBeenRemoved, object: oldPacket.guiClients[handle] as Any?)
       
-      } else {
-        // YES, it should be updated
-        oldPacket.guiClients[handle] = newPacket.guiClients[handle]
       }
     }
     // identify any added guiClients
@@ -366,29 +363,18 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
 ///     A struct therefore a "value" type
 ///     Equatable by handle
 ///
-public struct GuiClient       : Equatable {
+public struct GuiClient {
   
   public var clientId         : String? = nil
-
+  
   public var program          : String
   public var station          : String
   public var host             : String = ""
   public var ip               : String = ""
-
+  
   public var isAvailable      : Bool = false
   public var isLocalPtt       : Bool = false
   public var isThisClient     : Bool = false
-  
-  public static func ==(lhs: GuiClient, rhs: GuiClient) -> Bool {
-    
-    if lhs.program  != rhs.program  { return false }
-    if lhs.station  != rhs.station  { return false }
-    return true
-  }
-  
-  public static func !=(lhs: GuiClient, rhs: GuiClient) -> Bool {
-    return !(lhs == rhs)
-  }
 }
 
 

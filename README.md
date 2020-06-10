@@ -41,6 +41,11 @@ Flex Radios can have one of four different version groups:
 CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
 
 
+## 1.3.3 Release Notes
+
+* corrected issue with GuiClient.clientId being reset to nil by later broadcast packets
+
+
 ## 1.3.2 Release Notes
 
 * correction to Fdx Button command to radio
