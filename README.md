@@ -30,8 +30,8 @@ Flex Radios can have one of four different version groups:
 *  v1.x.x, the v1 API - untested at this time
 *  v2.0.x thru v2.4.9, the v2 API <<-- CURRENTLY SUPPORTED
 *  v2.5.1 to less than v3.0.0, the v3 API without MultiFlex <<-- CURRENTLY SUPPORTED
-*  v3.x.x thru v3.1.11, the v3 API with MultiFlex <<-- CURRENTLY SUPPORTED
-*  greater than v3.1.11 - untested at this time
+*  v3.x.x thru v3.1.12, the v3 API with MultiFlex <<-- CURRENTLY SUPPORTED
+*  greater than v3.1.12 - untested at this time
 
 
 ## Credits
@@ -39,6 +39,14 @@ Flex Radios can have one of four different version groups:
 [![CocoaAsyncSocket](https://img.shields.io/badge/CocoaAsyncSocket-v7.6.3-informational)](https://github.com/robbiehanson/CocoaAsyncSocket)
 
 CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
+
+
+## 1.3.4 Release Notes
+
+* added removeRemoteTxAudioStream()
+* added export() and restore(from:) methods to Interlock & Transmit (future use)
+* added Tests for export() and restore(from:)
+* removed compression from requestRemoteTxAudioStream()
 
 
 ## 1.3.3 Release Notes

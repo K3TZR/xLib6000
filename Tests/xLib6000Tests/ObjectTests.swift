@@ -2152,7 +2152,130 @@ final class ObjectTests: XCTestCase {
     }
     disconnect()
   }
+
+  func testInterlockExport() {
+    let type = "Interlock"
+    
+    Swift.print("\n-------------------- \(#function) --------------------\n")
+    
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+    guard radio != nil else { return }
   
+    do {
+      let json = try radio?.interlock.export()
+      Swift.print(json!)
+      
+    } catch {
+      print(error.localizedDescription)
+      XCTFail("----->>>>> Interlock export FAILED <<<<<-----", file: #function)
+    }
+    disconnect()
+  }
+
+  func testInterlockImport() {
+    let type = "Interlock"
+    
+    Swift.print("\n-------------------- \(#function) --------------------\n")
+    
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+    guard radio != nil else { return }
+
+    let json =
+    """
+    {
+      "_accTxDelay" : 10,
+      "_accTxEnabled" : true,
+      "_accTxReqEnabled" : false,
+      "_accTxReqPolarity" : true,
+      "_rcaTxReqEnabled" : false,
+      "_rcaTxReqPolarity" : true,
+      "_timeout" : 20,
+      "_txAllowed" : true,
+      "_txDelay" : 30,
+      "_tx1Delay" : 40,
+      "_tx1Enabled" : false,
+      "_tx2Delay" : 50,
+      "_tx2Enabled" : true,
+      "_tx3Delay" : 60,
+      "_tx3Enabled" : false
+    }
+    """
+    do {
+      try radio!.interlock.restore(from: json)
+
+      XCTAssertEqual(radio!.interlock.accTxDelay, 10, "accTxDelay", file: #function)
+      XCTAssertEqual(radio!.interlock.accTxEnabled, true, "accTxEnabled", file: #function)
+      XCTAssertEqual(radio!.interlock.accTxReqEnabled, false, "accTxReqEnabled", file: #function)
+      XCTAssertEqual(radio!.interlock.accTxReqPolarity, true, "accTxReqPolarity", file: #function)
+      XCTAssertEqual(radio!.interlock.rcaTxReqEnabled, false, "rcaTxReqEnabled", file: #function)
+      XCTAssertEqual(radio!.interlock.rcaTxReqPolarity, true, "rcaTxReqPolarity", file: #function)
+      XCTAssertEqual(radio!.interlock.timeout, 20, "timeout", file: #function)
+      XCTAssertEqual(radio!.interlock.txAllowed, true, "txAllowed", file: #function)
+      XCTAssertEqual(radio!.interlock.txDelay, 30, "txDelay", file: #function)
+      XCTAssertEqual(radio!.interlock.tx1Delay, 40, "tx1Delay", file: #function)
+      XCTAssertEqual(radio!.interlock.tx1Enabled, false, "tx1Enabled", file: #function)
+      XCTAssertEqual(radio!.interlock.tx2Delay, 50, "tx2Delay", file: #function)
+      XCTAssertEqual(radio!.interlock.tx2Enabled, true, "tx2Enabled", file: #function)
+      XCTAssertEqual(radio!.interlock.tx3Delay, 60, "tx3Delay", file: #function)
+      XCTAssertEqual(radio!.interlock.tx3Enabled, false, "tx3Enabled", file: #function)
+
+    } catch {
+      print(error.localizedDescription)
+      XCTFail("----->>>>> Interlock import FAILED <<<<<-----", file: #function)
+    }
+    disconnect()
+  }
+
+  func testTransmitExport() {
+    let type = "Transmit"
+    
+    Swift.print("\n-------------------- \(#function) --------------------\n")
+    
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+    guard radio != nil else { return }
+  
+    do {
+      let json = try radio?.transmit.export()
+      Swift.print(json!)
+      
+    } catch {
+      print(error.localizedDescription)
+      XCTFail("----->>>>> Transmit export FAILED <<<<<-----", file: #function)
+    }
+    disconnect()
+  }
+
+  func testTransmitImport() {
+    let type = "Transmit"
+    
+    Swift.print("\n-------------------- \(#function) --------------------\n")
+    
+    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+    guard radio != nil else { return }
+
+    let json =
+    """
+    {
+      "_hwAlcEnabled" : true,
+      "_tunePower" : 6,
+      "_rfPower" : 87
+    }
+    """
+    do {
+      try radio!.transmit.restore(from: json)
+
+      XCTAssertEqual(radio!.transmit.hwAlcEnabled, true, "hwAlcEnabled", file: #function)
+      XCTAssertEqual(radio!.transmit.tunePower, 6, "tunePower", file: #function)
+      XCTAssertEqual(radio!.transmit.rfPower, 87, "rfPower", file: #function)
+
+    } catch {
+      print(error.localizedDescription)
+      XCTFail("----->>>>> Transmit import FAILED <<<<<-----", file: #function)
+    }
+    disconnect()
+  }
+
+
   //  static var allTests = [
   //    ("testApi", testApi),
   //    ("testLog", testLog),

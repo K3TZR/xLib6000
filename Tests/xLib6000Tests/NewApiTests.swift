@@ -1361,7 +1361,7 @@ final class NewApiTests: XCTestCase {
         
         if showInfoMessages { Swift.print("\n***** 1st \(type) object requested") }
         
-        radio!.requestRemoteTxAudioStream(compression: "none")
+        radio!.requestRemoteTxAudioStream()
         sleep(2)
         if radio!.remoteTxAudioStreams.count == 1 {
           
@@ -1372,7 +1372,7 @@ final class NewApiTests: XCTestCase {
             let firstId = object.id
             
             XCTAssertEqual(object.clientHandle, Api.sharedInstance.connectionHandle, "clientHandle", file: #function)
-            XCTAssertEqual(object.compression, "none", "compression", file: #function)
+            XCTAssertEqual(object.compression, "opus", "compression", file: #function)
             
             if showInfoMessages { Swift.print("***** 1st \(type) object parameters saved") }
             
@@ -1386,7 +1386,7 @@ final class NewApiTests: XCTestCase {
               
               if showInfoMessages { Swift.print("\n***** 2nd \(type) object requested") }
               
-              radio!.requestRemoteTxAudioStream(compression: "opus")
+              radio!.requestRemoteTxAudioStream()
               sleep(2)
               if radio!.remoteTxAudioStreams.count == 1 {
                 if let object = radio!.remoteTxAudioStreams.first?.value {

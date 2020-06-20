@@ -518,7 +518,6 @@ extension Radio {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func requestLicense(callback: ReplyHandler? = nil) {
-    
     // ask the Radio for its license info
     return sendCommand("license refresh", replyTo: callback)
   }
@@ -527,7 +526,6 @@ extension Radio {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func requestLowBandwidthConnect(callback: ReplyHandler? = nil) {
-    
     // tell the Radio to limit the connection bandwidth
     sendCommand("client low_bw_connect", replyTo: callback)
   }
@@ -536,7 +534,6 @@ extension Radio {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func requestMicList(callback: ReplyHandler? = nil) {
-    
     // ask the Radio for a list of Mic Sources
     sendCommand("mic list", replyTo: callback == nil ? defaultReplyHandler : callback)
   }
@@ -545,7 +542,6 @@ extension Radio {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func requestPersistenceOff(callback: ReplyHandler? = nil) {
-    
     // tell the Radio to turn off persistence
     sendCommand("client program start_persistence off", replyTo: callback)
   }
@@ -582,14 +578,12 @@ extension Radio {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func requestReboot(callback: ReplyHandler? = nil) {
-    
     // tell the Radio to reboot
     sendCommand("radio reboot", replyTo: callback)
   }
   /// Request the elapsed uptime
   ///
   public func requestUptime(callback: ReplyHandler? = nil) {
-    
     // ask the Radio for the elapsed uptime
     sendCommand("radio uptime", replyTo: callback == nil ? defaultReplyHandler : callback)
   }
@@ -598,8 +592,7 @@ extension Radio {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func requestVersion(callback: ReplyHandler? = nil) {
-    
-    // ask the Radio for a list of Mic Sources
+    // ask the Radio for a list of Versions
     sendCommand("version", replyTo: callback == nil ? defaultReplyHandler : callback)
   }
   /// Reset the Static Net Params
@@ -607,7 +600,6 @@ extension Radio {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func staticNetParamsReset(callback: ReplyHandler? = nil) {
-    
     // tell the Radio to reset the Static Net Params
     sendCommand("radio static_net_params" + " reset", replyTo: callback)
   }
@@ -616,7 +608,6 @@ extension Radio {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func staticNetParamsSet(callback: ReplyHandler? = nil) {
-    
     sendCommand("radio static_net_params" + " " + RadioStaticNet.ip.rawValue + "=\(staticIp) " + RadioStaticNet.gateway.rawValue + "=\(staticGateway) " + RadioStaticNet.netmask.rawValue + "=\(staticNetmask)")
   }
 
@@ -669,7 +660,6 @@ extension Radio {
   /// Disable all TxEnabled
   ///
   public func disableSliceTx() {
-    
     // for all Slices, turn off txEnabled
     for (_, slice) in slices where slice.txEnabled {
       
@@ -683,7 +673,6 @@ extension Radio {
   /// - Returns:      an array of Slices (may be empty)
   ///
   public func findAllSlices(on id: PanadapterStreamId) -> [xLib6000.Slice]? {
-    
     // find the Slices on the Panadapter (if any)
     let filteredSlices = slices.values.filter { $0.panadapterId == id }
     guard filteredSlices.count >= 1 else { return nil }
@@ -695,11 +684,10 @@ extension Radio {
   /// - Parameters:
   ///   - id:         a Panadapter Stream Id
   ///   - freq:       a Frequency (in hz)
-  ///   - width:      frequenct width
+  ///   - width:      frequency width
   /// - Returns:      a reference to a Slice (or nil)
   ///
   public func findSlice(on id: PanadapterStreamId, at freq: Hz, width: Int) -> xLib6000.Slice? {
-    
     // find the Slices on the Panadapter (if any)
     let filteredSlices = findAllSlices(on: id)
     guard filteredSlices != nil else {return nil}
@@ -716,7 +704,6 @@ extension Radio {
   /// - Returns:      a Slice reference (or nil)
   ///
   public func findActiveSlice() -> xLib6000.Slice? {
-    
     // find the active Slices (if any)
     let filteredSlices = slices.values.filter { $0.active }
     guard filteredSlices.count >= 1 else { return nil }
@@ -731,7 +718,6 @@ extension Radio {
   /// - Returns:      a Slice reference (or nil)
   ///
   public func findActiveSlice(on id: PanadapterStreamId) -> xLib6000.Slice? {
-    
     // find the active Slices on the specified Panadapter (if any)
     let filteredSlices = slices.values.filter { $0.active && $0.panadapterId == id }
     guard filteredSlices.count >= 1 else { return nil }
@@ -745,7 +731,6 @@ extension Radio {
   /// - Returns:              a Slice (if any)
   ///
   public func findSlice(using channel: Int) -> xLib6000.Slice? {
-    
     // find the Slices with the specified Channel (if any)
     let filteredSlices = slices.values.filter { $0.daxChannel == channel }
     guard filteredSlices.count >= 1 else { return nil }
@@ -761,7 +746,6 @@ extension Radio {
   /// - Returns:             a Slice (if any)
   ///
   public func findSlice(letter: String, guiClientHandle: Handle) -> xLib6000.Slice? {
-    
     // find the Slices with the specified Channel (if any)
     let filteredSlices = slices.values.filter { $0.sliceLetter == letter && $0.clientHandle == guiClientHandle }
     guard filteredSlices.count >= 1 else { return nil }
@@ -776,7 +760,6 @@ extension Radio {
   /// - Returns:             a Slice (if any)
   ///
   public func getTransmitSliceForHandle(_ guiClientHandle: Handle) -> xLib6000.Slice? {
-    
     // find the Slices with the specified Channel (if any)
     let filteredSlices = slices.values.filter { $0.txEnabled && $0.clientHandle == guiClientHandle }
     guard filteredSlices.count >= 1 else { return nil }
@@ -791,7 +774,6 @@ extension Radio {
   /// - Returns:             a Slice (if any)
   ///
   public func getTransmitSliceForClientId(_ guiClientId: String) -> xLib6000.Slice? {
-    
     // find the GUI client for the ID
     if let handle = findHandle(for: guiClientId) {
       // find the Slices with the specified Channel (if any)
@@ -806,15 +788,6 @@ extension Radio {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: -  RemoteRxAudioStream methods
-  
-  public func remoteRxAudioStreamRemove(for clientHandle: Handle) {
-    for (_, stream) in remoteRxAudioStreams where stream.clientHandle == clientHandle {
-      stream.remove()
-    }
-  }
-  
-  // ----------------------------------------------------------------------------
   // MARK: -  GuiClient methods
   
   /// Find a GuiClient handle by Client Id
@@ -823,7 +796,6 @@ extension Radio {
   /// - Returns:              a Handle or nil
   ///
   public func findHandle(for clientId: String?) -> Handle? {
-    
     guard clientId != nil else { return nil }
     
     for (handle, guiClient) in packet.guiClients where guiClient.clientId == clientId {
@@ -837,13 +809,11 @@ extension Radio {
   /// - Returns:              a ClientId or nil
   ///
   public func findClientId(for station: String) -> String? {
-    
     for (_, client) in packet.guiClients {
       if client.station == station { return client.clientId }
     }
     return nil
   }
-
   /// Update / Add a GuiClient entry
   /// - Parameters:
   ///   - handle:         a handle
@@ -854,7 +824,6 @@ extension Radio {
   ///   - isThisClient:   whether ckient is the current client
   ///
   public func guiClientUpdate(handle: Handle, clientId: String, program: String, station: String, isLocalPtt: Bool, isThisClient: Bool) {
-    
     if packet.guiClients[handle] == nil {
       // Add
       packet.guiClients[handle] = GuiClient(clientId: clientId, program: program, station: station, isLocalPtt: isLocalPtt, isThisClient: isThisClient)
@@ -885,25 +854,38 @@ extension Radio {
   /// - Returns:              success / failure
   ///
   public func requestRemoteRxAudioStream(compression: String = RemoteRxAudioStream.Compression.opus.rawValue, callback: ReplyHandler? = nil) {
-    
     // tell the Radio to enable Opus Rx
     sendCommand("stream create type=remote_audio_rx compression=\(compression)", replyTo: callback)
   }
-  
+  /// Remove a RemoteRxAudioStream
+  /// - Parameter clientHandle:   a Client handle
+  ///
+  public func removeRemoteRxAudioStream(for clientHandle: Handle) {
+    for (_, stream) in remoteRxAudioStreams where stream.clientHandle == clientHandle {
+      stream.remove()
+    }
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: -  RemoteTxAudioStream methods
   
   /// Create a RemoteTxAudioStream
   ///
   /// - Parameters:
-  ///   - compression:        "opus"|"none""
   ///   - callback:           ReplyHandler (optional)
   /// - Returns:              success / failure
   ///
-  public func requestRemoteTxAudioStream(compression: String = RemoteRxAudioStream.Compression.none.rawValue, callback: ReplyHandler? = nil) {
-    
+  public func requestRemoteTxAudioStream(callback: ReplyHandler? = nil) {
     // tell the Radio to enable RemoteTxAudioStream
-    sendCommand("stream create type=remote_audio_tx compression=\(compression)", replyTo: callback)
+    sendCommand("stream create type=remote_audio_tx", replyTo: callback)
+  }
+  /// Remove a RemoteTxAudioStream
+  /// - Parameter clientHandle:   a Client handle
+  ///
+  public func removeRemoteTxAudioStream(for clientHandle: Handle) {
+    for (_, stream) in remoteTxAudioStreams where stream.clientHandle == clientHandle {
+      stream.remove()
+    }
   }
 
   // ----------------------------------------------------------------------------
@@ -916,7 +898,6 @@ extension Radio {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func requestTnf(at frequency: Hz, callback: ReplyHandler? = nil) {
-    
     // tell the Radio to create a Tnf
     sendCommand("tnf create " + "freq" + "=\(frequency.hzToMhz)", replyTo: callback)
   }
@@ -928,7 +909,6 @@ extension Radio {
   /// - Returns:          a Tnf reference (or nil)
   ///
   public func findTnf(at freq: Hz, minWidth: Hz) -> Tnf? {
-    
     // return the Tnfs within the specified Frequency / minimum width (if any)
     let filteredTnfs = tnfs.values.filter { freq >= ($0.frequency - Hz(max(minWidth, $0.width/2))) && freq <= ($0.frequency + Hz(max(minWidth, $0.width/2))) }
     guard filteredTnfs.count >= 1 else { return nil }
@@ -945,7 +925,6 @@ extension Radio {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func requestTxAudioStream(callback: ReplyHandler? = nil) {
-    
     // tell the Radio to create a Stream
     sendCommand("stream create daxtx", replyTo: callback)
   }
@@ -961,7 +940,6 @@ extension Radio {
   ///   - callback:                 ReplyHandler (optional)
   ///
   public func smartlinkConfigure(tcpPort: Int, udpPort: Int, callback: ReplyHandler? = nil) {
-    
     // set the Radio's SmartLink port usage
     sendCommand("wan set " + "public_tls_port" + "=\(tcpPort)" + " public_udp_port" + "=\(udpPort)", replyTo: callback)
   }
@@ -974,7 +952,6 @@ extension Radio {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func requestXvtr(callback: ReplyHandler? = nil) {
-    
     // tell the Radio to create a USB Cable
     sendCommand("xvtr create" , replyTo: callback)
   }

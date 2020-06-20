@@ -171,6 +171,8 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
       }
       // known Keys, in alphabetical order
       switch token {
+      
+      // Note: only supports "opus", not sure why the compression property exists (future?)
         
       case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
       case .compression:  willChangeValue(for: \.compression)   ; _compression = property.value.lowercased()  ; didChangeValue(for: \.compression)

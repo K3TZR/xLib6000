@@ -8,6 +8,65 @@
 
 import Foundation
 
+extension Interlock : Encodable {
+
+  enum CodingKeys : String, CodingKey {
+    case _accTxEnabled
+    case _accTxDelay
+    case _accTxReqEnabled
+    case _accTxReqPolarity
+    case _rcaTxReqEnabled
+    case _rcaTxReqPolarity
+    case _timeout
+    case _txAllowed
+    case _txDelay
+    case _tx1Delay
+    case _tx1Enabled
+    case _tx2Delay
+    case _tx2Enabled
+    case _tx3Delay
+    case _tx3Enabled
+  }
+//  enum CodingKeys : String, CodingKey {
+//    case _accTxEnabled     = "_accTxEnabled"
+//    case _accTxDelay       = "_accTxDelay"
+//    case _accTxReqEnabled  = "_accTxReqEnabled"
+//    case _accTxReqPolarity = "_accTxReqPolarity"
+//    case _rcaTxReqEnabled  = "_rcaTxReqEnabled"
+//    case _rcaTxReqPolarity = "_rcaTxReqPolarity"
+//    case _timeout          = "_timeout"
+//    case _txAllowed        = "_txAllowed"
+//    case _txDelay          = "_txDelay"
+//    case _tx1Delay         = "_tx1Delay"
+//    case _tx1Enabled       = "_tx1Enabled"
+//    case _tx2Delay         = "_tx2Delay"
+//    case _tx2Enabled       = "_tx2Enabled"
+//    case _tx3Delay         = "_tx3Delay"
+//    case _tx3Enabled       = "_tx3Enabled"
+//  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(_accTxEnabled, forKey: ._accTxEnabled)
+    try container.encode(_accTxDelay, forKey: ._accTxDelay)
+    try container.encode(_accTxReqEnabled, forKey: ._accTxReqEnabled)
+    try container.encode(_accTxReqPolarity, forKey: ._accTxReqPolarity)
+    try container.encode(_rcaTxReqEnabled, forKey: ._rcaTxReqEnabled)
+    try container.encode(_rcaTxReqPolarity, forKey: ._rcaTxReqPolarity)
+    try container.encode(_timeout, forKey: ._timeout)
+    try container.encode(_txAllowed, forKey: ._txAllowed)
+    try container.encode(_txDelay, forKey: ._txDelay)
+    try container.encode(_tx1Delay, forKey: ._tx1Delay)
+    try container.encode(_tx1Enabled, forKey: ._tx1Enabled)
+    try container.encode(_tx2Delay, forKey: ._tx2Delay)
+    try container.encode(_tx2Enabled, forKey: ._tx2Enabled)
+    try container.encode(_tx3Delay, forKey: ._tx3Delay)
+    try container.encode(_tx3Enabled, forKey: ._tx3Enabled)
+  }
+}
+
+
+
 /// Interlock Class implementation
 ///
 ///      creates an Interlock instance to be used by a Client to support the
@@ -15,7 +74,7 @@ import Foundation
 ///      updated by the incoming TCP messages.
 ///
 public final class Interlock : NSObject, StaticModel {
-  
+    
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
@@ -189,7 +248,7 @@ public final class Interlock : NSObject, StaticModel {
   private let _radio        : Radio
   private let _log          = Log.sharedInstance.logMessage
 
- // ------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------
   // MARK: - Initialization
   
   /// Initialize Interlock
@@ -198,7 +257,6 @@ public final class Interlock : NSObject, StaticModel {
   ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
-
     _radio = radio
     super.init()
   }
@@ -265,7 +323,68 @@ public final class Interlock : NSObject, StaticModel {
       }
     }
   }
-    
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods
+  
+  /// Export model properties as a JSON String
+  /// - Throws:       encoding errors
+  /// - Returns:      a JSON encoded String
+  ///
+  public func export() throws -> String {
+    // encode the JSON (may fail & throw)
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = .prettyPrinted
+    return String(data: try encoder.encode(self), encoding: .utf8)!
+  }
+  /// Restore model properties from a JSON String
+  /// - Parameter json:   a JSON encoded String
+  /// - Throws:           decoding errors
+  ///
+  public func restore(from json: String) throws {
+    // properties to be restored
+    struct Values : Codable {
+      var _accTxEnabled      : Bool
+      var _accTxDelay        : Int
+      var _accTxReqEnabled   : Bool
+      var _accTxReqPolarity  : Bool
+      var _rcaTxReqEnabled   : Bool
+      var _rcaTxReqPolarity  : Bool
+      var _timeout           : Int
+      var _txAllowed         : Bool
+      var _txDelay           : Int
+      var _tx1Delay          : Int
+      var _tx1Enabled        : Bool
+      var _tx2Delay          : Int
+      var _tx2Enabled        : Bool
+      var _tx3Delay          : Int
+      var _tx3Enabled        : Bool
+    }
+    var _values : Values!
+
+    // decode the JSON (may fail & throw)
+    let decoder = JSONDecoder()
+    _values = try decoder.decode(Values.self, from: json.data(using: .utf8)!)
+
+    // restore the properties
+    let model = Api.sharedInstance.radio!.interlock!
+    model._accTxEnabled = _values._accTxEnabled
+    model._accTxDelay = _values._accTxDelay
+    model._accTxReqEnabled = _values._accTxReqEnabled
+    model._accTxReqPolarity = _values._accTxReqPolarity
+    model._rcaTxReqEnabled = _values._rcaTxReqEnabled
+    model._rcaTxReqPolarity = _values._rcaTxReqPolarity
+    model._timeout = _values._timeout
+    model._txAllowed = _values._txAllowed
+    model._txDelay = _values._txDelay
+    model._tx1Delay = _values._tx1Delay
+    model._tx1Enabled = _values._tx1Enabled
+    model._tx2Delay = _values._tx2Delay
+    model._tx2Enabled = _values._tx2Enabled
+    model._tx3Delay = _values._tx3Delay
+    model._tx3Enabled = _values._tx3Enabled
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
 

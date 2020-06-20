@@ -8,6 +8,24 @@
 
 import Foundation
 
+extension Transmit : Encodable {
+
+  enum CodingKeys : String, CodingKey {
+    case _hwAlcEnabled
+    case _tunePower
+    case _rfPower
+
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(_hwAlcEnabled, forKey: ._hwAlcEnabled)
+    try container.encode(_tunePower, forKey: ._tunePower)
+    try container.encode(_rfPower, forKey: ._rfPower)
+
+  }
+}
+
 /// Transmit Class implementation
 ///
 ///      creates a Transmit instance to be used by a Client to support the
@@ -468,6 +486,43 @@ public final class Transmit : NSObject, StaticModel {
     
     let newValue = ( low > high - 50 ? high - 50 : low )
     return newValue < 0 ? 0 : newValue
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods
+
+  /// Export model properties as a JSON String
+  /// - Throws:       encoding errors
+  /// - Returns:      a JSON encoded String
+  ///
+  public func export() throws -> String {
+    // encode the JSON (may fail & throw)
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = .prettyPrinted
+    return String(data: try encoder.encode(self), encoding: .utf8)!
+  }
+  /// Restore model properties from a JSON String
+  /// - Parameter json:   a JSON encoded String
+  /// - Throws:           decoding errors
+  ///
+  public func restore(from json: String) throws {
+    // properties to be restored
+    struct Values : Codable {      
+      var _hwAlcEnabled : Bool
+      var _tunePower    : Int
+      var _rfPower      : Int
+    }
+    var _values : Values!
+
+    // decode the JSON (may fail & throw)
+    let decoder = JSONDecoder()
+    _values = try decoder.decode(Values.self, from: json.data(using: .utf8)!)
+
+    // restore the properties
+    let model = Api.sharedInstance.radio!.transmit!    
+    model._hwAlcEnabled = _values._hwAlcEnabled
+    model._tunePower    = _values._tunePower
+    model._rfPower      = _values._rfPower
   }
 
   // ----------------------------------------------------------------------------
