@@ -828,7 +828,7 @@ extension Radio {
       // Add
       packet.guiClients[handle] = GuiClient(clientId: clientId, program: program, station: station, isLocalPtt: isLocalPtt, isThisClient: isThisClient)
 
-      Log.sharedInstance.logMessage("\(packet.nickname), GuiClient added:   \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
+      Log.sharedInstance.logMessage("GuiClient   added: \(handle.hex), \(station), \(program), \(packet.nickname), (\(packet.isWan ? "SMARTLINK" : "LOCAL")), \(clientId)", .debug, #function, #file, #line)
       NC.post(.guiClientHasBeenAdded, object: packet.guiClients[handle] as Any?)
     }
     
@@ -839,7 +839,7 @@ extension Radio {
     packet.guiClients[handle]!.isLocalPtt = isLocalPtt
     packet.guiClients[handle]!.isThisClient = isThisClient
 
-    Log.sharedInstance.logMessage("\(packet.nickname), GuiClient updated: \(handle.hex), \(station), \(clientId)", .debug, #function, #file, #line)
+    Log.sharedInstance.logMessage("GuiClient updated: \(handle.hex), \(station), \(program), \(packet.nickname), (\(packet.isWan ? "SMARTLINK" : "LOCAL")), \(clientId)", .debug, #function, #file, #line)
     NC.post(.guiClientHasBeenUpdated, object: packet.guiClients[handle]! as Any?)
   }
   

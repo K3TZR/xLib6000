@@ -13,7 +13,7 @@ import Foundation
 ///      generates "ping" messages once a second, if no reply is received
 ///      sends a .tcpPingTimeout Notification
 ///
-final class Pinger {
+final class Pinger : NSObject {
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -22,7 +22,7 @@ final class Pinger {
   private var _pingTimer                    : DispatchSourceTimer!          // periodic timer for ping
   private var _pingQ                        : DispatchQueue!                // Queue for Pinger synchronization
   private var _lastPingRxTime               : Date!                         // Time of the last ping response
-  private var _pingFirstResponse            = true
+  private var _firstResponseReceived        = false
   
   private let kKeepAlive                    = "keepalive enable"
   private let kPing                         = "ping"
@@ -39,26 +39,29 @@ final class Pinger {
     
     _tcpManager = tcpManager
     _pingQ = pingQ
+    super.init()
     
     // start pinging
-    startPingTimer()
+    start()
   }
-  
-  deinit {
-    
-    // stop pinging
-    stopPingTimer()
-  }
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Internal methods
   
+  /// Stop the Pinger
+  ///
+  func stop() {
+    
+    // stop Pinging
+    _pingTimer?.cancel()
+    _firstResponseReceived = false
+  }
   /// Process the Response to a Ping
   ///
   func pingReply(_ command: String, seqNum: UInt, responseValue: String, reply: String) {
     
     // notification can be used to signal that the Radio is now fully initialized
-    if _pingFirstResponse { _pingFirstResponse = false ; NC.post(.tcpPingFirstResponse, object: nil) }
+    if !_firstResponseReceived { _firstResponseReceived = true ; NC.post(.tcpPingFirstResponse, object: nil) }
 
     _pingQ.async { [weak self] in
       // save the time of the Response
@@ -69,9 +72,9 @@ final class Pinger {
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
-  /// Start the Ping timer
+  /// Start the Pinger
   ///
-  private func startPingTimer() {
+  func start() {
     
     // tell the Radio to expect pings
     Api.sharedInstance.send(kKeepAlive)
@@ -101,7 +104,7 @@ final class Pinger {
         NC.post(.tcpPingTimeout, object: nil)
         
         // stop the Timer
-        self.stopPingTimer()
+        self.stop()
         
       } else {
         
@@ -109,18 +112,8 @@ final class Pinger {
         Api.sharedInstance.send(self.kPing, replyTo: self.pingReply)
       }
     }
-    
     // start the timer
     _pingTimer.resume()
-  }
-  /// Stop the Ping timer
-  ///
-  private func stopPingTimer() {
-    
-    // stop the Timer (if any)
-    _pingTimer?.cancel()
-    
-    _pingFirstResponse = true
   }
   
 }

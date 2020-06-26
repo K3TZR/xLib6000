@@ -14,99 +14,70 @@ import Foundation
 ///      creation / destruction of the Radio class (the object analog of the
 ///      Radio hardware)
 ///
-public final class Api                      : NSObject, TcpManagerDelegate, UdpManagerDelegate {
+public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
 
   public typealias CommandTuple = (command: String, diagnostic: Bool, replyHandler: ReplyHandler?)
 
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersionSupported       = Version("3.1.11")
+  public static let kVersionSupported = Version("3.1.12")
 
-  public static let kBundleIdentifier       = "net.k3tzr." + Api.kName
-  public static let kDaxChannels            = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
-  public static let kDaxIqChannels          = ["None", "1", "2", "3", "4"]
-  public static let kName                   = "xLib6000"
-  public static let kNoError                = "0"
+  public static let kBundleIdentifier = "net.k3tzr." + Api.kName
+  public static let kDaxChannels      = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
+  public static let kDaxIqChannels    = ["None", "1", "2", "3", "4"]
+  public static let kName             = "xLib6000"
+  public static let kNoError          = "0"
 
-  static        let objectQ                 = DispatchQueue(label: Api.kName + ".objectQ", attributes: [.concurrent])
-  static        let kTcpTimeout             = 2.0     // seconds
-  static        let kNotInUse               = "in_use=0"
-  static        let kRemoved                = "removed"
-  static        let kConnected              = "connected"
-  static        let kDisconnected           = "disconnected"
+  static        let objectQ           = DispatchQueue(label: Api.kName + ".objectQ", attributes: [.concurrent])
+  static        let kTcpTimeout       = 2.0     // seconds
+  static        let kNotInUse         = "in_use=0"
+  static        let kRemoved          = "removed"
+  static        let kConnected        = "connected"
+  static        let kDisconnected     = "disconnected"
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
-  public var nsLogState              : NSLogging = .normal
+  public var state                    : State = .clientDisconnected
   
-  public var apiState                : Api.State!
-  public var connectionHandle        : Handle?
-//  public var connectionHandleWan     = ""
-  public var isGui                   = true
-//  public var isWan                   = false
-  public var needsNetCwStream        = false
-  public var reducedDaxBw            = false
-  public var testerDelegate          : ApiDelegate?
-  public var testerModeEnabled       = false
-  public var pingerEnabled           = true
+  public var nsLogState               : NSLogging = .normal
+  public var connectionHandle         : Handle?
+  public var isGui                    = true
+  public var needsNetCwStream         = false
+  public var reducedDaxBw             = false
+  public var testerDelegate           : ApiDelegate?
+  public var testerModeEnabled        = false
+  public var pingerEnabled            = true
 
-  @objc dynamic public var radio : Radio? {
-    get { Api.objectQ.sync { _radio } }
-    set { Api.objectQ.sync(flags: .barrier) { _radio = newValue }}}
-  public var delegate : ApiDelegate? {
-    get { Api.objectQ.sync { _delegate } }
-    set { Api.objectQ.sync(flags: .barrier) { _delegate = newValue }}}
-  public var localIP : String {
-    get { Api.objectQ.sync { _localIP } }
-    set { Api.objectQ.sync(flags: .barrier) { _localIP  = newValue }}}
-  public var localUDPPort : UInt16 {
-    get { Api.objectQ.sync { _localUDPPort } }
-    set { Api.objectQ.sync(flags: .barrier) { _localUDPPort  = newValue }}}
+  @Barrier @objc dynamic  public var radio        : Radio? = nil
+  @Barrier                public var delegate     : ApiDelegate? = nil
+  @Barrier                public var localIP      : String = "0.0.0.0"
+  @Barrier                public var localUDPPort : UInt16 = 0
 
-  public enum DisconnectReason: Equatable {
-    public static func ==(lhs: Api.DisconnectReason, rhs: Api.DisconnectReason) -> Bool {
-      
-      switch (lhs, rhs) {
-      case (.normal, .normal): return true
-      case let (.error(l), .error(r)): return l == r
-      default: return false
-      }
-    }
-    case normal
-    case error (errorMessage: String)
-  }
-  public enum State: String {
-    case start
-    case tcpConnected
-    case udpBound
-    case clientConnected
-    case disconnected
-    case update
-  }
   public struct ApiConnectionParams {
-    public var packet            : DiscoveryPacket
-    public var station           : String
-    public var program           : String
-    public var clientId          : String?
-    public var isGui             : Bool
-    public var wanHandle         : String
-    public var reducedDaxBw      : Bool
-    public var logState          : NSLogging
-    public var needsCwStream     : Bool
-    public var pendingDisconnect : PendingDisconnect
+    public var packet                 : DiscoveryPacket
+    public var station                : String
+    public var program                : String
+    public var clientId               : String?
+    public var isGui                  : Bool
+    public var wanHandle              : String
+    public var reducedDaxBw           : Bool
+    public var logState               : NSLogging
+    public var needsCwStream          : Bool
+    public var pendingDisconnect      : PendingDisconnect
     
-    public init(packet            : DiscoveryPacket,
-                station           : String = "",
-                program           : String = "",
-                clientId          : String? = nil,
-                isGui             : Bool = true,
-                wanHandle         : String = "",
-                reducedDaxBw      : Bool = false,
-                logState          : NSLogging = .normal,
-                needsCwStream     : Bool = false,
-                pendingDisconnect : PendingDisconnect = .none) {
+    public init(packet                : DiscoveryPacket,
+                station               : String = "",
+                program               : String = "",
+                clientId              : String? = nil,
+                isGui                 : Bool = true,
+                wanHandle             : String = "",
+                reducedDaxBw          : Bool = false,
+                logState              : NSLogging = .normal,
+                needsCwStream         : Bool = false,
+                pendingDisconnect     : PendingDisconnect = .none) {
+      
       self.packet = packet
       self.station = station
       self.program = program
@@ -119,7 +90,31 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       self.pendingDisconnect = pendingDisconnect
     }
   }
-
+  public enum State {
+    case tcpConnected (host: String, port: UInt16)
+    case udpBound (receivePort: UInt16, sendPort: UInt16)
+    case clientDisconnected
+    case clientConnected (radio: Radio)
+    case tcpDisconnected (reason: String)
+    case udpUnbound (reason: String)
+    case update
+    
+    public static func ==(lhs: State, rhs: State) -> Bool {
+      switch (lhs, rhs) {
+      case (.tcpConnected, .tcpConnected):              return true
+      case (.udpBound, .udpBound):                      return true
+      case (.clientDisconnected, .clientDisconnected):  return true
+      case (.clientConnected, .clientConnected):        return true
+      case (.tcpDisconnected, .tcpDisconnected):        return true
+      case (.udpUnbound, .udpUnbound):                  return true
+      case (.update, .update):                          return true
+      default:                                          return false
+      }
+    }
+    public static func !=(lhs: State, rhs: State) -> Bool {
+      return !(lhs == rhs)
+    }
+  }
   public enum NSLogging {
     case normal
     case limited (to: [String])
@@ -134,31 +129,31 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  internal var tcp                          : TcpManager!  // commands
-  internal var udp                          : UdpManager!  // streams
+  internal var tcp                    : TcpManager!  // commands
+  internal var udp                    : UdpManager!  // streams
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _clientId                     : String?
-  private var _clientStation                = ""
-  private var _lowBandwidthConnect          = false
-  private var _params                       : ApiConnectionParams!
-  private var _pinger                       : Pinger?
-  private var _programName                  = ""
+  private var _clientId               : String?
+  private var _clientStation          = ""
+  private var _lowBandwidthConnect    = false
+  private var _params                 : ApiConnectionParams!
+  private var _pinger                 : Pinger?
+  private var _programName            = ""
 
   // GCD Serial Queues
-  private let _parseQ                       = DispatchQueue(label: Api.kName + ".parseQ", qos: .userInteractive)
-  private let _pingQ                        = DispatchQueue(label: Api.kName + ".pingQ")
-  private let _tcpReceiveQ                  = DispatchQueue(label: Api.kName + ".tcpReceiveQ")
-  private let _tcpSendQ                     = DispatchQueue(label: Api.kName + ".tcpSendQ")
-  private let _udpReceiveQ                  = DispatchQueue(label: Api.kName + ".udpReceiveQ", qos: .userInteractive)
-  private let _udpRegisterQ                 = DispatchQueue(label: Api.kName + ".udpRegisterQ")
-  private let _workerQ                      = DispatchQueue(label: Api.kName + ".workerQ")
+  private let _parseQ                 = DispatchQueue(label: Api.kName + ".parseQ", qos: .userInteractive)
+  private let _pingQ                  = DispatchQueue(label: Api.kName + ".pingQ")
+  private let _tcpReceiveQ            = DispatchQueue(label: Api.kName + ".tcpReceiveQ")
+  private let _tcpSendQ               = DispatchQueue(label: Api.kName + ".tcpSendQ")
+  private let _udpReceiveQ            = DispatchQueue(label: Api.kName + ".udpReceiveQ", qos: .userInteractive)
+  private let _udpRegisterQ           = DispatchQueue(label: Api.kName + ".udpRegisterQ")
+  private let _workerQ                = DispatchQueue(label: Api.kName + ".workerQ")
 
-  private let _clientIpSemaphore            = DispatchSemaphore(value: 0)
-  private let _isTnfSubscribed              = true // TODO:
-  private let _log                          = Log.sharedInstance.logMessage
+  private let _clientIpSemaphore      = DispatchSemaphore(value: 0)
+  private let _isTnfSubscribed        = true // TODO:
+  private let _log                    = Log.sharedInstance.logMessage
 
   // ----------------------------------------------------------------------------
   // MARK: - Singleton
@@ -177,9 +172,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     // initialize a Manager for the UDP Data Streams
     udp = UdpManager(udpReceiveQ: _udpReceiveQ, udpRegisterQ: _udpRegisterQ, delegate: self)
-    
-    // set the initial State
-    apiState = .disconnected
   }
 
   // ----------------------------------------------------------------------------
@@ -249,8 +241,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       reducedDaxBw      : Bool = false,
                       logState          : NSLogging = .normal,
                       needsCwStream     : Bool = false,
-                      pendingDisconnect : PendingDisconnect = .none) -> Bool {
+                      pendingDisconnect : PendingDisconnect = .none) {
 
+    // must be in the Disconnected state to connect
+    guard state == .clientDisconnected else { return }
+        
     // save the connection parameters
     _params = ApiConnectionParams(packet            : packet,
                                   station           : station,
@@ -264,9 +259,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                                   pendingDisconnect : pendingDisconnect)
     self.nsLogState = logState
     
-    // must be in the Disconnected state to connect
-    guard apiState == .disconnected else { return false }
-        
     // Create a Radio class
     radio = Radio(packet, api: self)
 
@@ -287,51 +279,116 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // Failed to connect
       radio = nil
     }
-    return radio != nil
   }
+
+
+  public func updateState(to newState: State) {
+    
+    state = newState
+    
+    switch state {
+      
+    case .clientDisconnected:
+      _log(Self.className() + " Client Disconnected", .debug, #function, #file, #line)
+      
+    case .clientConnected (let radio):
+      
+      // is this a Wan connection?
+      if radio.packet.isWan {
+        // YES, when connecting to a WAN radio, the public IP address of the connected
+        // client must be obtained from the radio.  This value is used to determine
+        // if audio streams from the radio are meant for this client.
+        // (IsAudioStreamStatusForThisClient() checks for LocalIP)
+        send("client ip", replyTo: clientIpReplyHandler)
+        
+      } else {
+        // NO, use the ip of the local interface
+        localIP = tcp.interfaceIpAddress
+        
+        // complete the connection
+        connectionCompletion(radio: radio)
+      }
+      
+    case .tcpDisconnected (let reason):
+      
+      // the tcp connection was disconnected, inform observers
+      NC.post(.tcpDidDisconnect, object: reason)
+      _log(Self.className() + " Tcp Disconnected: reason = \(reason)", .debug, #function, #file, #line)
+      
+      // close the UDP port (it won't be reused with a new connection)
+      udp.unbind(reason: "TCP Disconnected")
+      
+    case .tcpConnected (let host, let port):
+      NC.post(.tcpDidConnect, object: nil)
+      let wanStatus = radio!.packet.isWan ? "SMARTLINK" : "LOCAL"
+      let guiStatus = isGui ? "(GUI) " : "(NON-GUI)"
+      _log(Self.className() + " TCP connected to: \(host), port \(port) \(guiStatus)(\(wanStatus))", .debug, #function, #file, #line)
+      
+      if radio!.packet.isWan {
+        send("wan validate handle=" + radio!.packet.wanHandle)
+        _log(Self.className() + " Wan validate handle: \(radio!.packet.wanHandle)", .debug, #function, #file, #line)
+        
+      } else {
+        // bind a UDP port for the Streams
+        if udp.bind(radio!.packet) == false { tcp.disconnect() }
+      }
+      
+    case .udpBound (let receivePort, let sendPort):
+      _log(Self.className() + ": UDP bound: receive port \(receivePort), send port \(sendPort)", .debug, #function, #file, #line)
+      
+      // if a Wan connection, register
+      if radio!.packet.isWan { udp.register(clientHandle: connectionHandle) }
+      
+      localUDPPort = receivePort
+      
+      // a UDP port has been bound, inform observers
+      NC.post(.udpDidBind, object: nil)
+      
+    case .udpUnbound (let reason):
+      _log(Self.className() + " UDP unbound: reason = \(reason)", .debug, #function, #file, #line)
+      updateState(to: .clientDisconnected)
+      
+    case .update:
+      fatalError("Update not supported")
+    }
+  }
+
+
   /// Disconnect the active Radio
   ///
   /// - Parameter reason:         a reason code
   ///
-  public func disconnect(reason: DisconnectReason = .normal) {
+  public func disconnect(reason: String = "User Initiated") {
+    
     let name = radio?.packet.nickname ?? "Unknown"
+    _log(Self.className() + " Disconnect initiated:", .debug, #function, #file, #line)
 
-    _log(Self.className() + " Disconnect initiated: \(name)", .debug, #function, #file, #line)
-
+    guard radio != nil else { return }
+    
     // stop all streams
     delegate = nil
     
     // stop pinging (if active)
-    if _pinger != nil {
-      _pinger = nil
-      
-      _log(Self.className() + " Pinger stopped: \(name)", .info, #function, #file, #line)
-    }
+    _pinger?.stop()
+    _pinger = nil
+
     // the radio (if any) will be removed, inform observers
-    if radio != nil { NC.post(.radioWillBeRemoved, object: radio as Any?) }
+    NC.post(.radioWillBeRemoved, object: radio as Any?)
     
-    if apiState != .disconnected {
-      // disconnect TCP
-      tcp.disconnect()
-      
-      // unbind UDP
-      udp.unbind()
-    }
+    // disconnect TCP
+    tcp.disconnect()
+    
     // remove the Radio
     radio = nil
 
-    // the radio (if any)) has been removed, inform observers
+    // the radio has been removed, inform observers
     NC.post(.radioHasBeenRemoved, object: name)
   }
 
-  public func disconnectClient(packet: DiscoveryPacket, handle: Handle) {
-   
+  public func requestClientDisconnect(packet: DiscoveryPacket, handle: Handle) {
     if packet.isWan {
-      
       // FIXME: Does this need to be a TLS send?
-      
       send("application disconnect_users serial" + "=\(packet.serialNumber)" )
-    
     } else {
       send("client disconnect \(handle.hex)")
     }
@@ -339,7 +396,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal methods
-  
+
   /// Send a command to the Radio (hardware)
   ///
   /// - Parameters:
@@ -358,105 +415,68 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // pass it to xAPITester (if present)
     testerDelegate?.addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
   }
-  /// A Client has been connected
-  ///
-  func clientConnected(_ radio: Radio) {
-    
-    // code to be executed after an IP Address has been obtained
-    func connectionCompletion() {
-      
-      _log(Self.className() + " Connection completed: \(radio.packet.nickname)", .debug, #function, #file, #line)
-
-      // send the initial commands
-      sendCommands()
-      
-      // set the streaming UDP port
-      if radio.packet.isWan {
-        // Wan, establish a UDP port for the Data Streams
-        _ = udp.bind(packet: radio.packet, clientHandle: connectionHandle)
-        
-      } else {
-        // Local
-        send("client udpport " + "\(localUDPPort)")
-      }
-      // start pinging
-      if pingerEnabled {
-        
-        _pinger = Pinger(tcpManager: tcp, pingQ: _pingQ)
-
-        let wanStatus = radio.packet.isWan ? "SMARTLINK" : "LOCAL"
-        let port = (radio.packet.isWan ? radio.packet.publicTlsPort : radio.packet.port)
-        _log(Self.className() + " Pinger started: \(radio.packet.nickname) @ \(radio.packet.publicIp), port: \(port) (\(wanStatus))", .info, #function, #file, #line)
-      }
-      
-      if needsNetCwStream {
-        radio.requestNetCwStream()
-      }
-      
-      // TCP & UDP connections established, inform observers
-      NC.post(.clientDidConnect, object: radio as Any?)
-      
-      // is there a pending disconnect?
-      switch _params.pendingDisconnect {
-      case .none:               return                                    // NO
-      case .oldApi:
-        send("client disconnect")                 // YES, disconnect all clients
-      case .newApi(let handle):
-        send("client disconnect \(handle.hex)")   // YES, disconnect a specific client
-      }
-      // give it time to happen, then disconnect
-      sleep(1)
-      disconnect()
-      sleep(1)
-      
-      // now do the pending connection
-      connect(_params.packet,
-              station           : _params.station,
-              program           : _params.program,
-              clientId          : _params.clientId,
-              isGui             : _params.isGui,
-              wanHandle         : _params.wanHandle,
-              reducedDaxBw      : _params.reducedDaxBw,
-              logState          : _params.logState,
-              needsCwStream     : _params.needsCwStream,
-              pendingDisconnect : .none)
-    }
-    
-    _log(Self.className() + " Client connected: \(radio.packet.nickname)", .info, #function, #file, #line)
-    
-    // could this be a remote connection?
-    if radio.version.major >= 2 {
-      
-      // YES, when connecting to a WAN radio, the public IP address of the connected
-      // client must be obtained from the radio.  This value is used to determine
-      // if audio streams from the radio are meant for this client.
-      // (IsAudioStreamStatusForThisClient() checks for LocalIP)
-      send("client ip", replyTo: clientIpReplyHandler)
-      
-      // take this off the socket receive queue
-      _workerQ.async { [unowned self] in
-        
-        // wait for the response
-        let time = DispatchTime.now() + DispatchTimeInterval.milliseconds(5000)
-        _ = self._clientIpSemaphore.wait(timeout: time)
-        
-        // complete the connection
-        connectionCompletion()
-      }
-      
-    } else {
-      
-      // NO, use the ip of the local interface
-      localIP = tcp.interfaceIpAddress
-      
-      // complete the connection
-      connectionCompletion()
-    }
-  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
     
+  /// executed after an IP Address has been obtained
+  ///
+  private func connectionCompletion(radio: Radio) {
+    
+    _log(Self.className() + " Client connected: \(radio.packet.nickname)", .debug, #function, #file, #line)
+    
+    // send the initial commands
+    sendCommands()
+    
+    // set the streaming UDP port
+    if radio.packet.isWan {
+      // Wan, establish a UDP port for the Data Streams
+      _ = udp.bind(radio.packet, clientHandle: connectionHandle)
+      
+    } else {
+      // Local
+      send("client udpport " + "\(localUDPPort)")
+    }
+    // start pinging
+    if pingerEnabled {
+      
+      _pinger = Pinger(tcpManager: tcp, pingQ: _pingQ)
+
+      let wanStatus = radio.packet.isWan ? "SMARTLINK" : "LOCAL"
+      let port = (radio.packet.isWan ? radio.packet.publicTlsPort : radio.packet.port)
+      _log(Self.className() + " Pinger started: \(radio.packet.nickname) @ \(radio.packet.publicIp), port: \(port) (\(wanStatus))", .debug, #function, #file, #line)
+    }
+    
+    if needsNetCwStream {
+      radio.requestNetCwStream()
+    }
+    
+    // TCP & UDP connections established, inform observers
+    NC.post(.clientDidConnect, object: radio as Any?)
+    
+    // is there a pending disconnect?
+    switch _params.pendingDisconnect {
+    case .none:                 return                                    // NO, currently connected to the desired radio
+    case .oldApi:               send("client disconnect")                 // YES, oldApi, disconnect all clients
+    case .newApi(let handle):   send("client disconnect \(handle.hex)")   // YES, newApi, disconnect a specific client
+    }
+    // give it time to happen, then disconnect
+    sleep(1)
+    disconnect()
+    sleep(1)
+    
+    // now do the pending connection
+    connect(_params.packet,
+            station           : _params.station,
+            program           : _params.program,
+            clientId          : _params.clientId,
+            isGui             : _params.isGui,
+            wanHandle         : _params.wanHandle,
+            reducedDaxBw      : _params.reducedDaxBw,
+            logState          : _params.logState,
+            needsCwStream     : _params.needsCwStream,
+            pendingDisconnect : .none)
+  }
   /// Send commands to configure the connection
   ///
   private func sendCommands() {
@@ -530,7 +550,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       localIP = tcp.interfaceIpAddress
     }
     // signal completion of the "client ip" command
-    _clientIpSemaphore.signal()
+//    _clientIpSemaphore.signal()
+    
+    connectionCompletion(radio: radio!)
   }
   
   // ----------------------------------------------------------------------------
@@ -565,77 +587,23 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameter msg:         text of the message
   ///
   func didSend(_ msg: String) {
-    
     // pass it to any delegates
     delegate?.sentMessage( String(msg.dropLast()) )
     testerDelegate?.sentMessage( String(msg.dropLast()) )
   }
   
   func didConnect(host: String, port: UInt16) {
-
-    // YES, set state
-    apiState = .tcpConnected
-    
-    // log it
-    let wanStatus = radio!.packet.isWan ? "SMARTLINK" : "LOCAL"
-    let guiStatus = isGui ? "(GUI) " : "(NON-GUI)"
-    _log(Self.className() + " TCP connected to: \(host), port: \(port) \(guiStatus)(\(wanStatus))", .info, #function, #file, #line)
-
-    // a tcp connection has been established, inform observers
-    NC.post(.tcpDidConnect, object: nil)
+      updateState(to: .tcpConnected (host: host, port: port))
     
     tcp.readNext()
-    
-    if radio!.packet.isWan {
-      
-      // ask the Radio to validate
-      send("wan validate handle=" + radio!.packet.wanHandle, replyTo: nil)
-      
-      _log(Self.className() + " Wan validate handle: \(radio!.packet.wanHandle)", .debug, #function, #file, #line)
-
-    } else {
-      
-      // bind a UDP port for the Streams
-      guard udp.bind(packet: radio!.packet) else {
-        
-        // Bind failed, disconnect
-        tcp.disconnect()
-
-        // the tcp connection was disconnected, inform observers
-        NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: "Udp bind failure"))
-
-        return
-      }
-    }
   }
 
-  func didDisconnect(host: String, port: UInt16, error: String) {
-
-    // NO, error?
-    if error == "" {
-      
-      // the tcp connection was disconnected, inform observers
-      NC.post(.tcpDidDisconnect, object: DisconnectReason.normal)
-      
-      _log(Self.className() + " Tcp Disconnected", .info, #function, #file, #line)
-      
-    } else {
-      
-      // YES, disconnect with error (don't keep the UDP port open as it won't be reused with a new connection)
-      
-      udp.unbind()
-      
-      // the tcp connection was disconnected, inform observers
-      NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: error))
-      
-      _log(Self.className() + " Tcp Disconnected with message = \(error)", .info, #function, #file, #line)
-    }
-    
-    apiState = .disconnected
+  func didDisconnect(reason: String) {
+      updateState(to: .tcpDisconnected(reason: reason))
   }
 
   // ----------------------------------------------------------------------------
-  // MARK: - UdpManager delegate methods
+  // MARK: - UdpManagerDelegate methods
   
   /// Respond to a UDP bind event
   ///
@@ -644,22 +612,24 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameters:
   ///   - port:   a port number
   ///
-  func didBind(port: UInt16) {
+  func didBind(receivePort: UInt16, sendPort: UInt16) {
     
-    _log(Self.className() + " UDP bound to port: \(port)", .debug, #function, #file, #line)
+      updateState(to: .udpBound(receivePort: receivePort, sendPort: sendPort))
+    
+//    _log(Self.className() + " UDP bound to port: \(port)", .debug, #function, #file, #line)
 
-    apiState = .udpBound
+//    apiState = .udpBound
     
-    localUDPPort = port
+//    localUDPPort = port
+//
+//    // a UDP port has been bound, inform observers
+//    NC.post(.udpDidBind, object: nil)
     
-    // a UDP port has been bound, inform observers
-    NC.post(.udpDidBind, object: nil)
+//    // a UDP bind has been established
+//    udp.beginReceiving()
     
-    // a UDP bind has been established
-    udp.beginReceiving()
-    
-    // if WAN connection reset the state to .clientConnected as the true connection state
-    if radio!.packet.isWan { apiState = .clientConnected }
+//    // if WAN connection reset the state to .clientConnected as the true connection state
+//    if radio!.packet.isWan { apiState = .clientConnected }
   }
   /// Respond to a UDP unbind event
   ///
@@ -667,8 +637,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   /// - Parameters:
   ///
-  func didUnbind() {
-    // TODO:
+  func didUnbind(reason: String) {
+      updateState(to: .udpUnbound(reason: reason))
   }
   /// Receive a UDP Stream packet
   ///
@@ -687,8 +657,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // *** Backing properties (Do NOT use) ***
   
-  private var _radio         : Radio? = nil
-  private var _delegate      : ApiDelegate? = nil
-  private var _localIP       = "0.0.0.0"
-  private var _localUDPPort  : UInt16 = 0
+//  private var _radio         : Radio? = nil
+//  private var _delegate      : ApiDelegate? = nil
+//  private var _localIP       = "0.0.0.0"
+//  private var _localUDPPort  : UInt16 = 0
 }

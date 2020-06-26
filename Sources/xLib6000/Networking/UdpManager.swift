@@ -9,6 +9,45 @@
 import Foundation
 import CocoaAsyncSocket
 
+
+/// Delegate protocol for the UdpManager class
+///
+protocol UdpManagerDelegate                 : class {
+  
+  // if any of theses are not needed, implement a stub in the delegate that does nothing
+  
+  /// Process a change of Udp state
+  ///
+  /// - Parameters:
+  ///   - bound:                    is Bound
+  ///   - port:                     Port number
+  ///   - error:                    error message (may be blank)
+  ///
+//  func udpState(bound: Bool, port: UInt16, error: String)
+
+  /// Process a Udp bind
+  ///
+  /// - Parameters:
+  ///   - receivePort:              Port for UDP receive
+  ///   - sendPort:                 Port for UDP send
+  ///
+  func didBind(receivePort: UInt16, sendPort: UInt16)
+  
+  /// Process a Udp unbind
+  ///
+  /// - Parameters:
+  ///   - reason:                   explanation
+  ///
+  func didUnbind(reason: String)
+
+  /// Process a Udp Vita packet
+  ///
+  /// - Parameter vita:             a Vita packet
+  ///
+  func udpStreamHandler(_ vita: Vita)
+}
+
+
 ///  UDP Manager Class implementation
 ///
 ///      manages all Udp communication between the API and the Radio (hardware)
@@ -23,9 +62,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  var udpSuccessfulRegistration : Bool {
-    get { Api.objectQ.sync { _udpSuccessfulRegistration } }
-    set { Api.objectQ.sync(flags: .barrier) {_udpSuccessfulRegistration = newValue }}}
+  @Barrier var udpSuccessfulRegistration : Bool = false
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -91,7 +128,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   ///   - selectedRadio:      a DiscoveredRadio struct
   ///   - clientHandle:       handle
   ///
-  func bind(packet: DiscoveryPacket, clientHandle: Handle? = nil) -> Bool {
+  func bind(_ packet: DiscoveryPacket, clientHandle: Handle? = nil) -> Bool {
     
     var success               = false
     var portToUse             : UInt16 = 0
@@ -119,13 +156,13 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       do {
         try _udpSocket.bind(toPort: portToUse)
         
-        _log(Self.className() + ": UDP bound to port \(portToUse)", .info, #function, #file, #line)
+        _log(Self.className() + ": UDP bound to port \(portToUse)", .debug, #function, #file, #line)
         success = true
         
       } catch {
         
         // We didn't get the port we wanted
-        _log(Self.className() + ": UDP FAILED to bind to port \(portToUse)", .info, #function, #file, #line)
+        _log(Self.className() + ": UDP FAILED to bind to port \(portToUse)", .debug, #function, #file, #line)
 
         // try the next Port Number
         portToUse += 1
@@ -136,21 +173,21 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
     // was a port bound?
     if success {
       
-      // YES, capture the number of the actual port in use
+      // YES, save the actual port & ip in use
       _udpRcvPort = portToUse
-      
-      // save the ip address
       _udpSendIP = packet.publicIp
-      
-      // change the state
-      _delegate?.didBind(port: _udpRcvPort)
-      
       _udpBound = true
       
-      _log(Self.className() + ": UDP receive port: \(_udpRcvPort), Send port: \(_udpSendPort)", .info, #function, #file, #line)
+      // change the state
+      _delegate?.didBind(receivePort: _udpRcvPort, sendPort: _udpSendPort)
 
-      // if a Wan connection, register
-      if packet.isWan { register(clientHandle: clientHandle) }
+      // a UDP bind has been established
+      beginReceiving()
+
+//      _log(Self.className() + ": UDP receive port: \(_udpRcvPort), Send port: \(_udpSendPort)", .info, #function, #file, #line)
+//
+//      // if a Wan connection, register
+//      if packet.isWan { register(clientHandle: clientHandle) }
     }
     return success
   }
@@ -169,7 +206,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   }
   /// Unbind from the UDP port
   ///
-  func unbind() {
+  func unbind(reason: String) {
     
     _udpBound = false
     
@@ -179,14 +216,14 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
     udpSuccessfulRegistration = false
     
     // notify the delegate
-    _delegate?.didUnbind()
+    _delegate?.didUnbind(reason: reason)
   }
   /// Register UDP client handle and start pinger
   ///
   /// - Parameters:
   ///   - clientHandle:       our client handle
   ///
-  private func register(clientHandle: Handle?) {
+  func register(clientHandle: Handle?) {
     
     guard clientHandle != nil else {
       // should not happen
@@ -277,5 +314,5 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   // ----------------------------------------------------------------------------
   // *** Backing properties (Do NOT use) ***
   
-  private var _udpSuccessfulRegistration = false
+//  private var _udpSuccessfulRegistration = false
 }

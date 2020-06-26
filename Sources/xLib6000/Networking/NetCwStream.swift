@@ -19,10 +19,9 @@ public final class NetCwStream : NSObject {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
+  @Barrier @objc dynamic public var txCount: Int = 0
+  
   @objc dynamic public private(set) var isActive = false
-  @objc dynamic public var txCount: Int {
-    get { Api.objectQ.sync { _txCount } }
-    set { Api.objectQ.sync(flags: .barrier) { _txCount = newValue }}}
   @objc dynamic public private(set) var id: NetCwId = 0
 
   // ----------------------------------------------------------------------------
@@ -178,7 +177,7 @@ public final class NetCwStream : NSObject {
     let txData = cmd.data(using: String.Encoding.utf8, allowLossyConversion: false)!
     
     let bytesToSend = txData.count
-    _txCount += bytesToSend
+    txCount += bytesToSend
     
     if _vita == nil { _vita = Vita(type: .netCW, streamId: id) }
     
@@ -211,5 +210,5 @@ public final class NetCwStream : NSObject {
   
 //  private var _isActive  = false
 //  private var _id        : NetCwId = 0
-  private var _txCount   = 0
+//  private var _txCount   = 0
 }

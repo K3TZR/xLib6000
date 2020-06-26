@@ -13,16 +13,11 @@ final class ObjectTests: XCTestCase {
       
       Swift.print("***** Radio found: \(discovery.discoveredRadios[0].nickname) (v\(discovery.discoveredRadios[0].firmwareVersion)) @ \(discovery.discoveredRadios[0].publicIp)")
 
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], program: "ObjectTests", isGui: connectAsGui, logState: logState) {
+      Api.sharedInstance.connect(discovery.discoveredRadios[0], program: "ObjectTests", isGui: connectAsGui, logState: logState)
         sleep(2)
-        
         if showInfoMessages { Swift.print("***** Connected") }
-        
         return Api.sharedInstance.radio
-      } else {
-        XCTFail("----->>>>> Failed to connect to Radio <<<<<-----\n", file: #function)
-        return nil
-      }
+
     } else {
       XCTFail("----->>>>> No Radio(s) found <<<<<-----\n", file: #function)
       return nil

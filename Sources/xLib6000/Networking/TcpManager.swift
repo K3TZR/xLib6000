@@ -13,6 +13,42 @@ public typealias SequenceNumber = UInt
 public typealias ReplyHandler = (_ command: String, _ seqNumber: SequenceNumber, _ responseValue: String, _ reply: String) -> Void
 public typealias ReplyTuple = (replyTo: ReplyHandler?, command: String)
 
+
+/// Delegate protocol for the TcpManager class
+///
+protocol TcpManagerDelegate: class {
+  
+  // if any of theses are not needed, implement a stub in the delegate that does nothing
+  
+  /// A Tcp message was received the Radio
+  ///
+  /// - Parameter text:             text of the message
+  ///
+  func didReceive(_ text: String)
+  
+  /// A Tcp message was sent to the Radio
+  ///
+  /// - Parameter text:             text of the message
+  ///
+  func didSend(_ text: String)
+    
+  /// Process a Tcp connection
+  ///
+  /// - Parameters:
+  ///   - host:                     host Ip address
+  ///   - port:                     host Port number
+  ///   - error:                    error message (may be blank)
+  ///
+  func didConnect(host: String, port: UInt16)
+  /// Process a Tcp disconnection
+  ///
+  /// - Parameters:
+  ///   - reason:                   explanation
+  ///
+  func didDisconnect(reason: String)
+}
+
+
 ///  TcpManager Class implementation
 ///
 ///      manages all TCP communication between the API and the Radio (hardware)
@@ -36,12 +72,8 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   private var _tcpSocket                    : GCDAsyncSocket!
   private var _timeout                      = 0.0   // seconds
 
-  private var _isWan : Bool {
-    get { Api.objectQ.sync { __isWan } }
-    set { Api.objectQ.sync(flags: .barrier) {__isWan = newValue }}}
-  private var _seqNum : UInt {
-    get { Api.objectQ.sync { __seqNum } }
-    set { Api.objectQ.sync(flags: .barrier) {__seqNum = newValue }}}
+  @Barrier private var _isWan   : Bool = false
+  @Barrier private var _seqNum  : UInt = 0
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -172,7 +204,7 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   ///
   @objc func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
     
-    _delegate?.didDisconnect(host: sock.connectedHost ?? "", port: sock.connectedPort, error: (err == nil) ? "" : err!.localizedDescription)
+    _delegate?.didDisconnect(reason: (err == nil) ? "User Initiated" : err!.localizedDescription)
   }
   /// Called after the TCP/IP connection has been established
   ///
@@ -263,6 +295,6 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   // ----------------------------------------------------------------------------
   // *** Backing properties (Do NOT use) ***
   
-  private var __isWan   = false
-  private var __seqNum  : UInt = 0
+//  private var __isWan   = false
+//  private var __seqNum  : UInt = 0
 }

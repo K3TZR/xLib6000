@@ -21,16 +21,11 @@ final class NewApiTests: XCTestCase {
       
       Swift.print("***** Radio found: \(discovery.discoveredRadios[0].nickname) (v\(discovery.discoveredRadios[0].firmwareVersion)) @ \(discovery.discoveredRadios[0].publicIp)")
       
-      if Api.sharedInstance.connect(discovery.discoveredRadios[0], program: "v3Tests", isGui: connectAsGui, logState: logState) {
+      Api.sharedInstance.connect(discovery.discoveredRadios[0], program: "v3Tests", isGui: connectAsGui, logState: logState)
         sleep(2)
-        
         Swift.print("***** Connected")
-        
         return Api.sharedInstance.radio
-      } else {
-        XCTFail("----->>>>> Failed to connect to Radio <<<<<-----\n", file: #function)
-        return nil
-      }
+      
     } else {
       XCTFail("----->>>>> No Radio(s) found <<<<<-----\n", file: #function)
       return nil

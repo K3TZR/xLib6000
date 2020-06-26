@@ -1072,8 +1072,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         // YES
         _clientInitialized = true
         
-        // Finish the UDP initialization & set the API state
-        _api.clientConnected(self)
+        // set the API state to finish the UDP initialization
+        _api.updateState(to: .clientConnected(radio: self))
       }
     }
   }
@@ -1115,7 +1115,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if inUse {
                     
           // YES, Finish the UDP initialization & set the API state
-          _api.clientConnected(radio)
+//          _api.clientConnected(radio)
+          _api.updateState(to: .clientConnected(radio: radio))
           
         } else {
           // pre V3 API

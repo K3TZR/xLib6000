@@ -299,13 +299,14 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         // NO, it must be removed
         oldPacket.guiClients[handle] = nil
         
-        _log("GuiClient removed: \(oldPacket.nickname), \(oldPacket.isWan ? "SMARTLINK" : "LOCAL"), \(handle.hex), \(oldGuiClient.station), \(oldGuiClient.program)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenRemoved, object: oldPacket.guiClients[handle] as Any?)
+        _log("GuiClient removed: \(handle.hex), \(oldGuiClient.station), \(oldGuiClient.program), \(oldPacket.nickname), (\(oldPacket.isWan ? "SMARTLINK" : "LOCAL")), \(oldGuiClient.clientId ?? "")", .debug, #function, #file, #line)
+        
+          NC.post(.guiClientHasBeenRemoved, object: oldPacket.guiClients[handle] as Any?)
       
       }
     }
     // identify any added guiClients
-    for (handle, newClient) in newPacket.guiClients {
+    for (handle, newGuiClient) in newPacket.guiClients {
     
       // is the same handle in the oldPacket?
       if oldPacket.guiClients[handle] == nil {
@@ -313,8 +314,8 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         // NO, it must be added
         oldPacket.guiClients[handle] = newPacket.guiClients[handle]
       
-        _log("GuiClient added: \(newPacket.nickname), \(newPacket.isWan ? "SMARTLINK" : "LOCAL"), \(handle.hex), \(newClient.station), \(newClient.program)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenAdded, object: newClient as Any?)
+        _log("GuiClient   added: \(handle.hex), \(newGuiClient.station), \(newGuiClient.program), \(newPacket.nickname), (\(newPacket.isWan ? "SMARTLINK" : "LOCAL")), \(newGuiClient.clientId ?? "")", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenAdded, object: newGuiClient as Any?)
       }
     }
   }

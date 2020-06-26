@@ -203,7 +203,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // try to connect
     do {
       try _tlsSocket.connect(toHost: kHostName, onPort: UInt16(kHostPort), withTimeout: _timeout)
-      _log(Self.className() + ": SmartLink server connection successful", .info, #function, #file, #line)
+      _log(Self.className() + ": SmartLink server connection successful", .debug, #function, #file, #line)
       NC.post(.smartLinkLogon, object: nil)
       
     } catch _ {
@@ -254,7 +254,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   public func sendTestConnection(for packet: DiscoveryPacket) {
 
-    _log(Self.className() + ": SmartLink Test initiated", .info, #function, #file, #line)
+    _log(Self.className() + ": SmartLink Test initiated", .debug, #function, #file, #line)
 
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
@@ -736,7 +736,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     // Disconnected from the SmartLink server
     let error = (err == nil ? "" : " with error: " + err!.localizedDescription)
-    _log(Self.className() + ": SmartLink Server \(_currentHost), port \(_currentPort): Disconnected\(error)", .info, #function, #file, #line)
+    _log(Self.className() + ": SmartLink Server \(_currentHost), port \(_currentPort): Disconnected\(error)", .debug, #function, #file, #line)
 
     _isConnected = false
     _currentHost = ""
