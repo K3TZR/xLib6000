@@ -235,7 +235,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public var availablePanadapters : Int     { _availablePanadapters }
   @objc dynamic public var availableSlices      : Int     { _availableSlices }
   @objc dynamic public var chassisSerial        : String  { _chassisSerial }
-  @objc dynamic public var clientIp             : String  {  _clientIp }
+  @objc dynamic public var clientIp             : String  { _clientIp }
   @objc dynamic public var daxIqAvailable       : Int     { _daxIqAvailable }
   @objc dynamic public var daxIqCapacity        : Int     { _daxIqCapacity }
   @objc dynamic public var extPresent           : Bool    { _extPresent }
@@ -1115,7 +1115,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if inUse {
                     
           // YES, Finish the UDP initialization & set the API state
-//          _api.clientConnected(radio)
           _api.updateState(to: .clientConnected(radio: radio))
           
         } else {

@@ -17,7 +17,7 @@ public typealias BandId = ObjectId
 ///      updated by the incoming TCP messages. They are collected in the bandSettings
 ///      collection on the Radio object.
 ///
-public final class BandSetting                : NSObject, DynamicModel {
+public final class BandSetting  : NSObject, DynamicModel {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
@@ -27,43 +27,33 @@ public final class BandSetting                : NSObject, DynamicModel {
   @objc dynamic public var accTxEnabled: Bool {
     get { _accTxEnabled }
     set { if _accTxEnabled != newValue { _accTxEnabled = newValue ; interlockSet( .accTxEnabled, newValue.as1or0)  } } }
-  
   @objc dynamic public var accTxReqEnabled: Bool {
     get { _accTxReqEnabled }
     set { if _accTxReqEnabled != newValue { _accTxReqEnabled = newValue ; interlockSet( .accTxReqEnabled, newValue.as1or0) } } }
-  
   @objc dynamic public var bandName: String {
     get { _bandName }
     set { if _bandName != newValue { _bandName = newValue } } }
-  
   @objc dynamic public var hwAlcEnabled: Bool {
     get { _hwAlcEnabled }
     set { if _hwAlcEnabled != newValue { _hwAlcEnabled = newValue ; transmitSet( .hwAlcEnabled, newValue.as1or0)} } }
-  
   @objc dynamic public var inhibit: Bool {
     get { _inhibit }
     set { if _inhibit != newValue { _inhibit = newValue ; transmitSet( .inhibit, newValue.as1or0)  } } }
-  
   @objc dynamic public var rcaTxReqEnabled: Bool {
     get {  _rcaTxReqEnabled }
     set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue ; interlockSet( .rcaTxReqEnabled, newValue.as1or0) } } }
-  
   @objc dynamic public var rfPower: Int {
     get { return _rfPower }
     set { if _rfPower != newValue { _rfPower = newValue ; transmitSet( .rfPower, newValue) } } }
-  
   @objc dynamic public var tunePower: Int {
     get { return _tunePower }
     set { if _tunePower != newValue { _tunePower = newValue ; transmitSet( .tunePower, newValue) } } }
-
   @objc dynamic public var tx1Enabled: Bool {
     get { return _tx1Enabled }
     set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; interlockSet( .tx1Enabled, newValue.as1or0)  } } }
-  
   @objc dynamic public var tx2Enabled: Bool {
     get { return _tx2Enabled }
     set { if _tx2Enabled != newValue { _tx2Enabled = newValue ; interlockSet( .tx2Enabled, newValue.as1or0)  } } }
-  
   @objc dynamic public var tx3Enabled: Bool {
     get { return _tx3Enabled }
     set { if _tx3Enabled != newValue { _tx3Enabled = newValue ; interlockSet( .tx3Enabled, newValue.as1or0) } } }
@@ -116,17 +106,17 @@ public final class BandSetting                : NSObject, DynamicModel {
     set { Api.objectQ.sync(flags: .barrier) {__tx3Enabled = newValue } } }
   
   enum Token : String {
-    case accTxEnabled                       = "acc_tx_enabled"
-    case accTxReqEnabled                    = "acc_txreq_enable"
-    case bandName                           = "band_name"
-    case hwAlcEnabled                       = "hwalc_enabled"
+    case accTxEnabled             = "acc_tx_enabled"
+    case accTxReqEnabled          = "acc_txreq_enable"
+    case bandName                 = "band_name"
+    case hwAlcEnabled             = "hwalc_enabled"
     case inhibit
-    case rcaTxReqEnabled                    = "rca_txreq_enable"
-    case rfPower                            = "rfpower"
-    case tunePower                          = "tunepower"
-    case tx1Enabled                         = "tx1_enabled"
-    case tx2Enabled                         = "tx2_enabled"
-    case tx3Enabled                         = "tx3_enabled"
+    case rcaTxReqEnabled          = "rca_txreq_enable"
+    case rfPower                  = "rfpower"
+    case tunePower                = "tunepower"
+    case tx1Enabled               = "tx1_enabled"
+    case tx2Enabled               = "tx2_enabled"
+    case tx3Enabled               = "tx3_enabled"
   }
 
   // ----------------------------------------------------------------------------

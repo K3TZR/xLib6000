@@ -36,8 +36,11 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
     
-  public      let id              : WaterfallStreamId
-  public      var isStreaming     = false
+  public let id : WaterfallStreamId
+  
+  public var isStreaming : Bool {
+    get { Api.objectQ.sync { _isStreaming } }
+    set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
 
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
@@ -324,6 +327,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   // *** Backing properties (Do NOT use) ***
   
   private var _delegate           : StreamHandler? = nil
+  private var _isStreaming        = false
   
   private var __autoBlackEnabled  = false
   private var __autoBlackLevel    : UInt32 = 0

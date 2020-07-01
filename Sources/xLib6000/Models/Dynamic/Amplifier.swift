@@ -81,19 +81,19 @@ public final class Amplifier  : NSObject, DynamicModel {
     case ip
     case model
     case port
-    case serialNumber = "serial_num"
+    case serialNumber         = "serial_num"
     case state
   }
   
   enum State : String {
-    case fault      = "FAULT"
-    case idle       = "IDLE"
-    case powerUp    = "POWERUP"
-    case selfCheck  = "SELFCHECK"
-    case standby    = "STANDBY"
-    case transmitA  = "TRANSMIT_A"
-    case transmitB  = "TRANSMIT_B"
-    case unknown    = "UNKNOWN"
+    case fault                = "FAULT"
+    case idle                 = "IDLE"
+    case powerUp              = "POWERUP"
+    case selfCheck            = "SELFCHECK"
+    case standby              = "STANDBY"
+    case transmitA            = "TRANSMIT_A"
+    case transmitB            = "TRANSMIT_B"
+    case unknown              = "UNKNOWN"
   }
   
   // ----------------------------------------------------------------------------

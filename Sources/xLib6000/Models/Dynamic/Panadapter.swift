@@ -42,13 +42,14 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public      let id                : PanadapterStreamId
-  public      var isStreaming       = false
-
+  public let id  : PanadapterStreamId
+  
+  public var isStreaming : Bool {
+    get { Api.objectQ.sync { _isStreaming } }
+    set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var average: Int {
     get { _average }
     set {if _average != newValue { _average = newValue ; panadapterSet( .average, newValue) }}}
@@ -569,6 +570,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // *** Backing properties (Do NOT use) ***
   
   private var _delegate                     : StreamHandler? = nil
+  private var _isStreaming                  = false
 
   private var __clientHandle                : Handle = 0      // New Api only
 

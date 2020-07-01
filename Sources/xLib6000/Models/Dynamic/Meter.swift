@@ -24,8 +24,8 @@ public final class Meter : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kDbDbmDbfsSwrDenom  : Float = 128.0  // denominator for Db, Dbm, Dbfs, Swr
-  static let kDegDenom           : Float = 64.0   // denominator for Degc, Degf
+  static let kDbDbmDbfsSwrDenom   : Float = 128.0  // denominator for Db, Dbm, Dbfs, Swr
+  static let kDegDenom            : Float = 64.0   // denominator for Degc, Degf
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

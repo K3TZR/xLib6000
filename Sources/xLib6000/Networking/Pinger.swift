@@ -18,14 +18,12 @@ final class Pinger : NSObject {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _tcpManager                   : TcpManager                    // a TcpManager instance
-  private var _pingTimer                    : DispatchSourceTimer!          // periodic timer for ping
-  private var _pingQ                        : DispatchQueue!                // Queue for Pinger synchronization
-  private var _lastPingRxTime               : Date!                         // Time of the last ping response
   private var _firstResponseReceived        = false
-  
-  private let kKeepAlive                    = "keepalive enable"
-  private let kPing                         = "ping"
+  private var _lastPingRxTime               : Date!                         // Time of the last ping response
+  private let _log                          = Log.sharedInstance.logMessage
+  private let _pingQ                        = DispatchQueue(label: Api.kName + ".pingQ")
+  private var _pingTimer                    : DispatchSourceTimer!          // periodic timer for ping
+  private var _tcpManager                   : TcpManager                    // a TcpManager instance
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -35,10 +33,9 @@ final class Pinger : NSObject {
   /// - Parameters:
   ///   - tcpManager:     a TcpManager class instance
   ///
-  init(tcpManager: TcpManager, pingQ: DispatchQueue) {
+  init(tcpManager: TcpManager) {
     
     _tcpManager = tcpManager
-    _pingQ = pingQ
     super.init()
     
     // start pinging
@@ -55,6 +52,7 @@ final class Pinger : NSObject {
     // stop Pinging
     _pingTimer?.cancel()
     _firstResponseReceived = false
+    _log(Self.className() + " Pinger stopped", .debug, #function, #file, #line)
   }
   /// Process the Response to a Ping
   ///
@@ -76,8 +74,10 @@ final class Pinger : NSObject {
   ///
   func start() {
     
+    _log(Self.className() + " Pinger started", .debug, #function, #file, #line)
+
     // tell the Radio to expect pings
-    Api.sharedInstance.send(kKeepAlive)
+    Api.sharedInstance.send("keepalive enable")
     
     // fake the first response
     _lastPingRxTime = Date(timeIntervalSinceNow: 0)
@@ -109,7 +109,7 @@ final class Pinger : NSObject {
       } else {
         
         // NO, send another Ping
-        Api.sharedInstance.send(self.kPing, replyTo: self.pingReply)
+        Api.sharedInstance.send("ping", replyTo: self.pingReply)
       }
     }
     // start the timer

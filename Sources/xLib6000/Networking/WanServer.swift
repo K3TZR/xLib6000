@@ -565,7 +565,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       }
       currentPacketList.append(packet)
     }
-    Log.sharedInstance.logMessage("Discovery: WanRadioList received", .debug, #function, #file, #line)
+    Log.sharedInstance.logMessage(Self.className() + " : WanRadioList received", .debug, #function, #file, #line)
     
     for packet in currentPacketList {
       packet.isWan = true

@@ -24,7 +24,10 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public let id           : DaxRxStreamId
-  public var isStreaming  = false
+
+  public var isStreaming  : Bool {
+    get { Api.objectQ.sync { _isStreaming } }
+    set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
 
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
@@ -81,8 +84,8 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
     set { Api.objectQ.sync(flags: .barrier) {__slice = newValue }}}
   
   enum Token: String {
-    case clientHandle                       = "client_handle"
-    case daxChannel                         = "dax_channel"
+    case clientHandle         = "client_handle"
+    case daxChannel           = "dax_channel"
     case ip
     case slice
     case type
@@ -91,10 +94,10 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _initialized  = false
-  private let _log          = Log.sharedInstance.logMessage
-  private let _radio        : Radio
-  private var _rxSeq        : Int?
+  private var _initialized    = false
+  private let _log            = Log.sharedInstance.logMessage
+  private let _radio          : Radio
+  private var _rxSeq          : Int?
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -354,6 +357,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   // *** Backing properties (Do NOT use) ***
   
   private var _delegate       : StreamHandler? = nil
+  private var _isStreaming    = false
 
   private var __clientHandle  : Handle = 0
   private var __daxChannel    = 0

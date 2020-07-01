@@ -41,6 +41,12 @@ Flex Radios can have one of four different version groups:
 CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
 
 
+## 1.3.5 Release Notes
+
+* refactored apiState (renamed to state)
+* 
+
+
 ## 1.3.4 Release Notes
 
 * added removeRemoteTxAudioStream()

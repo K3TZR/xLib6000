@@ -60,20 +60,24 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  internal var isConnected                  : Bool { _tcpSocket.isConnected }
+  internal var isConnected      : Bool { _tcpSocket.isConnected }
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private weak var _delegate                : TcpManagerDelegate?
+  private weak var _delegate    : TcpManagerDelegate?
 
-  private var _tcpReceiveQ                  : DispatchQueue
-  private var _tcpSendQ                     : DispatchQueue
-  private var _tcpSocket                    : GCDAsyncSocket!
-  private var _timeout                      = 0.0   // seconds
+  private var _tcpReceiveQ      : DispatchQueue
+  private var _tcpSendQ         : DispatchQueue
+  private var _tcpSocket        : GCDAsyncSocket!
+  private var _timeout          = 0.0   // seconds
 
-  @Barrier private var _isWan   : Bool = false
-  @Barrier private var _seqNum  : UInt = 0
+  private var _isWan : Bool {
+    get { Api.objectQ.sync { __isWan } }
+    set { Api.objectQ.sync(flags: .barrier) {__isWan = newValue }}}
+  private var _seqNum : UInt {
+    get { Api.objectQ.sync { __seqNum } }
+    set { Api.objectQ.sync(flags: .barrier) {__seqNum = newValue }}}
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -295,6 +299,6 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   // ----------------------------------------------------------------------------
   // *** Backing properties (Do NOT use) ***
   
-//  private var __isWan   = false
-//  private var __seqNum  : UInt = 0
+  private var __isWan   = false
+  private var __seqNum  : UInt = 0
 }

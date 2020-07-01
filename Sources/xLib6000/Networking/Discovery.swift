@@ -27,14 +27,13 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var discoveredRadios: [DiscoveryPacket] {
+  public var discoveredRadios : [DiscoveryPacket] {
     get { Api.objectQ.sync { _discoveredRadios } }
-    set { Api.objectQ.sync(flags: .barrier) { _discoveredRadios = newValue }}}
+    set { Api.objectQ.sync(flags: .barrier) {_discoveredRadios = newValue }}}
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
-  private var _discoveredRadios             = [DiscoveryPacket]()
   private let _log                          = Log.sharedInstance.logMessage
   private var _timeoutTimer                 : DispatchSourceTimer!
   private var _udpSocket                    : GCDAsyncUdpSocket?
@@ -356,6 +355,11 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     
     processPacket(newPacket)
   }
+  
+  // ----------------------------------------------------------------------------
+  // *** Backing properties (Do NOT use) ***
+  
+  private var _discoveredRadios = [DiscoveryPacket]()
 }
 
 
@@ -388,51 +392,133 @@ public class DiscoveryPacket : Equatable {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
-  
-  @Barrier public var lastSeen: Date = Date()
-  
-  @Barrier public var availableClients: Int = 0
-  @Barrier public var availablePanadapters: Int = 0
-  @Barrier public var availableSlices: Int = 0
-  @Barrier public var callsign: String = ""
-  @Barrier public var discoveryVersion: String = ""
-  @Barrier public var firmwareVersion: String = ""
-  @Barrier public var fpcMac: String = ""
-  @Barrier public var guiClients: [Handle: GuiClient] = [Handle: GuiClient]()
-  @Barrier public var guiClientHandles: String = ""
-  @Barrier public var guiClientPrograms: String = ""
-  @Barrier public var guiClientStations: String = ""
-  @Barrier public var guiClientHosts: String = ""
-  @Barrier public var guiClientIps: String = ""
-  @Barrier public var inUseHost: String = ""
-  @Barrier public var inUseIp: String = ""
-  @Barrier public var licensedClients: Int = 0
-  @Barrier public var maxLicensedVersion: String = ""
-  @Barrier public var maxPanadapters: Int = 0
-  @Barrier public var maxSlices: Int = 0
-  @Barrier public var model: String = ""
-  @Barrier public var nickname: String = ""
-  @Barrier public var port: Int = -1
-  @Barrier public var publicIp: String = ""
-  @Barrier public var publicTlsPort: Int = -1
-  @Barrier public var publicUdpPort: Int = -1
-  @Barrier public var publicUpnpTlsPort: Int = -1
-  @Barrier public var publicUpnpUdpPort: Int = -1
-  @Barrier public var radioLicenseId: String = ""
-  @Barrier public var requiresAdditionalLicense: Bool = false
-  @Barrier public var serialNumber: String = ""
-  @Barrier public var status: String = ""
-  @Barrier public var upnpSupported: Bool = false
-  @Barrier public var wanConnected: Bool = false
-  
+
+  public var lastSeen : Date {
+    get { Api.objectQ.sync { _lastSeen } }
+    set { Api.objectQ.sync(flags: .barrier) {_lastSeen = newValue }}}
+
+  public var availableClients : Int {
+    get { Api.objectQ.sync { _availableClients } }
+    set { Api.objectQ.sync(flags: .barrier) {_availableClients = newValue }}}
+  public var availablePanadapters: Int {
+    get { Api.objectQ.sync { _availablePanadapters } }
+    set { Api.objectQ.sync(flags: .barrier) {_availablePanadapters = newValue }}}
+  public var availableSlices: Int {
+    get { Api.objectQ.sync { _availableSlices } }
+    set { Api.objectQ.sync(flags: .barrier) {_availableSlices = newValue }}}
+  public var callsign: String {
+    get { Api.objectQ.sync { _callsign } }
+    set { Api.objectQ.sync(flags: .barrier) {_callsign = newValue }}}
+  public var discoveryVersion: String {
+    get { Api.objectQ.sync { _discoveryVersion } }
+    set { Api.objectQ.sync(flags: .barrier) {_discoveryVersion = newValue }}}
+  public var firmwareVersion: String {
+    get { Api.objectQ.sync { _firmwareVersion } }
+    set { Api.objectQ.sync(flags: .barrier) {_firmwareVersion = newValue }}}
+  public var fpcMac: String {
+    get { Api.objectQ.sync { _fpcMac } }
+    set { Api.objectQ.sync(flags: .barrier) {_fpcMac = newValue }}}
+  public var guiClients: [Handle: GuiClient] {
+    get { Api.objectQ.sync { _guiClients } }
+    set { Api.objectQ.sync(flags: .barrier) {_guiClients = newValue }}}
+  public var guiClientHandles: String {
+    get { Api.objectQ.sync { _guiClientHandles } }
+    set { Api.objectQ.sync(flags: .barrier) {_guiClientHandles = newValue }}}
+  public var guiClientPrograms: String {
+    get { Api.objectQ.sync { _guiClientPrograms } }
+    set { Api.objectQ.sync(flags: .barrier) {_guiClientPrograms = newValue }}}
+  public var guiClientStations: String {
+    get { Api.objectQ.sync { _guiClientStations } }
+    set { Api.objectQ.sync(flags: .barrier) {_guiClientStations = newValue }}}
+  public var guiClientHosts: String {
+    get { Api.objectQ.sync { _guiClientHosts } }
+    set { Api.objectQ.sync(flags: .barrier) {_guiClientHosts = newValue }}}
+  public var guiClientIps: String {
+    get { Api.objectQ.sync { _guiClientIps } }
+    set { Api.objectQ.sync(flags: .barrier) {_guiClientIps = newValue }}}
+  public var inUseHost: String {
+    get { Api.objectQ.sync { _inUseHost } }
+    set { Api.objectQ.sync(flags: .barrier) {_inUseHost = newValue }}}
+  public var inUseIp: String {
+    get { Api.objectQ.sync { _inUseIp } }
+    set { Api.objectQ.sync(flags: .barrier) {_inUseIp = newValue }}}
+  public var licensedClients: Int {
+    get { Api.objectQ.sync { _licensedClients } }
+    set { Api.objectQ.sync(flags: .barrier) {_licensedClients = newValue }}}
+  public var maxLicensedVersion: String {
+    get { Api.objectQ.sync { _maxLicensedVersion } }
+    set { Api.objectQ.sync(flags: .barrier) {_maxLicensedVersion = newValue }}}
+  public var maxPanadapters: Int {
+    get { Api.objectQ.sync { _maxPanadapters } }
+    set { Api.objectQ.sync(flags: .barrier) {_maxPanadapters = newValue }}}
+  public var maxSlices: Int {
+    get { Api.objectQ.sync { _maxSlices } }
+    set { Api.objectQ.sync(flags: .barrier) {_maxSlices = newValue }}}
+  public var model: String {
+    get { Api.objectQ.sync { _model } }
+    set { Api.objectQ.sync(flags: .barrier) {_model = newValue }}}
+  public var nickname: String {
+    get { Api.objectQ.sync { _nickname } }
+    set { Api.objectQ.sync(flags: .barrier) {_nickname = newValue }}}
+  public var port: Int {
+    get { Api.objectQ.sync { _port } }
+    set { Api.objectQ.sync(flags: .barrier) {_port = newValue }}}
+  public var publicIp: String {
+    get { Api.objectQ.sync { _publicIp } }
+    set { Api.objectQ.sync(flags: .barrier) {_publicIp = newValue }}}
+  public var publicTlsPort: Int {
+    get { Api.objectQ.sync { _publicTlsPort } }
+    set { Api.objectQ.sync(flags: .barrier) {_publicTlsPort = newValue }}}
+  public var publicUdpPort: Int {
+    get { Api.objectQ.sync { _publicUdpPort } }
+    set { Api.objectQ.sync(flags: .barrier) {_publicUdpPort = newValue }}}
+  public var publicUpnpTlsPort: Int {
+    get { Api.objectQ.sync { _publicUpnpTlsPort } }
+    set { Api.objectQ.sync(flags: .barrier) {_publicUpnpTlsPort = newValue }}}
+  public var publicUpnpUdpPort: Int {
+    get { Api.objectQ.sync { _publicUpnpUdpPort } }
+    set { Api.objectQ.sync(flags: .barrier) {_publicUpnpUdpPort = newValue }}}
+  public var radioLicenseId: String {
+    get { Api.objectQ.sync { _radioLicenseId } }
+    set { Api.objectQ.sync(flags: .barrier) {_radioLicenseId = newValue }}}
+  public var requiresAdditionalLicense: Bool {
+    get { Api.objectQ.sync { _requiresAdditionalLicense } }
+    set { Api.objectQ.sync(flags: .barrier) {_requiresAdditionalLicense = newValue }}}
+  public var serialNumber: String {
+    get { Api.objectQ.sync { _serialNumber } }
+    set { Api.objectQ.sync(flags: .barrier) {_serialNumber = newValue }}}
+  public var status: String {
+    get { Api.objectQ.sync { _status } }
+    set { Api.objectQ.sync(flags: .barrier) {_status = newValue }}}
+  public var upnpSupported: Bool {
+    get { Api.objectQ.sync { _upnpSupported } }
+    set { Api.objectQ.sync(flags: .barrier) {_upnpSupported = newValue }}}
+  public var wanConnected: Bool {
+    get { Api.objectQ.sync { _wanConnected } }
+    set { Api.objectQ.sync(flags: .barrier) {_wanConnected = newValue }}}
+
   // FIXME: Not really part of the DiscoveryPacket
-  @Barrier public var isPortForwardOn: Bool = false
-  @Barrier public var isWan: Bool = false
-  @Barrier public var localInterfaceIP: String = ""
-  @Barrier public var lowBandwidthConnect: Bool = false
-  @Barrier public var negotiatedHolePunchPort: Int = -1
-  @Barrier public var requiresHolePunch: Bool = false
-  @Barrier public var wanHandle: String = ""
+  public var isPortForwardOn: Bool {
+    get { Api.objectQ.sync { _isPortForwardOn } }
+    set { Api.objectQ.sync(flags: .barrier) {_isPortForwardOn = newValue }}}
+  public var isWan: Bool {
+    get { Api.objectQ.sync { _isWan } }
+    set { Api.objectQ.sync(flags: .barrier) {_isWan = newValue }}}
+  public var localInterfaceIP: String {
+    get { Api.objectQ.sync { _localInterfaceIP } }
+    set { Api.objectQ.sync(flags: .barrier) {_localInterfaceIP = newValue }}}
+  public var lowBandwidthConnect: Bool {
+    get { Api.objectQ.sync { _lowBandwidthConnect } }
+    set { Api.objectQ.sync(flags: .barrier) {_lowBandwidthConnect = newValue }}}
+  public var negotiatedHolePunchPort: Int {
+    get { Api.objectQ.sync { _negotiatedHolePunchPort } }
+    set { Api.objectQ.sync(flags: .barrier) {_negotiatedHolePunchPort = newValue }}}
+  public var requiresHolePunch: Bool {
+    get { Api.objectQ.sync { _requiresHolePunch } }
+    set { Api.objectQ.sync(flags: .barrier) {_requiresHolePunch = newValue }}}
+  public var wanHandle: String {
+    get { Api.objectQ.sync { _wanHandle } }
+    set { Api.objectQ.sync(flags: .barrier) {_wanHandle = newValue }}}
 
   public var description : String {
     return """
@@ -455,54 +541,53 @@ public class DiscoveryPacket : Equatable {
     // same serial number
     return lhs.serialNumber == rhs.serialNumber && lhs.isWan == rhs.isWan
   }
-
   
   // ----------------------------------------------------------------------------
   // *** Backing properties (Do NOT use) ***
   
-//  public var _lastSeen                       = Date()
-//
-//  public var _availableClients               = 0                   // newAPI, Local only
-//  public var _availablePanadapters           = 0                   // newAPI, Local only
-//  public var _availableSlices                = 0                   // newAPI, Local only
-//  public var _callsign                       = ""
-//  public var _discoveryVersion               = ""                  // Local only
-//  public var _firmwareVersion                = ""
-//  public var _fpcMac                         = ""                  // Local only
-//  public var _guiClients                     = [Handle: GuiClient]()   // newAPI
-//  public var _guiClientHandles               = ""                  // newAPI only
-//  public var _guiClientPrograms              = ""                  // newAPI only
-//  public var _guiClientStations              = ""                  // newAPI only
-//  public var _guiClientHosts                 = ""                  // newAPI only
-//  public var _guiClientIps                   = ""                  // newAPI only
-//  public var _inUseHost                      = ""                  // deprecated -- 2 spellings
-//  public var _inUseIp                        = ""                  // deprecated -- 2 spellings
-//  public var _licensedClients                = 0                   // newAPI, Local only
-//  public var _maxLicensedVersion             = ""
-//  public var _maxPanadapters                 = 0                   // newAPI, Local only
-//  public var _maxSlices                      = 0                   // newAPI, Local only
-//  public var _model                          = ""
-//  public var _nickname                       = ""                  // 2 spellings
-//  public var _port                           = -1                  // Local only
-//  public var _publicIp                       = ""                  // 2 spellings
-//  public var _publicTlsPort                  = -1                  // SmartLink only
-//  public var _publicUdpPort                  = -1                  // SmartLink only
-//  public var _publicUpnpTlsPort              = -1                  // SmartLink only
-//  public var _publicUpnpUdpPort              = -1                  // SmartLink only
-//  public var _radioLicenseId                 = ""
-//  public var _requiresAdditionalLicense      = false
-//  public var _serialNumber                   = ""
-//  public var _status                         = ""
-//  public var _upnpSupported                  = false               // SmartLink only
-//  public var _wanConnected                   = false               // Local only
-//
-//  // FIXME: Not really part of the DiscoveryPacket
-//  public var _isPortForwardOn                = false               // ????
-//  public var _isWan                          = false
-//  public var _localInterfaceIP               = ""                  // ????
-//  public var _lowBandwidthConnect            = false               // ????
-//  public var _negotiatedHolePunchPort        = -1                  // ????
-//  public var _requiresHolePunch              = false               // ????
-//  public var _wanHandle                      = ""
+  private var _lastSeen                   = Date()
+  
+  private var _availableClients           = 0
+  private var _availablePanadapters       = 0
+  private var _availableSlices            = 0
+  private var _callsign                   = ""
+  private var _discoveryVersion           = ""
+  private var _firmwareVersion            = ""
+  private var _fpcMac                     = ""
+  private var _guiClients                 = [Handle: GuiClient]()
+  private var _guiClientHandles           = ""
+  private var _guiClientPrograms          = ""
+  private var _guiClientStations          = ""
+  private var _guiClientHosts             = ""
+  private var _guiClientIps               = ""
+  private var _inUseHost                  = ""
+  private var _inUseIp                    = ""
+  private var _licensedClients            = 0
+  private var _maxLicensedVersion         = ""
+  private var _maxPanadapters             = 0
+  private var _maxSlices                  = 0
+  private var _model                      = ""
+  private var _nickname                   = ""
+  private var _port                       = -1
+  private var _publicIp                   = ""
+  private var _publicTlsPort              = -1
+  private var _publicUdpPort              = -1
+  private var _publicUpnpTlsPort          = -1
+  private var _publicUpnpUdpPort          = -1
+  private var _radioLicenseId             = ""
+  private var _requiresAdditionalLicense  = false
+  private var _serialNumber               = ""
+  private var _status                     = ""
+  private var _upnpSupported              = false
+  private var _wanConnected               = false
+  
+  // FIXME: Not really part of the DiscoveryPacket
+  private var _isPortForwardOn            = false
+  private var _isWan                      = false
+  private var _localInterfaceIP           = ""
+  private var _lowBandwidthConnect        = false
+  private var _negotiatedHolePunchPort    = -1
+  private var _requiresHolePunch          = false
+  private var _wanHandle                  = ""
 }
 

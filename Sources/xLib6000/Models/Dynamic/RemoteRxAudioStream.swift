@@ -39,12 +39,13 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public      let id               : RemoteRxStreamId
-  public      var isStreaming      = false
   
+  public var isStreaming : Bool {
+    get { Api.objectQ.sync { _isStreaming } }
+    set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var clientHandle: Handle {
     get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue}}}
@@ -54,6 +55,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   @objc dynamic public var ip: String {
     get { _ip  }
     set { if _ip != newValue { _ip = newValue}}}  
+
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -265,6 +267,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   // *** Backing properties (Do NOT use) ***
   
   private var _delegate      : StreamHandler? = nil
+  private var _isStreaming   = false
 
   private var __clientHandle : Handle = 0
   private var __compression  : String = RemoteRxAudioStream.Compression.none.rawValue

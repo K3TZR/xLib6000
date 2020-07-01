@@ -39,9 +39,12 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public        let id             : OpusStreamId
-  public        var isStreaming    = false
+  public let id : OpusStreamId
   
+  public var isStreaming : Bool {
+    get { Api.objectQ.sync { _isStreaming } }
+    set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
+
   public enum RxState {
     case start
     case stop
@@ -356,6 +359,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   // *** Backing properties (Do NOT use) ***
   
   private var _delegate           : StreamHandler? = nil
+  private var _isStreaming        = false
 
   private var __expectedFrame     : Int? = nil
   private var __rxEnabled         = false

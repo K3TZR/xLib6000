@@ -46,7 +46,6 @@ public final class Tnf : NSObject, DynamicModel {
   @objc dynamic public var depth: UInt {
     get { _depth }
     set { if _depth != newValue { _depth = newValue ; tnfCmd( .depth, newValue) } } }
-
   @objc dynamic public var frequency: Hz {
     get { _frequency }
     set { if _frequency != newValue { _frequency = newValue ; tnfCmd( .frequency, newValue.hzToMhz) }}}

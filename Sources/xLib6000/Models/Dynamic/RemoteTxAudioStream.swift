@@ -18,28 +18,29 @@ public typealias RemoteTxStreamId = StreamId
 ///      periodically send Audio in a UDP stream. They are collected in the
 ///      RemoteTxAudioStreams collection on the Radio object.
 ///
-public final class RemoteTxAudioStream      : NSObject, DynamicModel {
+public final class RemoteTxAudioStream  : NSObject, DynamicModel {
 
   // ------------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let application             = 2049
-  public static let channelCount            = 2
-  public static let elementSize             = MemoryLayout<Float>.size
-  public static let frameCount              = 240
-  public static let isInterleaved           = true
-  public static let sampleRate              : Double = 24_000
+  public static let application         = 2049
+  public static let channelCount        = 2
+  public static let elementSize         = MemoryLayout<Float>.size
+  public static let frameCount          = 240
+  public static let isInterleaved       = true
+  public static let sampleRate          : Double = 24_000
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public      let id                : RemoteTxStreamId
-  public      var isStreaming       = false
+  public let id : RemoteTxStreamId
 
+  public var isStreaming : Bool {
+    get { Api.objectQ.sync { _isStreaming } }
+    set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var clientHandle: Handle {
     get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue}}}
@@ -48,7 +49,8 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
     set { if _compression != newValue { _compression = newValue}}}
   @objc dynamic public var ip: String {
     get { _ip  }
-    set { if _ip != newValue { _ip = newValue}}}  
+    set { if _ip != newValue { _ip = newValue}}}
+  
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -246,6 +248,7 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   // *** Backing properties (Do NOT use) ***
   
   private var _delegate      : StreamHandler? = nil
+  private var _isStreaming   = false
 
   private var __clientHandle : Handle = 0
   private var __compression  : String = RemoteRxAudioStream.Compression.none.rawValue

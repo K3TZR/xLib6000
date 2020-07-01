@@ -22,10 +22,11 @@ public final class TxAudioStream : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id           : TxStreamId
-  public var isStreaming  = false
-
-
+  public let id : TxStreamId
+  
+  public var isStreaming : Bool {
+    get { Api.objectQ.sync { _isStreaming } }
+    set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
   @objc dynamic public var clientHandle: Handle {
     return _clientHandle }
   @objc dynamic public var ip: String {
@@ -319,6 +320,8 @@ public final class TxAudioStream : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // *** Backing properties (Do NOT use) ***
   
+  private var _isStreaming    = false
+
   private var __clientHandle  : Handle = 0
   private var __ip            = ""
   private var __port          = 0

@@ -15,13 +15,16 @@ import Cocoa
 ///      objects are added / removed by the incoming TCP messages. MicAudioStream
 ///      objects periodically receive Mic Audio in a UDP stream.
 ///
-public final class MicAudioStream           : NSObject, DynamicModelWithStream {
+public final class MicAudioStream : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
   public let id           : DaxMicStreamId
-  public var isStreaming  = false
+
+  public var isStreaming  : Bool {
+    get { Api.objectQ.sync { _isStreaming } }
+    set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
 
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
@@ -74,8 +77,8 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
     set { Api.objectQ.sync(flags: .barrier) {__micGainScalar = newValue }}}
 
   enum Token: String {
-    case clientHandle = "client_handle"
-    case inUse        = "in_use"
+    case clientHandle         = "client_handle"
+    case inUse                = "in_use"
     case ip
     case port
   }
@@ -83,10 +86,10 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _initialized                  = false
-  private var _log                          = Log.sharedInstance.logMessage
-  private let _radio                        : Radio
-  private var _rxSeq                        : Int?
+  private var _initialized   = false
+  private var _log           = Log.sharedInstance.logMessage
+  private let _radio         : Radio
+  private var _rxSeq         : Int?
   
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -285,7 +288,8 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // *** Backing properties (Do NOT use) ***
   
   private var _delegate       : StreamHandler? = nil
-    
+  private var _isStreaming    = false
+
   private var __clientHandle  : Handle = 0
   private var __ip            = ""
   private var __port          = 0

@@ -62,7 +62,9 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  @Barrier var udpSuccessfulRegistration : Bool = false
+  var udpSuccessfulRegistration : Bool {
+    get { Api.objectQ.sync { _udpSuccessfulRegistration } }
+    set { Api.objectQ.sync(flags: .barrier) {_udpSuccessfulRegistration = newValue }}}
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -236,6 +238,8 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       
       while self._udpSocket != nil && !self.udpSuccessfulRegistration && self._udpBound {
         
+        self._log(Self.className() + ": Register Wan UDP", .debug, #function, #file, #line)
+
         // send a Registration command
         let cmd = "client udp_register handle=" + clientHandle!.hex
         self.sendData(cmd.data(using: String.Encoding.ascii, allowLossyConversion: false)!)
@@ -243,7 +247,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
         // pause
         usleep(self.kRegistrationDelay)
       }
-      self._log(Self.className() + ": SmartLink - register UDP successful", .info, #function, #file, #line)
+      self._log(Self.className() + ": Wan UDP registered", .debug, #function, #file, #line)
 
 //      // as long as connected after Registration
 //      while self._udpSocket != nil && self._udpBound {
@@ -314,5 +318,5 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   // ----------------------------------------------------------------------------
   // *** Backing properties (Do NOT use) ***
   
-//  private var _udpSuccessfulRegistration = false
+  private var _udpSuccessfulRegistration = false
 }

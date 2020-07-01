@@ -175,35 +175,35 @@ public final class Memory                   : NSObject, DynamicModel {
     set { Api.objectQ.sync(flags: .barrier) { __toneValue = newValue }}}
 
   enum Token : String {
-    case digitalLowerOffset                 = "digl_offset"
-    case digitalUpperOffset                 = "digu_offset"
-    case frequency                          = "freq"
+    case digitalLowerOffset         = "digl_offset"
+    case digitalUpperOffset         = "digu_offset"
+    case frequency                  = "freq"
     case group
     case highlight
-    case highlightColor                     = "highlight_color"
+    case highlightColor             = "highlight_color"
     case mode
     case name
     case owner
-    case repeaterOffsetDirection            = "repeater"
-    case repeaterOffset                     = "repeater_offset"
-    case rfPower                            = "power"
-    case rttyMark                           = "rtty_mark"
-    case rttyShift                          = "rtty_shift"
-    case rxFilterHigh                       = "rx_filter_high"
-    case rxFilterLow                        = "rx_filter_low"
+    case repeaterOffsetDirection    = "repeater"
+    case repeaterOffset             = "repeater_offset"
+    case rfPower                    = "power"
+    case rttyMark                   = "rtty_mark"
+    case rttyShift                  = "rtty_shift"
+    case rxFilterHigh               = "rx_filter_high"
+    case rxFilterLow                = "rx_filter_low"
     case step
-    case squelchEnabled                     = "squelch"
-    case squelchLevel                       = "squelch_level"
-    case toneMode                           = "tone_mode"
-    case toneValue                          = "tone_value"
+    case squelchEnabled             = "squelch"
+    case squelchLevel               = "squelch_level"
+    case toneMode                   = "tone_mode"
+    case toneValue                  = "tone_value"
   }
 
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _initialized                  = false
-  private let _log                          = Log.sharedInstance.logMessage
-  private var _radio                        : Radio
+  private var _initialized          = false
+  private let _log                  = Log.sharedInstance.logMessage
+  private var _radio                : Radio
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods

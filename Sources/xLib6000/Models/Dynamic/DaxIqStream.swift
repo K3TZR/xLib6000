@@ -25,7 +25,10 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public let id           : DaxIqStreamId
-  public var isStreaming  = false
+
+  public var isStreaming  : Bool {
+    get { Api.objectQ.sync { _isStreaming } }
+    set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
 
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
@@ -76,12 +79,12 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
     set { Api.objectQ.sync(flags: .barrier) {__isActive = newValue }}}
 
   enum Token: String {
-    case channel                            = "daxiq_channel"
-    case clientHandle                       = "client_handle"
+    case channel              = "daxiq_channel"
+    case clientHandle         = "client_handle"
     case ip
-    case isActive                           = "active"
+    case isActive             = "active"
     case pan
-    case rate                               = "daxiq_rate"
+    case rate                 = "daxiq_rate"
     case type
   }
   
@@ -296,6 +299,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // *** Backing properties (Do NOT use) ***
   
   private var _delegate       : StreamHandler? = nil
+  private var _isStreaming    = false
 
   private var __channel       = 0
   private var __clientHandle  : Handle = 0

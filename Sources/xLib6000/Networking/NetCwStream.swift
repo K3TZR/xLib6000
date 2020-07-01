@@ -19,10 +19,14 @@ public final class NetCwStream : NSObject {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  @Barrier @objc dynamic public var txCount: Int = 0
-  
-  @objc dynamic public private(set) var isActive = false
   @objc dynamic public private(set) var id: NetCwId = 0
+
+  @objc dynamic public private(set) var isActive : Bool {
+    get { Api.objectQ.sync { _isActive } }
+    set { Api.objectQ.sync(flags: .barrier) { _isActive = newValue }}}
+  @objc dynamic public var txCount: Int {
+    get { Api.objectQ.sync { _txCount } }
+    set { Api.objectQ.sync(flags: .barrier) { _txCount = newValue }}}
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -208,7 +212,6 @@ public final class NetCwStream : NSObject {
   // ----------------------------------------------------------------------------
   // *** Backing properties (Do NOT use) ***
   
-//  private var _isActive  = false
-//  private var _id        : NetCwId = 0
-//  private var _txCount   = 0
+  private var _isActive  = false
+  private var _txCount   = 0
 }
