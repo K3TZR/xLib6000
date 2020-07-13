@@ -7,8 +7,8 @@
 
 ### Built on:
 
-*  macOS 10.15.4
-*  Xcode 11.4.1 (11E503a)
+*  macOS 10.15.6 Beta (19G46c)
+*  Xcode 11.5 (11E608c)
 *  Swift 5.2
 
 
@@ -44,7 +44,7 @@ CocoaAsyncSocket is embedded in this project as source code. It provides TCP and
 ## 1.3.5 Release Notes
 
 * refactored apiState (renamed to state)
-* 
+* eliminate all @Barrier usage
 
 
 ## 1.3.4 Release Notes
