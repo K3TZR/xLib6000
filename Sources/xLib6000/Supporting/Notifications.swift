@@ -141,7 +141,7 @@ public enum NotificationType : String {
   case tcpDidConnect
   case tcpDidDisconnect
   case tcpPingStarted
-  case tcpPingFirstResponse
+  case tcpPingResponse
   case tcpPingTimeout
   case tcpWillDisconnect
   

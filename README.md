@@ -41,6 +41,14 @@ Flex Radios can have one of four different version groups:
 CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
 
 
+## 1.3.6 Release Notes
+
+* changed tcpFirstPingReceived to tcpPingReceived (now sends notification after 2nd ping response)
+* delayed Side View opening to tcpPingReceived (corrects crash on startup)
+* corrected frequency conversion extentions (uses Double now vs Float earlier) to correct 1 Hz frequency errors
+* corrected slice audioGain to deal with v2 vs v3 differences
+
+
 ## 1.3.5 Release Notes
 
 * refactored apiState (renamed to state)

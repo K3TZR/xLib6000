@@ -972,7 +972,6 @@ final class ObjectTests: XCTestCase {
           let apfEnabled = object.apfEnabled
           let apfLevel = object.apfLevel
           let audioGain = object.audioGain
-          let audioLevel = object.audioLevel
           
           let audioMute = object.audioMute
           let audioPan = object.audioPan
@@ -1081,7 +1080,6 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.apfEnabled, apfEnabled, "ApfEnabled", file: #function)
                 XCTAssertEqual(object.apfLevel, apfLevel, "ApfLevel", file: #function)
                 XCTAssertEqual(object.audioGain, audioGain, "AudioGain", file: #function)
-                XCTAssertEqual(object.audioLevel, audioLevel, "AudioLevel", file: #function)
                 
                 XCTAssertEqual(object.audioMute, audioMute, "AudioMute", file: #function)
                 XCTAssertEqual(object.audioPan, audioPan, "AudioPan", file: #function)
@@ -1170,7 +1168,6 @@ final class ObjectTests: XCTestCase {
                 object.apfEnabled = true
                 object.apfLevel = 30
                 object.audioGain = 40
-                object.audioLevel = 70
                 
                 object.audioMute = true
                 object.audioPan = 20
@@ -1258,7 +1255,6 @@ final class ObjectTests: XCTestCase {
                 XCTAssertEqual(object.apfEnabled, true, "ApfEnabled", file: #function)
                 XCTAssertEqual(object.apfLevel, 30, "ApfLevel", file: #function)
                 XCTAssertEqual(object.audioGain, 40, "AudioGain", file: #function)
-                XCTAssertEqual(object.audioLevel, 70, "AudioLevel", file: #function)
                 
                 XCTAssertEqual(object.audioMute, true, "AudioMute", file: #function)
                 XCTAssertEqual(object.audioPan, 20, "AudioPan", file: #function)

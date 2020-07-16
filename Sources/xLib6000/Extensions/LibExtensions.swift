@@ -271,8 +271,7 @@ public extension String {
   }
 }
 
-public extension Bool {
-  
+public extension Bool {  
   var as1or0Int   : Int     { self ? 1 : 0 }
   var as1or0      : String  { self ? "1" : "0" }
   var asTrueFalse : String  { self ? "True" : "False" }
@@ -294,8 +293,7 @@ public extension Float {
 }
 
 public extension Int {
-  
-  var hzToMhz     : String { String(format: "%02.6f", Float(self) / 1_000_000.0) }
+  var hzToMhz     : String { String(format: "%02.6f", Double(self) / 1_000_000.0) }
   /// Determine if a value is between two other values (inclusive)
   ///
   /// - Parameters:
@@ -326,20 +324,16 @@ public extension Int {
 }
 
 public extension UInt {
-  
-  var hzToMhz : String { String(format: "%02.6f", Float(self) / 1_000_000.0) }
+  var hzToMhz : String { String(format: "%02.6f", Double(self) / 1_000_000.0) }
 }
 
 public extension UInt16 {
-  
   var hex: String { return String(format: "0x%04X", self) }
-
   func toHex(_ format: String = "0x%04X") -> String { String(format: format, self) }
 }
-public extension UInt32 {
-  
-  var hex: String { return String(format: "0x%08X", self) }
 
+public extension UInt32 {
+  var hex: String { return String(format: "0x%08X", self) }
   func toHex(_ format: String = "0x%08X") -> String { String(format: format, self) }
 }
 

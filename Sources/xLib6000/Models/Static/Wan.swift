@@ -92,7 +92,7 @@ public final class Wan : NSObject, StaticModel {
       // YES, the Radio (hardware) has acknowledged it
       _initialized = true
 
-      _log(Self.className() + " added: ServerConnected = \(_serverConnected), RadioAuthenticated = \(_radioAuthenticated)", .debug, #function, #file, #line)
+      _log(Self.className() + " status: ServerConnected = \(_serverConnected), RadioAuthenticated = \(_radioAuthenticated)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.wanHasBeenAdded, object: self as Any?)

@@ -18,13 +18,15 @@ final class Pinger : NSObject {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _firstResponseReceived        = false
+  private var _responseCount                = 0
   private var _lastPingRxTime               : Date!                         // Time of the last ping response
-  private let _log                          = Log.sharedInstance.logMessage
-  private let _pingQ                        = DispatchQueue(label: Api.kName + ".pingQ")
   private var _pingTimer                    : DispatchSourceTimer!          // periodic timer for ping
   private var _tcpManager                   : TcpManager                    // a TcpManager instance
 
+  private let _log                          = Log.sharedInstance.logMessage
+  private let _pingQ                        = DispatchQueue(label: Api.kName + ".pingQ")
+  private let kResponseCount                = 2
+  
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -51,15 +53,16 @@ final class Pinger : NSObject {
     
     // stop Pinging
     _pingTimer?.cancel()
-    _firstResponseReceived = false
+    _responseCount = 0
     _log(Self.className() + " Pinger stopped", .debug, #function, #file, #line)
   }
   /// Process the Response to a Ping
   ///
   func pingReply(_ command: String, seqNum: UInt, responseValue: String, reply: String) {
     
+    _responseCount += 1
     // notification can be used to signal that the Radio is now fully initialized
-    if !_firstResponseReceived { _firstResponseReceived = true ; NC.post(.tcpPingFirstResponse, object: nil) }
+    if _responseCount == kResponseCount { NC.post(.tcpPingResponse, object: nil) }
 
     _pingQ.async { [weak self] in
       // save the time of the Response

@@ -58,16 +58,16 @@ public final class Slice  : NSObject, DynamicModel {
     set { if _apfLevel != newValue { _apfLevel = newValue ; sliceCmd( .apfLevel, newValue) }}}
   @objc dynamic public var audioGain: Int {
     get { _audioGain }
-    set { if _audioGain != newValue { _audioGain = newValue ; audioCmd("gain", value: newValue) }}}
-  @objc dynamic public var audioLevel: Int {
-    get { _audioLevel }
-    set { if _audioLevel != newValue { _audioLevel = newValue ; audioCmd(.audioLevel, value: newValue) }}}
+    set { if _audioGain != newValue { _audioGain = newValue ; audioGainCmd(newValue) }}}
+//  @objc dynamic public var audioLevel: Int {
+//    get { _audioLevel }
+//    set { if _audioLevel != newValue { _audioLevel = newValue ; audioCmd("audio_level", value: newValue) }}}
   @objc dynamic public var audioMute: Bool {
     get { _audioMute }
-    set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue.as1or0) }}}
+    set { if _audioMute != newValue { _audioMute = newValue ; audioMuteCmd(newValue) }}}
   @objc dynamic public var audioPan: Int {
     get { _audioPan }
-    set { if _audioPan != newValue { _audioPan = newValue ; audioCmd("pan", value: newValue) }}}
+    set { if _audioPan != newValue { _audioPan = newValue ; audioPanCmd(newValue) }}}
   @objc dynamic public var daxChannel: Int {
     get { _daxChannel }
     set { if _daxChannel != newValue { _daxChannel = newValue ; sliceCmd(.daxChannel, newValue) }}}
@@ -348,9 +348,9 @@ public final class Slice  : NSObject, DynamicModel {
   var _audioGain : Int {
     get { Api.objectQ.sync { __audioGain } }
     set { Api.objectQ.sync(flags: .barrier) {__audioGain = newValue }}}
-  var _audioLevel : Int {
-    get { Api.objectQ.sync { __audioLevel } }
-    set { Api.objectQ.sync(flags: .barrier) {__audioLevel = newValue }}}
+//  var _audioLevel : Int {
+//    get { Api.objectQ.sync { __audioLevel } }
+//    set { Api.objectQ.sync(flags: .barrier) {__audioLevel = newValue }}}
   var _audioMute : Bool {
     get { Api.objectQ.sync { __audioMute } }
     set { Api.objectQ.sync(flags: .barrier) {__audioMute = newValue }}}
@@ -862,7 +862,7 @@ public final class Slice  : NSObject, DynamicModel {
       case .apfEnabled:               willChangeValue(for: \.apfEnabled)              ; _apfEnabled = property.value.bValue               ; didChangeValue(for: \.apfEnabled)
       case .apfLevel:                 willChangeValue(for: \.apfLevel)                ; _apfLevel = property.value.iValue                 ; didChangeValue(for: \.apfLevel)
       case .audioGain:                willChangeValue(for: \.audioGain)               ; _audioGain = property.value.iValue                ; didChangeValue(for: \.audioGain)
-      case .audioLevel:               willChangeValue(for: \.audioLevel)              ; _audioLevel = property.value.iValue               ; didChangeValue(for: \.audioLevel)
+      case .audioLevel:               willChangeValue(for: \.audioGain)               ; _audioGain = property.value.iValue                ; didChangeValue(for: \.audioGain)
       case .audioMute:                willChangeValue(for: \.audioMute)               ; _audioMute = property.value.bValue                ; didChangeValue(for: \.audioMute)
       case .audioPan:                 willChangeValue(for: \.audioPan)                ; _audioPan = property.value.iValue                 ; didChangeValue(for: \.audioPan)
       case .clientHandle:             willChangeValue(for: \.clientHandle)            ; _clientHandle = property.value.handle ?? 0        ; didChangeValue(for: \.clientHandle)
@@ -1005,41 +1005,35 @@ public final class Slice  : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
-  /// Set a Slice property on the Radio
-  ///
-  /// - Parameters:
-  ///   - token:      the parse token
-  ///   - value:      the new value
-  ///
   private func sliceCmd(_ token: Token, _ value: Any) {
     
     _radio.sendCommand("slice set " + "\(id) " + token.rawValue + "=\(value)")
   }
-  /// Set an Audio property on the Radio
-  ///
-  /// - Parameters:
-  ///   - token:      the parse token
-  ///   - value:      the new value
-  ///
-  private func audioCmd(_ token: Token, value: Any) {
-    _radio.sendCommand("audio client 0 slice " + "\(id) " + token.rawValue + " \(value)")
+  
+  private func audioGainCmd(_ value: Int) {
+    if _radio.version.isNewApi {
+      _radio.sendCommand("slice set " + "\(id) audio_level" + "=\(value)")
+    } else {
+      _radio.sendCommand("audio client 0 slice " + "\(id) gain \(value)")
+    }
   }
-  /// Set an Audio property on the Radio
-  ///
-  /// - Parameters:
-  ///   - token:      a String
-  ///   - value:      the new value
-  ///
-  private func audioCmd(_ token: String, value: Any) {
-    // NOTE: commands use this format when the Token received does not match the Token sent
-    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    _radio.sendCommand("audio client 0 slice " + "\(id) " + token + " \(value)")
+
+  private func audioMuteCmd(_ value: Bool) {
+    if _radio.version.isNewApi {
+      _radio.sendCommand("slice set " + "\(id) audio_mute=\(value.as1or0)")
+    } else {
+      _radio.sendCommand("audio client 0 slice " + "\(id) mute \(value.as1or0)")
+    }
   }
-  /// Set a Filter property on the Radio
-  ///
-  /// - Parameters:
-  ///   - value:      the new value
-  ///
+
+  private func audioPanCmd(_ value: Int) {
+    if _radio.version.isNewApi {
+      _radio.sendCommand("slice set " + "\(id) audio_pan=\(value)")
+    } else {
+      _radio.sendCommand("audio client 0 slice " + "\(id) pan \(value)")
+    }
+  }
+
   private func filterCmd(low: Any, high: Any) {
     
     _radio.sendCommand("filt " + "\(id)" + " \(low)" + " \(high)")
@@ -1057,7 +1051,7 @@ public final class Slice  : NSObject, DynamicModel {
   private var __apfEnabled              = false
   private var __apfLevel                = 0
   private var __audioGain               = 0
-  private var __audioLevel              = 0
+//  private var __audioLevel              = 0
   private var __audioMute               = false
   private var __audioPan                = 0
   private var __autoPan                 = false
