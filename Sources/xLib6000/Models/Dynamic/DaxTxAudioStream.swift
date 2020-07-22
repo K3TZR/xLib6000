@@ -62,20 +62,21 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+    set { if newValue != _clientHandle { willChangeValue(for: \.clientHandle) ; Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } ; didChangeValue(for: \.clientHandle)}}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
-    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+    set { if newValue != _ip { willChangeValue(for: \.ip) ; Api.objectQ.sync(flags: .barrier) { __ip = newValue } ; didChangeValue(for: \.ip)}}}
   var _isTransmitChannel : Bool {
     get { Api.objectQ.sync { __isTransmitChannel } }
-    set { Api.objectQ.sync(flags: .barrier) {__isTransmitChannel = newValue }}}
+    set { if newValue != _isTransmitChannel { willChangeValue(for: \.isTransmitChannel) ; Api.objectQ.sync(flags: .barrier) { __isTransmitChannel = newValue } ; didChangeValue(for: \.isTransmitChannel)}}}
+
   var _txGain : Int {
     get { Api.objectQ.sync { __txGain } }
-    set { Api.objectQ.sync(flags: .barrier) {__txGain = newValue }}}
+    set { if newValue != _txGain { willChangeValue(for: \.txGain) ; Api.objectQ.sync(flags: .barrier) { __txGain = newValue } ; didChangeValue(for: \.txGain)}}}
   var _txGainScalar : Float {
     get { Api.objectQ.sync { __txGainScalar } }
-    set { Api.objectQ.sync(flags: .barrier) {__txGainScalar = newValue }}}
-
+    set { if newValue != _txGainScalar { Api.objectQ.sync(flags: .barrier) { __txGainScalar = newValue }}}}
+  
   enum Token: String {
     case clientHandle             = "client_handle"
     case ip
@@ -180,9 +181,9 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       // known keys, in alphabetical order
       switch token {
         
-      case .clientHandle:       willChangeValue(for: \.clientHandle)      ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
-      case .ip:                 willChangeValue(for: \.ip)                ; _ip = property.value                        ; didChangeValue(for: \.ip)
-      case .isTransmitChannel:  willChangeValue(for: \.isTransmitChannel) ; _isTransmitChannel = property.value.bValue  ; didChangeValue(for: \.isTransmitChannel)
+      case .clientHandle:       _clientHandle = property.value.handle ?? 0
+      case .ip:                 _ip = property.value
+      case .isTransmitChannel:  _isTransmitChannel = property.value.bValue
       case .type:               break  // included to inhibit unknown token warnings
       }
     }

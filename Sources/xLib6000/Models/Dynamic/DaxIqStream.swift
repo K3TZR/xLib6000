@@ -61,23 +61,23 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   
   var _channel : Int {
     get { Api.objectQ.sync { __channel } }
-    set { Api.objectQ.sync(flags: .barrier) {__channel = newValue }}}
+    set { if newValue != _channel { willChangeValue(for: \.channel) ; Api.objectQ.sync(flags: .barrier) { __channel = newValue } ; didChangeValue(for: \.channel)}}}
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+    set { if newValue != _clientHandle { willChangeValue(for: \.clientHandle) ; Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } ; didChangeValue(for: \.clientHandle)}}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
-    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+    set { if newValue != _ip { willChangeValue(for: \.ip) ; Api.objectQ.sync(flags: .barrier) { __ip = newValue } ; didChangeValue(for: \.ip)}}}
   var _pan : PanadapterStreamId {
     get { Api.objectQ.sync { __pan } }
-    set { Api.objectQ.sync(flags: .barrier) {__pan = newValue }}}
+    set { if newValue != _pan { willChangeValue(for: \.pan) ; Api.objectQ.sync(flags: .barrier) { __pan = newValue } ; didChangeValue(for: \.pan)}}}
   var _rate : Int {
     get { Api.objectQ.sync { __rate } }
-    set { Api.objectQ.sync(flags: .barrier) {__rate = newValue }}}
+    set { if newValue != _rate { willChangeValue(for: \.rate) ; Api.objectQ.sync(flags: .barrier) { __rate = newValue } ; didChangeValue(for: \.rate)}}}
   var _isActive : Bool {
     get { Api.objectQ.sync { __isActive } }
-    set { Api.objectQ.sync(flags: .barrier) {__isActive = newValue }}}
-
+    set { if newValue != _isActive { willChangeValue(for: \.isActive) ; Api.objectQ.sync(flags: .barrier) { __isActive = newValue } ; didChangeValue(for: \.isActive)}}}
+  
   enum Token: String {
     case channel              = "daxiq_channel"
     case clientHandle         = "client_handle"
@@ -185,12 +185,12 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
-      case .channel:      willChangeValue(for: \.channel)       ; _channel = property.value.iValue            ; didChangeValue(for: \.channel)
-      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
-      case .isActive:     willChangeValue(for: \.isActive)      ; _isActive = property.value.bValue           ; didChangeValue(for: \.isActive)
-      case .pan:          willChangeValue(for: \.pan)           ; _pan = property.value.streamId ?? 0         ; didChangeValue(for: \.pan)
-      case .rate:         willChangeValue(for: \.rate)          ; _rate = property.value.iValue               ; didChangeValue(for: \.rate)
+      case .clientHandle: _clientHandle = property.value.handle ?? 0
+      case .channel:      _channel = property.value.iValue
+      case .ip:           _ip = property.value
+      case .isActive:     _isActive = property.value.bValue
+      case .pan:          _pan = property.value.streamId ?? 0
+      case .rate:         _rate = property.value.iValue               
       case .type:         break  // included to inhibit unknown token warnings
       }
     }

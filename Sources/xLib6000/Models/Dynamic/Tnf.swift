@@ -67,17 +67,17 @@ public final class Tnf : NSObject, DynamicModel {
 
   var _depth : UInt {
     get { Api.objectQ.sync { __depth } }
-    set { Api.objectQ.sync(flags: .barrier) {__depth = newValue }}}
+    set { if newValue != _depth { willChangeValue(for: \.depth) ; Api.objectQ.sync(flags: .barrier) { __depth = newValue } ; didChangeValue(for: \.depth)}}}
   var _frequency : Hz {
     get { Api.objectQ.sync { __frequency } }
-    set { Api.objectQ.sync(flags: .barrier) {__frequency = newValue }}}
+    set { if newValue != _frequency { willChangeValue(for: \.frequency) ; Api.objectQ.sync(flags: .barrier) { __frequency = newValue } ; didChangeValue(for: \.frequency)}}}
   var _permanent : Bool {
     get { Api.objectQ.sync { __permanent } }
-    set { Api.objectQ.sync(flags: .barrier) {__permanent = newValue }}}
+    set { if newValue != _permanent { willChangeValue(for: \.permanent) ; Api.objectQ.sync(flags: .barrier) { __permanent = newValue } ; didChangeValue(for: \.permanent)}}}
   var _width : Hz {
     get { Api.objectQ.sync { __width } }
-    set { Api.objectQ.sync(flags: .barrier) {__width = newValue }}}
-
+    set { if newValue != _width { willChangeValue(for: \.width) ; Api.objectQ.sync(flags: .barrier) { __width = newValue } ; didChangeValue(for: \.width)}}}
+  
   enum Token : String {
     case depth
     case frequency      = "freq"
@@ -184,10 +184,10 @@ public final class Tnf : NSObject, DynamicModel {
       // known keys, in alphabetical order
       switch token {
 
-      case .depth:      willChangeValue(for: \.depth)     ; _depth = property.value.uValue      ; didChangeValue(for: \.depth)
-      case .frequency:  willChangeValue(for: \.frequency) ; _frequency = property.value.mhzToHz ; didChangeValue(for: \.frequency)
-      case .permanent:  willChangeValue(for: \.permanent) ; _permanent = property.value.bValue  ; didChangeValue(for: \.permanent)
-      case .width:      willChangeValue(for: \.width)     ; _width = property.value.mhzToHz     ; didChangeValue(for: \.width)
+      case .depth:      _depth = property.value.uValue
+      case .frequency:  _frequency = property.value.mhzToHz
+      case .permanent:  _permanent = property.value.bValue
+      case .width:      _width = property.value.mhzToHz     
       }
       // is the Tnf initialized?
       if !_initialized && _frequency != 0 {

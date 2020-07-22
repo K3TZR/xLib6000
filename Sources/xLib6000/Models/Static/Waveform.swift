@@ -26,7 +26,7 @@ public final class Waveform : NSObject, StaticModel {
   
   var _waveformList : String {
     get { Api.objectQ.sync { __waveformList } }
-    set { Api.objectQ.sync(flags: .barrier) {__waveformList = newValue }}}
+    set { if newValue != _waveformList { willChangeValue(for: \.waveformList) ; Api.objectQ.sync(flags: .barrier) { __waveformList = newValue } ; didChangeValue(for: \.waveformList)}}}
 
   enum Token: String {
     case waveformList = "installed_list"
@@ -76,7 +76,7 @@ public final class Waveform : NSObject, StaticModel {
       // Known tokens, in alphabetical order
       switch token {
         
-      case .waveformList: willChangeValue(for: \.waveformList)  ; _waveformList = property.value  ; didChangeValue(for: \.waveformList)
+      case .waveformList: _waveformList = property.value
       }
     }
   }

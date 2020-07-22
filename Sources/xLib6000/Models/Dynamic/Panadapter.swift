@@ -20,18 +20,6 @@ public typealias PanadapterStreamId = StreamId
 ///       collection on the Radio object.
 ///
 
-/// STATUS
-///     Old Api
-///
-///       Reviewed Flexlib 2.4.9 source, incorporated all properties and most features
-///       Reply handler approach not used, status messages provide the same functionality
-///       Error counting not implemented
-///       Contains NewApi feature(s) - clientHandle property
-///       ** Fully functional **
-///
-///     New Api
-///       ** Fully functional **
-
 public final class Panadapter               : NSObject, DynamicModelWithStream {
   
   // ----------------------------------------------------------------------------
@@ -153,115 +141,115 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   
   var _antList: [String] {
     get { Api.objectQ.sync { __antList } }
-    set { Api.objectQ.sync(flags: .barrier) { __antList = newValue } } }  
+    set { if newValue != _antList { willChangeValue(for: \.antList) ; Api.objectQ.sync(flags: .barrier) { __antList = newValue } ; didChangeValue(for: \.antList)}}}
   var _average: Int {
     get { Api.objectQ.sync { __average } }
-    set { Api.objectQ.sync(flags: .barrier) { __average = newValue }}}
+    set { if newValue != _average { willChangeValue(for: \.average) ; Api.objectQ.sync(flags: .barrier) { __average = newValue } ; didChangeValue(for: \.average)}}}
   var _band: String {
     get { Api.objectQ.sync { __band } }
-    set { Api.objectQ.sync(flags: .barrier) { __band = newValue }}}
+    set { if newValue != _band { willChangeValue(for: \.band) ; Api.objectQ.sync(flags: .barrier) { __band = newValue } ; didChangeValue(for: \.band)}}}
   var _bandwidth: Hz {
     get { Api.objectQ.sync { __bandwidth } }
-    set { Api.objectQ.sync(flags: .barrier) { __bandwidth = newValue }}}
+    set { if newValue != _bandwidth { willChangeValue(for: \.bandwidth) ; Api.objectQ.sync(flags: .barrier) { __bandwidth = newValue } ; didChangeValue(for: \.bandwidth)}}}
   var _bandZoomEnabled: Bool {
     get { Api.objectQ.sync { __bandZoomEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __bandZoomEnabled = newValue }}}
+    set { if newValue != _bandZoomEnabled { willChangeValue(for: \.bandZoomEnabled) ; Api.objectQ.sync(flags: .barrier) { __bandZoomEnabled = newValue } ; didChangeValue(for: \.bandZoomEnabled)}}}
   var _center: Hz {
     get { Api.objectQ.sync { __center } }
-    set { Api.objectQ.sync(flags: .barrier) { __center = newValue }}}
+    set { if newValue != _center { willChangeValue(for: \.center) ; Api.objectQ.sync(flags: .barrier) { __center = newValue } ; didChangeValue(for: \.center)}}}
   var _clientHandle: Handle {          // (V3 only)
     get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue }}}
+    set { if newValue != _clientHandle { willChangeValue(for: \.clientHandle) ; Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } ; didChangeValue(for: \.clientHandle)}}}
   var _daxIqChannel: Int {
     get { Api.objectQ.sync { __daxIqChannel } }
-    set { Api.objectQ.sync(flags: .barrier) { __daxIqChannel = newValue }}}
+    set { if newValue != _daxIqChannel { willChangeValue(for: \.daxIqChannel) ; Api.objectQ.sync(flags: .barrier) { __daxIqChannel = newValue } ; didChangeValue(for: \.daxIqChannel)}}}
   var _fillLevel: Int {
     get { Api.objectQ.sync { __fillLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __fillLevel = newValue }}}
+    set { if newValue != _fillLevel { willChangeValue(for: \.fillLevel) ; Api.objectQ.sync(flags: .barrier) { __fillLevel = newValue } ; didChangeValue(for: \.fillLevel)}}}
   var _fps: Int {
     get { Api.objectQ.sync { __fps } }
-    set { Api.objectQ.sync(flags: .barrier) { __fps = newValue }}}
+    set { if newValue != _fps { willChangeValue(for: \.fps) ; Api.objectQ.sync(flags: .barrier) { __fps = newValue } ; didChangeValue(for: \.fps)}}}
   var _loggerDisplayEnabled: Bool {
     get { Api.objectQ.sync { __loggerDisplayEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __loggerDisplayEnabled = newValue }}}
+    set { if newValue != _loggerDisplayEnabled { willChangeValue(for: \.loggerDisplayEnabled) ; Api.objectQ.sync(flags: .barrier) { __loggerDisplayEnabled = newValue } ; didChangeValue(for: \.loggerDisplayEnabled)}}}
   var _loggerDisplayIpAddress: String {
     get { Api.objectQ.sync { __loggerDisplayIpAddress } }
-    set { Api.objectQ.sync(flags: .barrier) { __loggerDisplayIpAddress = newValue }}}
+    set { if newValue != _loggerDisplayIpAddress { willChangeValue(for: \.loggerDisplayIpAddress) ; Api.objectQ.sync(flags: .barrier) { __loggerDisplayIpAddress = newValue } ; didChangeValue(for: \.loggerDisplayIpAddress)}}}
   var _loggerDisplayPort: Int {
     get { Api.objectQ.sync { __loggerDisplayPort } }
-    set { Api.objectQ.sync(flags: .barrier) { __loggerDisplayPort = newValue }}}
+    set { if newValue != _loggerDisplayPort { willChangeValue(for: \.loggerDisplayPort) ; Api.objectQ.sync(flags: .barrier) { __loggerDisplayPort = newValue } ; didChangeValue(for: \.loggerDisplayPort)}}}
   var _loggerDisplayRadioNumber: Int {
     get { Api.objectQ.sync { __loggerDisplayRadioNumber } }
-    set { Api.objectQ.sync(flags: .barrier) { __loggerDisplayRadioNumber = newValue }}}
+    set { if newValue != _loggerDisplayRadioNumber { willChangeValue(for: \.loggerDisplayRadioNumber) ; Api.objectQ.sync(flags: .barrier) { __loggerDisplayRadioNumber = newValue } ; didChangeValue(for: \.loggerDisplayRadioNumber)}}}
   var _loopAEnabled: Bool {
     get { Api.objectQ.sync { __loopAEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __loopAEnabled = newValue }}}
+    set { if newValue != _loopAEnabled { willChangeValue(for: \.loopAEnabled) ; Api.objectQ.sync(flags: .barrier) { __loopAEnabled = newValue } ; didChangeValue(for: \.loopAEnabled)}}}
   var _loopBEnabled: Bool {
     get { Api.objectQ.sync { __loopBEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __loopBEnabled = newValue }}}
+    set { if newValue != _loopBEnabled { willChangeValue(for: \.loopBEnabled) ; Api.objectQ.sync(flags: .barrier) { __loopBEnabled = newValue } ; didChangeValue(for: \.loopBEnabled)}}}
   var _maxBw: Int {
     get { Api.objectQ.sync { __maxBw } }
-    set { Api.objectQ.sync(flags: .barrier) { __maxBw = newValue }}}
+    set { if newValue != _maxBw { willChangeValue(for: \.maxBw) ; Api.objectQ.sync(flags: .barrier) { __maxBw = newValue } ; didChangeValue(for: \.maxBw)}}}
   var _maxDbm: CGFloat {
     get { Api.objectQ.sync { __maxDbm } }
-    set { Api.objectQ.sync(flags: .barrier) { __maxDbm = newValue }}}
+    set { if newValue != _maxDbm { willChangeValue(for: \.maxDbm) ; Api.objectQ.sync(flags: .barrier) { __maxDbm = newValue } ; didChangeValue(for: \.maxDbm)}}}
   var _minBw: Int {
     get { Api.objectQ.sync { __minBw } }
-    set { Api.objectQ.sync(flags: .barrier) { __minBw = newValue }}}
+    set { if newValue != _minBw { willChangeValue(for: \.minBw) ; Api.objectQ.sync(flags: .barrier) { __minBw = newValue } ; didChangeValue(for: \.minBw)}}}
   var _minDbm: CGFloat {
     get { Api.objectQ.sync { __minDbm } }
-    set { Api.objectQ.sync(flags: .barrier) { __minDbm = newValue }}}
+    set { if newValue != _minDbm { willChangeValue(for: \.minDbm) ; Api.objectQ.sync(flags: .barrier) { __minDbm = newValue } ; didChangeValue(for: \.minDbm)}}}
   var _preamp: String {
     get { Api.objectQ.sync { __preamp } }
-    set { Api.objectQ.sync(flags: .barrier) { __preamp = newValue }}}
+    set { if newValue != _preamp { willChangeValue(for: \.preamp) ; Api.objectQ.sync(flags: .barrier) { __preamp = newValue } ; didChangeValue(for: \.preamp)}}}
   var _rfGain: Int {
     get { Api.objectQ.sync { __rfGain } }
-    set { Api.objectQ.sync(flags: .barrier) { __rfGain = newValue }}}
+    set { if newValue != _rfGain { willChangeValue(for: \.rfGain) ; Api.objectQ.sync(flags: .barrier) { __rfGain = newValue } ; didChangeValue(for: \.rfGain)}}}
   var _rfGainHigh: Int {
     get { Api.objectQ.sync { __rfGainHigh } }
-    set { Api.objectQ.sync(flags: .barrier) { __rfGainHigh = newValue }}}
+    set { if newValue != _rfGainHigh { willChangeValue(for: \.rfGainHigh) ; Api.objectQ.sync(flags: .barrier) { __rfGainHigh = newValue } ; didChangeValue(for: \.rfGainHigh)}}}
   var _rfGainLow: Int {
     get { Api.objectQ.sync { __rfGainLow } }
-    set { Api.objectQ.sync(flags: .barrier) { __rfGainLow = newValue }}}
+    set { if newValue != _rfGainLow { willChangeValue(for: \.rfGainLow) ; Api.objectQ.sync(flags: .barrier) { __rfGainLow = newValue } ; didChangeValue(for: \.rfGainLow)}}}
   var _rfGainStep: Int {
     get { Api.objectQ.sync { __rfGainStep } }
-    set { Api.objectQ.sync(flags: .barrier) { __rfGainStep = newValue }}}
+    set { if newValue != _rfGainStep { willChangeValue(for: \.rfGainStep) ; Api.objectQ.sync(flags: .barrier) { __rfGainStep = newValue } ; didChangeValue(for: \.rfGainStep)}}}
   var _rfGainValues: String {
     get { Api.objectQ.sync { __rfGainValues } }
-    set { Api.objectQ.sync(flags: .barrier) { __rfGainValues = newValue }}}
+    set { if newValue != _rfGainValues { willChangeValue(for: \.rfGainValues) ; Api.objectQ.sync(flags: .barrier) { __rfGainValues = newValue } ; didChangeValue(for: \.rfGainValues)}}}
   var _rxAnt: String {
     get { Api.objectQ.sync { __rxAnt } }
-    set { Api.objectQ.sync(flags: .barrier) { __rxAnt = newValue }}}
+    set { if newValue != _rxAnt { willChangeValue(for: \.rxAnt) ; Api.objectQ.sync(flags: .barrier) { __rxAnt = newValue } ; didChangeValue(for: \.rxAnt)}}}
   var _segmentZoomEnabled: Bool {
     get { Api.objectQ.sync { __segmentZoomEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __segmentZoomEnabled = newValue }}}
+    set { if newValue != _segmentZoomEnabled { willChangeValue(for: \.segmentZoomEnabled) ; Api.objectQ.sync(flags: .barrier) { __segmentZoomEnabled = newValue } ; didChangeValue(for: \.segmentZoomEnabled)}}}
   var _waterfallId: WaterfallStreamId {
     get { Api.objectQ.sync { __waterfallId } }
-    set { Api.objectQ.sync(flags: .barrier) { __waterfallId = newValue }}}
+    set { if newValue != waterfallId { willChangeValue(for: \.waterfallId) ; Api.objectQ.sync(flags: .barrier) { __waterfallId = newValue } ; didChangeValue(for: \.waterfallId)}}}
   var _weightedAverageEnabled: Bool {
     get { Api.objectQ.sync { __weightedAverageEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __weightedAverageEnabled = newValue }}}
+    set { if newValue != _weightedAverageEnabled { willChangeValue(for: \.weightedAverageEnabled) ; Api.objectQ.sync(flags: .barrier) { __weightedAverageEnabled = newValue } ; didChangeValue(for: \.weightedAverageEnabled)}}}
   var _wide: Bool {
     get { Api.objectQ.sync { __wide } }
-    set { Api.objectQ.sync(flags: .barrier) { __wide = newValue }}}
+    set { if newValue != _wide { willChangeValue(for: \.wide) ; Api.objectQ.sync(flags: .barrier) { __wide = newValue } ; didChangeValue(for: \.wide)}}}
   var _wnbEnabled: Bool {
     get { Api.objectQ.sync { __wnbEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __wnbEnabled = newValue }}}
+    set { if newValue != _wnbEnabled { willChangeValue(for: \.wnbEnabled) ; Api.objectQ.sync(flags: .barrier) { __wnbEnabled = newValue } ; didChangeValue(for: \.wnbEnabled)}}}
   var _wnbLevel: Int {
     get { Api.objectQ.sync { __wnbLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __wnbLevel = newValue }}}
+    set { if newValue != _wnbLevel { willChangeValue(for: \.wnbLevel) ; Api.objectQ.sync(flags: .barrier) { __wnbLevel = newValue } ; didChangeValue(for: \.wnbLevel)}}}
   var _wnbUpdating: Bool {
     get { Api.objectQ.sync { __wnbUpdating } }
-    set { Api.objectQ.sync(flags: .barrier) { __wnbUpdating = newValue }}}
+    set { if newValue != _wnbUpdating { willChangeValue(for: \.wnbUpdating) ; Api.objectQ.sync(flags: .barrier) { __wnbUpdating = newValue } ; didChangeValue(for: \.wnbUpdating)}}}
   var _xPixels: CGFloat {
     get { Api.objectQ.sync { __xPixels } }
-    set { Api.objectQ.sync(flags: .barrier) { __xPixels = newValue }}}
+    set { if newValue != _xPixels { willChangeValue(for: \.xPixels) ; Api.objectQ.sync(flags: .barrier) { __xPixels = newValue } ; didChangeValue(for: \.xPixels)}}}
   var _xvtrLabel: String {
     get { Api.objectQ.sync { __xvtrLabel } }
-    set { Api.objectQ.sync(flags: .barrier) { __xvtrLabel = newValue }}}
+    set { if newValue != _xvtrLabel { willChangeValue(for: \.xvtrLabel) ; Api.objectQ.sync(flags: .barrier) { __xvtrLabel = newValue } ; didChangeValue(for: \.xvtrLabel)}}}
   var _yPixels: CGFloat {
     get { Api.objectQ.sync { __yPixels } }
-    set { Api.objectQ.sync(flags: .barrier) { __yPixels = newValue }}}
+    set { if newValue != _yPixels { willChangeValue(for: \.yPixels) ; Api.objectQ.sync(flags: .barrier) { __yPixels = newValue } ; didChangeValue(for: \.yPixels)}}}
 
   enum Token : String {
     // on Panadapter
@@ -441,34 +429,33 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       }
       // Known keys, in alphabetical order
       switch token {
-
-        case .antList:                willChangeValue(for: \.antList)                 ; _antList = property.value.list                  ; didChangeValue(for: \.antList)
-        case .average:                willChangeValue(for: \.average)                 ; _average = property.value.iValue                ; didChangeValue(for: \.average)
-        case .band:                   willChangeValue(for: \.band)                    ; _band = property.value                          ; didChangeValue(for: \.band)
-        case .bandwidth:              willChangeValue(for: \.bandwidth)               ; _bandwidth = property.value.mhzToHz             ; didChangeValue(for: \.bandwidth)
-        case .bandZoomEnabled:        willChangeValue(for: \.bandZoomEnabled)         ; _bandZoomEnabled = property.value.bValue        ; didChangeValue(for: \.bandZoomEnabled)
-        case .center:                 willChangeValue(for: \.center)                  ; _center = property.value.mhzToHz                ; didChangeValue(for: \.center)
-        case .clientHandle:           willChangeValue(for: \.clientHandle)            ; _clientHandle = property.value.handle ?? 0      ; didChangeValue(for: \.clientHandle)
-        case .daxIq:                  willChangeValue(for: \.daxIqChannel)            ; _daxIqChannel = property.value.iValue           ; didChangeValue(for: \.daxIqChannel)
-        case .daxIqChannel:           willChangeValue(for: \.daxIqChannel)            ; _daxIqChannel = property.value.iValue           ; didChangeValue(for: \.daxIqChannel)
-        case .fps:                    willChangeValue(for: \.fps)                     ; _fps = property.value.iValue                    ; didChangeValue(for: \.fps)
-        case .loopAEnabled:           willChangeValue(for: \.loopAEnabled)            ; _loopAEnabled = property.value.bValue           ; didChangeValue(for: \.loopAEnabled)
-        case .loopBEnabled:           willChangeValue(for: \.loopBEnabled)            ; _loopBEnabled = property.value.bValue           ; didChangeValue(for: \.loopBEnabled)
-        case .maxBw:                  willChangeValue(for: \.maxBw)                   ; _maxBw = property.value.mhzToHz                 ; didChangeValue(for: \.maxBw)
-        case .maxDbm:                 willChangeValue(for: \.maxDbm)                  ; _maxDbm = property.value.cgValue                ; didChangeValue(for: \.maxDbm)
-        case .minBw:                  willChangeValue(for: \.minBw)                   ; _minBw = property.value.mhzToHz                 ; didChangeValue(for: \.minBw)
-        case .minDbm:                 willChangeValue(for: \.minDbm)                  ; _minDbm = property.value.cgValue                ; didChangeValue(for: \.minDbm)
-        case .preamp:                 willChangeValue(for: \.preamp)                  ; _preamp = property.value                        ; didChangeValue(for: \.preamp)
-        case .rfGain:                 willChangeValue(for: \.rfGain)                  ; _rfGain = property.value.iValue                 ; didChangeValue(for: \.rfGain)
-        case .rxAnt:                  willChangeValue(for: \.rxAnt)                   ; _rxAnt = property.value                         ; didChangeValue(for: \.rxAnt)
-        case .segmentZoomEnabled:     willChangeValue(for: \.segmentZoomEnabled)      ; _segmentZoomEnabled = property.value.bValue     ; didChangeValue(for: \.segmentZoomEnabled)
-        case .waterfallId:            willChangeValue(for: \.waterfallId)             ; _waterfallId = property.value.streamId ?? 0     ; didChangeValue(for: \.waterfallId)
-        case .wide:                   willChangeValue(for: \.wide)                    ; _wide = property.value.bValue                   ; didChangeValue(for: \.wide)
-        case .weightedAverageEnabled: willChangeValue(for: \.weightedAverageEnabled)  ; _weightedAverageEnabled = property.value.bValue ; didChangeValue(for: \.weightedAverageEnabled)
-        case .wnbEnabled:             willChangeValue(for: \.wnbEnabled)              ; _wnbEnabled = property.value.bValue             ; didChangeValue(for: \.wnbEnabled)
-        case .wnbLevel:               willChangeValue(for: \.wnbLevel)                ; _wnbLevel = property.value.iValue               ; didChangeValue(for: \.wnbLevel)
-        case .wnbUpdating:            willChangeValue(for: \.wnbUpdating)             ; _wnbUpdating = property.value.bValue            ; didChangeValue(for: \.wnbUpdating)
-        case .xvtrLabel:              willChangeValue(for: \.xvtrLabel)               ; _xvtrLabel = property.value                     ; didChangeValue(for: \.xvtrLabel)
+        case .antList:                _antList = property.value.list
+        case .average:                _average = property.value.iValue
+        case .band:                   _band = property.value
+        case .bandwidth:              _bandwidth = property.value.mhzToHz
+        case .bandZoomEnabled:        _bandZoomEnabled = property.value.bValue
+        case .center:                 _center = property.value.mhzToHz
+        case .clientHandle:           _clientHandle = property.value.handle ?? 0
+        case .daxIq:                  _daxIqChannel = property.value.iValue
+        case .daxIqChannel:           _daxIqChannel = property.value.iValue
+        case .fps:                    _fps = property.value.iValue
+        case .loopAEnabled:           _loopAEnabled = property.value.bValue
+        case .loopBEnabled:           _loopBEnabled = property.value.bValue
+        case .maxBw:                  _maxBw = property.value.mhzToHz
+        case .maxDbm:                 _maxDbm = property.value.cgValue
+        case .minBw:                  _minBw = property.value.mhzToHz
+        case .minDbm:                 _minDbm = property.value.cgValue
+        case .preamp:                 _preamp = property.value
+        case .rfGain:                 _rfGain = property.value.iValue
+        case .rxAnt:                  _rxAnt = property.value
+        case .segmentZoomEnabled:     _segmentZoomEnabled = property.value.bValue
+        case .waterfallId:            _waterfallId = property.value.streamId ?? 0
+        case .wide:                   _wide = property.value.bValue
+        case .weightedAverageEnabled: _weightedAverageEnabled = property.value.bValue
+        case .wnbEnabled:             _wnbEnabled = property.value.bValue
+        case .wnbLevel:               _wnbLevel = property.value.iValue
+        case .wnbUpdating:            _wnbUpdating = property.value.bValue
+        case .xvtrLabel:              _xvtrLabel = property.value
         case .available, .capacity, .daxIqRate, .xPixels, .yPixels:     break // ignored by Panadapter
         case .n1mmSpectrumEnable, .n1mmAddress, .n1mmPort, .n1mmRadio:  break // not sent in status messages
       }

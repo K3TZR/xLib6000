@@ -35,39 +35,30 @@ public final class Meter : NSObject, DynamicModel {
   @objc dynamic public var desc : String {
     get { Api.objectQ.sync { _desc }}
     set { Api.objectQ.sync(flags: .barrier) { _desc = newValue }}}
-
   @objc dynamic public var fps : Int {
     get { Api.objectQ.sync { _fps }}
     set { Api.objectQ.sync(flags: .barrier) { _fps = newValue }}}
-
   @objc dynamic public var high : Float {
     get { Api.objectQ.sync { _high }}
     set { Api.objectQ.sync(flags: .barrier) { _high = newValue }}}
-
   @objc dynamic public var low : Float {
     get { Api.objectQ.sync { _low }}
     set { Api.objectQ.sync(flags: .barrier) { _low = newValue }}}
-
   @objc dynamic public var group : String {
     get { Api.objectQ.sync { _group }}
     set { Api.objectQ.sync(flags: .barrier) { _group = newValue }}}
-
   @objc dynamic public var name : String {
     get { Api.objectQ.sync { _name }}
     set { Api.objectQ.sync(flags: .barrier) { _name = newValue }}}
-
   @objc dynamic public var peak : Float {
     get { Api.objectQ.sync { _peak }}
     set { Api.objectQ.sync(flags: .barrier) { _peak = newValue }}}
-
   @objc dynamic public var source : String {
     get { Api.objectQ.sync { _source }}
     set { Api.objectQ.sync(flags: .barrier) { _source = newValue }}}
-
   @objc dynamic public var units : String {
     get { Api.objectQ.sync { _units }}
     set { Api.objectQ.sync(flags: .barrier) { _units = newValue }}}
-
   @objc dynamic public var value : Float {
     get { Api.objectQ.sync { _value }}
     set { Api.objectQ.sync(flags: .barrier) { _value = newValue }}}

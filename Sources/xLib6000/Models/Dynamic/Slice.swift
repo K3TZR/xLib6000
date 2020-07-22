@@ -323,230 +323,230 @@ public final class Slice  : NSObject, DynamicModel {
   
   var _active : Bool {
     get { Api.objectQ.sync { __active } }
-    set { Api.objectQ.sync(flags: .barrier) {__active = newValue }}}
+    set { if newValue != _active { willChangeValue(for: \.active) ; Api.objectQ.sync(flags: .barrier) { __active = newValue } ; didChangeValue(for: \.active)}}}
   var _agcMode : String {
     get { Api.objectQ.sync { __agcMode } }
-    set { Api.objectQ.sync(flags: .barrier) {__agcMode = newValue }}}
+    set { if newValue != _agcMode { willChangeValue(for: \.agcMode) ; Api.objectQ.sync(flags: .barrier) { __agcMode = newValue } ; didChangeValue(for: \.agcMode )}}}
   var _agcOffLevel : Int {
     get { Api.objectQ.sync { __agcOffLevel } }
-    set { Api.objectQ.sync(flags: .barrier) {__agcOffLevel = newValue }}}
+    set { if newValue != _agcOffLevel { willChangeValue(for: \.agcOffLevel) ; Api.objectQ.sync(flags: .barrier) { __agcOffLevel = newValue } ; didChangeValue(for: \.agcOffLevel)}}}
   var _agcThreshold : Int {
     get { Api.objectQ.sync { __agcThreshold } }
-    set { Api.objectQ.sync(flags: .barrier) {__agcThreshold = newValue }}}
+    set { if newValue != _agcThreshold { willChangeValue(for: \.agcThreshold) ; Api.objectQ.sync(flags: .barrier) { __agcThreshold = newValue } ; didChangeValue(for: \.agcThreshold)}}}
   var _anfEnabled : Bool {
     get { Api.objectQ.sync { __anfEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__anfEnabled = newValue }}}
+    set { if newValue != _anfEnabled { willChangeValue(for: \.anfEnabled) ; Api.objectQ.sync(flags: .barrier) { __anfEnabled = newValue } ; didChangeValue(for: \.anfEnabled)}}}
   var _anfLevel : Int {
     get { Api.objectQ.sync { __anfLevel } }
-    set { Api.objectQ.sync(flags: .barrier) {__anfLevel = newValue }}}
+    set { if newValue != _anfLevel { willChangeValue(for: \.anfLevel) ; Api.objectQ.sync(flags: .barrier) { __anfLevel = newValue } ; didChangeValue(for: \.anfLevel)}}}
   var _apfEnabled : Bool {
     get { Api.objectQ.sync { __apfEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__apfEnabled = newValue }}}
+    set { if newValue != _apfEnabled { willChangeValue(for: \.apfEnabled) ; Api.objectQ.sync(flags: .barrier) { __apfEnabled = newValue } ; didChangeValue(for: \.apfEnabled)}}}
   var _apfLevel : Int {
     get { Api.objectQ.sync { __apfLevel } }
-    set { Api.objectQ.sync(flags: .barrier) {__apfLevel = newValue }}}
+    set { if newValue != _apfLevel { willChangeValue(for: \.apfLevel) ; Api.objectQ.sync(flags: .barrier) { __apfLevel = newValue } ; didChangeValue(for: \.apfLevel)}}}
   var _audioGain : Int {
     get { Api.objectQ.sync { __audioGain } }
-    set { Api.objectQ.sync(flags: .barrier) {__audioGain = newValue }}}
-//  var _audioLevel : Int {
-//    get { Api.objectQ.sync { __audioLevel } }
-//    set { Api.objectQ.sync(flags: .barrier) {__audioLevel = newValue }}}
+    set { if newValue != _audioGain { willChangeValue(for: \.audioGain) ; Api.objectQ.sync(flags: .barrier) { __audioGain = newValue } ; didChangeValue(for: \.audioGain)}}}
+  //  var _audioLevel : Int {
+  //    get { Api.objectQ.sync { __audioLevel } }
+  //    set { Api.objectQ.sync(flags: .barrier) {__audioLevel = newValue }}}
   var _audioMute : Bool {
     get { Api.objectQ.sync { __audioMute } }
-    set { Api.objectQ.sync(flags: .barrier) {__audioMute = newValue }}}
+    set { if newValue != _audioMute { willChangeValue(for: \.audioMute) ; Api.objectQ.sync(flags: .barrier) { __audioMute = newValue } ; didChangeValue(for: \.audioMute)}}}
   var _audioPan : Int {
     get { Api.objectQ.sync { __audioPan } }
-    set { Api.objectQ.sync(flags: .barrier) {__audioPan = newValue }}}
+    set { if newValue != _audioPan { willChangeValue(for: \.audioPan) ; Api.objectQ.sync(flags: .barrier) { __audioPan = newValue } ; didChangeValue(for: \.audioPan)}}}
   var _autoPan : Bool {
     get { Api.objectQ.sync { __autoPan } }
-    set { Api.objectQ.sync(flags: .barrier) {__autoPan = newValue }}}
+    set { if newValue != _autoPan { willChangeValue(for: \.autoPan) ; Api.objectQ.sync(flags: .barrier) { __autoPan = newValue } ; didChangeValue(for: \.autoPan)}}}
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+    set { if newValue != _clientHandle { willChangeValue(for: \.clientHandle) ; Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } ; didChangeValue(for: \.clientHandle)}}}
   var _daxChannel : Int {
     get { Api.objectQ.sync { __daxChannel } }
-    set { Api.objectQ.sync(flags: .barrier) {__daxChannel = newValue }}}
+    set { if newValue != _daxChannel { willChangeValue(for: \.daxChannel) ; Api.objectQ.sync(flags: .barrier) { __daxChannel = newValue } ; didChangeValue(for: \.daxChannel)}}}
   var _daxClients : Int {
     get { Api.objectQ.sync { __daxClients } }
-    set { Api.objectQ.sync(flags: .barrier) {__daxClients = newValue }}}
+    set { if newValue != _daxClients { willChangeValue(for: \.daxClients) ; Api.objectQ.sync(flags: .barrier) { __daxClients = newValue } ; didChangeValue(for: \.daxClients)}}}
   var _daxTxEnabled : Bool {
     get { Api.objectQ.sync { __daxTxEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__daxTxEnabled = newValue }}}
+    set { if newValue != _daxTxEnabled { willChangeValue(for: \.daxTxEnabled) ; Api.objectQ.sync(flags: .barrier) { __daxTxEnabled = newValue } ; didChangeValue(for: \.daxTxEnabled)}}}
   var _detached : Bool {
     get { Api.objectQ.sync { __detached } }
-    set { Api.objectQ.sync(flags: .barrier) {__detached = newValue }}}
+    set { if newValue != _detached { willChangeValue(for: \.detached) ; Api.objectQ.sync(flags: .barrier) { __detached = newValue } ; didChangeValue(for: \.detached)}}}
   var _dfmPreDeEmphasisEnabled : Bool {
     get { Api.objectQ.sync { __dfmPreDeEmphasisEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__dfmPreDeEmphasisEnabled = newValue }}}
+    set { if newValue != _dfmPreDeEmphasisEnabled { willChangeValue(for: \.dfmPreDeEmphasisEnabled) ; Api.objectQ.sync(flags: .barrier) { __dfmPreDeEmphasisEnabled = newValue } ; didChangeValue(for: \.dfmPreDeEmphasisEnabled)}}}
   var _digitalLowerOffset : Int {
     get { Api.objectQ.sync { __digitalLowerOffset } }
-    set { Api.objectQ.sync(flags: .barrier) {__digitalLowerOffset = newValue }}}
+    set { if newValue != _digitalLowerOffset { willChangeValue(for: \.digitalLowerOffset) ; Api.objectQ.sync(flags: .barrier) { __digitalLowerOffset = newValue } ; didChangeValue(for: \.digitalLowerOffset)}}}
   var _digitalUpperOffset : Int {
     get { Api.objectQ.sync { __digitalUpperOffset } }
-    set { Api.objectQ.sync(flags: .barrier) {__digitalUpperOffset = newValue }}}
+    set { if newValue != _digitalUpperOffset { willChangeValue(for: \.digitalUpperOffset) ; Api.objectQ.sync(flags: .barrier) { __digitalUpperOffset = newValue } ; didChangeValue(for: \.digitalUpperOffset)}}}
   var _diversityChild : Bool {
     get { Api.objectQ.sync { __diversityChild } }
-    set { Api.objectQ.sync(flags: .barrier) {__diversityChild = newValue }}}
+    set { if newValue != _diversityChild { willChangeValue(for: \.diversityChild) ; Api.objectQ.sync(flags: .barrier) { __diversityChild = newValue } ; didChangeValue(for: \.diversityChild)}}}
   var _diversityEnabled : Bool {
     get { Api.objectQ.sync { __diversityEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__diversityEnabled = newValue }}}
+    set { if newValue != _diversityEnabled  { willChangeValue(for: \.diversityEnabled ) ; Api.objectQ.sync(flags: .barrier) { __diversityEnabled  = newValue } ; didChangeValue(for: \.diversityEnabled)}}}
   var _diversityIndex : Int {
     get { Api.objectQ.sync { __diversityIndex } }
-    set { Api.objectQ.sync(flags: .barrier) {__diversityIndex = newValue }}}
+    set { if newValue != _diversityIndex { willChangeValue(for: \.diversityIndex) ; Api.objectQ.sync(flags: .barrier) { __diversityIndex = newValue } ; didChangeValue(for: \.diversityIndex)}}}
   var _diversityParent : Bool {
     get { Api.objectQ.sync { __diversityParent } }
-    set { Api.objectQ.sync(flags: .barrier) {__diversityParent = newValue }}}
+    set { if newValue != _diversityParent { willChangeValue(for: \.diversityParent) ; Api.objectQ.sync(flags: .barrier) { __diversityParent = newValue } ; didChangeValue(for: \.diversityParent)}}}
   var _filterHigh : Int {
     get { Api.objectQ.sync { __filterHigh } }
-    set { Api.objectQ.sync(flags: .barrier) {__filterHigh = newValue }}}
+    set { if newValue != _filterHigh { willChangeValue(for: \.filterHigh) ; Api.objectQ.sync(flags: .barrier) { __filterHigh = newValue } ; didChangeValue(for: \.filterHigh)}}}
   var _filterLow : Int {
     get { Api.objectQ.sync { __filterLow } }
-    set { Api.objectQ.sync(flags: .barrier) {__filterLow = newValue }}}
+    set { if newValue != _filterLow { willChangeValue(for: \.filterLow) ; Api.objectQ.sync(flags: .barrier) { __filterLow = newValue } ; didChangeValue(for: \.filterLow)}}}
   var _fmDeviation : Int {
     get { Api.objectQ.sync { __fmDeviation } }
-    set { Api.objectQ.sync(flags: .barrier) {__fmDeviation = newValue }}}
+    set { if newValue != _fmDeviation { willChangeValue(for: \.fmDeviation) ; Api.objectQ.sync(flags: .barrier) { __fmDeviation = newValue } ; didChangeValue(for: \.fmDeviation)}}}
   var _fmRepeaterOffset : Float {
     get { Api.objectQ.sync { __fmRepeaterOffset } }
-    set { Api.objectQ.sync(flags: .barrier) {__fmRepeaterOffset = newValue }}}
+    set { if newValue != _fmRepeaterOffset { willChangeValue(for: \.fmRepeaterOffset) ; Api.objectQ.sync(flags: .barrier) { __fmRepeaterOffset = newValue } ; didChangeValue(for: \.fmRepeaterOffset)}}}
   var _fmToneBurstEnabled : Bool {
     get { Api.objectQ.sync { __fmToneBurstEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__fmToneBurstEnabled = newValue }}}
+    set { if newValue != _fmToneBurstEnabled { willChangeValue(for: \.fmToneBurstEnabled) ; Api.objectQ.sync(flags: .barrier) { __fmToneBurstEnabled = newValue } ; didChangeValue(for: \.fmToneBurstEnabled)}}}
   var _fmToneFreq : Float {
     get { Api.objectQ.sync { __fmToneFreq } }
-    set { Api.objectQ.sync(flags: .barrier) {__fmToneFreq = newValue }}}
+    set { if newValue != _fmToneFreq { willChangeValue(for: \.fmToneFreq) ; Api.objectQ.sync(flags: .barrier) { __fmToneFreq = newValue } ; didChangeValue(for: \.fmToneFreq)}}}
   var _fmToneMode : String {
     get { Api.objectQ.sync { __fmToneMode } }
-    set { Api.objectQ.sync(flags: .barrier) {__fmToneMode = newValue }}}
+    set { if newValue != _fmToneMode { willChangeValue(for: \.fmToneMode) ; Api.objectQ.sync(flags: .barrier) { __fmToneMode = newValue } ; didChangeValue(for: \.fmToneMode)}}}
   var _frequency : Hz {
     get { Api.objectQ.sync { __frequency } }
-    set { Api.objectQ.sync(flags: .barrier) {__frequency = newValue }}}
+    set { if newValue != _frequency { willChangeValue(for: \.frequency) ; Api.objectQ.sync(flags: .barrier) { __frequency = newValue } ; didChangeValue(for: \.frequency)}}}
   var _inUse : Bool {
     get { Api.objectQ.sync { __inUse } }
-    set { Api.objectQ.sync(flags: .barrier) {__inUse = newValue }}}
+    set { if newValue != _inUse { willChangeValue(for: \.inUse) ; Api.objectQ.sync(flags: .barrier) { __inUse = newValue } ; didChangeValue(for: \.inUse)}}}
   var _locked : Bool {
     get { Api.objectQ.sync { __locked } }
-    set { Api.objectQ.sync(flags: .barrier) {__locked = newValue }}}
+    set { if newValue != _locked { willChangeValue(for: \.locked) ; Api.objectQ.sync(flags: .barrier) { __locked = newValue } ; didChangeValue(for: \.locked)}}}
   var _loopAEnabled : Bool {
     get { Api.objectQ.sync { __loopAEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__loopAEnabled = newValue }}}
+    set { if newValue != _loopAEnabled { willChangeValue(for: \.loopAEnabled) ; Api.objectQ.sync(flags: .barrier) { __loopAEnabled = newValue } ; didChangeValue(for: \.loopAEnabled)}}}
   var _loopBEnabled : Bool {
     get { Api.objectQ.sync { __loopBEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__loopBEnabled = newValue }}}
+    set { if newValue != _loopBEnabled { willChangeValue(for: \.loopBEnabled) ; Api.objectQ.sync(flags: .barrier) { __loopBEnabled = newValue } ; didChangeValue(for: \.loopBEnabled)}}}
   var _mode : String {
     get { Api.objectQ.sync { __mode } }
-    set { Api.objectQ.sync(flags: .barrier) {__mode = newValue }}}
+    set { if newValue != _mode { willChangeValue(for: \.mode) ; Api.objectQ.sync(flags: .barrier) { __mode = newValue } ; didChangeValue(for: \.mode)}}}
   var _modeList : [String] {
     get { Api.objectQ.sync { __modeList } }
-    set { Api.objectQ.sync(flags: .barrier) {__modeList = newValue }}}
+    set { if newValue != _modeList { willChangeValue(for: \.modeList) ; Api.objectQ.sync(flags: .barrier) { __modeList = newValue } ; didChangeValue(for: \.modeList)}}}
   var _nbEnabled : Bool {
     get { Api.objectQ.sync { __nbEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__nbEnabled = newValue }}}
+    set { if newValue != _nbEnabled { willChangeValue(for: \.nbEnabled) ; Api.objectQ.sync(flags: .barrier) { __nbEnabled = newValue } ; didChangeValue(for: \.nbEnabled)}}}
   var _nbLevel : Int {
     get { Api.objectQ.sync { __nbLevel } }
-    set { Api.objectQ.sync(flags: .barrier) {__nbLevel = newValue }}}
+    set { if newValue != _nbLevel { willChangeValue(for: \.nbLevel) ; Api.objectQ.sync(flags: .barrier) { __nbLevel = newValue } ; didChangeValue(for: \.nbLevel)}}}
   var _nrEnabled : Bool {
     get { Api.objectQ.sync { __nrEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__nrEnabled = newValue }}}
+    set { if newValue != _nrEnabled { willChangeValue(for: \.nrEnabled) ; Api.objectQ.sync(flags: .barrier) { __nrEnabled = newValue } ; didChangeValue(for: \.nrEnabled)}}}
   var _nrLevel : Int {
     get { Api.objectQ.sync { __nrLevel } }
-    set { Api.objectQ.sync(flags: .barrier) {__nrLevel = newValue }}}
+    set { if newValue != _nrLevel { willChangeValue(for: \.nrLevel) ; Api.objectQ.sync(flags: .barrier) { __nrLevel = newValue } ; didChangeValue(for: \.nrLevel)}}}
   var _nr2 : Int {
     get { Api.objectQ.sync { __nr2 } }
-    set { Api.objectQ.sync(flags: .barrier) {__nr2 = newValue }}}
+    set { if newValue != _nr2 { willChangeValue(for: \.nr2) ; Api.objectQ.sync(flags: .barrier) { __nr2 = newValue } ; didChangeValue(for: \.nr2)}}}
   var _owner : Int {
     get { Api.objectQ.sync { __owner } }
-    set { Api.objectQ.sync(flags: .barrier) {__owner = newValue }}}
+    set { if newValue != _owner { willChangeValue(for: \.owner) ; Api.objectQ.sync(flags: .barrier) { __owner = newValue } ; didChangeValue(for: \.owner)}}}
   var _panadapterId     : PanadapterStreamId  {
     get { Api.objectQ.sync { __panadapterId } }
-    set { Api.objectQ.sync(flags: .barrier) {__panadapterId = newValue }}}
+    set { if newValue != _panadapterId { willChangeValue(for: \.panadapterId) ; Api.objectQ.sync(flags: .barrier) { __panadapterId = newValue } ; didChangeValue(for: \.panadapterId)}}}
   var _playbackEnabled : Bool {
     get { Api.objectQ.sync { __playbackEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__playbackEnabled = newValue }}}
+    set { if newValue != _playbackEnabled { willChangeValue(for: \.playbackEnabled) ; Api.objectQ.sync(flags: .barrier) { __playbackEnabled = newValue } ; didChangeValue(for: \.playbackEnabled)}}}
   var _postDemodBypassEnabled : Bool {
     get { Api.objectQ.sync { __postDemodBypassEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__postDemodBypassEnabled = newValue }}}
+    set { if newValue != _postDemodBypassEnabled { willChangeValue(for: \.postDemodBypassEnabled) ; Api.objectQ.sync(flags: .barrier) { __postDemodBypassEnabled = newValue } ; didChangeValue(for: \.postDemodBypassEnabled)}}}
   var _postDemodHigh : Int {
     get { Api.objectQ.sync { __postDemodHigh } }
-    set { Api.objectQ.sync(flags: .barrier) {__postDemodHigh = newValue }}}
+    set { if newValue != _postDemodHigh { willChangeValue(for: \.postDemodHigh) ; Api.objectQ.sync(flags: .barrier) { __postDemodHigh = newValue } ; didChangeValue(for: \.postDemodHigh)}}}
   var _postDemodLow : Int {
     get { Api.objectQ.sync { __postDemodLow } }
-    set { Api.objectQ.sync(flags: .barrier) {__postDemodLow = newValue }}}
+    set { if newValue != _postDemodLow { willChangeValue(for: \.postDemodLow) ; Api.objectQ.sync(flags: .barrier) { __postDemodLow = newValue } ; didChangeValue(for: \.postDemodLow)}}}
   var _qskEnabled : Bool {
     get { Api.objectQ.sync { __qskEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__qskEnabled = newValue }}}
+    set { if newValue != _qskEnabled { willChangeValue(for: \.qskEnabled) ; Api.objectQ.sync(flags: .barrier) { __qskEnabled = newValue } ; didChangeValue(for: \.qskEnabled)}}}
   var _recordEnabled : Bool {
     get { Api.objectQ.sync { __recordEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__recordEnabled = newValue }}}
+    set { if newValue != _recordEnabled { willChangeValue(for: \.recordEnabled) ; Api.objectQ.sync(flags: .barrier) { __recordEnabled = newValue } ; didChangeValue(for: \.recordEnabled)}}}
   var _recordLength : Float {
     get { Api.objectQ.sync { __recordLength } }
-    set { Api.objectQ.sync(flags: .barrier) {__recordLength = newValue }}}
+    set { if newValue != _recordLength { willChangeValue(for: \.recordLength) ; Api.objectQ.sync(flags: .barrier) { __recordLength = newValue } ; didChangeValue(for: \.recordLength)}}}
   var _repeaterOffsetDirection : String {
     get { Api.objectQ.sync { __repeaterOffsetDirection } }
-    set { Api.objectQ.sync(flags: .barrier) {__repeaterOffsetDirection = newValue }}}
+    set { if newValue != _repeaterOffsetDirection { willChangeValue(for: \.repeaterOffsetDirection) ; Api.objectQ.sync(flags: .barrier) { __repeaterOffsetDirection = newValue } ; didChangeValue(for: \.repeaterOffsetDirection)}}}
   var _rfGain : Int {
     get { Api.objectQ.sync { __rfGain } }
-    set { Api.objectQ.sync(flags: .barrier) {__rfGain = newValue }}}
+    set { if newValue != _rfGain { willChangeValue(for: \.rfGain) ; Api.objectQ.sync(flags: .barrier) { __rfGain = newValue } ; didChangeValue(for: \.rfGain)}}}
   var _ritEnabled : Bool {
     get { Api.objectQ.sync { __ritEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__ritEnabled = newValue }}}
+    set { if newValue != _ritEnabled { willChangeValue(for: \.ritEnabled) ; Api.objectQ.sync(flags: .barrier) { __ritEnabled = newValue } ; didChangeValue(for: \.ritEnabled)}}}
   var _ritOffset : Int {
     get { Api.objectQ.sync { __ritOffset } }
-    set { Api.objectQ.sync(flags: .barrier) {__ritOffset = newValue }}}
+    set { if newValue != _ritOffset { willChangeValue(for: \.ritOffset) ; Api.objectQ.sync(flags: .barrier) { __ritOffset = newValue } ; didChangeValue(for: \.ritOffset)}}}
   var _rttyMark : Int {
     get { Api.objectQ.sync { __rttyMark } }
-    set { Api.objectQ.sync(flags: .barrier) {__rttyMark = newValue }}}
+    set { if newValue != _rttyMark { willChangeValue(for: \.rttyMark) ; Api.objectQ.sync(flags: .barrier) { __rttyMark = newValue } ; didChangeValue(for: \.rttyMark)}}}
   var _rttyShift : Int {
     get { Api.objectQ.sync { __rttyShift } }
-    set { Api.objectQ.sync(flags: .barrier) {__rttyShift = newValue }}}
+    set { if newValue != _rttyShift { willChangeValue(for: \.rttyShift) ; Api.objectQ.sync(flags: .barrier) { __rttyShift = newValue } ; didChangeValue(for: \.rttyShift)}}}
   var _rxAnt : String {
     get { Api.objectQ.sync { __rxAnt } }
-    set { Api.objectQ.sync(flags: .barrier) {__rxAnt = newValue }}}
+    set { if newValue != _rxAnt { willChangeValue(for: \.rxAnt) ; Api.objectQ.sync(flags: .barrier) { __rxAnt = newValue } ; didChangeValue(for: \.rxAnt)}}}
   var _rxAntList : [String] {
     get { Api.objectQ.sync { __rxAntList } }
-    set { Api.objectQ.sync(flags: .barrier) {__rxAntList = newValue }}}
+    set { if newValue != _rxAntList { willChangeValue(for: \.rxAntList) ; Api.objectQ.sync(flags: .barrier) { __rxAntList = newValue } ; didChangeValue(for: \.rxAntList)}}}
   var _sliceLetter : String? {
     get { Api.objectQ.sync { __sliceLetter } }
-    set { Api.objectQ.sync(flags: .barrier) {__sliceLetter = newValue }}}
+    set { if newValue != _sliceLetter { willChangeValue(for: \.sliceLetter) ; Api.objectQ.sync(flags: .barrier) { __sliceLetter = newValue } ; didChangeValue(for: \.sliceLetter)}}}
   var _step : Int {
     get { Api.objectQ.sync { __step } }
-    set { Api.objectQ.sync(flags: .barrier) {__step = newValue }}}
+    set { if newValue != _step { willChangeValue(for: \.step) ; Api.objectQ.sync(flags: .barrier) { __step = newValue } ; didChangeValue(for: \.step)}}}
   var _squelchEnabled : Bool {
     get { Api.objectQ.sync { __squelchEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__squelchEnabled = newValue }}}
+    set { if newValue != _squelchEnabled { willChangeValue(for: \.squelchEnabled) ; Api.objectQ.sync(flags: .barrier) { __squelchEnabled = newValue } ; didChangeValue(for: \.squelchEnabled)}}}
   var _squelchLevel : Int {
     get { Api.objectQ.sync { __squelchLevel } }
-    set { Api.objectQ.sync(flags: .barrier) {__squelchLevel = newValue }}}
+    set { if newValue != _squelchLevel { willChangeValue(for: \.squelchLevel) ; Api.objectQ.sync(flags: .barrier) { __squelchLevel = newValue } ; didChangeValue(for: \.squelchLevel)}}}
   var _stepList : String {
     get { Api.objectQ.sync { __stepList } }
-    set { Api.objectQ.sync(flags: .barrier) {__stepList = newValue }}}
+    set { if newValue != _stepList { willChangeValue(for: \.stepList) ; Api.objectQ.sync(flags: .barrier) { __stepList = newValue } ; didChangeValue(for: \.stepList)}}}
   var _txAnt : String {
     get { Api.objectQ.sync { __txAnt } }
-    set { Api.objectQ.sync(flags: .barrier) {__txAnt = newValue }}}
+    set { if newValue != _txAnt { willChangeValue(for: \.txAnt) ; Api.objectQ.sync(flags: .barrier) { __txAnt = newValue } ; didChangeValue(for: \.txAnt)}}}
   var _txAntList : [String] {
     get { Api.objectQ.sync { __txAntList } }
-    set { Api.objectQ.sync(flags: .barrier) {__txAntList = newValue }}}
+    set { if newValue != _txAntList { willChangeValue(for: \.txAntList) ; Api.objectQ.sync(flags: .barrier) { __txAntList = newValue } ; didChangeValue(for: \.txAntList)}}}
   var _txEnabled : Bool {
     get { Api.objectQ.sync { __txEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__txEnabled = newValue }}}
+    set { if newValue != _txEnabled { willChangeValue(for: \.txEnabled) ; Api.objectQ.sync(flags: .barrier) { __txEnabled = newValue } ; didChangeValue(for: \.txEnabled)}}}
   var _txOffsetFreq : Float {
     get { Api.objectQ.sync { __txOffsetFreq } }
-    set { Api.objectQ.sync(flags: .barrier) {__txOffsetFreq = newValue }}}
+    set { if newValue != _txOffsetFreq { willChangeValue(for: \.txOffsetFreq) ; Api.objectQ.sync(flags: .barrier) { __txOffsetFreq = newValue } ; didChangeValue(for: \.txOffsetFreq)}}}
   var _wide : Bool {
     get { Api.objectQ.sync { __wide } }
-    set { Api.objectQ.sync(flags: .barrier) {__wide = newValue }}}
+    set { if newValue != _wide { willChangeValue(for: \.wide) ; Api.objectQ.sync(flags: .barrier) { __wide = newValue } ; didChangeValue(for: \.wide)}}}
   var _wnbEnabled : Bool {
     get { Api.objectQ.sync { __wnbEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__wnbEnabled = newValue }}}
+    set { if newValue != _wnbEnabled { willChangeValue(for: \.wnbEnabled) ; Api.objectQ.sync(flags: .barrier) { __wnbEnabled = newValue } ; didChangeValue(for: \.wnbEnabled)}}}
   var _wnbLevel : Int {
     get { Api.objectQ.sync { __wnbLevel } }
-    set { Api.objectQ.sync(flags: .barrier) {__wnbLevel = newValue }}}
+    set { if newValue != _wnbLevel { willChangeValue(for: \.wnbLevel) ; Api.objectQ.sync(flags: .barrier) { __wnbLevel = newValue } ; didChangeValue(for: \.wnbLevel)}}}
   var _xitEnabled : Bool {
     get { Api.objectQ.sync { __xitEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__xitEnabled = newValue }}}
+    set { if newValue != _xitEnabled { willChangeValue(for: \.xitEnabled) ; Api.objectQ.sync(flags: .barrier) { __xitEnabled = newValue } ; didChangeValue(for: \.xitEnabled)}}}
   var _xitOffset : Int {
     get { Api.objectQ.sync { __xitOffset } }
-    set { Api.objectQ.sync(flags: .barrier) {__xitOffset = newValue }}}
-
+    set { if newValue != _xitOffset { willChangeValue(for: \.xitOffset) ; Api.objectQ.sync(flags: .barrier) { __xitOffset = newValue } ; didChangeValue(for: \.xitOffset)}}}
+  
   enum Token : String {
     case active
     case agcMode                    = "agc_mode"
@@ -853,84 +853,84 @@ public final class Slice  : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
-      case .active:                   willChangeValue(for: \.active)                  ; _active = property.value.bValue                   ; didChangeValue(for: \.active)
-      case .agcMode:                  willChangeValue(for: \.agcMode)                 ; _agcMode = property.value                         ; didChangeValue(for: \.agcMode)
-      case .agcOffLevel:              willChangeValue(for: \.agcOffLevel)             ; _agcOffLevel = property.value.iValue              ; didChangeValue(for: \.agcOffLevel)
-      case .agcThreshold:             willChangeValue(for: \.agcThreshold)            ; _agcThreshold = property.value.iValue             ; didChangeValue(for: \.agcThreshold)
-      case .anfEnabled:               willChangeValue(for: \.anfEnabled)              ; _anfEnabled = property.value.bValue               ; didChangeValue(for: \.anfEnabled)
-      case .anfLevel:                 willChangeValue(for: \.anfLevel)                ; _anfLevel = property.value.iValue                 ; didChangeValue(for: \.anfLevel)
-      case .apfEnabled:               willChangeValue(for: \.apfEnabled)              ; _apfEnabled = property.value.bValue               ; didChangeValue(for: \.apfEnabled)
-      case .apfLevel:                 willChangeValue(for: \.apfLevel)                ; _apfLevel = property.value.iValue                 ; didChangeValue(for: \.apfLevel)
-      case .audioGain:                willChangeValue(for: \.audioGain)               ; _audioGain = property.value.iValue                ; didChangeValue(for: \.audioGain)
-      case .audioLevel:               willChangeValue(for: \.audioGain)               ; _audioGain = property.value.iValue                ; didChangeValue(for: \.audioGain)
-      case .audioMute:                willChangeValue(for: \.audioMute)               ; _audioMute = property.value.bValue                ; didChangeValue(for: \.audioMute)
-      case .audioPan:                 willChangeValue(for: \.audioPan)                ; _audioPan = property.value.iValue                 ; didChangeValue(for: \.audioPan)
-      case .clientHandle:             willChangeValue(for: \.clientHandle)            ; _clientHandle = property.value.handle ?? 0        ; didChangeValue(for: \.clientHandle)
+      case .active:                   _active = property.value.bValue
+      case .agcMode:                  _agcMode = property.value
+      case .agcOffLevel:              _agcOffLevel = property.value.iValue
+      case .agcThreshold:             _agcThreshold = property.value.iValue
+      case .anfEnabled:               _anfEnabled = property.value.bValue
+      case .anfLevel:                 _anfLevel = property.value.iValue
+      case .apfEnabled:               _apfEnabled = property.value.bValue
+      case .apfLevel:                 _apfLevel = property.value.iValue
+      case .audioGain:                _audioGain = property.value.iValue
+      case .audioLevel:               _audioGain = property.value.iValue
+      case .audioMute:                _audioMute = property.value.bValue
+      case .audioPan:                 _audioPan = property.value.iValue
+      case .clientHandle:             _clientHandle = property.value.handle ?? 0
       case .daxChannel:
         if _daxChannel != 0 && property.value.iValue == 0 {
           // remove this slice from the AudioStream it was using
           if let audioStream = radio.findAudioStream(with: _daxChannel) { audioStream.slice = nil }
         }
-        willChangeValue(for: \.daxChannel) ; _daxChannel = property.value.iValue ; didChangeValue(for: \.daxChannel)
-      case .daxTxEnabled:             willChangeValue(for: \.daxTxEnabled)            ; _daxTxEnabled = property.value.bValue             ; didChangeValue(for: \.daxTxEnabled)
-      case .detached:                 willChangeValue(for: \.detached)                ; _detached = property.value.bValue                 ; didChangeValue(for: \.detached)
-      case .dfmPreDeEmphasisEnabled:  willChangeValue(for: \.dfmPreDeEmphasisEnabled) ; _dfmPreDeEmphasisEnabled = property.value.bValue  ; didChangeValue(for: \.dfmPreDeEmphasisEnabled)
-      case .digitalLowerOffset:       willChangeValue(for: \.digitalLowerOffset)      ; _digitalLowerOffset = property.value.iValue       ; didChangeValue(for: \.digitalLowerOffset)
-      case .digitalUpperOffset:       willChangeValue(for: \.digitalUpperOffset)      ; _digitalUpperOffset = property.value.iValue       ; didChangeValue(for: \.digitalUpperOffset)
-      case .diversityEnabled:         willChangeValue(for: \.diversityEnabled)        ; _diversityEnabled = property.value.bValue         ; didChangeValue(for: \.diversityEnabled)
-      case .diversityChild:           willChangeValue(for: \.diversityChild)          ; _diversityChild = property.value.bValue           ; didChangeValue(for: \.diversityChild)
-      case .diversityIndex:           willChangeValue(for: \.diversityIndex)          ; _diversityIndex = property.value.iValue           ; didChangeValue(for: \.diversityIndex)
+        _daxChannel = property.value.iValue
+      case .daxTxEnabled:             _daxTxEnabled = property.value.bValue
+      case .detached:                 _detached = property.value.bValue
+      case .dfmPreDeEmphasisEnabled:  _dfmPreDeEmphasisEnabled = property.value.bValue
+      case .digitalLowerOffset:       _digitalLowerOffset = property.value.iValue
+      case .digitalUpperOffset:       _digitalUpperOffset = property.value.iValue
+      case .diversityEnabled:         _diversityEnabled = property.value.bValue
+      case .diversityChild:           _diversityChild = property.value.bValue
+      case .diversityIndex:           _diversityIndex = property.value.iValue
         
-      case .filterHigh:               willChangeValue(for: \.filterHigh)              ; _filterHigh = property.value.iValue               ; didChangeValue(for: \.filterHigh)
-      case .filterLow:                willChangeValue(for: \.filterLow)               ; _filterLow = property.value.iValue                ; didChangeValue(for: \.filterLow)
-      case .fmDeviation:              willChangeValue(for: \.fmDeviation)             ; _fmDeviation = property.value.iValue              ; didChangeValue(for: \.fmDeviation)
-      case .fmRepeaterOffset:         willChangeValue(for: \.fmRepeaterOffset)        ; _fmRepeaterOffset = property.value.fValue         ; didChangeValue(for: \.fmRepeaterOffset)
-      case .fmToneBurstEnabled:       willChangeValue(for: \.fmToneBurstEnabled)      ; _fmToneBurstEnabled = property.value.bValue       ; didChangeValue(for: \.fmToneBurstEnabled)
-      case .fmToneMode:               willChangeValue(for: \.fmToneMode)              ; _fmToneMode = property.value                      ; didChangeValue(for: \.fmToneMode)
-      case .fmToneFreq:               willChangeValue(for: \.fmToneFreq)              ; _fmToneFreq = property.value.fValue               ; didChangeValue(for: \.fmToneFreq)
-      case .frequency:                willChangeValue(for: \.frequency)               ; _frequency = property.value.mhzToHz               ; didChangeValue(for: \.frequency)
+      case .filterHigh:               _filterHigh = property.value.iValue
+      case .filterLow:                _filterLow = property.value.iValue
+      case .fmDeviation:              _fmDeviation = property.value.iValue
+      case .fmRepeaterOffset:         _fmRepeaterOffset = property.value.fValue
+      case .fmToneBurstEnabled:       _fmToneBurstEnabled = property.value.bValue
+      case .fmToneMode:               _fmToneMode = property.value
+      case .fmToneFreq:               _fmToneFreq = property.value.fValue
+      case .frequency:                _frequency = property.value.mhzToHz
       case .ghost:                    _log("Unprocessed Slice property: \( property.key).\(property.value)", .warning, #function, #file, #line)
-      case .inUse:                    willChangeValue(for: \.inUse)                   ; _inUse = property.value.bValue                    ; didChangeValue(for: \.inUse)
-      case .locked:                   willChangeValue(for: \.locked)                  ; _locked = property.value.bValue                   ; didChangeValue(for: \.locked)
-      case .loopAEnabled:             willChangeValue(for: \.loopAEnabled)            ; _loopAEnabled = property.value.bValue             ; didChangeValue(for: \.loopAEnabled)
-      case .loopBEnabled:             willChangeValue(for: \.loopBEnabled)            ; _loopBEnabled = property.value.bValue             ; didChangeValue(for: \.loopBEnabled)
-      case .mode:                     willChangeValue(for: \.mode)                    ; _mode = property.value.uppercased()               ; didChangeValue(for: \.mode)
-      case .modeList:                 willChangeValue(for: \.modeList)                ; _modeList = property.value.list                   ; didChangeValue(for: \.modeList)
-      case .nbEnabled:                willChangeValue(for: \.nbEnabled)               ; _nbEnabled = property.value.bValue                ; didChangeValue(for: \.nbEnabled)
-      case .nbLevel:                  willChangeValue(for: \.nbLevel)                 ; _nbLevel = property.value.iValue                  ; didChangeValue(for: \.nbLevel)
-      case .nrEnabled:                willChangeValue(for: \.nrEnabled)               ; _nrEnabled = property.value.bValue                ; didChangeValue(for: \.nrEnabled)
-      case .nrLevel:                  willChangeValue(for: \.nrLevel)                 ; _nrLevel = property.value.iValue                  ; didChangeValue(for: \.nrLevel)
-      case .nr2:                      willChangeValue(for: \.nr2)                     ; _nr2 = property.value.iValue                      ; didChangeValue(for: \.nr2)
-      case .owner:                    willChangeValue(for: \.owner)                   ; _nr2 = property.value.iValue                      ; didChangeValue(for: \.owner)
-      case .panadapterId:             willChangeValue(for: \.panadapterId)            ; _panadapterId = property.value.streamId ?? 0      ; didChangeValue(for: \.panadapterId)
-      case .playbackEnabled:          willChangeValue(for: \.playbackEnabled)         ; _playbackEnabled = (property.value == "enabled") || (property.value == "1")  ; didChangeValue(for: \.playbackEnabled)
-      case .postDemodBypassEnabled:   willChangeValue(for: \.postDemodBypassEnabled)  ; _postDemodBypassEnabled = property.value.bValue   ; didChangeValue(for: \.postDemodBypassEnabled)
-      case .postDemodLow:             willChangeValue(for: \.postDemodLow)            ; _postDemodLow = property.value.iValue             ; didChangeValue(for: \.postDemodLow)
-      case .postDemodHigh:            willChangeValue(for: \.postDemodHigh)           ; _postDemodHigh = property.value.iValue            ; didChangeValue(for: \.postDemodHigh)
-      case .qskEnabled:               willChangeValue(for: \.qskEnabled)              ; _qskEnabled = property.value.bValue               ; didChangeValue(for: \.qskEnabled)
-      case .recordEnabled:            willChangeValue(for: \.recordEnabled)           ; _recordEnabled = property.value.bValue            ; didChangeValue(for: \.recordEnabled)
-      case .repeaterOffsetDirection:  willChangeValue(for: \.repeaterOffsetDirection) ; _repeaterOffsetDirection = property.value         ; didChangeValue(for: \.repeaterOffsetDirection)
-      case .rfGain:                   willChangeValue(for: \.rfGain)                  ; _rfGain = property.value.iValue                   ; didChangeValue(for: \.rfGain)
-      case .ritOffset:                willChangeValue(for: \.ritOffset)               ; _ritOffset = property.value.iValue                ; didChangeValue(for: \.ritOffset)
-      case .ritEnabled:               willChangeValue(for: \.ritEnabled)              ; _ritEnabled = property.value.bValue               ; didChangeValue(for: \.ritEnabled)
-      case .rttyMark:                 willChangeValue(for: \.rttyMark)                ; _rttyMark = property.value.iValue                 ; didChangeValue(for: \.rttyMark)
-      case .rttyShift:                willChangeValue(for: \.rttyShift)               ; _rttyShift = property.value.iValue                ; didChangeValue(for: \.rttyShift)
-      case .rxAnt:                    willChangeValue(for: \.rxAnt)                   ; _rxAnt = property.value                           ; didChangeValue(for: \.rxAnt)
-      case .rxAntList:                willChangeValue(for: \.rxAntList)               ; _rxAntList = property.value.list                  ; didChangeValue(for: \.rxAntList)
-      case .sliceLetter:              willChangeValue(for: \.sliceLetter)             ; _sliceLetter = property.value                     ; didChangeValue(for: \.sliceLetter)
-      case .squelchEnabled:           willChangeValue(for: \.squelchEnabled)          ; _squelchEnabled = property.value.bValue           ; didChangeValue(for: \.squelchEnabled)
-      case .squelchLevel:             willChangeValue(for: \.squelchLevel)            ; _squelchLevel = property.value.iValue             ; didChangeValue(for: \.squelchLevel)
-      case .step:                     willChangeValue(for: \.step)                    ; _step = property.value.iValue                     ; didChangeValue(for: \.step)
-      case .stepList:                 willChangeValue(for: \.stepList)                ; _stepList = property.value                        ; didChangeValue(for: \.stepList)
-      case .txEnabled:                willChangeValue(for: \.txEnabled)               ; _txEnabled = property.value.bValue                ; didChangeValue(for: \.txEnabled)
-      case .txAnt:                    willChangeValue(for: \.txAnt)                   ; _txAnt = property.value                           ; didChangeValue(for: \.txAnt)
-      case .txAntList:                willChangeValue(for: \.txAntList)               ; _txAntList = property.value.list                  ; didChangeValue(for: \.txAntList)
-      case .txOffsetFreq:             willChangeValue(for: \.txOffsetFreq)            ; _txOffsetFreq = property.value.fValue             ; didChangeValue(for: \.txOffsetFreq)
-      case .wide:                     willChangeValue(for: \.wide)                    ; _wide = property.value.bValue                     ; didChangeValue(for: \.wide)
-      case .wnbEnabled:               willChangeValue(for: \.wnbEnabled)              ; _wnbEnabled = property.value.bValue               ; didChangeValue(for: \.wnbEnabled)
-      case .wnbLevel:                 willChangeValue(for: \.wnbLevel)                ; _wnbLevel = property.value.iValue                 ; didChangeValue(for: \.wnbLevel)
-      case .xitOffset:                willChangeValue(for: \.xitOffset)               ; _xitOffset = property.value.iValue                ; didChangeValue(for: \.xitOffset)
-      case .xitEnabled:               willChangeValue(for: \.xitEnabled)              ; _xitEnabled = property.value.bValue               ; didChangeValue(for: \.xitEnabled)
+      case .inUse:                    _inUse = property.value.bValue
+      case .locked:                   _locked = property.value.bValue
+      case .loopAEnabled:             _loopAEnabled = property.value.bValue
+      case .loopBEnabled:             _loopBEnabled = property.value.bValue
+      case .mode:                     _mode = property.value.uppercased()
+      case .modeList:                 _modeList = property.value.list
+      case .nbEnabled:                _nbEnabled = property.value.bValue
+      case .nbLevel:                  _nbLevel = property.value.iValue
+      case .nrEnabled:                _nrEnabled = property.value.bValue
+      case .nrLevel:                  _nrLevel = property.value.iValue
+      case .nr2:                      _nr2 = property.value.iValue
+      case .owner:                    _nr2 = property.value.iValue
+      case .panadapterId:             _panadapterId = property.value.streamId ?? 0
+      case .playbackEnabled:          _playbackEnabled = (property.value == "enabled") || (property.value == "1")
+      case .postDemodBypassEnabled:   _postDemodBypassEnabled = property.value.bValue
+      case .postDemodLow:             _postDemodLow = property.value.iValue
+      case .postDemodHigh:            _postDemodHigh = property.value.iValue
+      case .qskEnabled:               _qskEnabled = property.value.bValue
+      case .recordEnabled:            _recordEnabled = property.value.bValue
+      case .repeaterOffsetDirection:  _repeaterOffsetDirection = property.value
+      case .rfGain:                   _rfGain = property.value.iValue
+      case .ritOffset:                _ritOffset = property.value.iValue
+      case .ritEnabled:               _ritEnabled = property.value.bValue
+      case .rttyMark:                 _rttyMark = property.value.iValue
+      case .rttyShift:                _rttyShift = property.value.iValue
+      case .rxAnt:                    _rxAnt = property.value
+      case .rxAntList:                _rxAntList = property.value.list
+      case .sliceLetter:              _sliceLetter = property.value
+      case .squelchEnabled:           _squelchEnabled = property.value.bValue
+      case .squelchLevel:             _squelchLevel = property.value.iValue
+      case .step:                     _step = property.value.iValue
+      case .stepList:                 _stepList = property.value
+      case .txEnabled:                _txEnabled = property.value.bValue
+      case .txAnt:                    _txAnt = property.value
+      case .txAntList:                _txAntList = property.value.list
+      case .txOffsetFreq:             _txOffsetFreq = property.value.fValue
+      case .wide:                     _wide = property.value.bValue
+      case .wnbEnabled:               _wnbEnabled = property.value.bValue
+      case .wnbLevel:                 _wnbLevel = property.value.iValue
+      case .xitOffset:                _xitOffset = property.value.iValue
+      case .xitEnabled:               _xitEnabled = property.value.bValue
       case .daxClients, .diversityParent, .recordTime: break // ignored
       }
     }

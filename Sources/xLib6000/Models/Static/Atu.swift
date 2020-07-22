@@ -55,16 +55,16 @@ public final class Atu : NSObject, StaticModel {
   
   var _enabled : Bool {
     get { Api.objectQ.sync { __enabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__enabled = newValue }}}
+    set { if newValue != _enabled { willChangeValue(for: \.enabled) ; Api.objectQ.sync(flags: .barrier) { __enabled = newValue } ; didChangeValue(for: \.enabled)}}}
   var _memoriesEnabled : Bool {
     get { Api.objectQ.sync { __memoriesEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__memoriesEnabled = newValue }}}
+    set { if newValue != _memoriesEnabled { willChangeValue(for: \.memoriesEnabled) ; Api.objectQ.sync(flags: .barrier) { __memoriesEnabled = newValue } ; didChangeValue(for: \.memoriesEnabled)}}}
   var _status : String {
     get { Api.objectQ.sync { __status } }
-    set { Api.objectQ.sync(flags: .barrier) {__status = newValue }}}
+    set { if newValue != _status { willChangeValue(for: \.status) ; Api.objectQ.sync(flags: .barrier) { __status = newValue } ; didChangeValue(for: \.status)}}}
   var _usingMemories : Bool {
     get { Api.objectQ.sync { __usingMemories } }
-    set { Api.objectQ.sync(flags: .barrier) {__usingMemories = newValue }}}
+    set { if newValue != _usingMemories { willChangeValue(for: \.usingMemories) ; Api.objectQ.sync(flags: .barrier) { __usingMemories = newValue } ; didChangeValue(for: \.usingMemories)}}}
 
   enum Token: String {
     case status
@@ -129,10 +129,10 @@ public final class Atu : NSObject, StaticModel {
       // Known tokens, in alphabetical order
       switch token {
         
-      case .enabled:          willChangeValue(for: \.enabled)         ; _enabled = property.value.bValue          ; didChangeValue(for: \.enabled)
-      case .memoriesEnabled:  willChangeValue(for: \.memoriesEnabled) ; _memoriesEnabled = property.value.bValue  ; didChangeValue(for: \.memoriesEnabled)
+      case .enabled:          _enabled = property.value.bValue
+      case .memoriesEnabled:  _memoriesEnabled = property.value.bValue
       case .status:           break // unused
-      case .usingMemories:    willChangeValue(for: \.usingMemories)   ; _usingMemories = property.value.bValue    ; didChangeValue(for: \.usingMemories)
+      case .usingMemories:    _usingMemories = property.value.bValue
       }
     }
   }

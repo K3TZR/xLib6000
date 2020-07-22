@@ -81,29 +81,29 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     
   var _autoBlackEnabled: Bool {
     get { Api.objectQ.sync { __autoBlackEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__autoBlackEnabled = newValue }}}
+    set { if newValue != _autoBlackEnabled { willChangeValue(for: \.autoBlackEnabled) ; Api.objectQ.sync(flags: .barrier) { __autoBlackEnabled = newValue } ; didChangeValue(for: \.autoBlackEnabled)}}}
   var _autoBlackLevel: UInt32 {
     get { Api.objectQ.sync { __autoBlackLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __autoBlackLevel = newValue }}}
+    set { if newValue != _autoBlackLevel { willChangeValue(for: \.autoBlackLevel) ; Api.objectQ.sync(flags: .barrier) { __autoBlackLevel = newValue } ; didChangeValue(for: \.autoBlackLevel)}}}
   var _blackLevel: Int {
     get { Api.objectQ.sync { __blackLevel } }
-    set { Api.objectQ.sync(flags: .barrier) {__blackLevel = newValue }}}
+    set { if newValue != _blackLevel { willChangeValue(for: \.blackLevel) ; Api.objectQ.sync(flags: .barrier) { __blackLevel = newValue } ; didChangeValue(for: \.blackLevel)}}}
   var _clientHandle: Handle {          // (V3 only)
     get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue }}}
+    set { if newValue != _clientHandle { willChangeValue(for: \.clientHandle) ; Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } ; didChangeValue(for: \.clientHandle)}}}
   var _colorGain: Int {
     get { Api.objectQ.sync { __colorGain } }
-    set { Api.objectQ.sync(flags: .barrier) {__colorGain = newValue }}}
+    set { if newValue != _colorGain { willChangeValue(for: \.colorGain) ; Api.objectQ.sync(flags: .barrier) { __colorGain = newValue } ; didChangeValue(for: \.colorGain)}}}
   var _gradientIndex: Int {
     get { Api.objectQ.sync { __gradientIndex } }
-    set { Api.objectQ.sync(flags: .barrier) {__gradientIndex = newValue }}}
+    set { if newValue != _gradientIndex { willChangeValue(for: \.gradientIndex) ; Api.objectQ.sync(flags: .barrier) { __gradientIndex = newValue } ; didChangeValue(for: \.gradientIndex)}}}
   var _lineDuration: Int {
     get { Api.objectQ.sync { __lineDuration } }
-    set { Api.objectQ.sync(flags: .barrier) {__lineDuration = newValue }}}
+    set { if newValue != _lineDuration { willChangeValue(for: \.lineDuration) ; Api.objectQ.sync(flags: .barrier) { __lineDuration = newValue } ; didChangeValue(for: \.lineDuration)}}}
   var _panadapterId: PanadapterStreamId {
     get { Api.objectQ.sync { __panadapterId } }
-    set { Api.objectQ.sync(flags: .barrier) { __panadapterId = newValue }}}
-
+    set { if newValue != _panadapterId { willChangeValue(for: \.panadapterId) ; Api.objectQ.sync(flags: .barrier) { __panadapterId = newValue } ; didChangeValue(for: \.panadapterId)}}}
+  
   
   enum Token : String {
     case clientHandle         = "client_handle"   // New Api only
@@ -258,13 +258,13 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       // Known keys, in alphabetical order
       switch token {
         
-      case .autoBlackEnabled: willChangeValue(for: \.autoBlackEnabled)  ; _autoBlackEnabled = property.value.bValue     ; didChangeValue(for: \.autoBlackEnabled)
-      case .blackLevel:       willChangeValue(for: \.blackLevel)        ; _blackLevel = property.value.iValue           ; didChangeValue(for: \.blackLevel)
-      case .clientHandle:     willChangeValue(for: \.clientHandle)      ; _clientHandle = property.value.handle ?? 0    ; didChangeValue(for: \.clientHandle)
-      case .colorGain:        willChangeValue(for: \.colorGain)         ; _colorGain = property.value.iValue            ; didChangeValue(for: \.colorGain)
-      case .gradientIndex:    willChangeValue(for: \.gradientIndex)     ; _gradientIndex = property.value.iValue        ; didChangeValue(for: \.gradientIndex)
-      case .lineDuration:     willChangeValue(for: \.lineDuration)      ; _lineDuration = property.value.iValue         ; didChangeValue(for: \.lineDuration)
-      case .panadapterId:     willChangeValue(for: \.panadapterId)      ; _panadapterId = property.value.streamId ?? 0  ; didChangeValue(for: \.panadapterId)
+      case .autoBlackEnabled: _autoBlackEnabled = property.value.bValue
+      case .blackLevel:       _blackLevel = property.value.iValue
+      case .clientHandle:     _clientHandle = property.value.handle ?? 0
+      case .colorGain:        _colorGain = property.value.iValue
+      case .gradientIndex:    _gradientIndex = property.value.iValue
+      case .lineDuration:     _lineDuration = property.value.iValue
+      case .panadapterId:     _panadapterId = property.value.streamId ?? 0
       case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqChannel,
            .daxIqRate, .loopA, .loopB, .rfGain, .rxAnt, .segmentZoomEnabled, .wide, .xPixels, .xvtr:  break   // ignored here
       }

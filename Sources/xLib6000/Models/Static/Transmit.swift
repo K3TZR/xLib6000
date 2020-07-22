@@ -181,143 +181,143 @@ public final class Transmit : NSObject, StaticModel {
 
   var _carrierLevel: Int {
     get { Api.objectQ.sync { __carrierLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __carrierLevel = newValue.bound(kControlMin, kControlMax) }}}
+    set { if newValue != _carrierLevel { willChangeValue(for: \.carrierLevel) ; Api.objectQ.sync(flags: .barrier) { __carrierLevel = newValue } ; didChangeValue(for: \.carrierLevel)}}}
   var _companderEnabled: Bool {
     get { Api.objectQ.sync { __companderEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __companderEnabled = newValue }}}
+    set { if newValue != _companderEnabled { willChangeValue(for: \.companderEnabled) ; Api.objectQ.sync(flags: .barrier) { __companderEnabled = newValue } ; didChangeValue(for: \.companderEnabled)}}}
   var _companderLevel: Int {
     get { Api.objectQ.sync { __companderLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __companderLevel = newValue.bound(0, 100) }}}
+    set { if newValue != _companderLevel { willChangeValue(for: \.companderLevel) ; Api.objectQ.sync(flags: .barrier) { __companderLevel = newValue } ; didChangeValue(for: \.companderLevel)}}}
   var _cwBreakInEnabled: Bool {
     get { Api.objectQ.sync { __cwBreakInEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __cwBreakInEnabled = newValue }}}
+    set { if newValue != _cwBreakInEnabled { willChangeValue(for: \.cwBreakInEnabled) ; Api.objectQ.sync(flags: .barrier) { __cwBreakInEnabled = newValue } ; didChangeValue(for: \.cwBreakInEnabled)}}}
   var _cwBreakInDelay: Int {
     get { Api.objectQ.sync { __cwBreakInDelay } }
-    set { Api.objectQ.sync(flags: .barrier) { __cwBreakInDelay = newValue.bound(kMinBreakInDelay, kMaxBreakInDelay) }}}
+    set { if newValue != _cwBreakInDelay { willChangeValue(for: \.cwBreakInDelay) ; Api.objectQ.sync(flags: .barrier) { __cwBreakInDelay = newValue } ; didChangeValue(for: \.cwBreakInDelay)}}}
   var _cwIambicEnabled: Bool {
     get { Api.objectQ.sync { __cwIambicEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __cwIambicEnabled = newValue }}}
+    set { if newValue != _cwIambicEnabled { willChangeValue(for: \.cwIambicEnabled) ; Api.objectQ.sync(flags: .barrier) { __cwIambicEnabled = newValue } ; didChangeValue(for: \.cwIambicEnabled)}}}
   var _cwIambicMode: Int {
     get { Api.objectQ.sync { __cwIambicMode } }
-    set { Api.objectQ.sync(flags: .barrier) { __cwIambicMode = newValue }}}
+    set { if newValue != _cwIambicMode { willChangeValue(for: \.cwIambicMode) ; Api.objectQ.sync(flags: .barrier) { __cwIambicMode = newValue } ; didChangeValue(for: \.cwIambicMode)}}}
   var _cwlEnabled: Bool {
     get { Api.objectQ.sync { __cwlEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __cwlEnabled = newValue }}}
+    set { if newValue != _cwlEnabled { willChangeValue(for: \.cwlEnabled) ; Api.objectQ.sync(flags: .barrier) { __cwlEnabled = newValue } ; didChangeValue(for: \.cwlEnabled)}}}
   var _cwPitch: Int {
     get { Api.objectQ.sync { __cwPitch } }
-    set { Api.objectQ.sync(flags: .barrier) { __cwPitch = newValue.bound(kMinPitch, kMaxPitch) }}}
+    set { if newValue != _cwPitch { willChangeValue(for: \.cwPitch) ; Api.objectQ.sync(flags: .barrier) { __cwPitch = newValue } ; didChangeValue(for: \.cwPitch)}}}
   var _cwSidetoneEnabled: Bool {
     get { Api.objectQ.sync { __cwSidetoneEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __cwSidetoneEnabled = newValue }}}
+    set { if newValue != _cwSidetoneEnabled { willChangeValue(for: \.cwSidetoneEnabled) ; Api.objectQ.sync(flags: .barrier) { __cwSidetoneEnabled = newValue } ; didChangeValue(for: \.cwSidetoneEnabled)}}}
   var _cwSwapPaddles: Bool {
     get { Api.objectQ.sync { __cwSwapPaddles } }
-    set { Api.objectQ.sync(flags: .barrier) { __cwSwapPaddles = newValue }}}
+    set { if newValue != _cwSwapPaddles { willChangeValue(for: \.cwSwapPaddles) ; Api.objectQ.sync(flags: .barrier) { __cwSwapPaddles = newValue } ; didChangeValue(for: \.cwSwapPaddles)}}}
   var _cwSyncCwxEnabled: Bool {
     get { Api.objectQ.sync { __cwSyncCwxEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __cwSyncCwxEnabled = newValue }}}
+    set { if newValue != _cwSyncCwxEnabled { willChangeValue(for: \.cwSyncCwxEnabled) ; Api.objectQ.sync(flags: .barrier) { __cwSyncCwxEnabled = newValue } ; didChangeValue(for: \.cwSyncCwxEnabled)}}}
   var _cwSpeed: Int {
     get { Api.objectQ.sync { __cwSpeed } }
-    set { Api.objectQ.sync(flags: .barrier) { __cwSpeed = newValue.bound(kMinWpm, kMaxWpm) }}}
+    set { if newValue != _cwSpeed { willChangeValue(for: \.cwSpeed) ; Api.objectQ.sync(flags: .barrier) { __cwSpeed = newValue } ; didChangeValue(for: \.cwSpeed)}}}
   var _daxEnabled: Bool {
     get { Api.objectQ.sync { __daxEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __daxEnabled = newValue }}}
+    set { if newValue != _daxEnabled { willChangeValue(for: \.daxEnabled) ; Api.objectQ.sync(flags: .barrier) { __daxEnabled = newValue } ; didChangeValue(for: \.daxEnabled)}}}
   var _frequency: Int {
     get { Api.objectQ.sync { __frequency } }
-    set { Api.objectQ.sync(flags: .barrier) { __frequency = newValue }}}
+    set { if newValue != _frequency { willChangeValue(for: \.frequency) ; Api.objectQ.sync(flags: .barrier) { __frequency = newValue } ; didChangeValue(for: \.frequency)}}}
   var _hwAlcEnabled: Bool {
     get { Api.objectQ.sync { __hwAlcEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __hwAlcEnabled = newValue }}}
+    set { if newValue != _hwAlcEnabled{ willChangeValue(for: \.hwAlcEnabled) ; Api.objectQ.sync(flags: .barrier) { __hwAlcEnabled = newValue } ; didChangeValue(for: \.hwAlcEnabled)}}}
   var _inhibit: Bool {
     get { Api.objectQ.sync { __inhibit } }
-    set { Api.objectQ.sync(flags: .barrier) { __inhibit = newValue }}}
+    set { if newValue != _inhibit { willChangeValue(for: \.inhibit) ; Api.objectQ.sync(flags: .barrier) { __inhibit = newValue } ; didChangeValue(for: \.inhibit)}}}
   var _maxPowerLevel: Int {
     get { Api.objectQ.sync { __maxPowerLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __maxPowerLevel = newValue.bound(kControlMin, kControlMax) }}}
+    set { if newValue != _maxPowerLevel { willChangeValue(for: \.maxPowerLevel) ; Api.objectQ.sync(flags: .barrier) { __maxPowerLevel = newValue } ; didChangeValue(for: \.maxPowerLevel)}}}
   var _metInRxEnabled: Bool {
     get { Api.objectQ.sync { __metInRxEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __metInRxEnabled = newValue }}}
+    set { if newValue != _metInRxEnabled { willChangeValue(for: \.metInRxEnabled) ; Api.objectQ.sync(flags: .barrier) { __metInRxEnabled = newValue } ; didChangeValue(for: \.metInRxEnabled)}}}
   var _micAccEnabled: Bool {
     get { Api.objectQ.sync { __micAccEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __micAccEnabled = newValue }}}
+    set { if newValue != _micAccEnabled { willChangeValue(for: \.micAccEnabled) ; Api.objectQ.sync(flags: .barrier) { __micAccEnabled = newValue } ; didChangeValue(for: \.micAccEnabled)}}}
   var _micBoostEnabled: Bool {
     get { Api.objectQ.sync { __micBoostEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __micBoostEnabled = newValue }}}
+    set { if newValue != _micBoostEnabled { willChangeValue(for: \.micBoostEnabled) ; Api.objectQ.sync(flags: .barrier) { __micBoostEnabled = newValue } ; didChangeValue(for: \.micBoostEnabled)}}}
   var _micBiasEnabled: Bool {
     get { Api.objectQ.sync { __micBiasEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __micBiasEnabled = newValue }}}
+    set { if newValue != _micBiasEnabled { willChangeValue(for: \.micBiasEnabled) ; Api.objectQ.sync(flags: .barrier) { __micBiasEnabled = newValue } ; didChangeValue(for: \.micBiasEnabled)}}}
   var _micLevel: Int {
     get { Api.objectQ.sync { __micLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __micLevel = newValue.bound(kControlMin, kControlMax) }}}
+    set { if newValue != _micLevel { willChangeValue(for: \.micLevel) ; Api.objectQ.sync(flags: .barrier) { __micLevel = newValue } ; didChangeValue(for: \.micLevel)}}}
   var _micSelection: String {
     get { Api.objectQ.sync { __micSelection } }
-    set { Api.objectQ.sync(flags: .barrier) { __micSelection = newValue }}}
+    set { if newValue != _micSelection { willChangeValue(for: \.micSelection) ; Api.objectQ.sync(flags: .barrier) { __micSelection = newValue } ; didChangeValue(for: \.micSelection)}}}
   var _rawIqEnabled: Bool {
     get { Api.objectQ.sync { __rawIqEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __rawIqEnabled = newValue }}}
+    set { if newValue != _rawIqEnabled { willChangeValue(for: \.rawIqEnabled) ; Api.objectQ.sync(flags: .barrier) { __rawIqEnabled = newValue } ; didChangeValue(for: \.rawIqEnabled)}}}
   var _rfPower: Int {
     get { Api.objectQ.sync { __rfPower } }
-    set { Api.objectQ.sync(flags: .barrier) { __rfPower = newValue.bound(kControlMin, kControlMax) }}}
+    set { if newValue != _rfPower { willChangeValue(for: \.rfPower) ; Api.objectQ.sync(flags: .barrier) { __rfPower = newValue } ; didChangeValue(for: \.rfPower)}}}
   var _speechProcessorEnabled: Bool {
     get { Api.objectQ.sync { __speechProcessorEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __speechProcessorEnabled = newValue }}}
+    set { if newValue != _speechProcessorEnabled { willChangeValue(for: \.speechProcessorEnabled) ; Api.objectQ.sync(flags: .barrier) { __speechProcessorEnabled = newValue } ; didChangeValue(for: \.speechProcessorEnabled)}}}
   var _speechProcessorLevel: Int {
     get { Api.objectQ.sync { __speechProcessorLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __speechProcessorLevel = newValue }}}
+    set { if newValue != _speechProcessorLevel { willChangeValue(for: \.speechProcessorLevel) ; Api.objectQ.sync(flags: .barrier) { __speechProcessorLevel = newValue } ; didChangeValue(for: \.speechProcessorLevel)}}}
   var _txAntenna: String {
     get { Api.objectQ.sync { __txAntenna } }
-    set { Api.objectQ.sync(flags: .barrier) { __txAntenna = newValue }}}
+    set { if newValue != _txAntenna { willChangeValue(for: \.txAntenna) ; Api.objectQ.sync(flags: .barrier) { __txAntenna = newValue } ; didChangeValue(for: \.txAntenna)}}}
   var _txFilterChanges: Bool {
     get { Api.objectQ.sync { __txFilterChanges } }
-    set { Api.objectQ.sync(flags: .barrier) { __txFilterChanges = newValue }}}
+    set { if newValue != _txFilterChanges { willChangeValue(for: \.txFilterChanges) ; Api.objectQ.sync(flags: .barrier) { __txFilterChanges = newValue } ; didChangeValue(for: \.txFilterChanges)}}}
   var _txFilterHigh: Int {
     get { Api.objectQ.sync { __txFilterHigh } }
-    set { Api.objectQ.sync(flags: .barrier) { __txFilterHigh = newValue }}}
+    set { if newValue != _txFilterHigh { willChangeValue(for: \.txFilterHigh) ; Api.objectQ.sync(flags: .barrier) { __txFilterHigh = newValue } ; didChangeValue(for: \.txFilterHigh)}}}
   var _txFilterLow: Int {
     get { Api.objectQ.sync { __txFilterLow } }
-    set { Api.objectQ.sync(flags: .barrier) { __txFilterLow = newValue }}}
+    set { if newValue != _txFilterLow { willChangeValue(for: \.txFilterLow) ; Api.objectQ.sync(flags: .barrier) { __txFilterLow = newValue } ; didChangeValue(for: \.txFilterLow)}}}
   var _txInWaterfallEnabled: Bool {
     get { Api.objectQ.sync { __txInWaterfallEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __txInWaterfallEnabled = newValue }}}
+    set { if newValue != _txInWaterfallEnabled { willChangeValue(for: \.txInWaterfallEnabled) ; Api.objectQ.sync(flags: .barrier) { __txInWaterfallEnabled = newValue } ; didChangeValue(for: \.txInWaterfallEnabled)}}}
   var _txMonitorAvailable: Bool {
     get { Api.objectQ.sync { __txMonitorAvailable } }
-    set { Api.objectQ.sync(flags: .barrier) { __txMonitorAvailable = newValue }}}
+    set { if newValue != _txMonitorAvailable { willChangeValue(for: \.txMonitorAvailable) ; Api.objectQ.sync(flags: .barrier) { __txMonitorAvailable = newValue } ; didChangeValue(for: \.txMonitorAvailable)}}}
   var _txMonitorEnabled: Bool {
     get { Api.objectQ.sync { __txMonitorEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __txMonitorEnabled = newValue }}}
+    set { if newValue != _txMonitorEnabled { willChangeValue(for: \.txMonitorEnabled) ; Api.objectQ.sync(flags: .barrier) { __txMonitorEnabled = newValue } ; didChangeValue(for: \.txMonitorEnabled)}}}
   var _txMonitorGainCw: Int {
     get { Api.objectQ.sync { __txMonitorGainCw } }
-    set { Api.objectQ.sync(flags: .barrier) { __txMonitorGainCw = newValue.bound(kControlMin, kControlMax) }}}
+    set { if newValue != _txMonitorGainCw { willChangeValue(for: \.txMonitorGainCw) ; Api.objectQ.sync(flags: .barrier) { __txMonitorGainCw = newValue } ; didChangeValue(for: \.txMonitorGainCw)}}}
   var _txMonitorGainSb: Int {
     get { Api.objectQ.sync { __txMonitorGainSb } }
-    set { Api.objectQ.sync(flags: .barrier) { __txMonitorGainSb = newValue.bound(kControlMin, kControlMax) }}}
+    set { if newValue != _txMonitorGainSb { willChangeValue(for: \.txMonitorGainSb) ; Api.objectQ.sync(flags: .barrier) { __txMonitorGainSb = newValue } ; didChangeValue(for: \.txMonitorGainSb)}}}
   var _txMonitorPanCw: Int {
     get { Api.objectQ.sync { __txMonitorPanCw } }
-    set { Api.objectQ.sync(flags: .barrier) { __txMonitorPanCw = newValue.bound(0, 100) }}}
+    set { if newValue != _txMonitorPanCw { willChangeValue(for: \.txMonitorPanCw) ; Api.objectQ.sync(flags: .barrier) { __txMonitorPanCw = newValue } ; didChangeValue(for: \.txMonitorPanCw)}}}
   var _txMonitorPanSb: Int {
     get { Api.objectQ.sync { __txMonitorPanSb } }
-    set { Api.objectQ.sync(flags: .barrier) { __txMonitorPanSb = newValue.bound(0, 100) }}}
+    set { if newValue != _txMonitorPanSb { willChangeValue(for: \.txMonitorPanSb) ; Api.objectQ.sync(flags: .barrier) { __txMonitorPanSb = newValue } ; didChangeValue(for: \.txMonitorPanSb)}}}
   var _txRfPowerChanges: Bool {
     get { Api.objectQ.sync { __txRfPowerChanges } }
-    set { Api.objectQ.sync(flags: .barrier) { __txRfPowerChanges = newValue }}}
+    set { if newValue != _txRfPowerChanges { willChangeValue(for: \.txRfPowerChanges) ; Api.objectQ.sync(flags: .barrier) { __txRfPowerChanges = newValue } ; didChangeValue(for: \.txRfPowerChanges)}}}
   var _txSliceMode: String {
     get { Api.objectQ.sync { __txSliceMode } }
-    set { Api.objectQ.sync(flags: .barrier) { __txSliceMode = newValue }}}
+    set { if newValue != _txSliceMode { willChangeValue(for: \.txSliceMode) ; Api.objectQ.sync(flags: .barrier) { __txSliceMode = newValue } ; didChangeValue(for: \.txSliceMode)}}}
   var _tune: Bool {
     get { Api.objectQ.sync { __tune } }
-    set { Api.objectQ.sync(flags: .barrier) { __tune = newValue }}}
+    set { if newValue != _tune { willChangeValue(for: \.tune) ; Api.objectQ.sync(flags: .barrier) { __tune = newValue } ; didChangeValue(for: \.tune)}}}
   var _tunePower: Int {
     get { Api.objectQ.sync { __tunePower } }
-    set { Api.objectQ.sync(flags: .barrier) { __tunePower = newValue.bound(kControlMin, kControlMax) }}}
+    set { if newValue != _tunePower { willChangeValue(for: \.tunePower) ; Api.objectQ.sync(flags: .barrier) { __tunePower = newValue } ; didChangeValue(for: \.tunePower)}}}
   var _voxEnabled: Bool {
     get { Api.objectQ.sync { __voxEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __voxEnabled = newValue }}}
+    set { if newValue != _voxEnabled { willChangeValue(for: \.voxEnabled) ; Api.objectQ.sync(flags: .barrier) { __voxEnabled = newValue } ; didChangeValue(for: \.voxEnabled)}}}
   var _voxDelay: Int {
     get { Api.objectQ.sync { __voxDelay } }
-    set { Api.objectQ.sync(flags: .barrier) { __voxDelay = newValue.bound(kControlMin, kControlMax) }}}
+    set { if newValue != _voxDelay { willChangeValue(for: \.voxDelay) ; Api.objectQ.sync(flags: .barrier) { __voxDelay = newValue } ; didChangeValue(for: \.voxDelay)}}}
   var _voxLevel: Int {
     get { Api.objectQ.sync { __voxLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __voxLevel = newValue.bound(kControlMin, kControlMax) }}}
-
+    set { if newValue != _voxLevel { willChangeValue(for: \.voxLevel) ; Api.objectQ.sync(flags: .barrier) { __voxLevel = newValue } ; didChangeValue(for: \.voxLevel)}}}
+  
   enum Token: String {
     case amCarrierLevel           = "am_carrier_level"              // "am_carrier"
     case companderEnabled         = "compander"
@@ -419,53 +419,53 @@ public final class Transmit : NSObject, StaticModel {
       // Known tokens, in alphabetical order
       switch token {
         
-      case .amCarrierLevel:         willChangeValue(for: \.carrierLevel)            ; _carrierLevel = property.value.iValue           ; didChangeValue(for: \.carrierLevel)
-      case .companderEnabled:       willChangeValue(for: \.companderEnabled)        ; _companderEnabled = property.value.bValue       ; didChangeValue(for: \.companderEnabled)
-      case .companderLevel:         willChangeValue(for: \.companderLevel)          ; _companderLevel = property.value.iValue         ; didChangeValue(for: \.companderLevel)
-      case .cwBreakInEnabled:       willChangeValue(for: \.cwBreakInEnabled)        ; _cwBreakInEnabled = property.value.bValue       ; didChangeValue(for: \.cwBreakInEnabled)
-      case .cwBreakInDelay:         willChangeValue(for: \.cwBreakInDelay)          ; _cwBreakInDelay = property.value.iValue         ; didChangeValue(for: \.cwBreakInDelay)
-      case .cwIambicEnabled:        willChangeValue(for: \.cwIambicEnabled)         ; _cwIambicEnabled = property.value.bValue        ; didChangeValue(for: \.cwIambicEnabled)
-      case .cwIambicMode:           willChangeValue(for: \.cwIambicMode)            ; _cwIambicMode = property.value.iValue           ; didChangeValue(for: \.cwIambicMode)
-      case .cwlEnabled:             willChangeValue(for: \.cwlEnabled)              ; _cwlEnabled = property.value.bValue             ; didChangeValue(for: \.cwlEnabled)
-      case .cwPitch:                willChangeValue(for: \.cwPitch)                 ; _cwPitch = property.value.iValue                ; didChangeValue(for: \.cwPitch)
-      case .cwSidetoneEnabled:      willChangeValue(for: \.cwSidetoneEnabled)       ; _cwSidetoneEnabled = property.value.bValue      ; didChangeValue(for: \.cwSidetoneEnabled)
-      case .cwSpeed:                willChangeValue(for: \.cwSpeed)                 ; _cwSpeed = property.value.iValue                ; didChangeValue(for: \.cwSpeed)
-      case .cwSwapPaddles:          willChangeValue(for: \.cwSwapPaddles)           ; _cwSwapPaddles = property.value.bValue          ; didChangeValue(for: \.cwSwapPaddles)
-      case .cwSyncCwxEnabled:       willChangeValue(for: \.cwSyncCwxEnabled)        ; _cwSyncCwxEnabled = property.value.bValue       ; didChangeValue(for: \.cwSyncCwxEnabled)
-      case .daxEnabled:             willChangeValue(for: \.daxEnabled)              ; _daxEnabled = property.value.bValue             ; didChangeValue(for: \.daxEnabled)
-      case .frequency:              willChangeValue(for: \.frequency)               ; _frequency = property.value.mhzToHz             ; didChangeValue(for: \.frequency)
-      case .hwAlcEnabled:           willChangeValue(for: \.hwAlcEnabled)            ; _hwAlcEnabled = property.value.bValue           ; didChangeValue(for: \.hwAlcEnabled)
-      case .inhibit:                willChangeValue(for: \.inhibit)                 ; _inhibit = property.value.bValue                ; didChangeValue(for: \.inhibit)
-      case .maxPowerLevel:          willChangeValue(for: \.maxPowerLevel)           ; _maxPowerLevel = property.value.iValue          ; didChangeValue(for: \.maxPowerLevel)
-      case .metInRxEnabled:         willChangeValue(for: \.metInRxEnabled)          ; _metInRxEnabled = property.value.bValue         ; didChangeValue(for: \.metInRxEnabled)
-      case .micAccEnabled:          willChangeValue(for: \.micAccEnabled)           ; _micAccEnabled = property.value.bValue          ; didChangeValue(for: \.micAccEnabled)
-      case .micBoostEnabled:        willChangeValue(for: \.micBoostEnabled)         ; _micBoostEnabled = property.value.bValue        ; didChangeValue(for: \.micBoostEnabled)
-      case .micBiasEnabled:         willChangeValue(for: \.micBiasEnabled)          ; _micBiasEnabled = property.value.bValue         ; didChangeValue(for: \.micBiasEnabled)
-      case .micLevel:               willChangeValue(for: \.micLevel)                ; _micLevel = property.value.iValue               ; didChangeValue(for: \.micLevel)
-      case .micSelection:           willChangeValue(for: \.micSelection)            ; _micSelection = property.value                  ; didChangeValue(for: \.micSelection)
-      case .rawIqEnabled:           willChangeValue(for: \.rawIqEnabled)            ; _rawIqEnabled = property.value.bValue           ; didChangeValue(for: \.rawIqEnabled)
-      case .rfPower:                willChangeValue(for: \.rfPower)                 ; _rfPower = property.value.iValue                ; didChangeValue(for: \.rfPower)
-      case .speechProcessorEnabled: willChangeValue(for: \.speechProcessorEnabled)  ; _speechProcessorEnabled = property.value.bValue ; didChangeValue(for: \.speechProcessorEnabled)
-      case .speechProcessorLevel:   willChangeValue(for: \.speechProcessorLevel)    ; _speechProcessorLevel = property.value.iValue   ; didChangeValue(for: \.speechProcessorLevel)
-      case .txAntenna:              willChangeValue(for: \.txAntenna)               ; _txAntenna = property.value                     ; didChangeValue(for: \.txAntenna)
-      case .txFilterChanges:        willChangeValue(for: \.txFilterChanges)         ; _txFilterChanges = property.value.bValue        ; didChangeValue(for: \.txFilterChanges)
-      case .txFilterHigh:           willChangeValue(for: \.txFilterHigh)            ; _txFilterHigh = property.value.iValue           ; didChangeValue(for: \.txFilterHigh)
-      case .txFilterLow:            willChangeValue(for: \.txFilterLow)             ; _txFilterLow = property.value.iValue            ; didChangeValue(for: \.txFilterLow)
-      case .txInWaterfallEnabled:   willChangeValue(for: \.txInWaterfallEnabled)    ; _txInWaterfallEnabled = property.value.bValue   ; didChangeValue(for: \.txInWaterfallEnabled)
-      case .txMonitorAvailable:     willChangeValue(for: \.txMonitorAvailable)      ; _txMonitorAvailable = property.value.bValue     ; didChangeValue(for: \.txMonitorAvailable)
-      case .txMonitorEnabled:       willChangeValue(for: \.txMonitorEnabled)        ; _txMonitorEnabled = property.value.bValue       ; didChangeValue(for: \.txMonitorEnabled)
-      case .txMonitorGainCw:        willChangeValue(for: \.txMonitorGainCw)         ; _txMonitorGainCw = property.value.iValue        ; didChangeValue(for: \.txMonitorGainCw)
-      case .txMonitorGainSb:        willChangeValue(for: \.txMonitorGainSb)         ; _txMonitorGainSb = property.value.iValue        ; didChangeValue(for: \.txMonitorGainSb)
-      case .txMonitorPanCw:         willChangeValue(for: \.txMonitorPanCw)          ; _txMonitorPanCw = property.value.iValue         ; didChangeValue(for: \.txMonitorPanCw)
-      case .txMonitorPanSb:         willChangeValue(for: \.txMonitorPanSb)          ; _txMonitorPanSb = property.value.iValue         ; didChangeValue(for: \.txMonitorPanSb)
-      case .txRfPowerChanges:       willChangeValue(for: \.txRfPowerChanges)        ; _txRfPowerChanges = property.value.bValue       ; didChangeValue(for: \.txRfPowerChanges)
-      case .txSliceMode:            willChangeValue(for: \.txSliceMode)             ; _txSliceMode = property.value                   ; didChangeValue(for: \.txSliceMode)
-      case .tune:                   willChangeValue(for: \.tune)                    ; _tune = property.value.bValue                   ; didChangeValue(for: \.tune)
-      case .tunePower:              willChangeValue(for: \.tunePower)               ; _tunePower = property.value.iValue              ; didChangeValue(for: \.tunePower)
-      case .voxEnabled:             willChangeValue(for: \.voxEnabled)              ; _voxEnabled = property.value.bValue             ; didChangeValue(for: \.voxEnabled)
-      case .voxDelay:               willChangeValue(for: \.voxDelay)                ; _voxDelay = property.value.iValue               ; didChangeValue(for: \.voxDelay)
-      case .voxLevel:               willChangeValue(for: \.voxLevel)                ; _voxLevel = property.value.iValue               ; didChangeValue(for: \.voxLevel)
-      }
+      case .amCarrierLevel:         _carrierLevel = property.value.iValue
+      case .companderEnabled:       _companderEnabled = property.value.bValue 
+      case .companderLevel:         _companderLevel = property.value.iValue
+      case .cwBreakInEnabled:       _cwBreakInEnabled = property.value.bValue
+      case .cwBreakInDelay:         _cwBreakInDelay = property.value.iValue
+      case .cwIambicEnabled:        _cwIambicEnabled = property.value.bValue
+      case .cwIambicMode:           _cwIambicMode = property.value.iValue
+      case .cwlEnabled:             _cwlEnabled = property.value.bValue
+      case .cwPitch:                _cwPitch = property.value.iValue
+      case .cwSidetoneEnabled:      _cwSidetoneEnabled = property.value.bValue
+      case .cwSpeed:                _cwSpeed = property.value.iValue
+      case .cwSwapPaddles:          _cwSwapPaddles = property.value.bValue
+      case .cwSyncCwxEnabled:       _cwSyncCwxEnabled = property.value.bValue
+      case .daxEnabled:             _daxEnabled = property.value.bValue
+      case .frequency:              _frequency = property.value.mhzToHz
+      case .hwAlcEnabled:           _hwAlcEnabled = property.value.bValue
+      case .inhibit:                _inhibit = property.value.bValue
+      case .maxPowerLevel:          _maxPowerLevel = property.value.iValue
+      case .metInRxEnabled:         _metInRxEnabled = property.value.bValue
+      case .micAccEnabled:          _micAccEnabled = property.value.bValue
+      case .micBoostEnabled:        _micBoostEnabled = property.value.bValue
+      case .micBiasEnabled:         _micBiasEnabled = property.value.bValue
+      case .micLevel:               _micLevel = property.value.iValue
+      case .micSelection:           _micSelection = property.value
+      case .rawIqEnabled:           _rawIqEnabled = property.value.bValue
+      case .rfPower:                _rfPower = property.value.iValue
+      case .speechProcessorEnabled: _speechProcessorEnabled = property.value.bValue
+      case .speechProcessorLevel:   _speechProcessorLevel = property.value.iValue
+      case .txAntenna:              _txAntenna = property.value
+      case .txFilterChanges:        _txFilterChanges = property.value.bValue
+      case .txFilterHigh:           _txFilterHigh = property.value.iValue
+      case .txFilterLow:            _txFilterLow = property.value.iValue
+      case .txInWaterfallEnabled:   _txInWaterfallEnabled = property.value.bValue
+      case .txMonitorAvailable:     _txMonitorAvailable = property.value.bValue
+      case .txMonitorEnabled:       _txMonitorEnabled = property.value.bValue
+      case .txMonitorGainCw:        _txMonitorGainCw = property.value.iValue
+      case .txMonitorGainSb:        _txMonitorGainSb = property.value.iValue
+      case .txMonitorPanCw:         _txMonitorPanCw = property.value.iValue
+      case .txMonitorPanSb:         _txMonitorPanSb = property.value.iValue
+      case .txRfPowerChanges:       _txRfPowerChanges = property.value.bValue
+      case .txSliceMode:            _txSliceMode = property.value
+      case .tune:                   _tune = property.value.bValue
+      case .tunePower:              _tunePower = property.value.iValue
+      case .voxEnabled:             _voxEnabled = property.value.bValue
+      case .voxDelay:               _voxDelay = property.value.iValue
+      case .voxLevel:               _voxLevel = property.value.iValue               
+     }
     }
     // is Transmit initialized?
     if !_initialized {

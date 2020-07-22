@@ -112,22 +112,22 @@ public final class Memory                   : NSObject, DynamicModel {
   
   var _digitalLowerOffset: Int {
     get { Api.objectQ.sync { __digitalLowerOffset } }
-    set { Api.objectQ.sync(flags: .barrier) { __digitalLowerOffset = newValue }}}
+    set { if newValue != _digitalLowerOffset { willChangeValue(for: \.digitalLowerOffset) ; Api.objectQ.sync(flags: .barrier) { __digitalLowerOffset = newValue } ; didChangeValue(for: \.digitalLowerOffset)}}}
   var _digitalUpperOffset: Int {
     get { Api.objectQ.sync { __digitalUpperOffset } }
-    set { Api.objectQ.sync(flags: .barrier) { __digitalUpperOffset = newValue }}}
+    set { if newValue != _digitalUpperOffset { willChangeValue(for: \.digitalUpperOffset) ; Api.objectQ.sync(flags: .barrier) { __digitalUpperOffset = newValue } ; didChangeValue(for: \.digitalUpperOffset)}}}
   var _filterHigh: Int {
     get { Api.objectQ.sync { __filterHigh } }
-    set { Api.objectQ.sync(flags: .barrier) { __filterHigh = newValue }}}
+    set { if newValue != _filterHigh { willChangeValue(for: \.filterHigh) ; Api.objectQ.sync(flags: .barrier) { __filterHigh = newValue } ; didChangeValue(for: \.filterHigh)}}}
   var _filterLow: Int {
     get { Api.objectQ.sync { __filterLow } }
-    set { Api.objectQ.sync(flags: .barrier) { __filterLow = newValue }}}
+    set { if newValue != _filterLow { willChangeValue(for: \.filterLow) ; Api.objectQ.sync(flags: .barrier) { __filterLow = newValue } ; didChangeValue(for: \.filterLow)}}}
   var _frequency: Int {
     get { Api.objectQ.sync { __frequency } }
-    set { Api.objectQ.sync(flags: .barrier) { __frequency = newValue }}}
+    set { if newValue != _frequency { willChangeValue(for: \.frequency) ; Api.objectQ.sync(flags: .barrier) { __frequency = newValue } ; didChangeValue(for: \.frequency)}}}
   var _group: String {
     get { Api.objectQ.sync { __group } }
-    set { Api.objectQ.sync(flags: .barrier) { __group = newValue }}}
+    set { if newValue != _group { willChangeValue(for: \.group) ; Api.objectQ.sync(flags: .barrier) { __group = newValue } ; didChangeValue(for: \.group)}}}
 //  var _highlight: Bool {
 //    get { Api.objectQ.sync { __highlight } }
 //    set { Api.objectQ.sync(flags: .barrier) { __highlight = newValue }}}
@@ -136,43 +136,43 @@ public final class Memory                   : NSObject, DynamicModel {
 //    set { Api.objectQ.sync(flags: .barrier) { __highlightColor = newValue }}}
   var _mode: String {
     get { Api.objectQ.sync { __mode } }
-    set { Api.objectQ.sync(flags: .barrier) { __mode = newValue }}}
+    set { if newValue != _mode { willChangeValue(for: \.mode) ; Api.objectQ.sync(flags: .barrier) { __mode = newValue } ; didChangeValue(for: \.mode)}}}
   var _name: String {
     get { Api.objectQ.sync { __name } }
-    set { Api.objectQ.sync(flags: .barrier) { __name = newValue }}}
+    set { if newValue != _name { willChangeValue(for: \.name) ; Api.objectQ.sync(flags: .barrier) { __name = newValue } ; didChangeValue(for: \.name)}}}
   var _offset: Int {
     get { Api.objectQ.sync { __offset } }
-    set { Api.objectQ.sync(flags: .barrier) { __offset = newValue }}}
+    set { if newValue != _offset { willChangeValue(for: \.offset) ; Api.objectQ.sync(flags: .barrier) { __offset = newValue } ; didChangeValue(for: \.offset)}}}
   var _offsetDirection: String {
     get { Api.objectQ.sync { __offsetDirection } }
-    set { Api.objectQ.sync(flags: .barrier) { __offsetDirection = newValue }}}
+    set { if newValue != _offsetDirection { willChangeValue(for: \.offsetDirection) ; Api.objectQ.sync(flags: .barrier) { __offsetDirection = newValue } ; didChangeValue(for: \.offsetDirection)}}}
   var _owner: String {
     get { Api.objectQ.sync { __owner } }
-    set { Api.objectQ.sync(flags: .barrier) { __owner = newValue }}}
+    set { if newValue != _owner { willChangeValue(for: \.owner) ; Api.objectQ.sync(flags: .barrier) { __owner = newValue } ; didChangeValue(for: \.owner)}}}
   var _rfPower: Int {
     get { Api.objectQ.sync { __rfPower } }
-    set { Api.objectQ.sync(flags: .barrier) { __rfPower = newValue }}}
+    set { if newValue != _rfPower { willChangeValue(for: \.rfPower) ; Api.objectQ.sync(flags: .barrier) { __rfPower = newValue } ; didChangeValue(for: \.rfPower)}}}
   var _rttyMark: Int {
     get { Api.objectQ.sync { __rttyMark } }
-    set { Api.objectQ.sync(flags: .barrier) { __rttyMark = newValue }}}
+    set { if newValue != _rttyMark { willChangeValue(for: \.rttyMark) ; Api.objectQ.sync(flags: .barrier) { __rttyMark = newValue } ; didChangeValue(for: \.rttyMark)}}}
   var _rttyShift: Int {
     get { Api.objectQ.sync { __rttyShift } }
-    set { Api.objectQ.sync(flags: .barrier) { __rttyShift = newValue }}}
+    set { if newValue != _rttyShift { willChangeValue(for: \.rttyShift) ; Api.objectQ.sync(flags: .barrier) { __rttyShift = newValue } ; didChangeValue(for: \.rttyShift)}}}
   var _squelchEnabled: Bool {
     get { Api.objectQ.sync { __squelchEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __squelchEnabled = newValue }}}
+    set { if newValue != _squelchEnabled { willChangeValue(for: \.squelchEnabled) ; Api.objectQ.sync(flags: .barrier) { __squelchEnabled = newValue } ; didChangeValue(for: \.squelchEnabled)}}}
   var _squelchLevel: Int {
     get { Api.objectQ.sync { __squelchLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __squelchLevel = newValue }}}
+    set { if newValue != _squelchLevel { willChangeValue(for: \.squelchLevel) ; Api.objectQ.sync(flags: .barrier) { __squelchLevel = newValue } ; didChangeValue(for: \.squelchLevel)}}}
   var _step: Int {
     get { Api.objectQ.sync { __step } }
-    set { Api.objectQ.sync(flags: .barrier) { __step = newValue }}}
+    set { if newValue != _step { willChangeValue(for: \.step) ; Api.objectQ.sync(flags: .barrier) { __step = newValue } ; didChangeValue(for: \.step)}}}
   var _toneMode: String {
     get { Api.objectQ.sync { __toneMode } }
-    set { Api.objectQ.sync(flags: .barrier) { __toneMode = newValue }}}
+    set { if newValue != _toneMode { willChangeValue(for: \.toneMode) ; Api.objectQ.sync(flags: .barrier) { __toneMode = newValue } ; didChangeValue(for: \.toneMode)}}}
   var _toneValue: Float {
     get {  Api.objectQ.sync { __toneValue } }
-    set { Api.objectQ.sync(flags: .barrier) { __toneValue = newValue }}}
+    set { if newValue != _toneValue { willChangeValue(for: \.toneValue) ; Api.objectQ.sync(flags: .barrier) { __toneValue = newValue } ; didChangeValue(for: \.toneValue)}}}
 
   enum Token : String {
     case digitalLowerOffset         = "digl_offset"
@@ -366,27 +366,27 @@ public final class Memory                   : NSObject, DynamicModel {
       }
       // Known tokens, in alphabetical order
       switch (token) {
-        case .digitalLowerOffset:       willChangeValue(for: \.digitalLowerOffset)  ; _digitalLowerOffset = property.value.iValue         ; didChangeValue(for: \.digitalLowerOffset)
-        case .digitalUpperOffset:       willChangeValue(for: \.digitalUpperOffset)  ; _digitalUpperOffset = property.value.iValue         ; didChangeValue(for: \.digitalUpperOffset)
-        case .frequency:                willChangeValue(for: \.frequency)           ; _frequency = property.value.mhzToHz                 ; didChangeValue(for: \.frequency)
-        case .group:                    willChangeValue(for: \.group)               ; _group = property.value.replacingSpaces()           ; didChangeValue(for: \.group)
+        case .digitalLowerOffset:       _digitalLowerOffset = property.value.iValue
+        case .digitalUpperOffset:       _digitalUpperOffset = property.value.iValue
+        case .frequency:                _frequency = property.value.mhzToHz
+        case .group:                    _group = property.value.replacingSpaces()
         case .highlight:                break   // ignored here
         case .highlightColor:           break   // ignored here
-        case .mode:                     willChangeValue(for: \.mode)                ; _mode = property.value.replacingSpaces()            ; didChangeValue(for: \.mode)
-        case .name:                     willChangeValue(for: \.name)                ; _name = property.value.replacingSpaces()            ; didChangeValue(for: \.name)
-        case .owner:                    willChangeValue(for: \.owner)               ; _owner = property.value.replacingSpaces()           ; didChangeValue(for: \.owner)
-        case .repeaterOffsetDirection:  willChangeValue(for: \.offsetDirection)     ; _offsetDirection = property.value.replacingSpaces() ; didChangeValue(for: \.offsetDirection)
-        case .repeaterOffset:           willChangeValue(for: \.offset)              ; _offset = property.value.iValue                     ; didChangeValue(for: \.offset)
-        case .rfPower:                  willChangeValue(for: \.rfPower)             ; _rfPower = property.value.iValue                    ; didChangeValue(for: \.rfPower)
-        case .rttyMark:                 willChangeValue(for: \.rttyMark)            ; _rttyMark = property.value.iValue                   ; didChangeValue(for: \.rttyMark)
-        case .rttyShift:                willChangeValue(for: \.rttyShift)           ; _rttyShift = property.value.iValue                  ; didChangeValue(for: \.rttyShift)
-        case .rxFilterHigh:             willChangeValue(for: \.filterHigh)          ; _filterHigh = property.value.iValue                 ; didChangeValue(for: \.filterHigh)
-        case .rxFilterLow:              willChangeValue(for: \.filterLow)           ; _filterLow = property.value.iValue                  ; didChangeValue(for: \.filterLow)
-        case .squelchEnabled:           willChangeValue(for: \.squelchEnabled)      ; _squelchEnabled = property.value.bValue             ; didChangeValue(for: \.squelchEnabled)
-        case .squelchLevel:             willChangeValue(for: \.squelchLevel)        ; _squelchLevel = property.value.iValue               ; didChangeValue(for: \.squelchLevel)
-        case .step:                     willChangeValue(for: \.step)                ; _step = property.value.iValue                       ; didChangeValue(for: \.step)
-        case .toneMode:                 willChangeValue(for: \.toneMode)            ; _toneMode = property.value.replacingSpaces()        ; didChangeValue(for: \.toneMode)
-        case .toneValue:                willChangeValue(for: \.toneValue)           ; _toneValue = property.value.fValue                  ; didChangeValue(for: \.toneValue)
+        case .mode:                     _mode = property.value.replacingSpaces()
+        case .name:                     _name = property.value.replacingSpaces()
+        case .owner:                    _owner = property.value.replacingSpaces()
+        case .repeaterOffsetDirection:  _offsetDirection = property.value.replacingSpaces()
+        case .repeaterOffset:           _offset = property.value.iValue
+        case .rfPower:                  _rfPower = property.value.iValue
+        case .rttyMark:                 _rttyMark = property.value.iValue
+        case .rttyShift:                _rttyShift = property.value.iValue
+        case .rxFilterHigh:             _filterHigh = property.value.iValue
+        case .rxFilterLow:              _filterLow = property.value.iValue
+        case .squelchEnabled:           _squelchEnabled = property.value.bValue
+        case .squelchLevel:             _squelchLevel = property.value.iValue
+        case .step:                     _step = property.value.iValue
+        case .toneMode:                 _toneMode = property.value.replacingSpaces()
+        case .toneValue:                _toneValue = property.value.fValue
       }
     }
     // is the Memory initialized?

@@ -78,32 +78,32 @@ public final class Equalizer : NSObject, DynamicModel {
   
   var _eqEnabled : Bool {
     get { Api.objectQ.sync { __eqEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__eqEnabled = newValue }}}
+    set { if newValue != _eqEnabled { willChangeValue(for: \.eqEnabled) ; Api.objectQ.sync(flags: .barrier) { __eqEnabled = newValue } ; didChangeValue(for: \.eqEnabled)}}}
   var _level63Hz : Int {
     get { Api.objectQ.sync { __level63Hz } }
-    set { Api.objectQ.sync(flags: .barrier) {__level63Hz = newValue }}}
+    set { if newValue != _level63Hz { willChangeValue(for: \.level63Hz) ; Api.objectQ.sync(flags: .barrier) { __level63Hz = newValue } ; didChangeValue(for: \.level63Hz)}}}
   var _level125Hz : Int {
     get { Api.objectQ.sync { __level125Hz } }
-    set { Api.objectQ.sync(flags: .barrier) {__level125Hz = newValue }}}
+    set { if newValue != _level125Hz { willChangeValue(for: \.level125Hz) ; Api.objectQ.sync(flags: .barrier) { __level125Hz = newValue } ; didChangeValue(for: \.level125Hz)}}}
   var _level250Hz : Int {
     get { Api.objectQ.sync { __level250Hz } }
-    set { Api.objectQ.sync(flags: .barrier) {__level250Hz = newValue }}}
+    set { if newValue != _level250Hz { willChangeValue(for: \.level250Hz) ; Api.objectQ.sync(flags: .barrier) { __level250Hz = newValue } ; didChangeValue(for: \.level250Hz)}}}
   var _level500Hz : Int {
     get { Api.objectQ.sync { __level500Hz } }
-    set { Api.objectQ.sync(flags: .barrier) {__level500Hz = newValue }}}
+    set { if newValue != _level500Hz{ willChangeValue(for: \.level500Hz) ; Api.objectQ.sync(flags: .barrier) { __level500Hz = newValue } ; didChangeValue(for: \.level500Hz)}}}
   var _level1000Hz : Int {
     get { Api.objectQ.sync { __level1000Hz } }
-    set { Api.objectQ.sync(flags: .barrier) {__level1000Hz = newValue }}}
+    set { if newValue != _level1000Hz { willChangeValue(for: \.level1000Hz) ; Api.objectQ.sync(flags: .barrier) { __level1000Hz = newValue } ; didChangeValue(for: \.level1000Hz)}}}
   var _level2000Hz : Int {
     get { Api.objectQ.sync { __level2000Hz } }
-    set { Api.objectQ.sync(flags: .barrier) {__level2000Hz = newValue }}}
+    set { if newValue != _level2000Hz { willChangeValue(for: \.level2000Hz) ; Api.objectQ.sync(flags: .barrier) { __level2000Hz = newValue } ; didChangeValue(for: \.level2000Hz)}}}
   var _level4000Hz : Int {
     get { Api.objectQ.sync { __level4000Hz } }
-    set { Api.objectQ.sync(flags: .barrier) {__level4000Hz = newValue }}}
+    set { if newValue != _level4000Hz { willChangeValue(for: \.level4000Hz) ; Api.objectQ.sync(flags: .barrier) { __level4000Hz = newValue } ; didChangeValue(for: \.level4000Hz)}}}
   var _level8000Hz   : Int {
     get { Api.objectQ.sync { __level8000Hz } }
-    set { Api.objectQ.sync(flags: .barrier) {__level8000Hz = newValue }}}
-
+    set { if newValue != _level8000Hz { willChangeValue(for: \.level8000Hz) ; Api.objectQ.sync(flags: .barrier) { __level8000Hz = newValue } ; didChangeValue(for: \.level8000Hz)}}}
+  
   enum Token : String {
     case level63Hz                          = "63hz"
     case level125Hz                         = "125hz"
@@ -210,15 +210,15 @@ public final class Equalizer : NSObject, DynamicModel {
       // known Keys, in alphabetical order
       switch token {
         
-      case .level63Hz:    willChangeValue(for: \.level63Hz)   ; _level63Hz = property.value.iValue    ; didChangeValue(for: \.level63Hz)
-      case .level125Hz:   willChangeValue(for: \.level125Hz)  ; _level125Hz = property.value.iValue   ; didChangeValue(for: \.level125Hz)
-      case .level250Hz:   willChangeValue(for: \.level250Hz)  ; _level250Hz = property.value.iValue   ; didChangeValue(for: \.level250Hz)
-      case .level500Hz:   willChangeValue(for: \.level500Hz)  ; _level500Hz = property.value.iValue   ; didChangeValue(for: \.level500Hz)
-      case .level1000Hz:  willChangeValue(for: \.level1000Hz) ; _level1000Hz = property.value.iValue  ; didChangeValue(for: \.level1000Hz)
-      case .level2000Hz:  willChangeValue(for: \.level2000Hz) ; _level2000Hz = property.value.iValue  ; didChangeValue(for: \.level2000Hz)
-      case .level4000Hz:  willChangeValue(for: \.level4000Hz) ; _level4000Hz = property.value.iValue  ; didChangeValue(for: \.level4000Hz)
-      case .level8000Hz:  willChangeValue(for: \.level8000Hz) ; _level8000Hz = property.value.iValue  ; didChangeValue(for: \.level8000Hz)
-      case .enabled:      willChangeValue(for: \.eqEnabled)   ; _eqEnabled = property.value.bValue    ; didChangeValue(for: \.eqEnabled)
+      case .level63Hz:    _level63Hz = property.value.iValue
+      case .level125Hz:   _level125Hz = property.value.iValue
+      case .level250Hz:   _level250Hz = property.value.iValue
+      case .level500Hz:   _level500Hz = property.value.iValue
+      case .level1000Hz:  _level1000Hz = property.value.iValue
+      case .level2000Hz:  _level2000Hz = property.value.iValue
+      case .level4000Hz:  _level4000Hz = property.value.iValue
+      case .level8000Hz:  _level8000Hz = property.value.iValue
+      case .enabled:      _eqEnabled = property.value.bValue    
       }
     }
     // is the Equalizer initialized?

@@ -41,38 +41,39 @@ public final class Gps : NSObject, StaticModel {
   
   var _altitude : String {
     get { Api.objectQ.sync { __altitude } }
-    set { Api.objectQ.sync(flags: .barrier) {__altitude = newValue }}}
+    set { if newValue != _altitude { willChangeValue(for: \.altitude) ; Api.objectQ.sync(flags: .barrier) { __altitude = newValue } ; didChangeValue(for: \.altitude)}}}
   var _frequencyError : Double {
     get { Api.objectQ.sync { __frequencyError } }
-    set { Api.objectQ.sync(flags: .barrier) {__frequencyError = newValue }}}
+    set { if newValue != _frequencyError { willChangeValue(for: \.frequencyError) ; Api.objectQ.sync(flags: .barrier) { __frequencyError = newValue } ; didChangeValue(for: \.frequencyError)}}}
   var _grid : String {
     get { Api.objectQ.sync { __grid } }
-    set { Api.objectQ.sync(flags: .barrier) {__grid = newValue }}}
+    set { if newValue != _grid { willChangeValue(for: \.grid) ; Api.objectQ.sync(flags: .barrier) { __grid = newValue } ; didChangeValue(for: \.grid)}}}
   var _latitude : String {
     get { Api.objectQ.sync { __latitude } }
-    set { Api.objectQ.sync(flags: .barrier) {__latitude = newValue }}}
+    set { if newValue != _latitude { willChangeValue(for: \.latitude) ; Api.objectQ.sync(flags: .barrier) { __latitude = newValue } ; didChangeValue(for: \.latitude)}}}
   var _longitude : String {
     get { Api.objectQ.sync { __longitude } }
-    set { Api.objectQ.sync(flags: .barrier) {__longitude = newValue }}}
+    set { if newValue != _longitude { willChangeValue(for: \.longitude) ; Api.objectQ.sync(flags: .barrier) { __longitude = newValue } ; didChangeValue(for: \.longitude)}}}
   var _speed : String {
     get { Api.objectQ.sync { __speed } }
-    set { Api.objectQ.sync(flags: .barrier) {__speed = newValue }}}
+    set { if newValue != _speed { willChangeValue(for: \.speed) ; Api.objectQ.sync(flags: .barrier) { __speed = newValue } ; didChangeValue(for: \.speed)}}}
   var _status : Bool {
     get { Api.objectQ.sync { __status } }
-    set { Api.objectQ.sync(flags: .barrier) {__status = newValue }}}
+    set { if newValue != _status { willChangeValue(for: \.status) ; Api.objectQ.sync(flags: .barrier) { __status = newValue } ; didChangeValue(for: \.status)}}}
   var _time : String {
     get { Api.objectQ.sync { __time } }
-    set { Api.objectQ.sync(flags: .barrier) {__time = newValue }}}
+    set { if newValue != _time { willChangeValue(for: \.time) ; Api.objectQ.sync(flags: .barrier) { __time = newValue } ; didChangeValue(for: \.time)}}}
   var _track : Double {
     get { Api.objectQ.sync { __track } }
-    set { Api.objectQ.sync(flags: .barrier) {__track = newValue }}}
+    set { if newValue != _track { willChangeValue(for: \.track) ; Api.objectQ.sync(flags: .barrier) { __track = newValue } ; didChangeValue(for: \.track)}}}
   var _tracked : Bool {
     get { Api.objectQ.sync { __tracked } }
-    set { Api.objectQ.sync(flags: .barrier) {__tracked = newValue }}}
+    set { if newValue != _tracked { willChangeValue(for: \.tracked) ; Api.objectQ.sync(flags: .barrier) { __tracked = newValue } ; didChangeValue(for: \.tracked)}}}
   var _visible : Bool {
     get { Api.objectQ.sync { __visible } }
-    set { Api.objectQ.sync(flags: .barrier) {__visible = newValue }}}
-
+    set { if newValue != _visible { willChangeValue(for: \.visible) ; Api.objectQ.sync(flags: .barrier) { __visible = newValue } ; didChangeValue(for: \.visible)}}}
+  
+  
   enum Token: String {
     case altitude
     case frequencyError = "freq_error"
@@ -155,17 +156,17 @@ public final class Gps : NSObject, StaticModel {
       }
       // Known tokens, in alphabetical order
       switch token {
-      case .altitude:       willChangeValue(for: \.altitude)        ; _altitude = property.value              ; didChangeValue(for: \.altitude)
-      case .frequencyError: willChangeValue(for: \.frequencyError)  ; _frequencyError = property.value.dValue ; didChangeValue(for: \.frequencyError)
-      case .grid:           willChangeValue(for: \.grid)            ; _grid = property.value                  ; didChangeValue(for: \.grid)
-      case .latitude:       willChangeValue(for: \.latitude)        ; _latitude = property.value              ; didChangeValue(for: \.latitude)
-      case .longitude:      willChangeValue(for: \.longitude)       ; _longitude = property.value             ; didChangeValue(for: \.longitude)
-      case .speed:          willChangeValue(for: \.speed)           ; _speed = property.value                 ; didChangeValue(for: \.speed)
-      case .status:         willChangeValue(for: \.status)          ; _status = property.value == "present" ? true : false  ; didChangeValue(for: \.status)
-      case .time:           willChangeValue(for: \.time)            ; _time = property.value                  ; didChangeValue(for: \.time)
-      case .track:          willChangeValue(for: \.track)           ; _track = property.value.dValue          ; didChangeValue(for: \.track)
-      case .tracked:        willChangeValue(for: \.tracked)         ; _tracked = property.value.bValue        ; didChangeValue(for: \.tracked)
-      case .visible:        willChangeValue(for: \.visible)         ; _visible = property.value.bValue        ; didChangeValue(for: \.visible)
+      case .altitude:       _altitude = property.value
+      case .frequencyError: _frequencyError = property.value.dValue
+      case .grid:           _grid = property.value
+      case .latitude:       _latitude = property.value
+      case .longitude:      _longitude = property.value
+      case .speed:          _speed = property.value
+      case .status:         _status = property.value == "present" ? true : false
+      case .time:           _time = property.value
+      case .track:          _track = property.value.dValue
+      case .tracked:        _tracked = property.value.bValue
+      case .visible:        _visible = property.value.bValue
       }
     }
   }

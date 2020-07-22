@@ -725,6 +725,20 @@ extension Radio {
     // return the first one
     return filteredSlices[0]
   }
+  /// Return the first Slice on the specified Panadapter (if any)
+  ///
+  /// - Parameters:
+  ///   - id:         a Panadapter Stream Id
+  /// - Returns:      a Slice reference (or nil)
+  ///
+  public func findFirstSlice(on id: PanadapterStreamId) -> xLib6000.Slice? {
+    // find the Slices on the specified Panadapter (if any)
+    let filteredSlices = slices.values.filter { $0.panadapterId == id }
+    guard filteredSlices.count >= 1 else { return nil }
+    
+    // return the first one
+    return filteredSlices[0]
+  }
   /// Find a Slice by DAX Channel
   ///
   /// - Parameter channel:    Dax channel number

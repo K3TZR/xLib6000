@@ -133,64 +133,64 @@ public final class Interlock : NSObject, StaticModel {
   
   var _accTxEnabled: Bool {
     get { Api.objectQ.sync { __accTxEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __accTxEnabled = newValue }}}
+    set { if newValue != _accTxEnabled { willChangeValue(for: \.accTxEnabled) ; Api.objectQ.sync(flags: .barrier) { __accTxEnabled = newValue } ; didChangeValue(for: \.accTxEnabled)}}}
   var _accTxDelay: Int {
     get { Api.objectQ.sync { __accTxDelay } }
-    set { Api.objectQ.sync(flags: .barrier) { __accTxDelay = newValue }}}
+    set { if newValue != _accTxDelay { willChangeValue(for: \.accTxDelay) ; Api.objectQ.sync(flags: .barrier) { __accTxDelay = newValue } ; didChangeValue(for: \.accTxDelay)}}}
   var _accTxReqEnabled: Bool {
     get { Api.objectQ.sync { __accTxReqEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __accTxReqEnabled = newValue }}}
+    set { if newValue != _accTxReqEnabled { willChangeValue(for: \.accTxReqEnabled) ; Api.objectQ.sync(flags: .barrier) { __accTxReqEnabled = newValue } ; didChangeValue(for: \.accTxReqEnabled)}}}
   var _accTxReqPolarity: Bool {
     get { Api.objectQ.sync { __accTxReqPolarity } }
-    set { Api.objectQ.sync(flags: .barrier) { __accTxReqPolarity = newValue }}}
+    set { if newValue != _accTxReqPolarity { willChangeValue(for: \.accTxReqPolarity) ; Api.objectQ.sync(flags: .barrier) { __accTxReqPolarity = newValue } ; didChangeValue(for: \.accTxReqPolarity)}}}
   var _amplifier: String {
     get { Api.objectQ.sync { __amplifier } }
-    set { Api.objectQ.sync(flags: .barrier) { __amplifier = newValue }}}
+    set { if newValue != _amplifier { willChangeValue(for: \.amplifier) ; Api.objectQ.sync(flags: .barrier) { __amplifier = newValue } ; didChangeValue(for: \.amplifier)}}}
   var _rcaTxReqEnabled: Bool {
     get { Api.objectQ.sync { __rcaTxReqEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __rcaTxReqEnabled = newValue }}}
+    set { if newValue != _rcaTxReqEnabled { willChangeValue(for: \.rcaTxReqEnabled) ; Api.objectQ.sync(flags: .barrier) { __rcaTxReqEnabled = newValue } ; didChangeValue(for: \.rcaTxReqEnabled)}}}
   var _rcaTxReqPolarity: Bool {
     get { Api.objectQ.sync { __rcaTxReqPolarity } }
-    set { Api.objectQ.sync(flags: .barrier) { __rcaTxReqPolarity = newValue }}}
+    set { if newValue != _rcaTxReqPolarity { willChangeValue(for: \.rcaTxReqPolarity) ; Api.objectQ.sync(flags: .barrier) { __rcaTxReqPolarity = newValue } ; didChangeValue(for: \.rcaTxReqPolarity)}}}
   var _reason: String {
     get { Api.objectQ.sync { __reason } }
-    set { Api.objectQ.sync(flags: .barrier) { __reason = newValue }}}
+    set { if newValue != _reason { willChangeValue(for: \.reason) ; Api.objectQ.sync(flags: .barrier) { __reason = newValue } ; didChangeValue(for: \.reason)}}}
   var _source: String {
     get { Api.objectQ.sync { __source } }
-    set { Api.objectQ.sync(flags: .barrier) { __source = newValue }}}
+    set { if newValue != _source { willChangeValue(for: \.source) ; Api.objectQ.sync(flags: .barrier) { __source = newValue } ; didChangeValue(for: \.source)}}}
   var _state: String {
     get { Api.objectQ.sync { __state } }
-    set { Api.objectQ.sync(flags: .barrier) { __state = newValue }}}
+    set { if newValue != _state { willChangeValue(for: \.state) ; Api.objectQ.sync(flags: .barrier) { __state = newValue } ; didChangeValue(for: \.state)}}}
   var _timeout: Int {
     get { Api.objectQ.sync { __timeout } }
-    set { Api.objectQ.sync(flags: .barrier) { __timeout = newValue }}}
+    set { if newValue != _timeout { willChangeValue(for: \.timeout) ; Api.objectQ.sync(flags: .barrier) { __timeout = newValue } ; didChangeValue(for: \.timeout)}}}
   var _txAllowed: Bool {
     get { Api.objectQ.sync { __txAllowed } }
-    set { Api.objectQ.sync(flags: .barrier) { __txAllowed = newValue }}}
+    set { if newValue != _txAllowed { willChangeValue(for: \.txAllowed) ; Api.objectQ.sync(flags: .barrier) { __txAllowed = newValue } ; didChangeValue(for: \.txAllowed)}}}
   var _txClientHandle: Handle {
     get { Api.objectQ.sync { __txClientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) { __txClientHandle = newValue }}}
+    set { if newValue != _txClientHandle { willChangeValue(for: \.txClientHandle) ; Api.objectQ.sync(flags: .barrier) { __txClientHandle = newValue } ; didChangeValue(for: \.txClientHandle)}}}
   var _txDelay: Int {
     get { Api.objectQ.sync { __txDelay } }
-    set { Api.objectQ.sync(flags: .barrier) { __txDelay = newValue }}}
+    set { if newValue != _txDelay { willChangeValue(for: \.txDelay) ; Api.objectQ.sync(flags: .barrier) { __txDelay = newValue } ; didChangeValue(for: \.txDelay)}}}
   var _tx1Delay: Int {
     get { Api.objectQ.sync { __tx1Delay } }
-    set { Api.objectQ.sync(flags: .barrier) { __tx1Delay = newValue }}}
+    set { if newValue != _tx1Delay { willChangeValue(for: \.tx1Delay) ; Api.objectQ.sync(flags: .barrier) { __tx1Delay = newValue } ; didChangeValue(for: \.tx1Delay)}}}
   var _tx1Enabled: Bool {
     get { Api.objectQ.sync { __tx1Enabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __tx1Enabled = newValue }}}
+    set { if newValue != _tx1Enabled { willChangeValue(for: \.tx1Enabled) ; Api.objectQ.sync(flags: .barrier) { __tx1Enabled = newValue } ; didChangeValue(for: \.tx1Enabled)}}}
   var _tx2Delay: Int {
     get { Api.objectQ.sync { __tx2Delay } }
-    set { Api.objectQ.sync(flags: .barrier) { __tx2Delay = newValue }}}
+    set { if newValue != _tx2Delay { willChangeValue(for: \.tx2Delay) ; Api.objectQ.sync(flags: .barrier) { __tx2Delay = newValue } ; didChangeValue(for: \.tx2Delay)}}}
   var _tx2Enabled: Bool {
     get { Api.objectQ.sync { __tx2Enabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __tx2Enabled = newValue }}}
+    set { if newValue != _tx2Enabled { willChangeValue(for: \.tx2Enabled) ; Api.objectQ.sync(flags: .barrier) { __tx2Enabled = newValue } ; didChangeValue(for: \.tx2Enabled)}}}
   var _tx3Delay: Int {
     get { Api.objectQ.sync { __tx3Delay } }
-    set { Api.objectQ.sync(flags: .barrier) { __tx3Delay = newValue }}}
+    set { if newValue != _tx3Delay { willChangeValue(for: \.tx3Delay) ; Api.objectQ.sync(flags: .barrier) { __tx3Delay = newValue } ; didChangeValue(for: \.tx3Delay)}}}
   var _tx3Enabled: Bool {
     get { Api.objectQ.sync { __tx3Enabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __tx3Enabled = newValue }}}
+    set { if newValue != _tx3Enabled { willChangeValue(for: \.tx3Enabled) ; Api.objectQ.sync(flags: .barrier) { __tx3Enabled = newValue } ; didChangeValue(for: \.tx3Enabled)}}}
   
   enum Token: String {
     case accTxEnabled       = "acc_tx_enabled"
@@ -297,28 +297,28 @@ public final class Interlock : NSObject, StaticModel {
         // Known tokens, in alphabetical order
         switch token {
           
-        case .accTxEnabled:     willChangeValue(for: \.accTxEnabled)      ; _accTxEnabled = property.value.bValue         ; didChangeValue(for: \.accTxEnabled)
-        case .accTxDelay:       willChangeValue(for: \.accTxDelay)        ; _accTxDelay = property.value.iValue           ; didChangeValue(for: \.accTxDelay)
-        case .accTxReqEnabled:  willChangeValue(for: \.accTxReqEnabled)   ; _accTxReqEnabled = property.value.bValue      ; didChangeValue(for: \.accTxReqEnabled)
-        case .accTxReqPolarity: willChangeValue(for: \.accTxReqPolarity)  ; _accTxReqPolarity = property.value.bValue     ; didChangeValue(for: \.accTxReqPolarity)
-        case .amplifier:        willChangeValue(for: \.amplifier)         ; _amplifier = property.value                   ; didChangeValue(for: \.amplifier)
-        case .rcaTxReqEnabled:  willChangeValue(for: \.rcaTxReqEnabled)   ; _rcaTxReqEnabled = property.value.bValue      ; didChangeValue(for: \.rcaTxReqEnabled)
-        case .rcaTxReqPolarity: willChangeValue(for: \.rcaTxReqPolarity)  ; _rcaTxReqPolarity = property.value.bValue     ; didChangeValue(for: \.rcaTxReqPolarity)
-        case .reason:           willChangeValue(for: \.reason)            ; _reason = property.value                      ; didChangeValue(for: \.reason)
-        case .source:           willChangeValue(for: \.source)            ; _source = property.value                      ; didChangeValue(for: \.source)
-        case .state:            willChangeValue(for: \.state)             ; _state = property.value                       ; didChangeValue(for: \.state)
+        case .accTxEnabled:     _accTxEnabled = property.value.bValue
+        case .accTxDelay:       _accTxDelay = property.value.iValue
+        case .accTxReqEnabled:  _accTxReqEnabled = property.value.bValue
+        case .accTxReqPolarity: _accTxReqPolarity = property.value.bValue
+        case .amplifier:        _amplifier = property.value
+        case .rcaTxReqEnabled:  _rcaTxReqEnabled = property.value.bValue
+        case .rcaTxReqPolarity: _rcaTxReqPolarity = property.value.bValue
+        case .reason:           _reason = property.value
+        case .source:           _source = property.value
+        case .state:            _state = property.value
         // determine if a Mox change is needed
         _radio.interlockStateChange(_state)
-        case .timeout:          willChangeValue(for: \.timeout)           ; _timeout = property.value.iValue              ; didChangeValue(for: \.timeout)
-        case .txAllowed:        willChangeValue(for: \.txAllowed)         ; _txAllowed = property.value.bValue            ; didChangeValue(for: \.txAllowed)
-        case .txClientHandle:   willChangeValue(for: \.txClientHandle)    ; _txClientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.txClientHandle)
-        case .txDelay:          willChangeValue(for: \.txDelay)           ; _txDelay = property.value.iValue              ; didChangeValue(for: \.txDelay)
-        case .tx1Delay:         willChangeValue(for: \.tx1Delay)          ; _tx1Delay = property.value.iValue             ; didChangeValue(for: \.tx1Delay)
-        case .tx1Enabled:       willChangeValue(for: \.tx1Enabled)        ; _tx1Enabled = property.value.bValue           ; didChangeValue(for: \.tx1Enabled)
-        case .tx2Delay:         willChangeValue(for: \.tx2Delay)          ; _tx2Delay = property.value.iValue             ; didChangeValue(for: \.tx2Delay)
-        case .tx2Enabled:       willChangeValue(for: \.tx2Enabled)        ; _tx2Enabled = property.value.bValue           ; didChangeValue(for: \.tx2Enabled)
-        case .tx3Delay:         willChangeValue(for: \.tx3Delay)          ; _tx3Delay = property.value.iValue             ; didChangeValue(for: \.tx3Delay)
-        case .tx3Enabled:       willChangeValue(for: \.tx3Enabled)        ; _tx3Enabled = property.value.bValue           ; didChangeValue(for: \.tx3Enabled)
+        case .timeout:          _timeout = property.value.iValue
+        case .txAllowed:        _txAllowed = property.value.bValue
+        case .txClientHandle:   _txClientHandle = property.value.handle ?? 0
+        case .txDelay:          _txDelay = property.value.iValue
+        case .tx1Delay:         _tx1Delay = property.value.iValue
+        case .tx1Enabled:       _tx1Enabled = property.value.bValue
+        case .tx2Delay:         _tx2Delay = property.value.iValue
+        case .tx2Enabled:       _tx2Enabled = property.value.bValue
+        case .tx3Delay:         _tx3Delay = property.value.iValue
+        case .tx3Enabled:       _tx3Enabled = property.value.bValue           
         }
       }
     }

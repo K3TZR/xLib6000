@@ -69,19 +69,19 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
   
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+    set { if newValue != _clientHandle { willChangeValue(for: \.clientHandle) ; Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } ; didChangeValue(for: \.clientHandle)}}}
   var _daxChannel : Int {
     get { Api.objectQ.sync { __daxChannel } }
-    set { Api.objectQ.sync(flags: .barrier) {__daxChannel = newValue }}}
+    set { if newValue != _daxChannel { willChangeValue(for: \.daxChannel) ; Api.objectQ.sync(flags: .barrier) { __daxChannel = newValue } ; didChangeValue(for: \.daxChannel)}}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
-    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+    set { if newValue != _ip { willChangeValue(for: \.ip) ; Api.objectQ.sync(flags: .barrier) { __ip = newValue } ; didChangeValue(for: \.ip)}}}
   var _rxGain : Int {
     get { Api.objectQ.sync { __rxGain } }
-    set { Api.objectQ.sync(flags: .barrier) {__rxGain = newValue }}}
+    set { if newValue != _rxGain { willChangeValue(for: \.rxGain) ; Api.objectQ.sync(flags: .barrier) { __rxGain = newValue } ; didChangeValue(for: \.rxGain)}}}
   var _slice : xLib6000.Slice? {
     get { Api.objectQ.sync { __slice } }
-    set { Api.objectQ.sync(flags: .barrier) {__slice = newValue }}}
+    set { if newValue != _slice { willChangeValue(for: \.slice) ; Api.objectQ.sync(flags: .barrier) { __slice = newValue } ; didChangeValue(for: \.slice)}}}
   
   enum Token: String {
     case clientHandle         = "client_handle"
@@ -187,22 +187,22 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
-      case .daxChannel:   willChangeValue(for: \.daxChannel)    ; _daxChannel = property.value.iValue         ; didChangeValue(for: \.daxChannel)
-      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
+      case .clientHandle: _clientHandle = property.value.handle ?? 0
+      case .daxChannel:   _daxChannel = property.value.iValue
+      case .ip:           _ip = property.value
       case .type:         break  // included to inhibit unknown token warnings
       case .slice:
         // do we have a good reference to the GUI Client?
         if let handle = _radio.findHandle(for: _radio.boundClientId) {
           // YES,
           let slice = _radio.findSlice(letter: property.value, guiClientHandle: handle)
-          willChangeValue(for: \.slice)  ; _slice = slice  ; didChangeValue(for: \.slice)
+          _slice = slice
           let gain = _rxGain
           _rxGain = 0
           rxGain = gain
         } else {
           // NO, clear the Slice reference and carry on
-          willChangeValue(for: \.slice)  ; _slice = nil  ; didChangeValue(for: \.slice)
+          _slice = nil
           continue
         }
       }

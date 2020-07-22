@@ -75,6 +75,9 @@ public final class UsbCable : NSObject, DynamicModel {
   @objc dynamic public var usbLog: Bool {
     get { _usbLog }
     set { if _usbLog != newValue { _usbLog = newValue ; usbCableCmd( .usbLog, newValue.as1or0) } } }
+//  @objc dynamic public var usbLogLine: Bool {
+//    get { _usbLogLine }
+//    set { if _usbLogLine != newValue { _usbLog = newValue ; usbCableCmd( .usbLogLine, newValue.as1or0) } } }
 
   public private(set) var cableType         : UsbCableType
 
@@ -92,59 +95,59 @@ public final class UsbCable : NSObject, DynamicModel {
   
   var _autoReport : Bool {
     get { Api.objectQ.sync { __autoReport } }
-    set { Api.objectQ.sync(flags: .barrier) {__autoReport = newValue }}}
+    set { if newValue != _autoReport { willChangeValue(for: \.autoReport) ; Api.objectQ.sync(flags: .barrier) { __autoReport = newValue } ; didChangeValue(for: \.autoReport)}}}
   var _band : String {
     get { Api.objectQ.sync { __band } }
-    set { Api.objectQ.sync(flags: .barrier) {__band = newValue }}}
+    set { if newValue != _band { willChangeValue(for: \.band) ; Api.objectQ.sync(flags: .barrier) { __band = newValue } ; didChangeValue(for: \.band)}}}
   var _dataBits : Int {
     get { Api.objectQ.sync { __dataBits } }
-    set { Api.objectQ.sync(flags: .barrier) {__dataBits = newValue }}}
+    set { if newValue != _dataBits { willChangeValue(for: \.dataBits) ; Api.objectQ.sync(flags: .barrier) { __dataBits = newValue } ; didChangeValue(for: \.dataBits)}}}
   var _enable : Bool {
     get { Api.objectQ.sync { __enable } }
-    set { Api.objectQ.sync(flags: .barrier) {__enable = newValue }}}
+    set { if newValue != _enable { willChangeValue(for: \.enable) ; Api.objectQ.sync(flags: .barrier) { __enable = newValue } ; didChangeValue(for: \.enable)}}}
   var _flowControl : String {
     get { Api.objectQ.sync { __flowControl } }
-    set { Api.objectQ.sync(flags: .barrier) {__flowControl = newValue }}}
+    set { if newValue != _flowControl { willChangeValue(for: \.flowControl) ; Api.objectQ.sync(flags: .barrier) { __flowControl = newValue } ; didChangeValue(for: \.flowControl)}}}
   var _name : String {
     get { Api.objectQ.sync { __name } }
-    set { Api.objectQ.sync(flags: .barrier) {__name = newValue }}}
+    set { if newValue != _name { willChangeValue(for: \.name) ; Api.objectQ.sync(flags: .barrier) { __name = newValue } ; didChangeValue(for: \.name)}}}
   var _parity : String {
     get { Api.objectQ.sync { __parity } }
-    set { Api.objectQ.sync(flags: .barrier) {__parity = newValue }}}
+    set { if newValue != _parity { willChangeValue(for: \.parity) ; Api.objectQ.sync(flags: .barrier) { __parity = newValue } ; didChangeValue(for: \.parity)}}}
   var _pluggedIn : Bool {
     get { Api.objectQ.sync { __pluggedIn } }
-    set { Api.objectQ.sync(flags: .barrier) {__pluggedIn = newValue }}}
+    set { if newValue != _pluggedIn { willChangeValue(for: \.pluggedIn) ; Api.objectQ.sync(flags: .barrier) { __pluggedIn = newValue } ; didChangeValue(for: \.pluggedIn)}}}
   var _polarity : String {
     get { Api.objectQ.sync { __polarity } }
-    set { Api.objectQ.sync(flags: .barrier) {__polarity = newValue }}}
+    set { if newValue != _polarity { willChangeValue(for: \.polarity) ; Api.objectQ.sync(flags: .barrier) { __polarity = newValue } ; didChangeValue(for: \.polarity)}}}
   var _preamp : String {
     get { Api.objectQ.sync { __preamp } }
-    set { Api.objectQ.sync(flags: .barrier) {__preamp = newValue }}}
+    set { if newValue != _preamp { willChangeValue(for: \.preamp) ; Api.objectQ.sync(flags: .barrier) { __preamp = newValue } ; didChangeValue(for: \.preamp)}}}
   var _source : String {
     get { Api.objectQ.sync { __source } }
-    set { Api.objectQ.sync(flags: .barrier) {__source = newValue }}}
+    set { if newValue != _source { willChangeValue(for: \.source) ; Api.objectQ.sync(flags: .barrier) { __source = newValue } ; didChangeValue(for: \.source)}}}
   var _sourceRxAnt : String {
     get { Api.objectQ.sync { __sourceRxAnt } }
-    set { Api.objectQ.sync(flags: .barrier) {__sourceRxAnt = newValue }}}
+    set { if newValue != _sourceRxAnt { willChangeValue(for: \.sourceRxAnt) ; Api.objectQ.sync(flags: .barrier) { __sourceRxAnt = newValue } ; didChangeValue(for: \.sourceRxAnt)}}}
   var _sourceSlice : Int {
     get { Api.objectQ.sync { __sourceSlice } }
-    set { Api.objectQ.sync(flags: .barrier) {__sourceSlice = newValue }}}
+    set { if newValue != _sourceSlice { willChangeValue(for: \.sourceSlice) ; Api.objectQ.sync(flags: .barrier) { __sourceSlice = newValue } ; didChangeValue(for: \.sourceSlice)}}}
   var _sourceTxAnt : String {
     get { Api.objectQ.sync { __sourceTxAnt } }
-    set { Api.objectQ.sync(flags: .barrier) {__sourceTxAnt = newValue }}}
+    set { if newValue != _sourceTxAnt { willChangeValue(for: \.sourceTxAnt) ; Api.objectQ.sync(flags: .barrier) { __sourceTxAnt = newValue } ; didChangeValue(for: \.sourceTxAnt)}}}
   var _speed : Int {
     get { Api.objectQ.sync { __speed } }
-    set { Api.objectQ.sync(flags: .barrier) {__speed = newValue }}}
+    set { if newValue != _speed { willChangeValue(for: \.speed) ; Api.objectQ.sync(flags: .barrier) { __speed = newValue } ; didChangeValue(for: \.speed)}}}
   var _stopBits : Int {
     get { Api.objectQ.sync { __stopBits } }
-    set { Api.objectQ.sync(flags: .barrier) {__stopBits = newValue }}}
+    set { if newValue != _stopBits { willChangeValue(for: \.stopBits) ; Api.objectQ.sync(flags: .barrier) { __stopBits = newValue } ; didChangeValue(for: \.stopBits)}}}
   var _usbLog : Bool {
     get { Api.objectQ.sync { __usbLog } }
-    set { Api.objectQ.sync(flags: .barrier) {__usbLog = newValue }}}
-  var _usbLogLine : String {
-    get { Api.objectQ.sync { __usbLogLine } }
-    set { Api.objectQ.sync(flags: .barrier) {__usbLogLine = newValue }}}
-
+    set { if newValue != _usbLog  { willChangeValue(for: \.usbLog ) ; Api.objectQ.sync(flags: .barrier) { __usbLog  = newValue } ; didChangeValue(for: \.usbLog )}}}
+//  var _usbLogLine : String {
+//    get { Api.objectQ.sync { __usbLogLine } }
+//    set { if newValue != _usbLogLine { willChangeValue(for: \.usbLogLine) ; Api.objectQ.sync(flags: .barrier) { __usbLogLine = newValue } ; didChangeValue(for: \.usbLogLine)}}}
+  
   enum Token : String {
     case autoReport       = "auto_report"
     case band
@@ -289,24 +292,24 @@ public final class UsbCable : NSObject, DynamicModel {
         // Known keys, in alphabetical order
         switch token {
           
-        case .autoReport:   willChangeValue(for: \.autoReport)  ; _autoReport = property.value.bValue   ; didChangeValue(for: \.autoReport)
-        case .band:         willChangeValue(for: \.band)        ; _band = property.value                ; didChangeValue(for: \.band)
+        case .autoReport:   _autoReport = property.value.bValue
+        case .band:         _band = property.value
         case .cableType:    break   // FIXME:
-        case .dataBits:     willChangeValue(for: \.dataBits)    ; _dataBits = property.value.iValue     ; didChangeValue(for: \.dataBits)
-        case .enable:       willChangeValue(for: \.enable)      ; _enable = property.value.bValue       ; didChangeValue(for: \.enable)
-        case .flowControl:  willChangeValue(for: \.flowControl) ; _flowControl = property.value         ; didChangeValue(for: \.flowControl)
-        case .name:         willChangeValue(for: \.name)        ; _name = property.value                ; didChangeValue(for: \.name)
-        case .parity:       willChangeValue(for: \.parity)      ; _parity = property.value              ; didChangeValue(for: \.parity)
-        case .pluggedIn:    willChangeValue(for: \.pluggedIn)   ; _pluggedIn = property.value.bValue    ; didChangeValue(for: \.pluggedIn)
-        case .polarity:     willChangeValue(for: \.polarity)    ; _polarity = property.value            ; didChangeValue(for: \.polarity)
-        case .preamp:       willChangeValue(for: \.preamp)      ; _preamp = property.value              ; didChangeValue(for: \.preamp)
-        case .source:       willChangeValue(for: \.source)      ; _source = property.value              ; didChangeValue(for: \.source)
-        case .sourceRxAnt:  willChangeValue(for: \.sourceRxAnt) ; _sourceRxAnt = property.value         ; didChangeValue(for: \.sourceRxAnt)
-        case .sourceSlice:  willChangeValue(for: \.sourceSlice) ; _sourceSlice = property.value.iValue  ; didChangeValue(for: \.sourceSlice)
-        case .sourceTxAnt:  willChangeValue(for: \.sourceTxAnt) ; _sourceTxAnt = property.value         ; didChangeValue(for: \.sourceTxAnt)
-        case .speed:        willChangeValue(for: \.speed)       ; _speed = property.value.iValue        ; didChangeValue(for: \.speed)
-        case .stopBits:     willChangeValue(for: \.stopBits)    ; _stopBits = property.value.iValue     ; didChangeValue(for: \.stopBits)
-        case .usbLog:       willChangeValue(for: \.usbLog)      ; _usbLog = property.value.bValue       ; didChangeValue(for: \.usbLog)
+        case .dataBits:     _dataBits = property.value.iValue
+        case .enable:       _enable = property.value.bValue
+        case .flowControl:  _flowControl = property.value
+        case .name:         _name = property.value
+        case .parity:       _parity = property.value
+        case .pluggedIn:    _pluggedIn = property.value.bValue
+        case .polarity:     _polarity = property.value
+        case .preamp:       _preamp = property.value
+        case .source:       _source = property.value
+        case .sourceRxAnt:  _sourceRxAnt = property.value
+        case .sourceSlice:  _sourceSlice = property.value.iValue
+        case .sourceTxAnt:  _sourceTxAnt = property.value
+        case .speed:        _speed = property.value.iValue
+        case .stopBits:     _stopBits = property.value.iValue
+        case .usbLog:       _usbLog = property.value.bValue       
         }
       }
       
@@ -375,6 +378,6 @@ public final class UsbCable : NSObject, DynamicModel {
   private var __speed       = 0
   private var __stopBits    = 0
   private var __usbLog      = false
-  private var __usbLogLine  = ""
+//  private var __usbLogLine  = ""
 }
 

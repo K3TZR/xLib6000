@@ -27,10 +27,10 @@ public final class Wan : NSObject, StaticModel {
   
   var _radioAuthenticated : Bool {
     get { Api.objectQ.sync { __radioAuthenticated } }
-    set { Api.objectQ.sync(flags: .barrier) {__radioAuthenticated = newValue }}}
+    set { if newValue != _radioAuthenticated { willChangeValue(for: \.radioAuthenticated) ; Api.objectQ.sync(flags: .barrier) { __radioAuthenticated = newValue } ; didChangeValue(for: \.radioAuthenticated)}}}
   var _serverConnected : Bool {
     get { Api.objectQ.sync { __serverConnected } }
-    set { Api.objectQ.sync(flags: .barrier) {__serverConnected = newValue }}}
+    set { if newValue != _serverConnected { willChangeValue(for: \.serverConnected) ; Api.objectQ.sync(flags: .barrier) { __serverConnected = newValue } ; didChangeValue(for: \.serverConnected)}}}
 
   private var _initialized  = false
 
@@ -82,8 +82,8 @@ public final class Wan : NSObject, StaticModel {
       // Known tokens, in alphabetical order
       switch token {
         
-      case .serverConnected:    willChangeValue(for: \.serverConnected)     ; _serverConnected = property.value.bValue    ; didChangeValue(for: \.serverConnected)
-      case .radioAuthenticated: willChangeValue(for: \.radioAuthenticated)  ; _radioAuthenticated = property.value.bValue ; didChangeValue(for: \.radioAuthenticated)
+      case .serverConnected:    _serverConnected = property.value.bValue
+      case .radioAuthenticated: _radioAuthenticated = property.value.bValue 
       }
     }
     // is it initialized?

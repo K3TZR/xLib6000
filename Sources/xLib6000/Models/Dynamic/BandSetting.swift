@@ -63,47 +63,36 @@ public final class BandSetting  : NSObject, DynamicModel {
   
   var _accTxEnabled: Bool {
     get { Api.objectQ.sync { __accTxEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__accTxEnabled = newValue } } }
-  
+    set { if newValue != _accTxEnabled { willChangeValue(for: \.accTxEnabled) ; Api.objectQ.sync(flags: .barrier) { __accTxEnabled = newValue } ; didChangeValue(for: \.accTxEnabled)}}}
   var _accTxReqEnabled: Bool {
     get { Api.objectQ.sync { __accTxReqEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__accTxReqEnabled = newValue } } }
-  
+    set { if newValue != _accTxReqEnabled { willChangeValue(for: \.accTxReqEnabled) ; Api.objectQ.sync(flags: .barrier) { __accTxReqEnabled = newValue } ; didChangeValue(for: \.accTxReqEnabled)}}}
   var _bandName: String {
     get { Api.objectQ.sync { __bandName } }
-    set { Api.objectQ.sync(flags: .barrier) {__bandName = newValue } } }
-  
+    set { if newValue != _bandName { willChangeValue(for: \.bandName) ; Api.objectQ.sync(flags: .barrier) { __bandName = newValue } ; didChangeValue(for: \.bandName)}}}
   var _hwAlcEnabled: Bool {
     get { Api.objectQ.sync { __hwAlcEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__hwAlcEnabled = newValue } } }
-  
+    set { if newValue != _hwAlcEnabled { willChangeValue(for: \.hwAlcEnabled) ; Api.objectQ.sync(flags: .barrier) { __hwAlcEnabled = newValue } ; didChangeValue(for: \.hwAlcEnabled)}}}
   var _inhibit: Bool {
     get { Api.objectQ.sync { __inhibit } }
-    set { Api.objectQ.sync(flags: .barrier) {__inhibit = newValue } } }
-  
+    set { if newValue != _inhibit { willChangeValue(for: \.inhibit) ; Api.objectQ.sync(flags: .barrier) { __inhibit = newValue } ; didChangeValue(for: \.inhibit)}}}
   var _rcaTxReqEnabled: Bool {
     get { Api.objectQ.sync { __rcaTxReqEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__rcaTxReqEnabled = newValue } } }
-  
+    set { if newValue != _rcaTxReqEnabled { willChangeValue(for: \.rcaTxReqEnabled) ; Api.objectQ.sync(flags: .barrier) { __rcaTxReqEnabled = newValue } ; didChangeValue(for: \.rcaTxReqEnabled)}}}
   var _rfPower: Int {
     get { Api.objectQ.sync { __rfPower } }
-    set { Api.objectQ.sync(flags: .barrier) {__rfPower = newValue } } }
-  
+    set { if newValue != _rfPower { willChangeValue(for: \.rfPower) ; Api.objectQ.sync(flags: .barrier) { __rfPower = newValue } ; didChangeValue(for: \.rfPower)}}}
   var _tunePower: Int {
-    get { Api.objectQ.sync { __tunePower } }
-    set { Api.objectQ.sync(flags: .barrier) {__tunePower = newValue } } }
-
+    get { Api.objectQ.sync { __tunePower } }set { if newValue != _tunePower { willChangeValue(for: \.tunePower) ; Api.objectQ.sync(flags: .barrier) { __tunePower = newValue } ; didChangeValue(for: \.tunePower)}}}
   var _tx1Enabled: Bool {
     get { Api.objectQ.sync { __tx1Enabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__tx1Enabled = newValue } } }
-  
+    set { if newValue != _tx1Enabled { willChangeValue(for: \.tx1Enabled) ; Api.objectQ.sync(flags: .barrier) { __tx1Enabled = newValue } ; didChangeValue(for: \.tx1Enabled)}}}
   var _tx2Enabled: Bool {
     get { Api.objectQ.sync { __tx2Enabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__tx2Enabled = newValue } } }
-  
+    set { if newValue != _tx2Enabled { willChangeValue(for: \.tx2Enabled) ; Api.objectQ.sync(flags: .barrier) { __tx2Enabled = newValue } ; didChangeValue(for: \.tx2Enabled)}}}
   var _tx3Enabled: Bool {
     get { Api.objectQ.sync { __tx3Enabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__tx3Enabled = newValue } } }
+    set { if newValue != _tx3Enabled { willChangeValue(for: \.tx3Enabled) ; Api.objectQ.sync(flags: .barrier) { __tx3Enabled = newValue } ; didChangeValue(for: \.tx3Enabled)}}}
   
   enum Token : String {
     case accTxEnabled             = "acc_tx_enabled"
@@ -220,17 +209,17 @@ public final class BandSetting  : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
 
-        case .accTxEnabled:     willChangeValue(for: \.accTxEnabled)    ; _accTxEnabled = property.value.bValue     ; didChangeValue(for: \.accTxEnabled)
-        case .accTxReqEnabled:  willChangeValue(for: \.accTxReqEnabled) ; _accTxReqEnabled = property.value.bValue  ; didChangeValue(for: \.accTxReqEnabled)
-        case .bandName:         willChangeValue(for: \.bandName)        ; _bandName = property.value                ; didChangeValue(for: \.bandName)
-        case .hwAlcEnabled:     willChangeValue(for: \.hwAlcEnabled)    ; _hwAlcEnabled = property.value.bValue     ; didChangeValue(for: \.hwAlcEnabled)
-        case .inhibit:          willChangeValue(for: \.inhibit)         ; _inhibit = property.value.bValue          ; didChangeValue(for: \.inhibit)
-        case .rcaTxReqEnabled:  willChangeValue(for: \.rcaTxReqEnabled) ; _rcaTxReqEnabled = property.value.bValue  ; didChangeValue(for: \.rcaTxReqEnabled)
-        case .rfPower:          willChangeValue(for: \.rfPower)         ; _rfPower = property.value.iValue          ; didChangeValue(for: \.rfPower)
-        case .tunePower:        willChangeValue(for: \.tunePower)       ; _tunePower = property.value.iValue        ; didChangeValue(for: \.tunePower)
-        case .tx1Enabled:       willChangeValue(for: \.tx1Enabled)      ; _tx1Enabled = property.value.bValue       ; didChangeValue(for: \.tx1Enabled)
-        case .tx2Enabled:       willChangeValue(for: \.tx2Enabled)      ; _tx2Enabled = property.value.bValue       ; didChangeValue(for: \.tx2Enabled)
-        case .tx3Enabled:       willChangeValue(for: \.tx3Enabled)      ; _tx3Enabled = property.value.bValue       ; didChangeValue(for: \.tx3Enabled)
+        case .accTxEnabled:     _accTxEnabled = property.value.bValue
+        case .accTxReqEnabled:  _accTxReqEnabled = property.value.bValue
+        case .bandName:         _bandName = property.value
+        case .hwAlcEnabled:     _hwAlcEnabled = property.value.bValue
+        case .inhibit:          _inhibit = property.value.bValue
+        case .rcaTxReqEnabled:  _rcaTxReqEnabled = property.value.bValue
+        case .rfPower:          _rfPower = property.value.iValue
+        case .tunePower:        _tunePower = property.value.iValue
+        case .tx1Enabled:       _tx1Enabled = property.value.bValue
+        case .tx2Enabled:       _tx2Enabled = property.value.bValue
+        case .tx3Enabled:       _tx3Enabled = property.value.bValue
       }
     }
     // is the BandSetting initialized?

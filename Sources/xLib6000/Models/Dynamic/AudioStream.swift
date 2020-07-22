@@ -79,26 +79,26 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+    set { if newValue != _clientHandle { willChangeValue(for: \.clientHandle) ; Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } ; didChangeValue(for: \.clientHandle)}}}
   var _daxChannel : Int {
     get { Api.objectQ.sync { __daxChannel } }
-    set { Api.objectQ.sync(flags: .barrier) {__daxChannel = newValue }}}
+    set { if newValue != _daxChannel { willChangeValue(for: \.daxChannel) ; Api.objectQ.sync(flags: .barrier) { __daxChannel = newValue } ; didChangeValue(for: \.daxChannel)}}}
   var _daxClients : Int {
     get { Api.objectQ.sync { __daxClients } }
-    set { Api.objectQ.sync(flags: .barrier) {__daxClients = newValue }}}
+    set { if newValue != _daxClients { willChangeValue(for: \.daxClients) ; Api.objectQ.sync(flags: .barrier) { __daxClients = newValue } ; didChangeValue(for: \.daxClients)}}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
-    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+    set { if newValue != _ip { willChangeValue(for: \.ip) ; Api.objectQ.sync(flags: .barrier) { __ip = newValue } ; didChangeValue(for: \.ip)}}}
   var _port : Int {
     get { Api.objectQ.sync { __port } }
-    set { Api.objectQ.sync(flags: .barrier) {__port = newValue }}}
+    set { if newValue != _port { willChangeValue(for: \.port) ; Api.objectQ.sync(flags: .barrier) { __port = newValue } ; didChangeValue(for: \.port)}}}
   var _rxGain : Int {
     get { Api.objectQ.sync { __rxGain } }
-    set { Api.objectQ.sync(flags: .barrier) {__rxGain = newValue }}}
+    set { if newValue != _rxGain { willChangeValue(for: \.rxGain) ; Api.objectQ.sync(flags: .barrier) { __rxGain = newValue } ; didChangeValue(for: \.rxGain)}}}
   var _slice : xLib6000.Slice? {
     get { Api.objectQ.sync { __slice } }
-    set { Api.objectQ.sync(flags: .barrier) {__slice = newValue }}}
-
+    set { if newValue != _slice { willChangeValue(for: \.slice) ; Api.objectQ.sync(flags: .barrier) { __slice = newValue } ; didChangeValue(for: \.slice)}}}
+  
   internal enum Token: String {
     case clientHandle = "client_handle"
     case daxChannel   = "dax"
@@ -206,14 +206,14 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
-      case .daxChannel:   willChangeValue(for: \.daxChannel)    ; _daxChannel = property.value.iValue         ; didChangeValue(for: \.daxChannel)
-      case .daxClients:   willChangeValue(for: \.daxClients)    ; _daxClients = property.value .iValue        ; didChangeValue(for: \.daxClients)
+      case .clientHandle: _clientHandle = property.value.handle ?? 0
+      case .daxChannel:   _daxChannel = property.value.iValue
+      case .daxClients:   _daxClients = property.value .iValue
       case .inUse:        break   // included to inhibit unknown token warnings
-      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
-      case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue               ; didChangeValue(for: \.port)
+      case .ip:           _ip = property.value
+      case .port:         _port = property.value.iValue
       case .slice:
-        if let sliceId = property.value.objectId { willChangeValue(for: \.slice) ; _slice = _radio.slices[sliceId] ; didChangeValue(for: \.slice) }
+        if let sliceId = property.value.objectId { _slice = _radio.slices[sliceId] }
         let gain = _rxGain
         _rxGain = 0
         rxGain = gain

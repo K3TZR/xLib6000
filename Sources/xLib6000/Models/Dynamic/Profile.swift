@@ -52,10 +52,10 @@ public final class Profile                  : NSObject, StaticModel {
   
   var _list : [ProfileName] {
     get { Api.objectQ.sync { __list } }
-    set { Api.objectQ.sync(flags: .barrier) {__list = newValue }}}
+    set { if newValue != _list { willChangeValue(for: \.list) ; Api.objectQ.sync(flags: .barrier) { __list = newValue } ; didChangeValue(for: \.list)}}}
   var _selection : ProfileId {
     get { Api.objectQ.sync { __selection } }
-    set { Api.objectQ.sync(flags: .barrier) {__selection = newValue }}}
+    set { if newValue != _selection { willChangeValue(for: \.selection) ; Api.objectQ.sync(flags: .barrier) { __selection = newValue } ; didChangeValue(for: \.selection)}}}
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -150,19 +150,23 @@ public final class Profile                  : NSObject, StaticModel {
       _log(Self.className() + " unknown token: \(properties[0].key) = \(properties[0].value)", .warning, #function, #file, #line)
       return
     }
-    // Known keys, in alphabetical order
-    if token == Profile.Token.list {
-      willChangeValue(for: \.list)
-      _list = Array(properties[1].key.valuesArray( delimiter: "^" ))
-      if _list.last == "" { _list = Array(_list.dropLast()) }
-      didChangeValue(for: \.list)
-    }
     
-    if token  == Profile.Token.selection {
-      willChangeValue(for: \.selection)
-      _selection = (properties.count > 1 ? properties[1].key : "")
-      didChangeValue(for: \.selection)
+    switch token {
+    case .list:         let temp = Array(properties[1].key.valuesArray( delimiter: "^" )) ; _list = (temp.last == "" ? Array(temp.dropLast()) : temp)
+    case .selection:    _selection = (properties.count > 1 ? properties[1].key : "")
+      
     }
+//    // Known keys, in alphabetical order
+//    if token == Profile.Token.list {
+//      willChangeValue(for: \.list)
+//      _list = Array(properties[1].key.valuesArray( delimiter: "^" ))
+//      if _list.last == "" { _list = Array(_list.dropLast()) }
+//      didChangeValue(for: \.list)
+//    }
+//
+//    if token  == Profile.Token.selection {
+//      _selection = (properties.count > 1 ? properties[1].key : "")
+//    }
     // is the Profile initialized?
     if !_initialized && _list.count > 0 {
       

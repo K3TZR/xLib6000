@@ -60,23 +60,23 @@ public final class TxAudioStream : NSObject, DynamicModel {
   
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+    set { if newValue != _clientHandle { willChangeValue(for: \.clientHandle) ; Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } ; didChangeValue(for: \.clientHandle)}}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
-    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+    set { if newValue != _ip { willChangeValue(for: \.ip) ; Api.objectQ.sync(flags: .barrier) { __ip = newValue } ; didChangeValue(for: \.ip)}}}
   var _port : Int {
     get { Api.objectQ.sync { __port } }
-    set { Api.objectQ.sync(flags: .barrier) {__port = newValue }}}
+    set { if newValue != _port { willChangeValue(for: \.port) ; Api.objectQ.sync(flags: .barrier) { __port = newValue } ; didChangeValue(for: \.port)}}}
   var _transmit : Bool {
     get { Api.objectQ.sync { __transmit } }
-    set { Api.objectQ.sync(flags: .barrier) {__transmit = newValue }}}
+    set { if newValue != _transmit { willChangeValue(for: \.transmit) ; Api.objectQ.sync(flags: .barrier) { __transmit = newValue } ; didChangeValue(for: \.transmit)}}}
   var _txGain : Int {
     get { Api.objectQ.sync { __txGain } }
-    set { Api.objectQ.sync(flags: .barrier) {__txGain = newValue }}}
+    set { if newValue != _txGain { willChangeValue(for: \.txGain) ; Api.objectQ.sync(flags: .barrier) { __txGain = newValue } ; didChangeValue(for: \.txGain)}}}
   var _txGainScalar : Float {
     get { Api.objectQ.sync { __txGainScalar } }
-    set { Api.objectQ.sync(flags: .barrier) {__txGainScalar = newValue }}}
-
+    set { if newValue != _txGainScalar { Api.objectQ.sync(flags: .barrier) { __txGainScalar = newValue }}}}
+  
   enum Token: String {
     case clientHandle   = "client_handle"
     case daxTx          = "dax_tx"
@@ -189,11 +189,11 @@ public final class TxAudioStream : NSObject, DynamicModel {
       // known keys, in alphabetical order
       switch token {
         
-      case .clientHandle: willChangeValue(for: \.clientHandle) ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
-      case .daxTx:        willChangeValue(for: \.transmit)      ; _transmit = property.value.bValue           ; didChangeValue(for: \.transmit)
+      case .clientHandle: _clientHandle = property.value.handle ?? 0
+      case .daxTx:        _transmit = property.value.bValue
       case .inUse:        break   // included to inhibit unknown token warnings
-      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
-      case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue               ; didChangeValue(for: \.port)
+      case .ip:           _ip = property.value
+      case .port:         _port = property.value.iValue               
       }
     }
     // is the AudioStream acknowledged by the radio?

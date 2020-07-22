@@ -71,32 +71,32 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   
   var _available : Int {
     get { Api.objectQ.sync { __available } }
-    set { Api.objectQ.sync(flags: .barrier) {__available = newValue }}}
+    set { if newValue != _available { willChangeValue(for: \.available) ; Api.objectQ.sync(flags: .barrier) { __available = newValue } ; didChangeValue(for: \.available)}}}
   var _capacity : Int {
     get { Api.objectQ.sync { __capacity } }
-    set { Api.objectQ.sync(flags: .barrier) {__capacity = newValue }}}
+    set { if newValue != _capacity { willChangeValue(for: \.capacity) ; Api.objectQ.sync(flags: .barrier) { __capacity = newValue } ; didChangeValue(for: \.capacity)}}}
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+    set { if newValue != _clientHandle { willChangeValue(for: \.clientHandle) ; Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } ; didChangeValue(for: \.clientHandle)}}}
   var _daxIqChannel : Int {
     get { Api.objectQ.sync { __daxIqChannel } }
-    set { Api.objectQ.sync(flags: .barrier) {__daxIqChannel = newValue }}}
+    set { if newValue != _daxIqChannel { willChangeValue(for: \.daxIqChannel) ; Api.objectQ.sync(flags: .barrier) { __daxIqChannel = newValue } ; didChangeValue(for: \.daxIqChannel)}}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
-    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+    set { if newValue != _ip { willChangeValue(for: \.ip) ; Api.objectQ.sync(flags: .barrier) { __ip = newValue } ; didChangeValue(for: \.ip)}}}
   var _pan : PanadapterStreamId {
     get { Api.objectQ.sync { __pan } }
-    set { Api.objectQ.sync(flags: .barrier) {__pan = newValue }}}
+    set { if newValue != _pan { willChangeValue(for: \.pan) ; Api.objectQ.sync(flags: .barrier) { __pan = newValue } ; didChangeValue(for: \.pan)}}}
   var _port : Int {
     get { Api.objectQ.sync { __port } }
-    set { Api.objectQ.sync(flags: .barrier) {__port = newValue }}}
+    set { if newValue != _port { willChangeValue(for: \.port) ; Api.objectQ.sync(flags: .barrier) { __port = newValue } ; didChangeValue(for: \.port)}}}
   var _rate : Int {
     get { Api.objectQ.sync { __rate } }
-    set { Api.objectQ.sync(flags: .barrier) {__rate = newValue }}}
+    set { if newValue != _rate { willChangeValue(for: \.rate) ; Api.objectQ.sync(flags: .barrier) { __rate = newValue } ; didChangeValue(for: \.rate)}}}
   var _streaming : Bool {
     get { Api.objectQ.sync { __streaming } }
-    set { Api.objectQ.sync(flags: .barrier) {__streaming = newValue }}}
-
+    set { if newValue != _streaming { willChangeValue(for: \.streaming) ; Api.objectQ.sync(flags: .barrier) { __streaming = newValue } ; didChangeValue(for: \.streaming)}}}
+  
   enum Token: String {
     case available
     case capacity
@@ -209,17 +209,17 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .available:    willChangeValue(for: \.available)     ; _available = property.value.iValue          ; didChangeValue(for: \.available)
-      case .capacity:     willChangeValue(for: \.capacity)      ; _capacity = property.value.iValue           ; didChangeValue(for: \.capacity)
-      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
-      case .daxIqChannel: willChangeValue(for: \.daxIqChannel)  ; _daxIqChannel = property.value.iValue       ; didChangeValue(for: \.daxIqChannel)
-      case .daxIqRate:    willChangeValue(for: \.rate)          ; _rate = property.value.iValue               ; didChangeValue(for: \.rate)
+      case .available:    _available = property.value.iValue
+      case .capacity:     _capacity = property.value.iValue
+      case .clientHandle: _clientHandle = property.value.handle ?? 0
+      case .daxIqChannel: _daxIqChannel = property.value.iValue
+      case .daxIqRate:    _rate = property.value.iValue
       case .inUse:        break   // included to inhibit unknown token warnings
-      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
-      case .pan:          willChangeValue(for: \.pan)           ; _pan = property.value.streamId ?? 0         ; didChangeValue(for: \.pan)
-      case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue               ; didChangeValue(for: \.port)
-      case .rate:         willChangeValue(for: \.rate)          ; _rate = property.value.iValue               ; didChangeValue(for: \.rate)
-      case .streaming:    willChangeValue(for: \.streaming)     ; _streaming = property.value.bValue          ; didChangeValue(for: \.streaming)
+      case .ip:           _ip = property.value
+      case .pan:          _pan = property.value.streamId ?? 0
+      case .port:         _port = property.value.iValue
+      case .rate:         _rate = property.value.iValue
+      case .streaming:    _streaming = property.value.bValue          
       }
     }
     // is the Stream initialized?

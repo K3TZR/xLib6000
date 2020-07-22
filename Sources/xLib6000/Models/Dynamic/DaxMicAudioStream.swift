@@ -67,17 +67,18 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+    set { if newValue != _clientHandle { willChangeValue(for: \.clientHandle) ; Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } ; didChangeValue(for: \.clientHandle)}}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
-    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+    set { if newValue != _ip { willChangeValue(for: \.ip) ; Api.objectQ.sync(flags: .barrier) { __ip = newValue } ; didChangeValue(for: \.ip)}}}
   var _micGain : Int {
     get { Api.objectQ.sync { __micGain } }
-    set { Api.objectQ.sync(flags: .barrier) {__micGain = newValue }}}
+    set { if newValue != _micGain { willChangeValue(for: \.micGain) ; Api.objectQ.sync(flags: .barrier) { __micGain = newValue } ; didChangeValue(for: \.micGain)}}}
+
   var _micGainScalar : Float {
     get { Api.objectQ.sync { __micGainScalar } }
-    set { Api.objectQ.sync(flags: .barrier) {__micGainScalar = newValue }}}
-
+    set { if newValue != _micGainScalar { Api.objectQ.sync(flags: .barrier) { __micGainScalar = newValue }}}}
+  
   enum Token: String {
     case clientHandle           = "client_handle"
     case ip
@@ -180,8 +181,8 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
 
-        case .clientHandle: willChangeValue(for: \.clientHandle) ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
-        case .ip:           willChangeValue(for: \.ip)           ; _ip = property.value                        ; didChangeValue(for: \.ip)
+        case .clientHandle: _clientHandle = property.value.handle ?? 0
+        case .ip:           _ip = property.value
         case .type:         break  // included to inhibit unknown token warnings
       }
     }

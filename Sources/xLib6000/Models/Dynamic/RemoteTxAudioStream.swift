@@ -41,6 +41,7 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
+
   @objc dynamic public var clientHandle: Handle {
     get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue}}}
@@ -56,14 +57,14 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
   
   var _clientHandle : Handle {
     get { Api.objectQ.sync { __clientHandle } }
-    set { Api.objectQ.sync(flags: .barrier) {__clientHandle = newValue }}}
+    set { if newValue != _clientHandle { willChangeValue(for: \.clientHandle) ; Api.objectQ.sync(flags: .barrier) { __clientHandle = newValue } ; didChangeValue(for: \.clientHandle)}}}
   var _compression : String {
     get { Api.objectQ.sync { __compression } }
-    set { Api.objectQ.sync(flags: .barrier) {__compression = newValue }}}
+    set { if newValue != _compression { willChangeValue(for: \.compression) ; Api.objectQ.sync(flags: .barrier) { __compression = newValue } ; didChangeValue(for: \.compression)}}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
-    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
-
+    set { if newValue != _ip { willChangeValue(for: \.ip) ; Api.objectQ.sync(flags: .barrier) { __ip = newValue } ; didChangeValue(for: \.ip)}}}
+  
   enum Token : String {
     case clientHandle         = "client_handle"
     case compression
@@ -176,9 +177,9 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
       
       // Note: only supports "opus", not sure why the compression property exists (future?)
         
-      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
-      case .compression:  willChangeValue(for: \.compression)   ; _compression = property.value.lowercased()  ; didChangeValue(for: \.compression)
-      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                        ; didChangeValue(for: \.ip)
+      case .clientHandle: _clientHandle = property.value.handle ?? 0
+      case .compression:  _compression = property.value.lowercased()
+      case .ip:           _ip = property.value                       
      }
     }
     // the Radio (hardware) has acknowledged this Stream

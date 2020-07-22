@@ -55,26 +55,26 @@ public final class Amplifier  : NSObject, DynamicModel {
 
   var _ant : String {
     get { Api.objectQ.sync { __ant } }
-    set { Api.objectQ.sync(flags: .barrier) {__ant = newValue }}}
+    set { if newValue != _ant { willChangeValue(for: \.ant) ; Api.objectQ.sync(flags: .barrier) { __ant = newValue } ; didChangeValue(for: \.ant)}}}
   var _handle : Handle {
     get { Api.objectQ.sync { __handle } }
-    set { Api.objectQ.sync(flags: .barrier) {__handle = newValue }}}
+    set { if newValue != _handle { willChangeValue(for: \.handle) ; Api.objectQ.sync(flags: .barrier) { __handle = newValue } ; didChangeValue(for: \.handle)}}}
   var _ip : String {
     get { Api.objectQ.sync { __ip } }
-    set { Api.objectQ.sync(flags: .barrier) {__ip = newValue }}}
+    set { if newValue != _ip { willChangeValue(for: \.ip) ; Api.objectQ.sync(flags: .barrier) { __ip = newValue } ; didChangeValue(for: \.ip)}}}
   var _model : String {
     get { Api.objectQ.sync { __model } }
-    set { Api.objectQ.sync(flags: .barrier) {__model = newValue }}}
+    set { if newValue != _model { willChangeValue(for: \.model) ; Api.objectQ.sync(flags: .barrier) { __model = newValue } ; didChangeValue(for: \.model)}}}
   var _port : Int {
     get { Api.objectQ.sync { __port } }
-    set { Api.objectQ.sync(flags: .barrier) {__port = newValue }}}
+    set { if newValue != _port { willChangeValue(for: \.port) ; Api.objectQ.sync(flags: .barrier) { __port = newValue } ; didChangeValue(for: \.port)}}}
   var _serialNumber : String {
     get { Api.objectQ.sync { __serialNumber } }
-    set { Api.objectQ.sync(flags: .barrier) {__serialNumber = newValue }}}
+    set { if newValue != _serialNumber { willChangeValue(for: \.serialNumber) ; Api.objectQ.sync(flags: .barrier) { __serialNumber = newValue } ; didChangeValue(for: \.serialNumber)}}}
   var _state : String {
     get { Api.objectQ.sync { __state } }
-    set { Api.objectQ.sync(flags: .barrier) {__state = newValue }}}
-
+    set { if newValue != _state { willChangeValue(for: \.state) ; Api.objectQ.sync(flags: .barrier) { __state = newValue } ; didChangeValue(for: \.state)}}}
+  
   enum Token : String {
     case ant
     case handle
@@ -195,13 +195,13 @@ public final class Amplifier  : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
-      case .ant:          willChangeValue(for: \.ant)           ; _ant = property.value                 ; didChangeValue(for: \.ant)  ; _antennaDict = parseAntennaSettings( _ant)
-      case .handle:       willChangeValue(for: \.handle)        ; _handle = property.value.handle ?? 0  ; didChangeValue(for: \.handle)
-      case .ip:           willChangeValue(for: \.ip)            ; _ip = property.value                  ; didChangeValue(for: \.ip)
-      case .model:        willChangeValue(for: \.model)         ; _model = property.value               ; didChangeValue(for: \.model)
-      case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue         ; didChangeValue(for: \.port)
-      case .serialNumber: willChangeValue(for: \.serialNumber)  ; _serialNumber = property.value        ; didChangeValue(for: \.serialNumber)
-      case .state:        willChangeValue(for: \.state)         ; _state = property.value               ; didChangeValue(for: \.state)
+      case .ant:          _ant = property.value                 ; _antennaDict = parseAntennaSettings( _ant)
+      case .handle:       _handle = property.value.handle ?? 0
+      case .ip:           _ip = property.value
+      case .model:        _model = property.value
+      case .port:         _port = property.value.iValue
+      case .serialNumber: _serialNumber = property.value
+      case .state:        _state = property.value
       }
     }
     // is the Amplifier initialized?

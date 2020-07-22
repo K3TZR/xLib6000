@@ -67,37 +67,37 @@ public final class Xvtr : NSObject, DynamicModel {
   
   var _ifFrequency : Hz {
     get { Api.objectQ.sync { __ifFrequency } }
-    set { Api.objectQ.sync(flags: .barrier) {__ifFrequency = newValue }}}
+    set { if newValue != _ifFrequency { willChangeValue(for: \.ifFrequency) ; Api.objectQ.sync(flags: .barrier) { __ifFrequency = newValue } ; didChangeValue(for: \.ifFrequency)}}}
   var _isValid : Bool {
     get { Api.objectQ.sync { __isValid } }
-    set { Api.objectQ.sync(flags: .barrier) {__isValid = newValue }}}
+    set { if newValue != _isValid { willChangeValue(for: \.isValid) ; Api.objectQ.sync(flags: .barrier) { __isValid = newValue } ; didChangeValue(for: \.isValid)}}}
   var _loError : Int {
     get { Api.objectQ.sync { __loError } }
-    set { Api.objectQ.sync(flags: .barrier) {__loError = newValue }}}
+    set { if newValue != _loError  { willChangeValue(for: \.loError ) ; Api.objectQ.sync(flags: .barrier) { __loError  = newValue } ; didChangeValue(for: \.loError )}}}
   var _name : String {
     get { Api.objectQ.sync { __name } }
-    set { Api.objectQ.sync(flags: .barrier) {__name = String(newValue.prefix(4)) }}}
+    set { if newValue != _name { willChangeValue(for: \.name) ; Api.objectQ.sync(flags: .barrier) { __name = newValue } ; didChangeValue(for: \.name)}}}
   var _maxPower : Int {
     get { Api.objectQ.sync { __maxPower } }
-    set { Api.objectQ.sync(flags: .barrier) {__maxPower = newValue }}}
+    set { if newValue != _maxPower { willChangeValue(for: \.maxPower) ; Api.objectQ.sync(flags: .barrier) { __maxPower = newValue } ; didChangeValue(for: \.maxPower)}}}
   var _order : Int {
     get { Api.objectQ.sync { __order } }
-    set { Api.objectQ.sync(flags: .barrier) {__order = newValue }}}
+    set { if newValue != _order { willChangeValue(for: \.order) ; Api.objectQ.sync(flags: .barrier) { __order = newValue } ; didChangeValue(for: \.order)}}}
   var _preferred : Bool {
     get { Api.objectQ.sync { __preferred } }
-    set { Api.objectQ.sync(flags: .barrier) {__preferred = newValue }}}
+    set { if newValue != _preferred { willChangeValue(for: \.preferred) ; Api.objectQ.sync(flags: .barrier) { __preferred = newValue } ; didChangeValue(for: \.preferred)}}}
   var _rfFrequency : Hz {
     get { Api.objectQ.sync { __rfFrequency } }
-    set { Api.objectQ.sync(flags: .barrier) {__rfFrequency = newValue }}}
+    set { if newValue != _rfFrequency { willChangeValue(for: \.rfFrequency) ; Api.objectQ.sync(flags: .barrier) { __rfFrequency = newValue } ; didChangeValue(for: \.rfFrequency)}}}
   var _rxGain : Int {
     get { Api.objectQ.sync { __rxGain } }
-    set { Api.objectQ.sync(flags: .barrier) {__rxGain = newValue }}}
+    set { if newValue != _rxGain { willChangeValue(for: \.rxGain) ; Api.objectQ.sync(flags: .barrier) { __rxGain = newValue } ; didChangeValue(for: \.rxGain)}}}
   var _rxOnly : Bool {
     get { Api.objectQ.sync { __rxOnly } }
-    set { Api.objectQ.sync(flags: .barrier) {__rxOnly = newValue }}}
+    set { if newValue != _rxOnly { willChangeValue(for: \.rxOnly) ; Api.objectQ.sync(flags: .barrier) { __rxOnly = newValue } ; didChangeValue(for: \.rxOnly)}}}
   var _twoMeterInt : Int {
     get { Api.objectQ.sync { __twoMeterInt } }
-    set { Api.objectQ.sync(flags: .barrier) {__twoMeterInt = newValue }}}
+    set { if newValue != _twoMeterInt { willChangeValue(for: \.twoMeterInt) ; Api.objectQ.sync(flags: .barrier) { __twoMeterInt = newValue } ; didChangeValue(for: \.twoMeterInt)}}}
 
   enum Token : String {
     case name
@@ -211,17 +211,17 @@ public final class Xvtr : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
 
-        case .name:         willChangeValue(for: \.name)        ; _name = property.value                ; didChangeValue(for: \.name)
-        case .ifFrequency:  willChangeValue(for: \.ifFrequency) ; _ifFrequency = property.value.mhzToHz ; didChangeValue(for: \.ifFrequency)
-        case .isValid:      willChangeValue(for: \.isValid)     ; _isValid = property.value.bValue      ; didChangeValue(for: \.isValid)
-        case .loError:      willChangeValue(for: \.loError)     ; _loError = property.value.iValue      ; didChangeValue(for: \.loError)
-        case .maxPower:     willChangeValue(for: \.maxPower)    ; _maxPower = property.value.iValue     ; didChangeValue(for: \.maxPower)
-        case .order:        willChangeValue(for: \.order)       ; _order = property.value.iValue        ; didChangeValue(for: \.order)
-        case .preferred:    willChangeValue(for: \.preferred)   ; _preferred = property.value.bValue    ; didChangeValue(for: \.preferred)
-        case .rfFrequency:  willChangeValue(for: \.rfFrequency) ; _rfFrequency = property.value.mhzToHz ; didChangeValue(for: \.rfFrequency)
-        case .rxGain:       willChangeValue(for: \.rxGain)      ; _rxGain = property.value.iValue       ; didChangeValue(for: \.rxGain)
-        case .rxOnly:       willChangeValue(for: \.rxOnly)      ; _rxOnly = property.value.bValue       ; didChangeValue(for: \.rxOnly)
-        case .twoMeterInt:  willChangeValue(for: \.twoMeterInt) ; _twoMeterInt = property.value.iValue  ; didChangeValue(for: \.twoMeterInt)
+        case .name:         _name = property.value
+        case .ifFrequency:  _ifFrequency = property.value.mhzToHz
+        case .isValid:      _isValid = property.value.bValue
+        case .loError:      _loError = property.value.iValue
+        case .maxPower:     _maxPower = property.value.iValue
+        case .order:        _order = property.value.iValue
+        case .preferred:    _preferred = property.value.bValue
+        case .rfFrequency:  _rfFrequency = property.value.mhzToHz
+        case .rxGain:       _rxGain = property.value.iValue
+        case .rxOnly:       _rxOnly = property.value.bValue
+        case .twoMeterInt:  _twoMeterInt = property.value.iValue  
       }
     }
     // is the waterfall initialized?

@@ -80,22 +80,23 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   
   var _expectedFrame     : Int? {
     get { Api.objectQ.sync { __expectedFrame } }
-    set { Api.objectQ.sync(flags: .barrier) {__expectedFrame = newValue }}}
-  var _rxEnabled : Bool {
-    get { Api.objectQ.sync { __rxEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__rxEnabled = newValue }}}
+    set { if newValue != _expectedFrame { Api.objectQ.sync(flags: .barrier) { __expectedFrame = newValue }}}}
   var _rxLostPacketCount : Int {
     get { Api.objectQ.sync { __rxLostPacketCount } }
-    set { Api.objectQ.sync(flags: .barrier) {__rxLostPacketCount = newValue }}}
+    set { if newValue != _rxLostPacketCount { Api.objectQ.sync(flags: .barrier) { __rxLostPacketCount = newValue }}}}
+
+  var _rxEnabled : Bool {
+    get { Api.objectQ.sync { __rxEnabled } }
+    set { if newValue != _rxEnabled { willChangeValue(for: \.rxEnabled) ; Api.objectQ.sync(flags: .barrier) { __rxEnabled = newValue } ; didChangeValue(for: \.rxEnabled)}}}
   var _rxPacketCount : Int {
     get { Api.objectQ.sync { __rxPacketCount } }
-    set { Api.objectQ.sync(flags: .barrier) {__rxPacketCount = newValue }}}
+    set { if newValue != _rxPacketCount { Api.objectQ.sync(flags: .barrier) { __rxPacketCount = newValue } }}}
   var _rxStopped : Bool {
     get { Api.objectQ.sync { __rxStopped } }
-    set { Api.objectQ.sync(flags: .barrier) {__rxStopped = newValue }}}
+    set { if newValue != _rxStopped { willChangeValue(for: \.rxStopped) ; Api.objectQ.sync(flags: .barrier) { __rxStopped = newValue } ; didChangeValue(for: \.rxStopped)}}}
   var _txEnabled : Bool {
     get { Api.objectQ.sync { __txEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__txEnabled = newValue }}}
+    set { if newValue != _txEnabled { willChangeValue(for: \.txEnabled) ; Api.objectQ.sync(flags: .barrier) { __txEnabled = newValue } ; didChangeValue(for: \.txEnabled)}}}
 
   enum Token : String {
     case clientHandle         = "client_handle"
@@ -251,12 +252,12 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
       // known Keys, in alphabetical order
       switch token {
         
-      case .clientHandle: willChangeValue(for: \.clientHandle)  ; _clientHandle = property.value.handle ?? 0  ; didChangeValue(for: \.clientHandle)
-      case .ipAddress:    willChangeValue(for: \.ip)            ; _ip = property.value.trimmed                ; didChangeValue(for: \.ip)
-      case .port:         willChangeValue(for: \.port)          ; _port = property.value.iValue               ; didChangeValue(for: \.port)
-      case .rxEnabled:    willChangeValue(for: \.rxEnabled)     ; _rxEnabled = property.value.bValue          ; didChangeValue(for: \.rxEnabled)
-      case .rxStopped:    willChangeValue(for: \.rxStopped)     ; _rxStopped = property.value.bValue          ; didChangeValue(for: \.rxStopped)
-      case .txEnabled:    willChangeValue(for: \.txEnabled)     ; _txEnabled = property.value.bValue          ; didChangeValue(for: \.txEnabled)
+      case .clientHandle: _clientHandle = property.value.handle ?? 0
+      case .ipAddress:    _ip = property.value.trimmed
+      case .port:         _port = property.value.iValue
+      case .rxEnabled:    _rxEnabled = property.value.bValue
+      case .rxStopped:    _rxStopped = property.value.bValue
+      case .txEnabled:    _txEnabled = property.value.bValue
      }
     }
     // the Radio (hardware) has acknowledged this Opus

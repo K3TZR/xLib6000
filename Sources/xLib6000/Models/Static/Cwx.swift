@@ -38,13 +38,13 @@ public final class Cwx : NSObject, StaticModel {
   
   var _breakInDelay : Int {
     get { Api.objectQ.sync { __breakInDelay } }
-    set { Api.objectQ.sync(flags: .barrier) {__breakInDelay = newValue }}}
+    set { if newValue != _breakInDelay { willChangeValue(for: \.breakInDelay) ; Api.objectQ.sync(flags: .barrier) { __breakInDelay = newValue } ; didChangeValue(for: \.breakInDelay)}}}
   var _qskEnabled : Bool {
     get { Api.objectQ.sync { __qskEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) {__qskEnabled = newValue }}}
+    set { if newValue != _qskEnabled { willChangeValue(for: \.qskEnabled) ; Api.objectQ.sync(flags: .barrier) { __qskEnabled = newValue } ; didChangeValue(for: \.qskEnabled)}}}
   var _wpm : Int {
     get { Api.objectQ.sync { __wpm } }
-    set { Api.objectQ.sync(flags: .barrier) {__wpm = newValue }}}
+    set { if newValue != _wpm { willChangeValue(for: \.wpm) ; Api.objectQ.sync(flags: .barrier) { __wpm = newValue } ; didChangeValue(for: \.wpm)}}}
 
   internal var macros                       : [String]
   internal let kMaxNumberOfMacros           = 12
@@ -203,9 +203,9 @@ public final class Cwx : NSObject, StaticModel {
             // inform the Event Handler (if any)
             eraseSentEventHandler?(start, stop)
           }
-        case .breakInDelay: willChangeValue(for: \.breakInDelay)  ; _breakInDelay = property.value.iValue ; didChangeValue(for: \.breakInDelay)
-        case .qskEnabled:   willChangeValue(for: \.qskEnabled)    ; _qskEnabled = property.value.bValue   ; didChangeValue(for: \.qskEnabled)
-        case .wpm:          willChangeValue(for: \.wpm)           ; _wpm = property.value.iValue          ; didChangeValue(for: \.wpm)
+        case .breakInDelay: _breakInDelay = property.value.iValue
+        case .qskEnabled:   _qskEnabled = property.value.bValue
+        case .wpm:          _wpm = property.value.iValue          
 
         case .sent:         charSentEventHandler?(property.value.iValue)
         }
