@@ -99,10 +99,10 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   
   var _isConnected : Bool {
     get { Api.objectQ.sync { __isConnected } }
-    set { Api.objectQ.sync(flags: .barrier) {__isConnected = newValue }}}
+    set { if newValue != _isConnected { willChangeValue(for: \.isConnected) ; Api.objectQ.sync(flags: .barrier) { __isConnected = newValue } ; didChangeValue(for: \.isConnected)}}}
   var _sslClientPublicIp : String {
     get { Api.objectQ.sync { __sslClientPublicIp } }
-    set { Api.objectQ.sync(flags: .barrier) {__sslClientPublicIp = newValue }}}
+    set { if newValue != _sslClientPublicIp { willChangeValue(for: \.sslClientPublicIp) ; Api.objectQ.sync(flags: .barrier) { __sslClientPublicIp = newValue } ; didChangeValue(for: \.sslClientPublicIp)}}}
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -381,9 +381,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       // Known tokens, in alphabetical order
       switch token {
       
-      case .publicIp: willChangeValue(for: \.sslClientPublicIp) ; _sslClientPublicIp = property.value ; didChangeValue(for: \.sslClientPublicIp)
-
-        //      case .publicIp:   update(self, &_sslClientPublicIp, to: property.value, signal: \.sslClientPublicIp)
+      case .publicIp: _sslClientPublicIp = property.value
       }
     }
   }

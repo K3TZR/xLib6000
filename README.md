@@ -41,6 +41,12 @@ Flex Radios can have one of four different version groups:
 CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
 
 
+## 1.3.7 Release Notes
+
+* added findFirstSlice(...) method in RadioExtensions.swift (needed for xMini)
+* changes throughout to reduce the number of KVO updates
+
+
 ## 1.3.6 Release Notes
 
 * changed tcpFirstPingReceived to tcpPingReceived (now sends notification after 2nd ping response)

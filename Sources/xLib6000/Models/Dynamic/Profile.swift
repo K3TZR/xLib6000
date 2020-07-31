@@ -156,17 +156,6 @@ public final class Profile                  : NSObject, StaticModel {
     case .selection:    _selection = (properties.count > 1 ? properties[1].key : "")
       
     }
-//    // Known keys, in alphabetical order
-//    if token == Profile.Token.list {
-//      willChangeValue(for: \.list)
-//      _list = Array(properties[1].key.valuesArray( delimiter: "^" ))
-//      if _list.last == "" { _list = Array(_list.dropLast()) }
-//      didChangeValue(for: \.list)
-//    }
-//
-//    if token  == Profile.Token.selection {
-//      _selection = (properties.count > 1 ? properties[1].key : "")
-//    }
     // is the Profile initialized?
     if !_initialized && _list.count > 0 {
       

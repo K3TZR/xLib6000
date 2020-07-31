@@ -194,6 +194,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public var lineoutMute: Bool {
     get { _lineoutMute }
     set { if _lineoutMute != newValue { _lineoutMute = newValue ; mixerCmd( "lineout mute", newValue.as1or0) }}}
+  @objc dynamic public var localPtt: Bool {
+    get { _localPtt }
+    set { if _localPtt != newValue { }}}          // FIXME:
   @objc dynamic public var mox: Bool {
     get { _mox }
     set { if _mox != newValue { _mox = newValue ; xmitCmd( newValue.as1or0) }}}
@@ -203,6 +206,12 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public var nickname: String {
     get { _nickname }
     set { if _nickname != newValue { _nickname = newValue ; radioCmd("name", newValue) }}}
+  @objc dynamic public var oscillator: String {
+    get { _oscillator }
+    set { if _oscillator != newValue {  }}}       // FIXME:
+    @objc dynamic public var program: String {
+      get { _program }
+      set { if _program != newValue {  }}}        // FIXME:
   @objc dynamic public var radioScreenSaver: String {
     get { _radioScreenSaver }
     set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ; radioCmd("screensaver", newValue) }}}
@@ -227,6 +236,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   @objc dynamic public var staticNetmask: String {
     get { _staticNetmask }
     set { if _staticNetmask != newValue { _staticNetmask = newValue }}}
+  @objc dynamic public var station: String {
+    get { _station }
+    set { if _station != newValue {  }}}       // FIXME:
   @objc dynamic public var tnfsEnabled: Bool {
     get { _tnfsEnabled }
     set { if _tnfsEnabled != newValue { _tnfsEnabled = newValue ; radioSetCmd( .tnfsEnabled, newValue.asTrueFalse) }}}
@@ -298,209 +310,210 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   
   var _apfEnabled: Bool {
     get { Api.objectQ.sync { __apfEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __apfEnabled = newValue }}}
+    set { if newValue != _apfEnabled { willChangeValue(for: \.apfEnabled) ; Api.objectQ.sync(flags: .barrier) { __apfEnabled = newValue } ; didChangeValue(for: \.apfEnabled)}}}
   var _apfQFactor: Int {
     get { Api.objectQ.sync { __apfQFactor } }
-    set { Api.objectQ.sync(flags: .barrier) { __apfQFactor = newValue.bound(kMinApfQ, kMaxApfQ) }}}
+    set { if newValue != _apfQFactor { willChangeValue(for: \.apfQFactor) ; Api.objectQ.sync(flags: .barrier) { __apfQFactor = newValue } ; didChangeValue(for: \.apfQFactor)}}}
   var _apfGain: Int {
     get { Api.objectQ.sync { __apfGain } }
-    set { Api.objectQ.sync(flags: .barrier) { __apfGain = newValue.bound(kControlMin, kControlMax) }}}
+    set { if newValue != _apfGain { willChangeValue(for: \.apfGain) ; Api.objectQ.sync(flags: .barrier) { __apfGain = newValue } ; didChangeValue(for: \.apfGain)}}}
   var _availablePanadapters: Int {
     get { Api.objectQ.sync { __availablePanadapters } }
-    set { Api.objectQ.sync(flags: .barrier) { __availablePanadapters = newValue }}}
+    set { if newValue != _availablePanadapters { willChangeValue(for: \.availablePanadapters) ; Api.objectQ.sync(flags: .barrier) { __availablePanadapters = newValue } ; didChangeValue(for: \.availablePanadapters)}}}
   var _availableSlices: Int {
     get { Api.objectQ.sync { __availableSlices } }
-    set { Api.objectQ.sync(flags: .barrier) { __availableSlices = newValue }}}
+    set { if newValue != _availableSlices { willChangeValue(for: \.availableSlices) ; Api.objectQ.sync(flags: .barrier) { __availableSlices = newValue } ; didChangeValue(for: \.availableSlices)}}}
   var _backlight: Int {
     get { Api.objectQ.sync { __backlight } }
-    set { Api.objectQ.sync(flags: .barrier) { __backlight = newValue }}}
+    set { if newValue != _backlight { willChangeValue(for: \.backlight) ; Api.objectQ.sync(flags: .barrier) { __backlight = newValue } ; didChangeValue(for: \.backlight)}}}
   var _bandPersistenceEnabled: Bool {
     get { Api.objectQ.sync { __bandPersistenceEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __bandPersistenceEnabled = newValue }}}
+    set { if newValue != _bandPersistenceEnabled { willChangeValue(for: \.bandPersistenceEnabled) ; Api.objectQ.sync(flags: .barrier) { __bandPersistenceEnabled = newValue } ; didChangeValue(for: \.bandPersistenceEnabled)}}}
   var _binauralRxEnabled: Bool {
     get { Api.objectQ.sync { __binauralRxEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __binauralRxEnabled = newValue }}}
+    set { if newValue != _binauralRxEnabled { willChangeValue(for: \.binauralRxEnabled) ; Api.objectQ.sync(flags: .barrier) { __binauralRxEnabled = newValue } ; didChangeValue(for: \.binauralRxEnabled)}}}
   var _boundClientId: String? {                          // (V3 only)
     get { Api.objectQ.sync { __boundClientId } }
-    set { Api.objectQ.sync(flags: .barrier) { __boundClientId = newValue }}}
+    set { if newValue != _boundClientId { willChangeValue(for: \.boundClientId) ; Api.objectQ.sync(flags: .barrier) { __boundClientId = newValue } ; didChangeValue(for: \.boundClientId)}}}
   var _calFreq: Int {
     get { Api.objectQ.sync { __calFreq } }
-    set { Api.objectQ.sync(flags: .barrier) { __calFreq = newValue }}}
+    set { if newValue != _calFreq { willChangeValue(for: \.calFreq) ; Api.objectQ.sync(flags: .barrier) { __calFreq = newValue } ; didChangeValue(for: \.calFreq)}}}
   var _callsign: String {
     get { Api.objectQ.sync { __callsign } }
-    set { Api.objectQ.sync(flags: .barrier) { __callsign = newValue }}}
+    set { if newValue != _callsign { willChangeValue(for: \.callsign) ; Api.objectQ.sync(flags: .barrier) { __callsign = newValue } ; didChangeValue(for: \.callsign)}}}
   var _chassisSerial: String {
     get { Api.objectQ.sync { __chassisSerial } }
-    set { Api.objectQ.sync(flags: .barrier) { __chassisSerial = newValue }}}
+    set { if newValue != _chassisSerial { willChangeValue(for: \.chassisSerial) ; Api.objectQ.sync(flags: .barrier) { __chassisSerial = newValue } ; didChangeValue(for: \.chassisSerial)}}}
   var _clientIp: String {
     get { Api.objectQ.sync { __clientIp } }
-    set { Api.objectQ.sync(flags: .barrier) { __clientIp = newValue }}}
+    set { if newValue != _clientIp { willChangeValue(for: \.clientIp) ; Api.objectQ.sync(flags: .barrier) { __clientIp = newValue } ; didChangeValue(for: \.clientIp)}}}
   var _daxIqAvailable: Int {
     get { Api.objectQ.sync { __daxIqAvailable } }
-    set { Api.objectQ.sync(flags: .barrier) { __daxIqAvailable = newValue }}}
+    set { if newValue != _daxIqAvailable { willChangeValue(for: \.daxIqAvailable) ; Api.objectQ.sync(flags: .barrier) { __daxIqAvailable = newValue } ; didChangeValue(for: \.daxIqAvailable)}}}
   var _daxIqCapacity: Int {
     get { Api.objectQ.sync { __daxIqCapacity } }
-    set { Api.objectQ.sync(flags: .barrier) { __daxIqCapacity = newValue }}}
+    set { if newValue != _daxIqCapacity { willChangeValue(for: \.daxIqCapacity) ; Api.objectQ.sync(flags: .barrier) { __daxIqCapacity = newValue } ; didChangeValue(for: \.daxIqCapacity)}}}
   var _enforcePrivateIpEnabled: Bool {
     get { Api.objectQ.sync { __enforcePrivateIpEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __enforcePrivateIpEnabled = newValue }}}
+    set { if newValue != _enforcePrivateIpEnabled { willChangeValue(for: \.enforcePrivateIpEnabled) ; Api.objectQ.sync(flags: .barrier) { __enforcePrivateIpEnabled = newValue } ; didChangeValue(for: \.enforcePrivateIpEnabled)}}}
   var _extPresent: Bool {
     get { Api.objectQ.sync { __extPresent } }
-    set { Api.objectQ.sync(flags: .barrier) { __extPresent = newValue }}}
+    set { if newValue != _extPresent { willChangeValue(for: \.extPresent) ; Api.objectQ.sync(flags: .barrier) { __extPresent = newValue } ; didChangeValue(for: \.extPresent)}}}
   var _filterCwAutoEnabled: Bool {
     get { Api.objectQ.sync { __filterCwAutoEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __filterCwAutoEnabled = newValue }}}
+    set { if newValue != _filterCwAutoEnabled { willChangeValue(for: \.filterCwAutoEnabled) ; Api.objectQ.sync(flags: .barrier) { __filterCwAutoEnabled = newValue } ; didChangeValue(for: \.filterCwAutoEnabled)}}}
   var _filterDigitalAutoEnabled: Bool {
     get { Api.objectQ.sync { __filterDigitalAutoEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __filterDigitalAutoEnabled = newValue }}}
+    set { if newValue != _filterDigitalAutoEnabled { willChangeValue(for: \.filterDigitalAutoEnabled) ; Api.objectQ.sync(flags: .barrier) { __filterDigitalAutoEnabled = newValue } ; didChangeValue(for: \.filterDigitalAutoEnabled)}}}
   var _filterVoiceAutoEnabled: Bool {
     get { Api.objectQ.sync { __filterVoiceAutoEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __filterVoiceAutoEnabled = newValue }}}
+    set { if newValue != _filterVoiceAutoEnabled { willChangeValue(for: \.filterVoiceAutoEnabled) ; Api.objectQ.sync(flags: .barrier) { __filterVoiceAutoEnabled = newValue } ; didChangeValue(for: \.filterVoiceAutoEnabled)}}}
   var _filterCwLevel: Int {
     get { Api.objectQ.sync { __filterCwLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __filterCwLevel = newValue }}}
+    set { if newValue != _filterCwLevel { willChangeValue(for: \.filterCwLevel) ; Api.objectQ.sync(flags: .barrier) { __filterCwLevel = newValue } ; didChangeValue(for: \.filterCwLevel)}}}
   var _filterDigitalLevel: Int {
     get { Api.objectQ.sync { __filterDigitalLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __filterDigitalLevel = newValue }}}
+    set { if newValue != _filterDigitalLevel { willChangeValue(for: \.filterDigitalLevel) ; Api.objectQ.sync(flags: .barrier) { __filterDigitalLevel = newValue } ; didChangeValue(for: \.filterDigitalLevel)}}}
   var _filterVoiceLevel: Int {
     get { Api.objectQ.sync { __filterVoiceLevel } }
-    set { Api.objectQ.sync(flags: .barrier) { __filterVoiceLevel = newValue }}}
+    set { if newValue != _filterVoiceLevel { willChangeValue(for: \.filterVoiceLevel) ; Api.objectQ.sync(flags: .barrier) { __filterVoiceLevel = newValue } ; didChangeValue(for: \.filterVoiceLevel)}}}
   var _fpgaMbVersion: String {
     get { Api.objectQ.sync { __fpgaMbVersion } }
-    set { Api.objectQ.sync(flags: .barrier) { __fpgaMbVersion = newValue }}}
+    set { if newValue != _fpgaMbVersion { willChangeValue(for: \.fpgaMbVersion) ; Api.objectQ.sync(flags: .barrier) { __fpgaMbVersion = newValue } ; didChangeValue(for: \.fpgaMbVersion)}}}
   var _freqErrorPpb: Int {
     get { Api.objectQ.sync { __freqErrorPpb } }
-    set { Api.objectQ.sync(flags: .barrier) { __freqErrorPpb = newValue }}}
+    set { if newValue != _freqErrorPpb { willChangeValue(for: \.freqErrorPpb) ; Api.objectQ.sync(flags: .barrier) { __freqErrorPpb = newValue } ; didChangeValue(for: \.freqErrorPpb)}}}
   var _frontSpeakerMute: Bool {
     get { Api.objectQ.sync { __frontSpeakerMute } }
-    set { Api.objectQ.sync(flags: .barrier) { __frontSpeakerMute = newValue }}}
+    set { if newValue != _frontSpeakerMute { willChangeValue(for: \.frontSpeakerMute) ; Api.objectQ.sync(flags: .barrier) { __frontSpeakerMute = newValue } ; didChangeValue(for: \.frontSpeakerMute)}}}
   var _fullDuplexEnabled: Bool {
     get { Api.objectQ.sync { __fullDuplexEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __fullDuplexEnabled = newValue }}}
+    set { if newValue != _fullDuplexEnabled { willChangeValue(for: \.fullDuplexEnabled) ; Api.objectQ.sync(flags: .barrier) { __fullDuplexEnabled = newValue } ; didChangeValue(for: \.fullDuplexEnabled)}}}
   var _gateway: String {
     get { Api.objectQ.sync { __gateway } }
-    set { Api.objectQ.sync(flags: .barrier) { __gateway = newValue }}}
+    set { if newValue != gateway { willChangeValue(for: \.gateway) ; Api.objectQ.sync(flags: .barrier) { __gateway = newValue } ; didChangeValue(for: \.gateway)}}}
   var _gpsdoPresent: Bool {
     get { Api.objectQ.sync { __gpsdoPresent } }
-    set { Api.objectQ.sync(flags: .barrier) { __gpsdoPresent = newValue }}}
+    set { if newValue != _gpsdoPresent { willChangeValue(for: \.gpsdoPresent) ; Api.objectQ.sync(flags: .barrier) { __gpsdoPresent = newValue } ; didChangeValue(for: \.gpsdoPresent)}}}
   var _headphoneGain: Int {
     get { Api.objectQ.sync { __headphoneGain } }
-    set { Api.objectQ.sync(flags: .barrier) { __headphoneGain = newValue.bound(kControlMin, kControlMax) }}}
+    set { if newValue != _headphoneGain { willChangeValue(for: \.headphoneGain) ; Api.objectQ.sync(flags: .barrier) { __headphoneGain = newValue } ; didChangeValue(for: \.headphoneGain)}}}
   var _headphoneMute: Bool {
     get { Api.objectQ.sync { __headphoneMute } }
-    set { Api.objectQ.sync(flags: .barrier) { __headphoneMute = newValue }}}
+    set { if newValue != _headphoneMute { willChangeValue(for: \.headphoneMute) ; Api.objectQ.sync(flags: .barrier) { __headphoneMute = newValue } ; didChangeValue(for: \.headphoneMute)}}}
   var _ipAddress: String {
     get { Api.objectQ.sync { __ipAddress } }
-    set { Api.objectQ.sync(flags: .barrier) { __ipAddress = newValue }}}
+    set { if newValue != _ipAddress { willChangeValue(for: \.ipAddress) ; Api.objectQ.sync(flags: .barrier) { __ipAddress = newValue } ; didChangeValue(for: \.ipAddress)}}}
   var _location: String {
     get { Api.objectQ.sync { __location } }
-    set { Api.objectQ.sync(flags: .barrier) { __location = newValue }}}
+    set { if newValue != _location { willChangeValue(for: \.location) ; Api.objectQ.sync(flags: .barrier) { __location = newValue } ; didChangeValue(for: \.location)}}}
   var _macAddress: String {
     get { Api.objectQ.sync { __macAddress } }
-    set { Api.objectQ.sync(flags: .barrier) { __macAddress = newValue }}}
+    set { if newValue != _macAddress { willChangeValue(for: \.macAddress) ; Api.objectQ.sync(flags: .barrier) { __macAddress = newValue } ; didChangeValue(for: \.macAddress)}}}
   var _lineoutGain: Int {
     get { Api.objectQ.sync { __lineoutGain } }
-    set { Api.objectQ.sync(flags: .barrier) { __lineoutGain = newValue.bound(kControlMin, kControlMax) }}}
+    set { if newValue != _lineoutGain { willChangeValue(for: \.lineoutGain) ; Api.objectQ.sync(flags: .barrier) { __lineoutGain = newValue } ; didChangeValue(for: \.lineoutGain)}}}
   var _lineoutMute: Bool {
     get { Api.objectQ.sync { __lineoutMute } }
-    set { Api.objectQ.sync(flags: .barrier) { __lineoutMute = newValue }}}
+    set { if newValue != _lineoutMute { willChangeValue(for: \.lineoutMute) ; Api.objectQ.sync(flags: .barrier) { __lineoutMute = newValue } ; didChangeValue(for: \.lineoutMute)}}}
   var _localPtt: Bool {              // (V3 only)
     get { Api.objectQ.sync { __localPtt } }
-    set { Api.objectQ.sync(flags: .barrier) { __localPtt = newValue }}}
+    set { if newValue != _localPtt { willChangeValue(for: \.localPtt) ; Api.objectQ.sync(flags: .barrier) { __localPtt = newValue } ; didChangeValue(for: \.localPtt)}}}
   var _locked: Bool {
     get { Api.objectQ.sync { __locked } }
-    set { Api.objectQ.sync(flags: .barrier) { __locked = newValue }}}
+    set { if newValue != _locked { willChangeValue(for: \.locked) ; Api.objectQ.sync(flags: .barrier) { __locked = newValue } ; didChangeValue(for: \.locked)}}}
   var _mox: Bool {
     get { Api.objectQ.sync { __mox } }
-    set { Api.objectQ.sync(flags: .barrier) { __mox = newValue }}}
+    set { if newValue != _mox { willChangeValue(for: \.mox) ; Api.objectQ.sync(flags: .barrier) { __mox = newValue } ; didChangeValue(for: \.mox)}}}
   var _muteLocalAudio: Bool {
     get { Api.objectQ.sync { __muteLocalAudio } }
-    set { Api.objectQ.sync(flags: .barrier) { __muteLocalAudio = newValue } } }
+    set { if newValue != _muteLocalAudio { willChangeValue(for: \.muteLocalAudio) ; Api.objectQ.sync(flags: .barrier) { __muteLocalAudio = newValue } ; didChangeValue(for: \.muteLocalAudio)}}}
   var _netmask: String {
     get { Api.objectQ.sync { __netmask } }
-    set { Api.objectQ.sync(flags: .barrier) { __netmask = newValue }}}
+    set { if newValue != _netmask { willChangeValue(for: \.netmask) ; Api.objectQ.sync(flags: .barrier) { __netmask = newValue } ; didChangeValue(for: \.netmask)}}}
   var _nickname: String {
     get { Api.objectQ.sync { __nickname } }
-    set { Api.objectQ.sync(flags: .barrier) { __nickname = newValue }}}
+    set { if newValue != _nickname { willChangeValue(for: \.nickname) ; Api.objectQ.sync(flags: .barrier) { __nickname = newValue } ; didChangeValue(for: \.nickname)}}}
   var _numberOfScus: Int {
     get { Api.objectQ.sync { __numberOfScus } }
-    set { Api.objectQ.sync(flags: .barrier) { __numberOfScus = newValue }}}
+    set { if newValue != _numberOfScus { willChangeValue(for: \.numberOfScus) ; Api.objectQ.sync(flags: .barrier) { __numberOfScus = newValue } ; didChangeValue(for: \.numberOfScus)}}}
   var _numberOfSlices: Int {
     get { Api.objectQ.sync { __numberOfSlices } }
-    set { Api.objectQ.sync(flags: .barrier) { __numberOfSlices = newValue }}}
+    set { if newValue != _numberOfSlices { willChangeValue(for: \.numberOfSlices) ; Api.objectQ.sync(flags: .barrier) { __numberOfSlices = newValue } ; didChangeValue(for: \.numberOfSlices)}}}
   var _numberOfTx: Int {
     get { Api.objectQ.sync { __numberOfTx } }
-    set { Api.objectQ.sync(flags: .barrier) { __numberOfTx = newValue }}}
+    set { if newValue != _numberOfTx { willChangeValue(for: \.numberOfTx) ; Api.objectQ.sync(flags: .barrier) { __numberOfTx = newValue } ; didChangeValue(for: \.numberOfTx)}}}
   var _oscillator: String {
     get { Api.objectQ.sync { __oscillator } }
-    set { Api.objectQ.sync(flags: .barrier) { __oscillator = newValue }}}
+    set { if newValue != _oscillator { willChangeValue(for: \.oscillator) ; Api.objectQ.sync(flags: .barrier) { __oscillator = newValue } ; didChangeValue(for: \.oscillator)}}}
   var _picDecpuVersion: String {
     get { Api.objectQ.sync { __picDecpuVersion } }
-    set { Api.objectQ.sync(flags: .barrier) { __picDecpuVersion = newValue }}}
+    set { if newValue != _picDecpuVersion { willChangeValue(for: \.picDecpuVersion) ; Api.objectQ.sync(flags: .barrier) { __picDecpuVersion = newValue } ; didChangeValue(for: \.picDecpuVersion)}}}
   var _program: String {
     get { Api.objectQ.sync { __program } }
-    set { Api.objectQ.sync(flags: .barrier) { __program = newValue }}}
+    set { if newValue != _program { willChangeValue(for: \.program) ; Api.objectQ.sync(flags: .barrier) { __program = newValue } ; didChangeValue(for: \.program)}}}
   var _psocMbPa100Version: String {
     get { Api.objectQ.sync { __psocMbPa100Version } }
-    set { Api.objectQ.sync(flags: .barrier) { __psocMbPa100Version = newValue }}}
+    set { if newValue != _psocMbPa100Version { willChangeValue(for: \.psocMbPa100Version) ; Api.objectQ.sync(flags: .barrier) { __psocMbPa100Version = newValue } ; didChangeValue(for: \.psocMbPa100Version)}}}
   var _psocMbtrxVersion: String {
     get { Api.objectQ.sync { __psocMbtrxVersion } }
-    set { Api.objectQ.sync(flags: .barrier) { __psocMbtrxVersion = newValue }}}
+    set { if newValue != _psocMbtrxVersion { willChangeValue(for: \.psocMbtrxVersion) ; Api.objectQ.sync(flags: .barrier) { __psocMbtrxVersion = newValue } ; didChangeValue(for: \.psocMbtrxVersion)}}}
   var _radioModel: String {
     get { Api.objectQ.sync { __radioModel } }
-    set { Api.objectQ.sync(flags: .barrier) { __radioModel = newValue }}}
+    set { if newValue != _radioModel { willChangeValue(for: \.radioModel) ; Api.objectQ.sync(flags: .barrier) { __radioModel = newValue } ; didChangeValue(for: \.radioModel)}}}
   var _radioOptions: String {
     get { Api.objectQ.sync { __radioOptions } }
-    set { Api.objectQ.sync(flags: .barrier) { __radioOptions = newValue }}}
+    set { if newValue != _radioOptions { willChangeValue(for: \.radioOptions) ; Api.objectQ.sync(flags: .barrier) { __radioOptions = newValue } ; didChangeValue(for: \.radioOptions)}}}
   var _radioScreenSaver: String {
     get { Api.objectQ.sync { __radioScreenSaver } }
-    set { Api.objectQ.sync(flags: .barrier) { __radioScreenSaver = newValue }}}
+    set { if newValue != _radioScreenSaver { willChangeValue(for: \.radioScreenSaver) ; Api.objectQ.sync(flags: .barrier) { __radioScreenSaver = newValue } ; didChangeValue(for: \.radioScreenSaver)}}}
   var _region: String {
     get { Api.objectQ.sync { __region } }
-    set { Api.objectQ.sync(flags: .barrier) { __region = newValue }}}
+    set { if newValue != _region { willChangeValue(for: \.region) ; Api.objectQ.sync(flags: .barrier) { __region = newValue } ; didChangeValue(for: \.region)}}}
   var _remoteOnEnabled: Bool {
     get { Api.objectQ.sync { __remoteOnEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __remoteOnEnabled = newValue }}}
+    set { if newValue != _remoteOnEnabled { willChangeValue(for: \.remoteOnEnabled) ; Api.objectQ.sync(flags: .barrier) { __remoteOnEnabled = newValue } ; didChangeValue(for: \.remoteOnEnabled)}}}
   var _rttyMark: Int {
     get { Api.objectQ.sync { __rttyMark } }
-    set { Api.objectQ.sync(flags: .barrier) { __rttyMark = newValue }}}
+    set { if newValue != _rttyMark { willChangeValue(for: \.rttyMark) ; Api.objectQ.sync(flags: .barrier) { __rttyMark = newValue } ; didChangeValue(for: \.rttyMark)}}}
   var _setting: String {
     get { Api.objectQ.sync { __setting } }
-    set { Api.objectQ.sync(flags: .barrier) { __setting = newValue }}}
+    set { if newValue != _setting { willChangeValue(for: \.setting) ; Api.objectQ.sync(flags: .barrier) { __setting = newValue } ; didChangeValue(for: \.setting)}}}
   var _smartSdrMB: String {
     get { Api.objectQ.sync { __smartSdrMB } }
-    set { Api.objectQ.sync(flags: .barrier) { __smartSdrMB = newValue }}}
+    set { if newValue != _smartSdrMB { willChangeValue(for: \.smartSdrMB) ; Api.objectQ.sync(flags: .barrier) { __smartSdrMB = newValue } ; didChangeValue(for: \.smartSdrMB)}}}
   var _snapTuneEnabled: Bool {
     get { Api.objectQ.sync { __snapTuneEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __snapTuneEnabled = newValue }}}
+    set { if newValue != _snapTuneEnabled { willChangeValue(for: \.snapTuneEnabled) ; Api.objectQ.sync(flags: .barrier) { __snapTuneEnabled = newValue } ; didChangeValue(for: \.snapTuneEnabled)}}}
   var _softwareVersion: String {
     get { Api.objectQ.sync { __softwareVersion } }
-    set { Api.objectQ.sync(flags: .barrier) { __softwareVersion = newValue }}}
+    set { if newValue != _softwareVersion { willChangeValue(for: \.softwareVersion) ; Api.objectQ.sync(flags: .barrier) { __softwareVersion = newValue } ; didChangeValue(for: \.softwareVersion)}}}
   var _startCalibration: Bool {
     get { Api.objectQ.sync { __startCalibration } }
-    set { Api.objectQ.sync(flags: .barrier) { __startCalibration = newValue }}}
+    set { if newValue != _startCalibration { willChangeValue(for: \.startCalibration) ; Api.objectQ.sync(flags: .barrier) { __startCalibration = newValue } ; didChangeValue(for: \.startCalibration)}}}
   var _state: String {
     get { Api.objectQ.sync { __state } }
-    set { Api.objectQ.sync(flags: .barrier) { __state = newValue }}}
+    set { if newValue != _state { willChangeValue(for: \.state) ; Api.objectQ.sync(flags: .barrier) { __state = newValue } ; didChangeValue(for: \.state)}}}
   var _staticGateway: String {
     get { Api.objectQ.sync { __staticGateway } }
-    set { Api.objectQ.sync(flags: .barrier) { __staticGateway = newValue }}}
+    set { if newValue != _staticGateway { willChangeValue(for: \.staticGateway) ; Api.objectQ.sync(flags: .barrier) { __staticGateway = newValue } ; didChangeValue(for: \.staticGateway)}}}
   var _staticIp: String {
     get { Api.objectQ.sync { __staticIp } }
-    set { Api.objectQ.sync(flags: .barrier) { __staticIp = newValue }}}
+    set { if newValue != _staticIp { willChangeValue(for: \.staticIp) ; Api.objectQ.sync(flags: .barrier) { __staticIp = newValue } ; didChangeValue(for: \.staticIp)}}}
   var _staticNetmask: String {
     get { Api.objectQ.sync { __staticNetmask } }
-    set { Api.objectQ.sync(flags: .barrier) { __staticNetmask = newValue }}}
+    set { if newValue != _staticNetmask { willChangeValue(for: \.staticNetmask) ; Api.objectQ.sync(flags: .barrier) { __staticNetmask = newValue } ; didChangeValue(for: \.staticNetmask)}}}
   var _station: String {           // (V3 only)
     get { Api.objectQ.sync { __station } }
-    set { Api.objectQ.sync(flags: .barrier) { __station = newValue }}}
+    set { if newValue != _station { willChangeValue(for: \.station) ; Api.objectQ.sync(flags: .barrier) { __station = newValue } ; didChangeValue(for: \.station)}}}
   var _tcxoPresent: Bool {
     get { Api.objectQ.sync { __tcxoPresent } }
-    set { Api.objectQ.sync(flags: .barrier) { __tcxoPresent = newValue }}}
+    set { if newValue != _tcxoPresent { willChangeValue(for: \.tcxoPresent) ; Api.objectQ.sync(flags: .barrier) { __tcxoPresent = newValue } ; didChangeValue(for: \.tcxoPresent)}}}
   var _tnfsEnabled: Bool {
     get { Api.objectQ.sync { __tnfsEnabled } }
-    set { Api.objectQ.sync(flags: .barrier) { __tnfsEnabled = newValue } } }
-
+    set { if newValue != _tnfsEnabled { willChangeValue(for: \.tnfsEnabled) ; Api.objectQ.sync(flags: .barrier) { __tnfsEnabled = newValue } ; didChangeValue(for: \.tnfsEnabled)}}}
+  
+  
   enum ClientToken : String {
     case host
     case id                       = "client_id"
@@ -843,12 +856,12 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // if PTT_REQUESTED or TRANSMITTING
     if state == Interlock.State.pttRequested.rawValue || state == Interlock.State.transmitting.rawValue {
       // and mox not on, turn it on
-      if currentMox == false { willChangeValue(for: \.mox) ; _mox = true ; didChangeValue(for: \.mox) }
+      if currentMox == false { _mox = true }
       
     // if READY or UNKEY_REQUESTED
     } else if state == Interlock.State.ready.rawValue || state == Interlock.State.unKeyRequested.rawValue {
       // and mox is on, turn it off
-      if currentMox == true { willChangeValue(for: \.mox) ; _mox = false ; didChangeValue(for: \.mox) }
+      if currentMox == true { _mox = false  }
     }
   }
   
@@ -1293,24 +1306,24 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Known keys, in alphabetical order
       switch token {
         
-      case .atuPresent:       willChangeValue(for: \.atuPresent)        ; _atuPresent = property.value.bValue     ; didChangeValue(for: \.atuPresent)
-      case .callsign:         willChangeValue(for: \.callsign)          ; _callsign = property.value              ; didChangeValue(for: \.callsign)
-      case .chassisSerial:    willChangeValue(for: \.chassisSerial)     ; _chassisSerial = property.value         ; didChangeValue(for: \.chassisSerial)
-      case .gateway:          willChangeValue(for: \.gateway)           ; _gateway = property.value               ; didChangeValue(for: \.gateway)
-      case .gps:              willChangeValue(for: \.gps)               ; _gpsPresent = (property.value != "Not Present") ; didChangeValue(for: \.gps)
-      case .ipAddress:        willChangeValue(for: \.ipAddress)         ; _ipAddress = property.value             ; didChangeValue(for: \.ipAddress)
-      case .location:         willChangeValue(for: \.location)          ; _location = property.value              ; didChangeValue(for: \.location)
-      case .macAddress:       willChangeValue(for: \.macAddress)        ; _macAddress = property.value            ; didChangeValue(for: \.macAddress)
-      case .model:            willChangeValue(for: \.radioModel)        ; _radioModel = property.value            ; didChangeValue(for: \.radioModel)
-      case .netmask:          willChangeValue(for: \.netmask)           ; _netmask = property.value               ; didChangeValue(for: \.netmask)
-      case .name:             willChangeValue(for: \.nickname)          ; _nickname = property.value              ; didChangeValue(for: \.nickname)
-      case .numberOfScus:     willChangeValue(for: \.numberOfScus)      ; _numberOfScus = property.value.iValue   ; didChangeValue(for: \.numberOfScus)
-      case .numberOfSlices:   willChangeValue(for: \.numberOfSlices)    ; _numberOfSlices = property.value.iValue ; didChangeValue(for: \.numberOfSlices)
-      case .numberOfTx:       willChangeValue(for: \.numberOfTx)        ; _numberOfTx = property.value.iValue     ; didChangeValue(for: \.numberOfTx)
-      case .options:          willChangeValue(for: \.radioOptions)      ; _radioOptions = property.value          ; didChangeValue(for: \.radioOptions)
-      case .region:           willChangeValue(for: \.region)            ; _region = property.value                ; didChangeValue(for: \.region)
-      case .screensaver:      willChangeValue(for: \.radioScreenSaver)  ; _radioScreenSaver = property.value      ; didChangeValue(for: \.radioScreenSaver)
-      case .softwareVersion:  willChangeValue(for: \.softwareVersion)   ; _softwareVersion = property.value       ; didChangeValue(for: \.softwareVersion)
+      case .atuPresent:       _atuPresent = property.value.bValue
+      case .callsign:         _callsign = property.value
+      case .chassisSerial:    _chassisSerial = property.value
+      case .gateway:          _gateway = property.value
+      case .gps:              _gpsPresent = (property.value != "Not Present")
+      case .ipAddress:        _ipAddress = property.value
+      case .location:         _location = property.value
+      case .macAddress:       _macAddress = property.value
+      case .model:            _radioModel = property.value
+      case .netmask:          _netmask = property.value
+      case .name:             _nickname = property.value
+      case .numberOfScus:     _numberOfScus = property.value.iValue
+      case .numberOfSlices:   _numberOfSlices = property.value.iValue
+      case .numberOfTx:       _numberOfTx = property.value.iValue
+      case .options:          _radioOptions = property.value
+      case .region:           _region = property.value
+      case .screensaver:      _radioScreenSaver = property.value
+      case .softwareVersion:  _softwareVersion = property.value
       }
     }
   }
@@ -1364,11 +1377,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Known tokens, in alphabetical order
       switch token {
         
-      case .smartSdrMB:   willChangeValue(for: \.smartSdrMB)          ; _smartSdrMB = property.value          ; didChangeValue(for: \.smartSdrMB)
-      case .picDecpu:     willChangeValue(for: \.picDecpuVersion)     ; _picDecpuVersion = property.value     ; didChangeValue(for: \.picDecpuVersion)
-      case .psocMbTrx:    willChangeValue(for: \.psocMbtrxVersion)    ; _psocMbtrxVersion = property.value    ; didChangeValue(for: \.psocMbtrxVersion)
-      case .psocMbPa100:  willChangeValue(for: \.psocMbPa100Version)  ; _psocMbPa100Version = property.value  ; didChangeValue(for: \.psocMbPa100Version)
-      case .fpgaMb:       willChangeValue(for: \.fpgaMbVersion)       ; _fpgaMbVersion = property.value       ; didChangeValue(for: \.fpgaMbVersion)
+      case .smartSdrMB:   _smartSdrMB = property.value
+      case .picDecpu:     _picDecpuVersion = property.value
+      case .psocMbTrx:    _psocMbtrxVersion = property.value
+      case .psocMbPa100:  _psocMbPa100Version = property.value
+      case .fpgaMb:       _fpgaMbVersion = property.value
       }
     }
   }
@@ -1401,13 +1414,13 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       case .voice:    voice = true
         
       case .autoLevel:
-        if cw       { willChangeValue(for: \.filterCwAutoEnabled) ; _filterCwAutoEnabled = property.value.bValue ; didChangeValue(for: \.filterCwAutoEnabled) ; cw = false }
-        if digital  { willChangeValue(for: \.filterDigitalAutoEnabled) ; _filterDigitalAutoEnabled = property.value.bValue ; didChangeValue(for: \.filterDigitalAutoEnabled) ; digital = false }
-        if voice    { willChangeValue(for: \.filterVoiceAutoEnabled) ; _filterVoiceAutoEnabled = property.value.bValue ; didChangeValue(for: \.filterVoiceAutoEnabled) ; voice = false }
+        if cw       { _filterCwAutoEnabled = property.value.bValue ; cw = false }
+        if digital  { _filterDigitalAutoEnabled = property.value.bValue ; digital = false }
+        if voice    { _filterVoiceAutoEnabled = property.value.bValue ; voice = false }
       case .level:
-        if cw {       willChangeValue(for: \.filterCwLevel) ; _filterCwLevel = property.value.iValue ; didChangeValue(for: \.filterCwLevel) }
-        if digital {  willChangeValue(for: \.filterDigitalLevel) ; _filterDigitalLevel = property.value.iValue ; didChangeValue(for: \.filterDigitalLevel) }
-        if voice {    willChangeValue(for: \.filterVoiceLevel) ; _filterVoiceLevel = property.value.iValue ; didChangeValue(for: \.filterVoiceLevel) }
+        if cw       { _filterCwLevel = property.value.iValue }
+        if digital  { _filterDigitalLevel = property.value.iValue  }
+        if voice    { _filterVoiceLevel = property.value.iValue }
       }
     }
   }
@@ -1432,9 +1445,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Known tokens, in alphabetical order
       switch token {
         
-      case .gateway:  willChangeValue(for: \.staticGateway) ; _staticGateway = property.value ; didChangeValue(for: \.staticGateway)
-      case .ip:       willChangeValue(for: \.staticIp)      ; _staticIp = property.value      ; didChangeValue(for: \.staticIp)
-      case .netmask:  willChangeValue(for: \.staticNetmask) ; _staticNetmask = property.value ; didChangeValue(for: \.staticNetmask)
+      case .gateway:  _staticGateway = property.value
+      case .ip:       _staticIp = property.value
+      case .netmask:  _staticNetmask = property.value
       }
     }
   }
@@ -1459,12 +1472,12 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Known tokens, in alphabetical order
       switch token {
         
-      case .extPresent:   willChangeValue(for: \.extPresent)    ; _extPresent = property.value.bValue   ; didChangeValue(for: \.extPresent)
-      case .gpsdoPresent: willChangeValue(for: \.gpsdoPresent)  ; _gpsdoPresent = property.value.bValue ; didChangeValue(for: \.gpsdoPresent)
-      case .locked:       willChangeValue(for: \.locked)        ; _locked = property.value.bValue       ; didChangeValue(for: \.locked)
-      case .setting:      willChangeValue(for: \.setting)       ; _setting = property.value             ; didChangeValue(for: \.setting)
-      case .state:        willChangeValue(for: \.state)         ; _state = property.value               ; didChangeValue(for: \.state)
-      case .tcxoPresent:  willChangeValue(for: \.tcxoPresent)   ; _tcxoPresent = property.value.bValue  ; didChangeValue(for: \.tcxoPresent)
+      case .extPresent:   _extPresent = property.value.bValue
+      case .gpsdoPresent: _gpsdoPresent = property.value.bValue
+      case .locked:       _locked = property.value.bValue
+      case .setting:      _setting = property.value
+      case .state:        _state = property.value
+      case .tcxoPresent:  _tcxoPresent = property.value.bValue
       }
     }
   }
@@ -1511,30 +1524,30 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         // Known tokens, in alphabetical order
         switch token {
           
-        case .backlight:                willChangeValue(for: \.backlight)               ; _backlight = property.value.iValue                ; didChangeValue(for: \.backlight)
-        case .bandPersistenceEnabled:   willChangeValue(for: \.bandPersistenceEnabled)  ; _bandPersistenceEnabled = property.value.bValue   ; didChangeValue(for: \.bandPersistenceEnabled)
-        case .binauralRxEnabled:        willChangeValue(for: \.binauralRxEnabled)       ; _binauralRxEnabled = property.value.bValue        ; didChangeValue(for: \.binauralRxEnabled)
-        case .calFreq:                  willChangeValue(for: \.calFreq)                 ; _calFreq = property.value.mhzToHz                 ; didChangeValue(for: \.calFreq)
-        case .callsign:                 willChangeValue(for: \.callsign)                ; _callsign = property.value                        ; didChangeValue(for: \.callsign)
-        case .daxIqAvailable:           willChangeValue(for: \.daxIqAvailable)          ; _daxIqAvailable = property.value.iValue           ; didChangeValue(for: \.daxIqAvailable)
-        case .daxIqCapacity:            willChangeValue(for: \.daxIqCapacity)           ; _daxIqCapacity = property.value.iValue            ; didChangeValue(for: \.daxIqCapacity)
-        case .enforcePrivateIpEnabled:  willChangeValue(for: \.enforcePrivateIpEnabled) ; _enforcePrivateIpEnabled = property.value.bValue  ; didChangeValue(for: \.enforcePrivateIpEnabled)
-        case .freqErrorPpb:             willChangeValue(for: \.freqErrorPpb)            ; _freqErrorPpb = property.value.iValue             ; didChangeValue(for: \.freqErrorPpb)
-        case .fullDuplexEnabled:        willChangeValue(for: \.fullDuplexEnabled)       ; _fullDuplexEnabled = property.value.bValue        ; didChangeValue(for: \.fullDuplexEnabled)
-        case .frontSpeakerMute:         willChangeValue(for: \.frontSpeakerMute)        ; _frontSpeakerMute = property.value.bValue         ; didChangeValue(for: \.frontSpeakerMute)
-        case .headphoneGain:            willChangeValue(for: \.headphoneGain)           ; _headphoneGain = property.value.iValue            ; didChangeValue(for: \.headphoneGain)
-        case .headphoneMute:            willChangeValue(for: \.headphoneMute)           ; _headphoneMute = property.value.bValue            ; didChangeValue(for: \.headphoneMute)
-        case .lineoutGain:              willChangeValue(for: \.lineoutGain)             ; _lineoutGain = property.value.iValue              ; didChangeValue(for: \.lineoutGain)
-        case .lineoutMute:              willChangeValue(for: \.lineoutMute)             ; _lineoutMute = property.value.bValue              ; didChangeValue(for: \.lineoutMute)
-        case .muteLocalAudio:           willChangeValue(for: \.muteLocalAudio)          ; _muteLocalAudio = property.value.bValue           ; didChangeValue(for: \.muteLocalAudio)
-        case .nickname:                 willChangeValue(for: \.nickname)                ; _nickname = property.value                        ; didChangeValue(for: \.nickname)
-        case .panadapters:              willChangeValue(for: \.availablePanadapters)    ; _availablePanadapters = property.value.iValue     ; didChangeValue(for: \.availablePanadapters)
-        case .pllDone:                  willChangeValue(for: \.startCalibration)        ; _startCalibration = property.value.bValue         ; didChangeValue(for: \.startCalibration)
-        case .remoteOnEnabled:          willChangeValue(for: \.remoteOnEnabled)         ; _remoteOnEnabled = property.value.bValue          ; didChangeValue(for: \.remoteOnEnabled)
-        case .rttyMark:                 willChangeValue(for: \.rttyMark)                ; _rttyMark = property.value.iValue                 ; didChangeValue(for: \.rttyMark)
-        case .slices:                   willChangeValue(for: \.availableSlices)         ; _availableSlices = property.value.iValue          ; didChangeValue(for: \.availableSlices)
-        case .snapTuneEnabled:          willChangeValue(for: \.snapTuneEnabled)         ; _snapTuneEnabled = property.value.bValue          ; didChangeValue(for: \.snapTuneEnabled)
-        case .tnfsEnabled:              willChangeValue(for: \.tnfsEnabled)             ; _tnfsEnabled = property.value.bValue              ; didChangeValue(for: \.tnfsEnabled)
+        case .backlight:                _backlight = property.value.iValue
+        case .bandPersistenceEnabled:   _bandPersistenceEnabled = property.value.bValue
+        case .binauralRxEnabled:        _binauralRxEnabled = property.value.bValue
+        case .calFreq:                  _calFreq = property.value.mhzToHz
+        case .callsign:                 _callsign = property.value
+        case .daxIqAvailable:           _daxIqAvailable = property.value.iValue
+        case .daxIqCapacity:            _daxIqCapacity = property.value.iValue
+        case .enforcePrivateIpEnabled:  _enforcePrivateIpEnabled = property.value.bValue
+        case .freqErrorPpb:             _freqErrorPpb = property.value.iValue
+        case .fullDuplexEnabled:        _fullDuplexEnabled = property.value.bValue
+        case .frontSpeakerMute:         _frontSpeakerMute = property.value.bValue
+        case .headphoneGain:            _headphoneGain = property.value.iValue
+        case .headphoneMute:            _headphoneMute = property.value.bValue
+        case .lineoutGain:              _lineoutGain = property.value.iValue
+        case .lineoutMute:              _lineoutMute = property.value.bValue
+        case .muteLocalAudio:           _muteLocalAudio = property.value.bValue
+        case .nickname:                 _nickname = property.value
+        case .panadapters:              _availablePanadapters = property.value.iValue
+        case .pllDone:                  _startCalibration = property.value.bValue
+        case .remoteOnEnabled:          _remoteOnEnabled = property.value.bValue
+        case .rttyMark:                 _rttyMark = property.value.iValue
+        case .slices:                   _availableSlices = property.value.iValue
+        case .snapTuneEnabled:          _snapTuneEnabled = property.value.bValue
+        case .tnfsEnabled:              _tnfsEnabled = property.value.bValue              
         }
       }
     }

@@ -232,7 +232,7 @@ extension Radio {
     
     sendCommand("client bind client_id=" + clientId, replyTo: callback)
 
-    willChangeValue(for: \.boundClientId) ; _boundClientId = clientId ; didChangeValue(for: \.boundClientId)
+    _boundClientId = clientId
   }
   
   // ----------------------------------------------------------------------------
