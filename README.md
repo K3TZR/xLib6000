@@ -8,8 +8,8 @@
 ### Built on:
 
 *  macOS 10.15.6 Beta (19G46c)
-*  Xcode 11.5 (11E608c)
-*  Swift 5.2
+*  Xcode 12.0 beta 4 (12A8179i)
+*  Swift 5.3
 
 
 ## Usage
@@ -39,6 +39,11 @@ Flex Radios can have one of four different version groups:
 [![CocoaAsyncSocket](https://img.shields.io/badge/CocoaAsyncSocket-v7.6.3-informational)](https://github.com/robbiehanson/CocoaAsyncSocket)
 
 CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
+
+
+## 1.3.8 Release Notes
+
+* correction to guiClientHasBeenRemoved notification (note.object was nil)
 
 
 ## 1.3.7 Release Notes
