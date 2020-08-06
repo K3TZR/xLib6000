@@ -300,7 +300,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         
         _log("GuiClient removed: \(handle.hex), \(oldGuiClient.station), \(oldGuiClient.program), \(oldPacket.nickname), (\(oldPacket.isWan ? "SMARTLINK" : "LOCAL")), \(oldGuiClient.clientId ?? "")", .debug, #function, #file, #line)
         
-          NC.post(.guiClientHasBeenRemoved, object: oldPacket.guiClients[handle] as Any?)
+          NC.post(.guiClientHasBeenRemoved, object: oldGuiClient as Any?)
       
       }
     }

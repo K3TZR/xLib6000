@@ -38,6 +38,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
+
   @objc dynamic public var average: Int {
     get { _average }
     set {if _average != newValue { _average = newValue ; panadapterSet( .average, newValue) }}}
