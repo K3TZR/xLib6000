@@ -10,20 +10,18 @@ import Foundation
 
 /// Delegate protocol for the Api layer
 ///
-public protocol ApiDelegate {
+public protocol TesterDelegate {
   
   func sentMessage(_ text: String)
   func receivedMessage(_ text: String)
-  func addReplyHandler(_ sequenceNumber: SequenceNumber, replyTuple: ReplyTuple)
-  func defaultReplyHandler(_ command: String, sequenceNumber: SequenceNumber, responseValue: String, reply: String)
-  func vitaParser(_ vitaPacket: Vita)
 }
 /// Delegate protocol for the Api layer
 ///
-public protocol TesterDelegate: ApiDelegate {
+public protocol ApiDelegate: TesterDelegate {
   
-  func startTester()
-  func stopTester()
+  func addReplyHandler(_ sequenceNumber: SequenceNumber, replyTuple: ReplyTuple)
+  func defaultReplyHandler(_ command: String, sequenceNumber: SequenceNumber, responseValue: String, reply: String)
+  func vitaParser(_ vitaPacket: Vita)
 }
 
 /// API Class implementation
@@ -458,8 +456,8 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     // register to be notified when reply received
     delegate?.addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
     
-    // pass it to xAPITester (if present)
-    testerDelegate?.addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
+//    // pass it to xAPITester (if present)
+//    testerDelegate?.addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
   }
 
   // ----------------------------------------------------------------------------
@@ -676,8 +674,8 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     delegate?.vitaParser(vitaPacket)
 
-    // pass it to xAPITester (if present)
-    testerDelegate?.vitaParser(vitaPacket)
+//    // pass it to xAPITester (if present)
+//    testerDelegate?.vitaParser(vitaPacket)
   }
   
   // ----------------------------------------------------------------------------

@@ -733,8 +733,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // register to be notified when reply received
     addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
     
-    // pass it to xAPITester (if present)
-    _api.testerDelegate?.addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
+//    // pass it to xAPITester (if present)
+//    _api.testerDelegate?.addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
   }
   /// Send Vita UDP data
   /// - Parameter data:   the contents as Data
