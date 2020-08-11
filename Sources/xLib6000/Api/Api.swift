@@ -8,6 +8,24 @@
 
 import Foundation
 
+/// Delegate protocol for the Api layer
+///
+public protocol ApiDelegate {
+  
+  func sentMessage(_ text: String)
+  func receivedMessage(_ text: String)
+  func addReplyHandler(_ sequenceNumber: SequenceNumber, replyTuple: ReplyTuple)
+  func defaultReplyHandler(_ command: String, sequenceNumber: SequenceNumber, responseValue: String, reply: String)
+  func vitaParser(_ vitaPacket: Vita)
+}
+/// Delegate protocol for the Api layer
+///
+public protocol TesterDelegate: ApiDelegate {
+  
+  func startTester()
+  func stopTester()
+}
+
 /// API Class implementation
 ///
 ///      manages the connections to the Radio (hardware), responsible for the
@@ -46,8 +64,8 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
   public var isGui                    = true
   public var needsNetCwStream         = false
   public var reducedDaxBw             = false
-  public var testerDelegate           : ApiDelegate?
-  public var testerModeEnabled        = false
+  public var testerDelegate           : TesterDelegate?
+  public var testerModeEnabled        = false                   // FIXME: is this needed ?
   public var pingerEnabled            = true
 
   @objc dynamic public var radio : Radio? {
