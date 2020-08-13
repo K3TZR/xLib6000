@@ -8,21 +8,22 @@
 
 import Foundation
 
-/// Delegate protocol for the Api layer
-///
+// ----------------------------------------------------------------------------
+// MARK: - Delegate protocols
+
 public protocol TesterDelegate {
-  
   func sentMessage(_ text: String)
   func receivedMessage(_ text: String)
 }
-/// Delegate protocol for the Api layer
-///
+
 public protocol ApiDelegate: TesterDelegate {
-  
   func addReplyHandler(_ sequenceNumber: SequenceNumber, replyTuple: ReplyTuple)
   func defaultReplyHandler(_ command: String, sequenceNumber: SequenceNumber, responseValue: String, reply: String)
   func vitaParser(_ vitaPacket: Vita)
 }
+
+// ----------------------------------------------------------------------------
+// MARK: - Class implementation
 
 /// API Class implementation
 ///
