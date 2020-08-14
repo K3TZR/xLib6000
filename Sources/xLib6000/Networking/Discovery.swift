@@ -298,10 +298,8 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         // NO, it must be removed
         oldPacket.guiClients[handle] = nil
         
-        _log("GuiClient removed: \(handle.hex), \(oldGuiClient.station), \(oldGuiClient.program), \(oldPacket.nickname), (\(oldPacket.isWan ? "SMARTLINK" : "LOCAL")), \(oldGuiClient.clientId ?? "")", .debug, #function, #file, #line)
-        
-          NC.post(.guiClientHasBeenRemoved, object: oldGuiClient as Any?)
-      
+        _log("GuiClient removed: \(handle.hex), \(oldGuiClient.station), \(oldGuiClient.program), \(oldPacket.nickname), (\(oldPacket.isWan ? "SMARTLINK" : "LOCAL")), \(oldGuiClient.clientId ?? "")", .debug, #function, #file, #line)        
+        NC.post(.guiClientHasBeenRemoved, object: oldGuiClient as Any?)
       }
     }
     // identify any added guiClients
