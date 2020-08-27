@@ -11,12 +11,9 @@ import Foundation
 // ----------------------------------------------------------------------------
 // MARK: - Delegate protocols
 
-public protocol TesterDelegate {
+public protocol ApiDelegate {
   func sentMessage(_ text: String)
   func receivedMessage(_ text: String)
-}
-
-public protocol ApiDelegate: TesterDelegate {
   func addReplyHandler(_ sequenceNumber: SequenceNumber, replyTuple: ReplyTuple)
   func defaultReplyHandler(_ command: String, sequenceNumber: SequenceNumber, responseValue: String, reply: String)
   func vitaParser(_ vitaPacket: Vita)
@@ -63,7 +60,7 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
   public var isGui                    = true
   public var needsNetCwStream         = false
   public var reducedDaxBw             = false
-  public var testerDelegate           : TesterDelegate?
+  public var testerDelegate           : ApiDelegate?
   public var testerModeEnabled        = false                   // FIXME: is this needed ?
   public var pingerEnabled            = true
 

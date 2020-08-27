@@ -220,11 +220,10 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     // is there a previous packet with the same serialNumber and isWan?
     if let radioIndex = findRadioPacket(with: newPacket) {
       
-      // known radio
+      // YES, known radio
       let oldPacket = discoveredRadios[radioIndex]
-      scanGuiClients(newPacket, oldPacket)
 
-      // update other fields
+      // update various fields
       oldPacket.status                = newPacket.status
       oldPacket.availableClients      = newPacket.availableClients
       oldPacket.availablePanadapters  = newPacket.availablePanadapters
@@ -238,10 +237,15 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       oldPacket.guiClientPrograms     = newPacket.guiClientPrograms
       oldPacket.guiClientStations     = newPacket.guiClientStations
       oldPacket.guiClientIps          = newPacket.guiClientIps
+
+      // determine what (if anything) has changed in GuiClients
+      scanGuiClients(newPacket, oldPacket)
+      
+      // update the record
       discoveredRadios[radioIndex] = oldPacket
 
     } else {
-      // unknown radio, add it
+      // NO, unknown radio, add it
       discoveredRadios.append(newPacket)
 
       // log Radio addition
@@ -386,7 +390,11 @@ public struct GuiClient {
 ///     A class therefore a "reference" type
 ///     Equatable by serial number & isWan
 ///
-public class DiscoveryPacket : Equatable {
+public class DiscoveryPacket : Equatable, Hashable {
+  
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(publicIp)
+  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
