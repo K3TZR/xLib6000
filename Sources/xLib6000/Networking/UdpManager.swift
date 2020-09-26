@@ -158,13 +158,13 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       do {
         try _udpSocket.bind(toPort: portToUse)
         
-        _log(Self.className() + ": UDP bound to port \(portToUse)", .debug, #function, #file, #line)
+        _log(Self.className() + " UDP bound to port \(portToUse)", .debug, #function, #file, #line)
         success = true
         
       } catch {
         
         // We didn't get the port we wanted
-        _log(Self.className() + ": UDP FAILED to bind to port \(portToUse)", .debug, #function, #file, #line)
+        _log(Self.className() + " UDP FAILED to bind to port \(portToUse)", .debug, #function, #file, #line)
 
         // try the next Port Number
         portToUse += 1
@@ -186,7 +186,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       // a UDP bind has been established
       beginReceiving()
 
-//      _log(Self.className() + ": UDP receive port: \(_udpRcvPort), Send port: \(_udpSendPort)", .info, #function, #file, #line)
+//      _log(Self.className() + " UDP receive port: \(_udpRcvPort), Send port: \(_udpSendPort)", .info, #function, #file, #line)
 //
 //      // if a Wan connection, register
 //      if packet.isWan { register(clientHandle: clientHandle) }
@@ -203,7 +203,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       
     } catch let error {
       // read error
-      _log(Self.className() + ": UDP Begin receiving error - \(error.localizedDescription)", .error, #function, #file, #line)
+      _log(Self.className() + " UDP Begin receiving error - \(error.localizedDescription)", .error, #function, #file, #line)
     }
   }
   /// Unbind from the UDP port
@@ -229,7 +229,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
     
     guard clientHandle != nil else {
       // should not happen
-      _log(Self.className() + ": No client handle in register UDP", .error, #function, #file, #line)
+      _log(Self.className() + " No client handle in register UDP", .error, #function, #file, #line)
 
       return
     }
@@ -238,7 +238,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       
       while self._udpSocket != nil && !self.udpSuccessfulRegistration && self._udpBound {
         
-        self._log(Self.className() + ": Register Wan UDP", .debug, #function, #file, #line)
+        self._log(Self.className() + " Register Wan UDP", .debug, #function, #file, #line)
 
         // send a Registration command
         let cmd = "client udp_register handle=" + clientHandle!.hex
@@ -247,7 +247,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
         // pause
         usleep(self.kRegistrationDelay)
       }
-      self._log(Self.className() + ": Wan UDP registered", .debug, #function, #file, #line)
+      self._log(Self.className() + " Wan UDP registered", .debug, #function, #file, #line)
 
 //      // as long as connected after Registration
 //      while self._udpSocket != nil && self._udpBound {
@@ -304,13 +304,13 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
         case .ifData, .extData, .ifContext, .extContext:
           
           // log the error
-          self?._log(Self.className() + ": Unexpected packetType - \(vita.packetType.rawValue)", .warning, #function, #file, #line)
+          self?._log(Self.className() + " Unexpected packetType - \(vita.packetType.rawValue)", .warning, #function, #file, #line)
         }
         
       } else {
         
         // log the error
-        self?._log(Self.className() + ": Unable to decode received packet", .warning, #function, #file, #line)
+        self?._log(Self.className() + " Unable to decode received packet", .warning, #function, #file, #line)
       }
     }
   }

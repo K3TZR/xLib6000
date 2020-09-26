@@ -38,7 +38,7 @@ public final class Log {
   // ----------------------------------------------------------------------------
   // MARK: - Public methods
   
-  /// Create an entry in a Log (if any). May be called from any thread
+  /// Create an entry in a Log (if any).
   ///
   /// - Parameters:
   ///   - msg:        a message String

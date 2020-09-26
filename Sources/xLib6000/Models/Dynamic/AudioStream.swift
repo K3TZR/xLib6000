@@ -18,18 +18,6 @@ public typealias AudioStreamId = StreamId
 ///       objects periodically receive Audio in a UDP stream.
 ///
 
-/// STATUS
-///     Old Api
-///
-///       Reviewed Flexlib 2.4.9 source, incorporated all properties and most features
-///       Removed properties not found in Flexlib.
-///       Error counting not implemented
-///       Reply handler approach not used, status messages provide the same functionality
-///        ** Fully functional **
-///
-///     New Api
-///       ** Unused **
-
 public final class AudioStream : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------

@@ -21,16 +21,6 @@ public typealias EqualizerId = String
 ///            The "sc" version is the standard for API Version 1.4 and greater
 ///
 
-/// STATUS
-///     Old Api
-///
-///       Reviewed Flexlib 2.4.9 source, incorporated all properties and most features
-///       Reply handler approach not used, status messages provide the same functionality
-///       ** Fully functional **
-///
-///     New Api
-///       ** Fully functional **
-
 public final class Equalizer : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------

@@ -19,18 +19,6 @@ public typealias WaterfallStreamId = StreamId
 ///       on the Radio object.
 ///
 
-/// STATUS
-///     Old Api
-///
-///       Reviewed Flexlib 2.4.9 source, incorporated all properties and most features
-///       Reply handler approach not used, status messages provide the same functionality
-///       Error counting not implemented
-///       Contains NewApi feature(s) - clientHandle property
-///       ** Fully functional **
-///
-///     New Api
-///       ** Fully functional **
-
 public final class Waterfall : NSObject, DynamicModelWithStream {
   
   // ----------------------------------------------------------------------------

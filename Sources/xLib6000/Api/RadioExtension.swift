@@ -828,34 +828,6 @@ extension Radio {
     }
     return nil
   }
-  /// Update / Add a GuiClient entry
-  /// - Parameters:
-  ///   - handle:         a handle
-  ///   - clientId:       a ClientId
-  ///   - program:        a Program name
-  ///   - station:        a Station name
-  ///   - isLocalPtt:     whether localPtt is enabled
-  ///   - isThisClient:   whether ckient is the current client
-  ///
-  public func guiClientUpdate(handle: Handle, clientId: String, program: String, station: String, isLocalPtt: Bool, isThisClient: Bool) {
-    if packet.guiClients[handle] == nil {
-      // Add
-      packet.guiClients[handle] = GuiClient(clientId: clientId, program: program, station: station, isLocalPtt: isLocalPtt, isThisClient: isThisClient)
-
-      Log.sharedInstance.logMessage("GuiClient   added: \(handle.hex), \(station), \(program), \(packet.nickname), (\(packet.isWan ? "SMARTLINK" : "LOCAL")), \(clientId)", .debug, #function, #file, #line)
-      NC.post(.guiClientHasBeenAdded, object: packet.guiClients[handle] as Any?)
-    }
-    
-    // Update
-    packet.guiClients[handle]!.clientId = clientId
-    packet.guiClients[handle]!.program = program
-    packet.guiClients[handle]!.station = station
-    packet.guiClients[handle]!.isLocalPtt = isLocalPtt
-    packet.guiClients[handle]!.isThisClient = isThisClient
-
-    Log.sharedInstance.logMessage("GuiClient updated: \(handle.hex), \(station), \(program), \(packet.nickname), (\(packet.isWan ? "SMARTLINK" : "LOCAL")), \(clientId)", .debug, #function, #file, #line)
-    NC.post(.guiClientHasBeenUpdated, object: packet.guiClients[handle]! as Any?)
-  }
   
   // ----------------------------------------------------------------------------
   // MARK: -  RemoteRxAudioStream methods

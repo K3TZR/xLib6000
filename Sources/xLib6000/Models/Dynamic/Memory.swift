@@ -18,14 +18,6 @@ public typealias MemoryId = ObjectId
 ///       memories collection on the Radio object.
 ///
 
-/// STATUS
-///     Old Api
-///
-///       Reviewed Flexlib 2.4.9 source, incorporated all properties and most features
-///       Reply handler approach not used, status messages provide the same functionality
-///       ** Fully functional **
-///
-
 public final class Memory                   : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------

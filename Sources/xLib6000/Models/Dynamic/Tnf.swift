@@ -17,14 +17,6 @@ public typealias TnfId = ObjectId
 ///       updated by the incoming TCP messages. They are collected in the
 ///       tnfs collection on the Radio object.
 ///
-/// STATUS
-///     Old Api
-///
-///       Reviewed Flexlib 2.4.9 source, incorporated all properties and features
-///       ** Fully functional **
-///
-///     New Api
-///       ** Fully functional **
 
 public final class Tnf : NSObject, DynamicModel {
   

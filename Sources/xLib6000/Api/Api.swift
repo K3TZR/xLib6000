@@ -89,7 +89,7 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public var logState               : NSLogging
     public var needsCwStream          : Bool
     public var pendingDisconnect      : PendingDisconnect
-    
+
     public init(packet                : DiscoveryPacket,
                 station               : String = "",
                 program               : String = "",
@@ -109,6 +109,7 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
       self.wanHandle = wanHandle
       self.reducedDaxBw = reducedDaxBw
       self.logState = logState
+      self.needsCwStream = needsCwStream
       self.needsCwStream = needsCwStream
       self.pendingDisconnect = pendingDisconnect
     }
@@ -150,6 +151,10 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     case oldApi
     case newApi (handle: Handle)
   }
+
+  public var guiClients             : [Handle: GuiClient] {
+    get { Api.objectQ.sync { _guiClients } }
+    set { Api.objectQ.sync(flags: .barrier) { _guiClients = newValue }}}
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -306,8 +311,8 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
   /// Alternate form of connect
   /// - Parameter params:     connection parameters struct
   ///
-  public func connect(_ params: ApiConnectionParams) {
-    
+public func connectAfterDisconnect(_ params: ApiConnectionParams) {
+      
     connect(params.packet,
             station           : params.station,
             program           : params.program,
@@ -317,7 +322,7 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             reducedDaxBw      : params.reducedDaxBw,
             logState          : params.logState,
             needsCwStream     : params.needsCwStream,
-            pendingDisconnect : params.pendingDisconnect)
+            pendingDisconnect : .none)
   }
   /// Change the state of the API
   /// - Parameter newState: the new state
@@ -378,7 +383,7 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
       }
       
     case .udpBound (let receivePort, let sendPort):
-      _log(Self.className() + ": UDP bound: receive port \(receivePort), send port \(sendPort)", .debug, #function, #file, #line)
+      _log(Self.className() + " UDP bound: receive port \(receivePort), send port \(sendPort)", .debug, #function, #file, #line)
       
       // if a Wan connection, register
       if radio!.packet.isWan { udp.register(clientHandle: connectionHandle) }
@@ -465,19 +470,19 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
   ///
   private func connectionCompletion(radio: Radio) {
     
-    _log(Self.className() + " Client connected: \(radio.packet.nickname)", .debug, #function, #file, #line)
+    _log(Self.className() + " Client connected: \(radio.packet.nickname)\(_params.pendingDisconnect != .none ? " (Pending Disconnection)" : "")", .debug, #function, #file, #line)
     
-    // send the initial commands
-    sendCommands()
+    // send the initial commands if a normal connection
+    if _params.pendingDisconnect == .none { sendCommands() }
     
     // set the UDP port for a Local connection
     if !radio.packet.isWan { send("client udpport " + "\(localUDPPort)") }
 
     // start pinging (if enabled)
-    if pingerEnabled { _pinger = Pinger(tcpManager: tcp) }
+    if _params.pendingDisconnect == .none { if pingerEnabled { _pinger = Pinger(tcpManager: tcp) }}
     
     // ask for a CW stream (if requested)
-    if needsNetCwStream { radio.requestNetCwStream() }
+    if _params.pendingDisconnect == .none { if needsNetCwStream { radio.requestNetCwStream() } }
     
     // TCP & UDP connections established, inform observers
     NC.post(.clientDidConnect, object: radio as Any?)
@@ -503,7 +508,7 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     sleep(1)
     
     // now do the pending connection
-    connect(params)
+    connectAfterDisconnect(params)
   }
 
 
@@ -512,35 +517,28 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
   private func sendCommands() {
     
     if let radio = radio {
-      
-      if _params.pendingDisconnect != .oldApi {
-        // gui clientId
-        if isGui {
-          
-          if radio.version.isNewApi && _clientId != nil   {
-            send("client gui " + _clientId!)
-          } else {
-            send("client gui")
-          }
+      if isGui {
+        if radio.version.isNewApi && _clientId != nil   {
+          send("client gui " + _clientId!)
+        } else {
+          send("client gui")
         }
-        
-        send("client program " + _programName)
-        if radio.version.isNewApi && isGui                       { send("client station " + _clientStation) }
-        if radio.version.isNewApi && !isGui && _clientId != nil  { radio.bindGuiClient(_clientId!) }
-        
-        if _lowBandwidthConnect           { radio.requestLowBandwidthConnect() }
-        radio.requestInfo()
-        radio.requestVersion()
-        radio.requestAntennaList()
-        radio.requestMicList()
-        radio.requestGlobalProfile()
-        radio.requestTxProfile()
-        radio.requestMicProfile()
-        radio.requestDisplayProfile()
-        radio.requestSubAll()
-        if radio.version.isGreaterThanV22 { radio.requestMtuLimit(1_500) }
-        if radio.version.isNewApi         { radio.requestDaxBandwidthLimit(self.reducedDaxBw) }
       }
+      send("client program " + _programName)
+      if radio.version.isNewApi && isGui                       { send("client station " + _clientStation) }
+      if radio.version.isNewApi && !isGui && _clientId != nil  { radio.bindGuiClient(_clientId!) }
+      if _lowBandwidthConnect           { radio.requestLowBandwidthConnect() }
+      radio.requestInfo()
+      radio.requestVersion()
+      radio.requestAntennaList()
+      radio.requestMicList()
+      radio.requestGlobalProfile()
+      radio.requestTxProfile()
+      radio.requestMicProfile()
+      radio.requestDisplayProfile()
+      radio.requestSubAll()
+      if radio.version.isGreaterThanV22 { radio.requestMtuLimit(1_500) }
+      if radio.version.isNewApi         { radio.requestDaxBandwidthLimit(self.reducedDaxBw) }
     }
   }
   /// Determine if the Radio Firmware version is compatable with the API version
@@ -683,4 +681,6 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
   private var _delegate      : ApiDelegate? = nil
   private var _localIP       = "0.0.0.0"
   private var _localUDPPort  : UInt16 = 0
+
+  private var _guiClients             = [Handle: GuiClient]()
 }

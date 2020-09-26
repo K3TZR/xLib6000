@@ -34,6 +34,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
+  private let _api                          = Api.sharedInstance
   private let _log                          = Log.sharedInstance.logMessage
   private var _timeoutTimer                 : DispatchSourceTimer!
   private var _udpSocket                    : GCDAsyncUdpSocket?
@@ -207,47 +208,34 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     }
     updateDiscoveredRadios()
   }
-  /// Process a DiscoveryPacket
-  /// - Parameter newPacket: the packet
-  ///
-  public func processPacket(_ newPacket: DiscoveryPacket) {
-    
+  
+  
+  func processPacket(_ newPacket: DiscoveryPacket) {
     newPacket.lastSeen = Date()
     
-    // parse the packet to populate GuiClients
-    parseGuiClientFields(newPacket)
+    // populate it's guiClients
+    parseGuiClients(newPacket)
     
     // is there a previous packet with the same serialNumber and isWan?
     if let radioIndex = findRadioPacket(with: newPacket) {
-      
-      // YES, known radio
+      // YES
       let oldPacket = discoveredRadios[radioIndex]
-
-      // update various fields
-      oldPacket.status                = newPacket.status
-      oldPacket.availableClients      = newPacket.availableClients
-      oldPacket.availablePanadapters  = newPacket.availablePanadapters
-      oldPacket.availableSlices       = newPacket.availableSlices
-      oldPacket.inUseHost             = newPacket.inUseHost
-      oldPacket.inUseIp               = newPacket.inUseIp
-      oldPacket.isWan                 = newPacket.isWan
-      oldPacket.lastSeen              = newPacket.lastSeen
-      oldPacket.guiClientHandles      = newPacket.guiClientHandles
-      oldPacket.guiClientHosts        = newPacket.guiClientHosts
-      oldPacket.guiClientPrograms     = newPacket.guiClientPrograms
-      oldPacket.guiClientStations     = newPacket.guiClientStations
-      oldPacket.guiClientIps          = newPacket.guiClientIps
-
-      // determine what (if anything) has changed in GuiClients
-      scanGuiClients(newPacket, oldPacket)
       
-      // update the record
-      discoveredRadios[radioIndex] = oldPacket
-
+      // YES, update the record
+      copyPacket(newPacket, oldPacket)
+      
+      // update and notify for additions / removals
+      processAdditions(newPacket, oldPacket)
+      processRemovals(newPacket, oldPacket)
+      
     } else {
-      // NO, unknown radio, add it
+      
+      // NO, it's a previously unknown packet (radio)
       discoveredRadios.append(newPacket)
-
+      
+      // notify for additions
+      processNewAdditions(newPacket)
+      
       // log Radio addition
       _log("Radio discovered: \(newPacket.nickname) v\(newPacket.firmwareVersion) \(newPacket.isWan ? "SMARTLINK" : "LOCAL")", .info, #function, #file, #line)
       
@@ -255,68 +243,139 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       NC.post(.discoveredRadios, object: discoveredRadios as Any?)
     }
   }
+
   
+  
+  /// Process a DiscoveryPacket
+  /// - Parameter newPacket: the packet
+  ///
+//  public func processSmartLinkPacket(_ newPacket: DiscoveryPacket) {
+//    
+//    newPacket.lastSeen = Date()
+//    
+//    // is there a previous packet with the same serialNumber and isWan?
+//    if let radioIndex = findRadioPacket(with: newPacket) {
+//      
+//      // update the record
+//      discoveredRadios[radioIndex] = newPacket
+//
+//    } else {
+//      // NO, unknown radio, add it
+//      discoveredRadios.append(newPacket)
+//
+//      // log Radio addition
+//      _log("Radio discovered: \(newPacket.nickname) v\(newPacket.firmwareVersion) \(newPacket.isWan ? "SMARTLINK" : "LOCAL")", .info, #function, #file, #line)
+//      
+//      // notify observers of Radio addition
+//      NC.post(.discoveredRadios, object: discoveredRadios as Any?)
+//    }
+//  }
+    
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
   /// Parse the csv fields in a Discovery packet
   /// - Parameter packet:       the packet to parse
   ///
-  private func parseGuiClientFields(_ packet: DiscoveryPacket) {
+  private func parseGuiClients( _ packet: DiscoveryPacket) {
     
     guard packet.guiClientPrograms != "" && packet.guiClientStations != "" && packet.guiClientHandles != "" else { return }
     
     let programs  = packet.guiClientPrograms.components(separatedBy: ",")
     let stations  = packet.guiClientStations.components(separatedBy: ",")
     let handles   = packet.guiClientHandles.components(separatedBy: ",")
-    let hosts     = packet.guiClientHosts.components(separatedBy: ",")
-    let ips       = packet.guiClientIps.components(separatedBy: ",")
+    //    let hosts     = currentPacket.guiClientHosts.components(separatedBy: ",")
+    //    let ips       = currentPacket.guiClientIps.components(separatedBy: ",")
     
-    guard programs.count == stations.count && programs.count == handles.count && stations.count == handles.count && hosts.count == handles.count && ips.count == handles.count else { return }
+    //    guard programs.count == handles.count && stations.count == handles.count && hosts.count == handles.count && ips.count == handles.count else { return }
+    guard programs.count == handles.count && stations.count == handles.count else { return }
     
     for i in 0..<handles.count {
-      
-      if let handle = handles[i].handle, stations[i] != "" {
-        
-        packet.guiClients[handle] = GuiClient(program: programs[i],
-                                              station: stations[i].replacingOccurrences(of: "\u{007f}", with: " "),
-                                              host: hosts[i],
-                                              ip: ips[i])
+      // valid handle and non-blank station
+      if let handle = handles[i].handle, stations[i] != "", programs[i] != "" {
+        let addedGuiClient = GuiClient(handle: handle,
+                                        station: stations[i],
+                                        program: programs[i])
+        packet.guiClients[handle] = addedGuiClient
       }
     }
-    return
   }
-  /// Scan GuiClient data for changes
-  /// - Parameters:
-  ///   - newPacket:        a newly received packet
-  ///   - oldPacket:        the previous packet
-  ///
-  private func scanGuiClients(_ newPacket: DiscoveryPacket, _ oldPacket: DiscoveryPacket) {
+  
+  private func copyPacket(_ newPacket: DiscoveryPacket, _ oldPacket: DiscoveryPacket) {
+    oldPacket.availableClients           = newPacket.availableClients
+    oldPacket.availablePanadapters       = newPacket.availablePanadapters
+    oldPacket.availableSlices            = newPacket.availableSlices
+    oldPacket.callsign                   = newPacket.callsign
+    oldPacket.discoveryVersion           = newPacket.discoveryVersion
+    oldPacket.firmwareVersion            = newPacket.firmwareVersion
+    oldPacket.fpcMac                     = newPacket.fpcMac
+//    oldPacket.guiClients                 = newPacket.guiClients
+    oldPacket.guiClientHandles           = newPacket.guiClientHandles
+    oldPacket.guiClientPrograms          = newPacket.guiClientPrograms
+    oldPacket.guiClientStations          = newPacket.guiClientStations
+    oldPacket.guiClientHosts             = newPacket.guiClientHosts
+    oldPacket.guiClientIps               = newPacket.guiClientIps
+    oldPacket.inUseHost                  = newPacket.inUseHost
+    oldPacket.inUseIp                    = newPacket.inUseIp
+    oldPacket.lastSeen                   = newPacket.lastSeen
+    oldPacket.licensedClients            = newPacket.licensedClients
+    oldPacket.maxLicensedVersion         = newPacket.maxLicensedVersion
+    oldPacket.maxPanadapters             = newPacket.maxPanadapters
+    oldPacket.maxSlices                  = newPacket.maxSlices
+    oldPacket.model                      = newPacket.model
+    oldPacket.nickname                   = newPacket.nickname
+    oldPacket.port                       = newPacket.port
+    oldPacket.publicIp                   = newPacket.publicIp
+    oldPacket.publicTlsPort              = newPacket.publicTlsPort
+    oldPacket.publicUdpPort              = newPacket.publicUdpPort
+    oldPacket.publicUpnpTlsPort          = newPacket.publicUpnpTlsPort
+    oldPacket.publicUpnpUdpPort          = newPacket.publicUpnpUdpPort
+    oldPacket.radioLicenseId             = newPacket.radioLicenseId
+    oldPacket.requiresAdditionalLicense  = newPacket.requiresAdditionalLicense
+    oldPacket.serialNumber               = newPacket.serialNumber
+    oldPacket.status                     = newPacket.status
+    oldPacket.upnpSupported              = newPacket.upnpSupported
+    oldPacket.wanConnected               = newPacket.wanConnected
     
-    // identify any removed guiClients
-    for (handle, oldGuiClient) in oldPacket.guiClients {
-      
-      // is the same handle in the newPacket?
-      if newPacket.guiClients[handle] == nil {
-        
-        // NO, it must be removed
-        oldPacket.guiClients[handle] = nil
-        
-        _log("GuiClient removed: \(handle.hex), \(oldGuiClient.station), \(oldGuiClient.program), \(oldPacket.nickname), (\(oldPacket.isWan ? "SMARTLINK" : "LOCAL")), \(oldGuiClient.clientId ?? "")", .debug, #function, #file, #line)        
-        NC.post(.guiClientHasBeenRemoved, object: oldGuiClient as Any?)
-      }
+    // FIXME: Not really part of the DiscoveryPacket
+    oldPacket.isPortForwardOn            = newPacket.isPortForwardOn
+    oldPacket.isWan                      = newPacket.isWan
+    oldPacket.localInterfaceIP           = newPacket.localInterfaceIP
+    oldPacket.lowBandwidthConnect        = newPacket.lowBandwidthConnect
+    oldPacket.negotiatedHolePunchPort    = newPacket.negotiatedHolePunchPort
+    oldPacket.requiresHolePunch          = newPacket.requiresHolePunch
+    oldPacket.wanHandle                  = newPacket.wanHandle
+  }
+  
+  private func processNewAdditions(_ newPacket: DiscoveryPacket) {
+    
+    for client in newPacket.guiClients {
+      _log("GuiClient added: \(client.key.hex), \(client.value.station), Packet = \(newPacket.isWan ? "wan" : "local").\(newPacket.serialNumber)", .debug, #function, #file, #line)
+      NC.post(.guiClientHasBeenAdded, object: newPacket as Any?)
     }
-    // identify any added guiClients
-    for (handle, newGuiClient) in newPacket.guiClients {
-    
-      // is the same handle in the oldPacket?
-      if oldPacket.guiClients[handle] == nil {
-        
-        // NO, it must be added
-        oldPacket.guiClients[handle] = newPacket.guiClients[handle]
+  }
+  
+  private func processAdditions(_ newPacket: DiscoveryPacket, _ oldPacket: DiscoveryPacket) {
+  
+    for client in newPacket.guiClients {
+      if oldPacket.guiClients[client.key] == nil {
+        // not in oldPacket GuiClients, add it
+        oldPacket.guiClients[client.key] = client.value
+        _log("GuiClient added: \(client.key.hex), \(client.value.station), Packet = \(oldPacket.isWan ? "wan" : "local").\(oldPacket.serialNumber)", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenAdded, object: newPacket as Any?)
+      }
       
-        _log("GuiClient   added: \(handle.hex), \(newGuiClient.station), \(newGuiClient.program), \(newPacket.nickname), (\(newPacket.isWan ? "SMARTLINK" : "LOCAL")), \(newGuiClient.clientId ?? "")", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenAdded, object: newGuiClient as Any?)
+    }
+  }
+
+  private func processRemovals(_ newPacket: DiscoveryPacket, _ oldPacket: DiscoveryPacket) {
+    
+    for client in oldPacket.guiClients {
+      if newPacket.guiClients[client.key] == nil {
+        // not in newPacket GuiClients, remove it
+        oldPacket.guiClients[client.key] = nil
+        _log("GuiClient removed: handle = \(client.key.hex), \(client.value.station), Packet = \(oldPacket.isWan ? "wan" : "local").\(oldPacket.serialNumber)", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenRemoved, object: newPacket as Any?)
       }
     }
   }
@@ -329,7 +388,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     // is the Radio already in the discoveredRadios array?
     for (i, existingPacket) in discoveredRadios.enumerated() {
       // by serialNumber & isWan (same radio can be visible both locally and via SmartLink)
-      if existingPacket.serialNumber == newPacket.serialNumber && existingPacket.isWan == newPacket.isWan { return i }
+      if existingPacket == newPacket { return i }
     }
     return nil
   }
@@ -337,6 +396,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   // ----------------------------------------------------------------------------
   // MARK: - GCDAsyncUdp delegate method
     
+  
   /// The Socket received data
   ///
   ///   GCDAsyncUdpSocket delegate method, executes on the udpReceiveQ
@@ -352,6 +412,8 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     // VITA encoded Discovery packet?
     guard let vita = Vita.decodeFrom(data: data) else { return }
     
+    
+    
     // parse vita to obtain a DiscoveryPacket
     guard let newPacket = Vita.parseDiscovery(vita) else { return }
     
@@ -362,26 +424,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   // *** Backing properties (Do NOT use) ***
   
   private var _discoveredRadios = [DiscoveryPacket]()
-}
-
-
-/// GuiClient Class implementation
-///
-///     A struct therefore a "value" type
-///     Equatable by handle
-///
-public struct GuiClient {
-  
-  public var clientId         : String? = nil
-  
-  public var program          : String
-  public var station          : String
-  public var host             : String = ""
-  public var ip               : String = ""
-  
-  public var isAvailable      : Bool = false
-  public var isLocalPtt       : Bool = false
-  public var isThisClient     : Bool = false
 }
 
 

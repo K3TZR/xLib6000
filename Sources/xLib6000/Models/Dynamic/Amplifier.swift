@@ -18,13 +18,6 @@ public typealias AmplifierId = Handle
 ///       collection on the Radio object.
 ///
 
-/// STATUS
-///     Old Api
-///
-///       Reviewed Flexlib 3.1.8 source, incorporated all properties and most features
-///       ** Need usage and status message examples in order to become fully functional **
-///
-
 public final class Amplifier  : NSObject, DynamicModel {
 
   // ----------------------------------------------------------------------------

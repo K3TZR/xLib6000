@@ -17,17 +17,6 @@ import Accelerate
 ///       objects periodically receive IQ data in a UDP stream.
 ///
 
-/// STATUS
-///     Old Api
-///
-///       Reviewed Flexlib 2.4.9 source, incorporated all properties and most features
-///       Reply handler approach not used, status messages provide the same functionality
-///       Error counting not implemented
-///       ** Fully functional **
-///
-///     New Api
-///       ** Unused **
-
 public final class IqStream : NSObject, DynamicModelWithStream {  
 
   // ------------------------------------------------------------------------------

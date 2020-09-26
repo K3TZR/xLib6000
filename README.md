@@ -36,6 +36,10 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.3.9 Release Notes
+* refactor of Discovery code related to GuiClients
+* chages throughout to make log message more consistent
+
 ##### 1.3.8 Release Notes
 * correction to guiClientHasBeenRemoved notification (note.object was nil)
 
