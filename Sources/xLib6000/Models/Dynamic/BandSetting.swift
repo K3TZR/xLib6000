@@ -228,7 +228,7 @@ public final class BandSetting  : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this BandSetting
       _initialized = true
             
-      _log(Self.className() + " added: id = \(id)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id), bandName = \(_bandName)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.bandSettingHasBeenAdded, object: self as Any?)

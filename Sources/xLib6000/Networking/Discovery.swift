@@ -287,7 +287,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     //    let hosts     = currentPacket.guiClientHosts.components(separatedBy: ",")
     //    let ips       = currentPacket.guiClientIps.components(separatedBy: ",")
     
-    //    guard programs.count == handles.count && stations.count == handles.count && hosts.count == handles.count && ips.count == handles.count else { return }
     guard programs.count == handles.count && stations.count == handles.count else { return }
     
     for i in 0..<handles.count {
@@ -309,7 +308,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     oldPacket.discoveryVersion           = newPacket.discoveryVersion
     oldPacket.firmwareVersion            = newPacket.firmwareVersion
     oldPacket.fpcMac                     = newPacket.fpcMac
-//    oldPacket.guiClients                 = newPacket.guiClients
     oldPacket.guiClientHandles           = newPacket.guiClientHandles
     oldPacket.guiClientPrograms          = newPacket.guiClientPrograms
     oldPacket.guiClientStations          = newPacket.guiClientStations

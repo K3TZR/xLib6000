@@ -219,7 +219,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       
       _pan = _radio.findPanadapterId(using: _daxIqChannel) ?? 0
                   
-      _log(Self.className() + " added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id.hex), channel = \(_daxIqChannel)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.iqStreamHasBeenAdded, object: self as Any?)

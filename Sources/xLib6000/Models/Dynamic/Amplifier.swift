@@ -203,7 +203,7 @@ public final class Amplifier  : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Amplifier
       _initialized = true
                   
-      _log(Self.className() + " added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id.hex), model = \(_model)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.amplifierHasBeenAdded, object: self as Any?)

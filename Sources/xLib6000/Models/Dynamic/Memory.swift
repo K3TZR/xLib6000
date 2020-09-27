@@ -387,7 +387,7 @@ public final class Memory                   : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Memory
       _initialized = true
                   
-      _log(Self.className() + " added: id = \(id)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id), name = \(_name)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.memoryHasBeenAdded, object: self as Any?)

@@ -187,7 +187,7 @@ public final class Tnf : NSObject, DynamicModel {
         // YES, the Radio (hardware) has acknowledged this Tnf
         _initialized = true
         
-        _log(Self.className() + " added: id = \(id)", .debug, #function, #file, #line)
+        _log(Self.className() + " added: id = \(id), frequency = \(_frequency)", .debug, #function, #file, #line)
 
         // notify all observers
         NC.post(.tnfHasBeenAdded, object: self as Any?)

@@ -899,10 +899,13 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         station = property.value.replacingOccurrences(of: "\u{007f}", with: " ").trimmingCharacters(in: .whitespaces)
       }
     }
-    guard station != "" && program != "" && clientId != nil else { return }
+    
+//    print("-----> Handle = \(handle), Station = \(station), Program = \(program), Id = \(clientId ?? "")")
+    
+//    guard station != "" && program != "" && clientId != nil else { return }
 
     // is it a known GuiClient?
-    if let packet = _api.radio?.packet {
+//    if let packet = _api.radio?.packet {
       // YES, get the GuiClient
       if let client = packet.guiClients[handle] {
         // YES, update the values that are populated
@@ -910,24 +913,28 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if station != "" { client.station = station }
         if program != "" { client.program = program }
         client.isLocalPtt = isLocalPtt
-        _log(Self.className() + " GuiClient updated: \(handle.hex), \(station), \(program), \(clientId!), Packet = \(packet.isWan ? "wan" : "local").\(packet.serialNumber)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenUpdated, object: packet as Any?)
+        if client.clientId != nil && client.clientId != "" {
+          _log(Self.className() + " GuiClient updated: \(handle.hex), \(client.station), \(client.program), \(client.clientId!), Packet = \(packet.isWan ? "wan" : "local").\(packet.serialNumber)", .debug, #function, #file, #line)
+          NC.post(.guiClientHasBeenUpdated, object: packet as Any?)
+        }
       } else {
         // NO, add it an
-        let newGuiClient = GuiClient(handle:     handle,
-                                      station:    station,
-                                      program:    program,
-                                      clientId:   clientId,
-                                      isLocalPtt: isLocalPtt)
-        _api.radio!.packet.guiClients[handle] = newGuiClient
+        let client = GuiClient(handle:     handle,
+                               station:    station,
+                               program:    program,
+                               clientId:   clientId,
+                               isLocalPtt: isLocalPtt)
+        _api.radio!.packet.guiClients[handle] = client
         
         //      _log("GuiClient added: \(handle.hex), \(station), \(program), \(clientId!)", .debug, #function, #file, #line)
         //      NC.post(.guiClientHasBeenAdded, object: newGuiClient as Any?)
         
-        _log(Self.className() + " GuiClient updated: \(handle.hex), \(station), \(program), \(clientId!), Packet = \(packet.isWan ? "wan" : "local").\(packet.serialNumber)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenUpdated, object: packet as Any?)
+        if client.clientId != nil && client.clientId != "" && client.program != "" && client.station != "" {
+          _log(Self.className() + " GuiClient added/updated: \(handle.hex), \(client.station), \(client.program), \(client.clientId!), Packet = \(packet.isWan ? "wan" : "local").\(packet.serialNumber)", .debug, #function, #file, #line)
+          NC.post(.guiClientHasBeenUpdated, object: packet as Any?)
+        }
       }
-    }
+//    }
   }
     
   private func parseV3Disconnection(properties: KeyValuesArray, handle: Handle) {

@@ -230,7 +230,7 @@ public final class Xvtr : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Waterfall
       _initialized = true
       
-      _log(Self.className() + " added: id = \(id)", .debug, #function, #file, #line)
+      _log(Self.className() + " added: id = \(id), name = \(name)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.xvtrHasBeenAdded, object: self as Any?)
