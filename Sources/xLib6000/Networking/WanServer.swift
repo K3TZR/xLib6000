@@ -468,7 +468,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     for message in radioMessages where message != "" {
       
       // create a minimal DiscoveredRadio packet with now as "lastSeen"
-      let packet = DiscoveryPacket()
+      var packet = DiscoveryPacket()
       
       var publicTlsPortToUse = -1
       var publicUdpPortToUse = -1
@@ -565,9 +565,13 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     }
     Log.sharedInstance.logMessage(Self.className() + " : WanRadioList received", .debug, #function, #file, #line)
     
-    for packet in currentPacketList {
-      packet.isWan = true
-      Discovery.sharedInstance.processPacket(packet)
+    for (i, _) in currentPacketList.enumerated() {
+      currentPacketList[i].isWan = true
+
+      // populate it's guiClients
+      currentPacketList[i].guiClients = Discovery.sharedInstance.parseGuiClients(currentPacketList[i])
+
+      Discovery.sharedInstance.processPacket(currentPacketList[i])
     }
   }
   /// Parse a Test Connection result

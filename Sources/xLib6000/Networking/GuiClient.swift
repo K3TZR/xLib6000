@@ -7,35 +7,35 @@
 
 import Foundation
 
-public final class GuiClient : NSObject {
+public struct GuiClient {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
     
-  @objc dynamic public var clientId : String? {
+  public var clientId : String? {
     get { Api.objectQ.sync { _clientId } }
-    set { if newValue != clientId { willChangeValue(for: \.clientId) ; Api.objectQ.sync(flags: .barrier) { _clientId = newValue } ; didChangeValue(for: \.clientId)}}}
-  @objc dynamic public var handle : Handle {
+    set { if newValue != clientId { Api.objectQ.sync(flags: .barrier) { _clientId = newValue }}}}
+  public var handle : Handle {
     get { Api.objectQ.sync { _handle } }
-    set { if newValue != handle { willChangeValue(for: \.handle) ; Api.objectQ.sync(flags: .barrier) { _handle = newValue } ; didChangeValue(for: \.handle)}}}
-  @objc dynamic public var host : String {
+    set { if newValue != handle { Api.objectQ.sync(flags: .barrier) { _handle = newValue }}}}
+  public var host : String {
     get { Api.objectQ.sync { _host } }
-    set { if newValue != host { willChangeValue(for: \.host) ; Api.objectQ.sync(flags: .barrier) { _host = newValue } ; didChangeValue(for: \.host)}}}
-  @objc dynamic public var ip : String {
+    set { if newValue != host { Api.objectQ.sync(flags: .barrier) { _host = newValue }}}}
+  public var ip : String {
     get { Api.objectQ.sync { _ip } }
-    set { if newValue != ip { willChangeValue(for: \.ip) ; Api.objectQ.sync(flags: .barrier) { _ip = newValue } ; didChangeValue(for: \.ip)}}}
-  @objc dynamic public var isLocalPtt : Bool {
+    set { if newValue != ip { Api.objectQ.sync(flags: .barrier) { _ip = newValue }}}}
+  public var isLocalPtt : Bool {
     get { Api.objectQ.sync { _isLocalPtt } }
-    set { if newValue != isLocalPtt { willChangeValue(for: \.isLocalPtt) ; Api.objectQ.sync(flags: .barrier) { _isLocalPtt = newValue } ; didChangeValue(for: \.isLocalPtt)}}}
-  @objc dynamic public var isThisClient : Bool {
+    set { if newValue != isLocalPtt { Api.objectQ.sync(flags: .barrier) { _isLocalPtt = newValue }}}}
+  public var isThisClient : Bool {
     get { Api.objectQ.sync { _isThisClient } }
-    set { if newValue != isThisClient { willChangeValue(for: \.isThisClient) ; Api.objectQ.sync(flags: .barrier) { _isThisClient = newValue } ; didChangeValue(for: \.isThisClient)}}}
-  @objc dynamic public var program : String {
+    set { if newValue != isThisClient { Api.objectQ.sync(flags: .barrier) { _isThisClient = newValue }}}}
+  public var program : String {
     get { Api.objectQ.sync { _program } }
-    set { if newValue != program { willChangeValue(for: \.program) ; Api.objectQ.sync(flags: .barrier) { _program = newValue } ; didChangeValue(for: \.program)}}}
-  @objc dynamic public var station : String {
+    set { if newValue != program { Api.objectQ.sync(flags: .barrier) { _program = newValue }}}}
+  public var station : String {
     get { Api.objectQ.sync { _station } }
-    set { if newValue != station { willChangeValue(for: \.station) ; Api.objectQ.sync(flags: .barrier) { _station = newValue } ; didChangeValue(for: \.station)}}}
+    set { if newValue != station {  Api.objectQ.sync(flags: .barrier) { _station = newValue }}}}
   
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -47,7 +47,6 @@ public final class GuiClient : NSObject {
   ///   - id:           a Tnf Id
   ///
   public init(handle: Handle, station: String, program: String, clientId: String? = nil, host: String = "", ip: String = "", isLocalPtt: Bool = false, isThisClient: Bool = false) {
-    super.init()
 
     _handle = handle
     _station = station

@@ -247,11 +247,6 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
     // pass the bytes read to the delegate
     if let text = String(data: data, encoding: .ascii) {
       _delegate?.didReceive(text)
-
-      
-      if text.contains("client ") { print(">>>>> " + text)}
-      
-
     }
     // trigger the next read
     readNext()

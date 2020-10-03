@@ -309,7 +309,7 @@ public class Vita {
     if vita.classIdPresent && vita.classCode == .discovery {
       
       // YES, create a minimal DiscoveredRadio with now as "lastSeen"
-      let discoveredRadio = DiscoveryPacket()
+      var discoveredRadio = DiscoveryPacket()
 
       // Payload is a series of strings of the form <key=value> separated by ' ' (space)
       var payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
