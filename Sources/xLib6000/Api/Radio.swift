@@ -699,7 +699,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     _api.delegate = self
     radioType = RadioType(rawValue: packet.model.lowercased())
-    if radioType == nil { _log(Self.className() + " Unknown RadioType: \(packet.model)", .warning, #function, #file, #line) }
+    if radioType == nil { _log("Radio, Unknown model: \(packet.model)", .warning, #function, #file, #line) }
     
     // initialize the static models (only one of each is ever created)
     atu = Atu(radio: self)
@@ -882,7 +882,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Keys
       guard let token = ClientTokenV3Connection(rawValue: property.key) else {
         // log it and ignore this Key
-        _log(Self.className() + " Unknown Client Connection token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Radio client token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -901,37 +901,35 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         station = property.value.replacingOccurrences(of: "\u{007f}", with: "").trimmingCharacters(in: .whitespaces)
       }
     }
-    
-//    print("+++++ Handle = \(handle.hex), Station = \(station), Program = \(program), Id = \(clientId)")
-    
     var handleWasFound = false
     // find the packet of the currently connected radio
-    for (i, packet) in Discovery.sharedInstance.discoveredRadios.enumerated() where packet == self.packet {
+    for (i, packet) in Discovery.sharedInstance.discoveryPackets.enumerated() where packet == self.packet {
       
       // within that packet, find the guiClient with the specified handle
       for (j, guiClient) in packet.guiClients.enumerated() where guiClient.handle == handle {
         handleWasFound = true
         
         // update any fields that are present
-        if clientId != "" { Discovery.sharedInstance.discoveredRadios[i].guiClients[j].clientId = clientId }
-        if program  != "" { Discovery.sharedInstance.discoveredRadios[i].guiClients[j].program = program }
-        if station  != "" { Discovery.sharedInstance.discoveredRadios[i].guiClients[j].station = station }
-        Discovery.sharedInstance.discoveredRadios[i].guiClients[j].isLocalPtt = isLocalPtt
+        if clientId != "" { Discovery.sharedInstance.discoveryPackets[i].guiClients[j].clientId = clientId }
+        if program  != "" { Discovery.sharedInstance.discoveryPackets[i].guiClients[j].program = program }
+        if station  != "" { Discovery.sharedInstance.discoveryPackets[i].guiClients[j].station = station }
+        Discovery.sharedInstance.discoveryPackets[i].guiClients[j].isLocalPtt = isLocalPtt
         
         // log and notify of GuiClient update
-        _log(Self.className() + " GuiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.isWan ? "wan" : "local").\(packet.serialNumber)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveredRadios[i].guiClients as Any?)
-
+        _log("Radio, GuiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.isWan ? "wan" : "local").\(packet.serialNumber)", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveryPackets[i].guiClients as Any?)
+        
       }
       
       if handleWasFound == false {
         // GuiClient with the specified handle was not found, add it
         let client = GuiClient(handle: handle, station: station, program: program, clientId: clientId, isLocalPtt: isLocalPtt, isThisClient: handle == _api.connectionHandle)
-        Discovery.sharedInstance.discoveredRadios[i].guiClients.append(client)
+        Discovery.sharedInstance.discoveryPackets[i].guiClients.append(client)
         
         // log and notify of GuiClient update
-        _log(Self.className() + " GuiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.isWan ? "wan" : "local").\(packet.serialNumber)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenAdded, object: Discovery.sharedInstance.discoveredRadios[i].guiClients as Any?)      }
+        _log("Radio, GuiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.isWan ? "wan" : "local").\(packet.serialNumber)", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveryPackets[i].guiClients as Any?)
+      }
     }
   }
   
@@ -946,7 +944,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Keys
       guard let token = ClientTokenV3Disconnection(rawValue: property.key) else {
         // log it and ignore this Key
-        _log(Self.className() + " Unknown Client Disconnection token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Radio client disconnection token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -965,7 +963,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // is it me?
     if handle == _api.connectionHandle && (duplicateClientId || forced || wanValidationFailed) {
       
-//      _log(Self.className() + " \(packet.nickname) Disconnected: reason = \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , (duplicateClientId || wanValidationFailed) ? .warning : .info, #function, #file, #line)
       var reason = ""
       if duplicateClientId        { reason = "Duplicate ClientId" }
       else if forced              { reason = "Forced" }
@@ -990,13 +987,13 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // ignore incorrectly formatted messages
     if components.count < 2 {
-      _log(Self.className() + " Incomplete message: c\(commandSuffix)", .warning, #function,  #file,  #line)
+      _log("Radio, incomplete message: c\(commandSuffix)", .warning, #function,  #file,  #line)
       return
     }
     let msgText = components[1]
     
     // log it
-    _log(Self.className() + " Msg: \(msgText)", flexErrorLevel(errorCode: components[0]), #function, #file, #line)
+    _log("Radio, message: \(msgText)", flexErrorLevel(errorCode: components[0]), #function, #file, #line)
     
     // FIXME: Take action on some/all errors?
   }
@@ -1015,7 +1012,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // ignore incorrectly formatted replies
     if components.count < 2 {
-      _log(Self.className() + " Incomplete reply: r\(replySuffix)", .warning, #function, #file, #line)
+      _log("Radio,iIncomplete reply: r\(replySuffix)", .warning, #function, #file, #line)
       return
     }
     // is there an Object expecting to be notified?
@@ -1042,7 +1039,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
       // no Object is waiting for this reply, log it if it is a non-zero Reply (i.e a possible error)
       if components[1] != Api.kNoError {
-        _log(Self.className() + " Unhandled non-zero reply: c\(components[0]), r\(replySuffix), \(flexErrorString(errorCode: components[1]))", .warning, #function, #file, #line)
+        _log("Radio, unhandled non-zero reply: c\(components[0]), r\(replySuffix), \(flexErrorString(errorCode: components[1]))", .warning, #function, #file, #line)
       }
     }
   }
@@ -1061,7 +1058,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // ignore incorrectly formatted status
     guard components.count > 1 else {
-      _log(Self.className() + " Incomplete status: c\(commandSuffix)", .warning, #function, #file, #line)
+      _log("Radio, incomplete status: c\(commandSuffix)", .warning, #function, #file, #line)
       return
     }
     // find the space & get the msgType
@@ -1075,7 +1072,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // Check for unknown Message Types
     guard let token = StatusToken(rawValue: msgType)  else {
       // log it and ignore the message
-      _log(Self.className() + " Unknown Status token: \(msgType)", .warning, #function, #file, #line)
+      _log("Unknown Radio status token: \(msgType)", .warning, #function, #file, #line)
       return
     }
     // Known Message Types, in alphabetical order
@@ -1089,13 +1086,13 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .daxiq:          break  // no longer in use
     case .display:        parseDisplay(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .eq:             Equalizer.parseStatus(self, remainder.keyValuesArray())
-    case .file:           _log(Self.className() + " Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
+    case .file:           _log("Radio, unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
     case .gps:            gps.parseProperties(self, remainder.keyValuesArray(delimiter: "#") )
     case .interlock:      parseInterlock(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .memory:         Memory.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .meter:          Meter.parseStatus(self, remainder.keyValuesArray(delimiter: "#"), !remainder.contains(Api.kRemoved))
     case .micAudioStream: MicAudioStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kNotInUse))
-    case .mixer:          _log(Self.className() + " Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
+    case .mixer:          _log("Radio, unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
     case .opusStream:     OpusAudioStream.parseStatus(self, remainder.keyValuesArray())
     case .profile:        Profile.parseStatus(self, remainder.keyValuesArray(delimiter: "="))
     case .radio:          parseProperties(self, remainder.keyValuesArray())
@@ -1103,7 +1100,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .stream:         parseStream(self, remainder)
     case .tnf:            Tnf.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .transmit:       parseTransmit(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
-    case .turf:           _log(Self.className() + " Unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
+    case .turf:           _log("Radio, unprocessed \(msgType): \(remainder)", .warning, #function, #file, #line)
     case .txAudioStream:  TxAudioStream.parseStatus(self, remainder.keyValuesArray(), !remainder.contains(Api.kRemoved))
     case .usbCable:       UsbCable.parseStatus(self, remainder.keyValuesArray())
     case .wan:            wan.parseProperties(self, remainder.keyValuesArray())
@@ -1166,7 +1163,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           // pre V3 API
           if properties[2].key == "forced" {
             // NO, Disconnected
-            _log(Self.className() + " Disconnect, forced = \(properties[2].value)", .info, #function, #file, #line)
+            _log("Radio, disconnect, forced = \(properties[2].value)", .info, #function, #file, #line)
             
             NC.post(.clientDidDisconnect, object: handle as Any?)
           }
@@ -1192,7 +1189,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case DisplayToken.panadapter.rawValue:  Panadapter.parseStatus(radio, keyValues, inUse)
     case DisplayToken.waterfall.rawValue:   Waterfall.parseStatus(radio, keyValues, inUse)
       
-    default:            _log(Self.className() + " Unknown Display type: \(keyValues[0].key)", .warning, #function, #file, #line)
+    default:            _log("Unknown Radio display type: \(keyValues[0].key)", .warning, #function, #file, #line)
     }
   }
   /// Parse a Stream status message
@@ -1242,7 +1239,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           // New Api, check for unknown Keys
           guard let token = StreamTypeNew(rawValue: properties[1].value) else {
             // log it and ignore the Key
-            _log(Self.className() + " Unknown Stream type: \(properties[1].value)", .warning, #function, #file, #line)
+            _log("Radio, unknown Stream type: \(properties[1].value)", .warning, #function, #file, #line)
             return
           }
           switch token {
@@ -1259,7 +1256,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           // Old Api, check for unknown Keys
           guard let token = StreamTypeOld(rawValue: properties[1].key) else {
             // log it and ignore the Key
-            _log(Self.className() + " Unknown Stream type: \(properties[1].key)", .warning, #function, #file, #line)
+            _log("Radio, unknown Stream type: \(properties[1].key)", .warning, #function, #file, #line)
             return
           }
           switch token {
@@ -1332,7 +1329,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Keys
       guard let token = InfoToken(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Self.className() + " Unknown Info token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Radio info token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -1403,7 +1400,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Keys
       guard let token = VersionToken(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Self.className() + " Unknown Version token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Radio version token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1435,7 +1432,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Check for Unknown Keys
       guard let token = RadioFilterSharpness(rawValue: property.key.lowercased())  else {
         // log it and ignore the Key
-        _log(Self.className() + " Unknown Filter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Radio filter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1471,7 +1468,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Check for Unknown Keys
       guard let token = RadioStaticNet(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log(Self.className() + " Unknown Static token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Radio static token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1498,7 +1495,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Check for Unknown Keys
       guard let token = RadioOscillator(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log(Self.className() + " Unknown Oscillator token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Radio oscillator token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1550,7 +1547,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         // Check for Unknown Keys
         guard let token = RadioToken(rawValue: property.key)  else {
           // log it and ignore the Key
-          _log(Self.className() + " Unknown Radio token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+          _log("Unknown Radio token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
           continue
         }
         // Known tokens, in alphabetical order
@@ -1618,7 +1615,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case "V", "v":  _hardwareVersion = suffix
       
     default:    // Unknown Type
-      _log(Self.className() + " Unexpected message: \(msg)", .warning, #function, #file, #line)
+      _log("Radio, unexpected message: \(msg)", .warning, #function, #file, #line)
     }
   }
   /// Process outbound Tcp messages
@@ -1660,7 +1657,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
         // Anything other than 0 is an error, log it and ignore the Reply
         let errorLevel = flexErrorLevel(errorCode: responseValue)
-        _log(Self.className() + " c\(sequenceNumber), \(command), non-zero reply \(responseValue), \(flexErrorString(errorCode: responseValue))", errorLevel, #function, #file, #line)
+        _log("Radio, c\(sequenceNumber), \(command), non-zero reply \(responseValue), \(flexErrorString(errorCode: responseValue))", errorLevel, #function, #file, #line)
         
         // FIXME: ***** Temporarily commented out until bugs in v2.4.9 are fixed *****
         
@@ -1796,7 +1793,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       if object.isStreaming == false {
         object.isStreaming = true
         // log the start of the stream
-        _log(name + " Stream started id = \(object.id.hex)", .info, #function, #file, #line)
+        _log("Radio," + name + " Stream started id = \(object.id.hex)", .info, #function, #file, #line)
       }
     }
     
@@ -1848,7 +1845,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     default:
       // log the error
-      _log(Self.className() + " Stream error, unknown Vita class code: \(vitaPacket.classCode.description()) Stream Id = \(vitaPacket.streamId.hex)", .error, #function, #file, #line)
+      _log("Radio, Stream error, unknown Vita class code: \(vitaPacket.classCode.description()) Stream Id = \(vitaPacket.streamId.hex)", .error, #function, #file, #line)
     }
   }
   

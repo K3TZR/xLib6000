@@ -76,7 +76,7 @@ public final class Wan : NSObject, StaticModel {
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log(Self.className() + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Wan token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -92,7 +92,7 @@ public final class Wan : NSObject, StaticModel {
       // YES, the Radio (hardware) has acknowledged it
       _initialized = true
 
-      _log(Self.className() + " status: ServerConnected = \(_serverConnected), RadioAuthenticated = \(_radioAuthenticated)", .debug, #function, #file, #line)
+      _log("Wan status: ServerConnected = \(_serverConnected), RadioAuthenticated = \(_radioAuthenticated)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.wanHasBeenAdded, object: self as Any?)

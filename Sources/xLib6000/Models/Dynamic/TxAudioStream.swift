@@ -141,7 +141,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
           // YES, remove it
           radio.txAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("TxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           
           // notify all observers
           NC.post(.txAudioStreamHasBeenRemoved, object: id as Any?)
@@ -183,7 +183,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Self.className() + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown TxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -202,7 +202,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
                   
-      _log(Self.className() + " added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
+      _log("TxAudioStream added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)

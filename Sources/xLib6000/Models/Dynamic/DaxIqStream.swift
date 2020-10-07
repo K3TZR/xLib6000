@@ -179,7 +179,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _log(Self.className() + " Unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown DaxIqStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -200,7 +200,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Stream
       _initialized = true
 
-      _log(Self.className() + " added: id = \(id.hex), channel = \(_channel)", .debug, #function, #file, #line)
+      _log("DaxIqStream added: id = \(id.hex), channel = \(_channel)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.daxIqStreamHasBeenAdded, object: self as Any?)

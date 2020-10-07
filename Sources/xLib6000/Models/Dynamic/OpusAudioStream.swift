@@ -166,7 +166,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
           // remove it immediately
           radio.opusAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("OpusAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           
           NC.post(.opusAudioStreamHasBeenRemoved, object: id as Any?)
         }
@@ -246,7 +246,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Self.className() + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown OpusAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -266,7 +266,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
       // YES, the Radio (hardware) has acknowledged this Opus
       _initialized = true
       
-      _log(Self.className() + " added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
+      _log("OpusAudioStream added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.opusAudioStreamHasBeenAdded, object: self as Any?)
@@ -324,7 +324,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
       
       // from a later group, jump forward
       let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
-      _log(Self.className() + " missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+      _log("missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
 
       // Pass an error frame (count == 0) to the Opus delegate
       delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: 0) )
@@ -370,4 +370,56 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   private var __txEnabled         = false
 }
 
+/// Struct containing Opus Stream data
+///
+public struct OpusFrame {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
+  public var samples: [UInt8]                     // array of samples
+  public var numberOfSamples: Int                 // number of samples
+//  public var duration: Float                     // frame duration (ms)
+//  public var channels: Int                       // number of channels (1 or 2)
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize an OpusFrame
+  ///
+  /// - Parameters:
+  ///   - payload:            pointer to the Vita packet payload
+  ///   - numberOfSamples:    number of Samples in the payload
+  ///
+  public init(payload: [UInt8], sampleCount: Int) {
+    
+    // allocate the samples array
+    samples = [UInt8](repeating: 0, count: sampleCount)
+    
+    // save the count and copy the data
+    numberOfSamples = sampleCount
+    memcpy(&samples, payload, sampleCount)
+    
+    // Flex 6000 series uses:
+    //     duration = 10 ms
+    //     channels = 2 (stereo)
+    
+//    // determine the frame duration
+//    let durationCode = (samples[0] & 0xF8)
+//    switch durationCode {
+//    case 0xC0:
+//      duration = 2.5
+//    case 0xC8:
+//      duration = 5.0
+//    case 0xD0:
+//      duration = 10.0
+//    case 0xD8:
+//      duration = 20.0
+//    default:
+//      duration = 0
+//    }
+//    // determine the number of channels (mono = 1, stereo = 2)
+//    channels = (samples[0] & 0x04) == 0x04 ? 2 : 1
+  }
+}
 

@@ -192,7 +192,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Self.className() + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown IqStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -219,7 +219,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       
       _pan = _radio.findPanadapterId(using: _daxIqChannel) ?? 0
                   
-      _log(Self.className() + " added: id = \(id.hex), channel = \(_daxIqChannel)", .debug, #function, #file, #line)
+      _log("IqStream added: id = \(id.hex), channel = \(_daxIqChannel)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.iqStreamHasBeenAdded, object: self as Any?)
@@ -292,7 +292,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       if vita.sequence != expectedSequenceNumber {
         
         // NO, log the issue
-        _log(Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence), != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
+        _log("missing packet(s), rcvdSeq: \(vita.sequence), != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
         
         _rxSeq = nil
         rxLostPacketCount += 1
@@ -332,5 +332,39 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   private var __port          = 0
   private var __rate          = 0
   private var __streaming     = false
+}
+
+/// Struct containing IQ Stream data
+///
+///   populated by the IQ Stream vitaHandler
+///
+public struct IqStreamFrame {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
+  public var daxIqChannel                   = -1
+  public private(set) var samples           = 0                             // number of samples (L/R) in this frame
+  public var realSamples                    = [Float]()                     // Array of real (I) samples
+  public var imagSamples                    = [Float]()                     // Array of imag (Q) samples
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize an IqStreamFrame
+  ///
+  /// - Parameters:
+  ///   - payload:        pointer to a Vita packet payload
+  ///   - numberOfBytes:  number of bytes in the payload
+  ///
+  public init(payload: UnsafeRawBufferPointer, numberOfBytes: Int) {
+    
+    // 4 byte each for left and right sample (4 * 2)
+    self.samples = numberOfBytes / (4 * 2)
+    
+    // allocate the samples arrays
+    self.realSamples = [Float](repeating: 0, count: samples)
+    self.imagSamples = [Float](repeating: 0, count: samples)
+  }
 }
 

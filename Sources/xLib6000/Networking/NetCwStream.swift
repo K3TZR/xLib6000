@@ -68,7 +68,7 @@ public final class NetCwStream : NSObject {
     
     // NOTE: NetCwStream remove does not receive any Status message to confirm removal
 
-    _log(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+    _log("NetCwStream removed: id = \(id.hex)", .debug, #function, #file, #line)
 
     // change its status
     let previousId = id
@@ -154,14 +154,14 @@ public final class NetCwStream : NSObject {
       id = streamId
       isActive = true
       
-      _log(Self.className() + " added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log("NetCwStream added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.netCwStreamHasBeenAdded, object: self as Any?)
 
     } else {
       
-      _log(Self.className() + " Error parsing Stream ID (" + reply + ")", .error, #function, #file, #line)
+      _log("NetCwStream, Error parsing Stream ID (" + reply + ")", .error, #function, #file, #line)
       isActive = false
     }
   }

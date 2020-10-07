@@ -140,7 +140,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
           // YES, remove it
           radio.daxRxAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("DaxRxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           
           NC.post(.daxRxAudioStreamHasBeenRemoved, object: id as Any?)
         }
@@ -181,7 +181,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Self.className() + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown DaxRxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -213,7 +213,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
-      _log(Self.className() + " added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
+      _log("DaxRxAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.daxRxAudioStreamHasBeenAdded, object: self as Any?)

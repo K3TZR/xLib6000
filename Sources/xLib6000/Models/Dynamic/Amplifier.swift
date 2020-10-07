@@ -141,7 +141,7 @@ public final class Amplifier  : NSObject, DynamicModel {
           
           radio.amplifiers[id] = nil
           
-          Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("Amplifier removed: id = \(id.hex)", .debug, #function, #file, #line)
           
           NC.post(.amplifierHasBeenRemoved, object: id as Any?)
         }
@@ -182,7 +182,7 @@ public final class Amplifier  : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Self.className() + " Unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown Amplifier token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -203,7 +203,7 @@ public final class Amplifier  : NSObject, DynamicModel {
       // YES, the Radio (hardware) has acknowledged this Amplifier
       _initialized = true
                   
-      _log(Self.className() + " added: id = \(id.hex), model = \(_model)", .debug, #function, #file, #line)
+      _log("Amplifier added: id = \(id.hex), model = \(_model)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.amplifierHasBeenAdded, object: self as Any?)

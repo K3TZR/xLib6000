@@ -188,7 +188,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Self.className() + " Unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown AudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -213,7 +213,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
             
-      _log(Self.className() + " added: id = \(id.hex), channel = \(_daxChannel)", .debug, #function, #file, #line)
+      _log("AudioStream added: id = \(id.hex), channel = \(_daxChannel)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.audioStreamHasBeenAdded, object: self as Any?)
@@ -289,7 +289,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      _log(Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .debug, #function, #file, #line)
+      _log("missing packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .debug, #function, #file, #line)
       
       _rxSeq = nil
       rxLostPacketCount += 1
@@ -326,4 +326,52 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
   private var __slice       : xLib6000.Slice? = nil
 }
 
+/// Struct containing Audio Stream data
+///
+///   populated by the Audio Stream vitaHandler
+///
+public struct AudioStreamFrame {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
+  public var daxChannel                     = -1
+  public private(set) var samples           = 0                             // number of samples (L/R) in this frame
+  public var leftAudio                      = [Float]()                     // Array of left audio samples
+  public var rightAudio                     = [Float]()                     // Array of right audio samples
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize an AudioStreamFrame
+  ///
+  /// - Parameters:
+  ///   - payload:        pointer to a Vita packet payload
+  ///   - numberOfBytes:  number of bytes in the payload
+  ///
+  public init(payload: UnsafeRawBufferPointer, numberOfBytes: Int) {
+    
+    // 4 byte each for left and right sample (4 * 2)
+    self.samples = numberOfBytes / (4 * 2)
+    
+    // allocate the samples arrays
+    self.leftAudio = [Float](repeating: 0, count: samples)
+    self.rightAudio = [Float](repeating: 0, count: samples)
+  }
+  /// Initialize an AudioStreamFrame
+  ///
+  /// - Parameters:
+  ///   - payload:          pointer to a Vita packet payload
+  ///   - numberOfSamples:  number of samples (L/R) needed
+  ///
+  public init(payload: UnsafeRawBufferPointer, numberOfSamples: Int) {
+    
+    // 4 byte each for left and right sample (4 * 2)
+    self.samples = numberOfSamples
+    
+    // allocate the samples arrays
+    self.leftAudio = [Float](repeating: 0, count: samples)
+    self.rightAudio = [Float](repeating: 0, count: samples)
+  }
+}
 

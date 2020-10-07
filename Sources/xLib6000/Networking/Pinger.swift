@@ -54,7 +54,7 @@ final class Pinger : NSObject {
     // stop Pinging
     _pingTimer?.cancel()
     _responseCount = 0
-    _log(Self.className() + " Pinger stopped", .debug, #function, #file, #line)
+    _log("Pinger stopped", .debug, #function, #file, #line)
   }
   /// Process the Response to a Ping
   ///
@@ -77,7 +77,7 @@ final class Pinger : NSObject {
   ///
   func start() {
     
-    _log(Self.className() + " Pinger started", .debug, #function, #file, #line)
+    _log("Pinger started", .debug, #function, #file, #line)
 
     // tell the Radio to expect pings
     Api.sharedInstance.send("keepalive enable")

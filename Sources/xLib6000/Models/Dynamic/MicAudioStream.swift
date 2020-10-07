@@ -134,7 +134,7 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
           // YES, remove it
           radio.micAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+          Log.sharedInstance.logMessage("MicAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
 
           NC.post(.micAudioStreamHasBeenRemoved, object: id as Any?)
         }
@@ -175,7 +175,7 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log(Self.className() + " unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Unknown MicAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -193,7 +193,7 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
-      _log(Self.className() + " added: id = \(id.hex), ip = \(_ip)", .debug, #function, #file, #line)
+      _log("MicAudioStream added: id = \(id.hex), ip = \(_ip)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.micAudioStreamHasBeenAdded, object: self as Any?)
@@ -274,7 +274,7 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
       if vita.sequence != expectedSequenceNumber {
         
         // NO, log the issue
-        _log(Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .debug, #function, #file, #line)
+        _log("MicAudioStream missing packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .debug, #function, #file, #line)
         
         _rxSeq = nil
         rxLostPacketCount += 1
@@ -296,4 +296,50 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
   private var __port          = 0
   private var __micGain       = 50
   private var __micGainScalar : Float = 1.0
+}
+
+/// Struct containing Mic Audio Stream data
+///
+public struct MicAudioStreamFrame {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
+  public private(set) var samples           = 0                             // number of samples (L/R) in this frame
+  public var leftAudio                      = [Float]()                     // Array of left audio samples
+  public var rightAudio                     = [Float]()                     // Array of right audio samples
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize a MicAudioStreamFrame
+  ///
+  /// - Parameters:
+  ///   - payload:        pointer to a Vita packet payload
+  ///   - numberOfWords:  number of 32-bit Words in the payload
+  ///
+  public init(payload: UnsafeRawBufferPointer, numberOfBytes: Int) {
+
+    // 4 byte each for left and right sample (4 * 2)
+    self.samples = numberOfBytes / (4 * 2)
+
+    // allocate the samples arrays
+    self.leftAudio = [Float](repeating: 0, count: samples)
+    self.rightAudio = [Float](repeating: 0, count: samples)
+  }
+  /// Initialize an MicAudioStreamFrame
+  ///
+  /// - Parameters:
+  ///   - payload:          pointer to a Vita packet payload
+  ///   - numberOfSamples:  number of samples (L/R) needed
+  ///
+  public init(payload: UnsafeRawBufferPointer, numberOfSamples: Int) {
+
+    // 4 byte each for left and right sample (4 * 2)
+    self.samples = numberOfSamples
+
+    // allocate the samples arrays
+    self.leftAudio = [Float](repeating: 0, count: samples)
+    self.rightAudio = [Float](repeating: 0, count: samples)
+  }
 }

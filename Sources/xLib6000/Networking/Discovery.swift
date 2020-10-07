@@ -27,9 +27,9 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var discoveredRadios : [DiscoveryPacket] {
-    get { Api.objectQ.sync { _discoveredRadios } }
-    set { Api.objectQ.sync(flags: .barrier) {_discoveredRadios = newValue }}}
+  public var discoveryPackets : [DiscoveryPacket] {
+    get { Api.objectQ.sync { _discoveryPackets } }
+    set { Api.objectQ.sync(flags: .barrier) {_discoveryPackets = newValue }}}
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -99,11 +99,11 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
           var deleteList = [Int]()
           
           // check the timestamps of the Discovered radios
-          for i in 0..<self.discoveredRadios.count {
+          for i in 0..<self.discoveryPackets.count {
             
-            if !self.discoveredRadios[i].isWan {
+            if !self.discoveryPackets[i].isWan {
               
-              let interval = abs(self.discoveredRadios[i].lastSeen.timeIntervalSinceNow)
+              let interval = abs(self.discoveryPackets[i].lastSeen.timeIntervalSinceNow)
               
               // is it past expiration?
               if interval > notSeenInterval {                
@@ -119,22 +119,22 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
             // YES, remove the Radio(s)
             for i in deleteList.reversed() {
               
-              let nickname = self.discoveredRadios[i].nickname
-              let firmwareVersion = self.discoveredRadios[i].firmwareVersion
-              let wanState = self.discoveredRadios[i].isWan ? "SMARTLINK" : "LOCAL"
+              let nickname = self.discoveryPackets[i].nickname
+              let firmwareVersion = self.discoveryPackets[i].firmwareVersion
+              let wanState = self.discoveryPackets[i].isWan ? "SMARTLINK" : "LOCAL"
 
               // remove a Radio
-              self.discoveredRadios.remove(at: i)
+              self.discoveryPackets.remove(at: i)
 
-              self._log("Radio removed: \(nickname) v\(firmwareVersion) \(wanState)", .debug, #function, #file, #line)
+              self._log("Discovery, Radio removed: \(nickname) v\(firmwareVersion) \(wanState)", .debug, #function, #file, #line)
             }
             // send the current list of radios to all observers
-            NC.post(.discoveredRadios, object: self.discoveredRadios as Any?)
+            NC.post(.discoveredRadios, object: self.discoveryPackets as Any?)
           }
         }
         
       } catch let error as NSError {
-        fatalError("Begin receiving error: \(error.localizedDescription)")
+        fatalError("Discovery, receiving error: \(error.localizedDescription)")
       }
       // start the timer
       _timeoutTimer.resume()
@@ -182,7 +182,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     let components = defaultString!.split(separator: ".")
     if components.count == 2 {
       let isWan = (components[0] == "wan")
-      return discoveredRadios.first(where: { $0.serialNumber == components[1] && $0.isWan == isWan} )
+      return discoveryPackets.first(where: { $0.serialNumber == components[1] && $0.isWan == isWan} )
     }
     return nil
   }
@@ -193,86 +193,22 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   public func updateDiscoveredRadios() {
     
     // send the current list of radios to all observers
-    NC.post(.discoveredRadios, object: self.discoveredRadios as Any?)
+    NC.post(.discoveredRadios, object: self.discoveryPackets as Any?)
   }
   /// Remove all SmartLink redios
   ///
   public func removeSmartLinkRadios() {
     var deleteList = [Int]()
     
-    for (i, packet) in discoveredRadios.enumerated() where packet.isWan {
+    for (i, packet) in discoveryPackets.enumerated() where packet.isWan {
       deleteList.append(i)
     }
     for i in deleteList.reversed() {
-      discoveredRadios.remove(at: i)
+      discoveryPackets.remove(at: i)
     }
     updateDiscoveredRadios()
   }
-  
-  
-//  func processPacket(_ newPacket: DiscoveryPacket) {
-//    newPacket.lastSeen = Date()
-//
-//    // populate it's guiClients
-//    newPacket.guiClients = parseGuiClients(newPacket)
-//
-////    print(">>>>> \(newPacket.guiClients)")
-//
-//    // is there a previous packet with the same serialNumber and isWan?
-//    if let radioIndex = findRadioPacket(with: newPacket) {
-//      // YES
-//      let oldPacket = discoveredRadios[radioIndex]
-//
-//      // YES, update the record
-//      copyPacket(newPacket, oldPacket)
-//
-//      // update and notify for additions / removals
-//      processAdditions(newPacket, oldPacket)
-//      processRemovals(newPacket, oldPacket)
-//
-//    } else {
-//
-//      // NO, it's a previously unknown packet (radio)
-//      discoveredRadios.append(newPacket)
-//
-//      // notify for additions
-//      processNewAdditions(newPacket)
-//
-//      // log Radio addition
-//      _log("Radio discovered: \(newPacket.nickname) v\(newPacket.firmwareVersion) \(newPacket.isWan ? "SMARTLINK" : "LOCAL")", .info, #function, #file, #line)
-//
-//      // notify observers of Radio addition
-//      NC.post(.discoveredRadios, object: discoveredRadios as Any?)
-//    }
-//  }
-
-  
-  
-  /// Process a DiscoveryPacket
-  /// - Parameter newPacket: the packet
-  ///
-//  public func processSmartLinkPacket(_ newPacket: DiscoveryPacket) {
-//    
-//    newPacket.lastSeen = Date()
-//    
-//    // is there a previous packet with the same serialNumber and isWan?
-//    if let radioIndex = findRadioPacket(with: newPacket) {
-//      
-//      // update the record
-//      discoveredRadios[radioIndex] = newPacket
-//
-//    } else {
-//      // NO, unknown radio, add it
-//      discoveredRadios.append(newPacket)
-//
-//      // log Radio addition
-//      _log("Radio discovered: \(newPacket.nickname) v\(newPacket.firmwareVersion) \(newPacket.isWan ? "SMARTLINK" : "LOCAL")", .info, #function, #file, #line)
-//      
-//      // notify observers of Radio addition
-//      NC.post(.discoveredRadios, object: discoveredRadios as Any?)
-//    }
-//  }
-    
+      
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
@@ -303,56 +239,11 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     }
     return guiClients
   }
-  
-//  private func copyPacket(_ newPacket: DiscoveryPacket, _ oldPacket: DiscoveryPacket) {
-//    oldPacket.availableClients           = newPacket.availableClients
-//    oldPacket.availablePanadapters       = newPacket.availablePanadapters
-//    oldPacket.availableSlices            = newPacket.availableSlices
-//    oldPacket.callsign                   = newPacket.callsign
-//    oldPacket.discoveryVersion           = newPacket.discoveryVersion
-//    oldPacket.firmwareVersion            = newPacket.firmwareVersion
-//    oldPacket.fpcMac                     = newPacket.fpcMac
-//    oldPacket.guiClientHandles           = newPacket.guiClientHandles
-//    oldPacket.guiClientPrograms          = newPacket.guiClientPrograms
-//    oldPacket.guiClientStations          = newPacket.guiClientStations
-//    oldPacket.guiClientHosts             = newPacket.guiClientHosts
-//    oldPacket.guiClientIps               = newPacket.guiClientIps
-//    oldPacket.inUseHost                  = newPacket.inUseHost
-//    oldPacket.inUseIp                    = newPacket.inUseIp
-//    oldPacket.lastSeen                   = newPacket.lastSeen
-//    oldPacket.licensedClients            = newPacket.licensedClients
-//    oldPacket.maxLicensedVersion         = newPacket.maxLicensedVersion
-//    oldPacket.maxPanadapters             = newPacket.maxPanadapters
-//    oldPacket.maxSlices                  = newPacket.maxSlices
-//    oldPacket.model                      = newPacket.model
-//    oldPacket.nickname                   = newPacket.nickname
-//    oldPacket.port                       = newPacket.port
-//    oldPacket.publicIp                   = newPacket.publicIp
-//    oldPacket.publicTlsPort              = newPacket.publicTlsPort
-//    oldPacket.publicUdpPort              = newPacket.publicUdpPort
-//    oldPacket.publicUpnpTlsPort          = newPacket.publicUpnpTlsPort
-//    oldPacket.publicUpnpUdpPort          = newPacket.publicUpnpUdpPort
-//    oldPacket.radioLicenseId             = newPacket.radioLicenseId
-//    oldPacket.requiresAdditionalLicense  = newPacket.requiresAdditionalLicense
-//    oldPacket.serialNumber               = newPacket.serialNumber
-//    oldPacket.status                     = newPacket.status
-//    oldPacket.upnpSupported              = newPacket.upnpSupported
-//    oldPacket.wanConnected               = newPacket.wanConnected
-//
-//    // FIXME: Not really part of the DiscoveryPacket
-//    oldPacket.isPortForwardOn            = newPacket.isPortForwardOn
-//    oldPacket.isWan                      = newPacket.isWan
-//    oldPacket.localInterfaceIP           = newPacket.localInterfaceIP
-//    oldPacket.lowBandwidthConnect        = newPacket.lowBandwidthConnect
-//    oldPacket.negotiatedHolePunchPort    = newPacket.negotiatedHolePunchPort
-//    oldPacket.requiresHolePunch          = newPacket.requiresHolePunch
-//    oldPacket.wanHandle                  = newPacket.wanHandle
-//  }
-  
+ 
   private func processNewAdditions(_ newPacket: DiscoveryPacket) {
     // log and notify for GuiClient addition(s)
     for client in newPacket.guiClients {
-      _log("GuiClient added: \(client.handle.hex), \(client.station), Packet = \(newPacket.isWan ? "wan" : "local").\(newPacket.serialNumber)", .debug, #function, #file, #line)
+      _log("Discovery, GuiClient added: \(client.handle.hex), \(client.station), Packet = \(newPacket.isWan ? "wan" : "local").\(newPacket.serialNumber)", .debug, #function, #file, #line)
       NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients as Any?)
     }
   }
@@ -362,13 +253,13 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     for client in newPacket.guiClients {
 
       // is it in the current packet?
-      if findGuiClient(by: client.handle, in: discoveredRadios[index].guiClients) == nil {
+      if findGuiClient(by: client.handle, in: discoveryPackets[index].guiClients) == nil {
         // NO, it must be added to the current packet
-        discoveredRadios[index].guiClients.append(client)
+        discoveryPackets[index].guiClients.append(client)
         
         // log and notify for GuiClient addition
-        _log("GuiClient added: \(client.handle.hex), Station = \(client.station)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenAdded, object: discoveredRadios[index].guiClients as Any?)
+        _log("Discovery, GuiClient added: \(client.handle.hex), Station = \(client.station)", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenAdded, object: discoveryPackets[index].guiClients as Any?)
       }
     }
   }
@@ -383,18 +274,18 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   
   private func processRemovals(_ newPacket: DiscoveryPacket, _ index: Int) {
     // examine each GuiClient in the current packet
-    for (i, client) in discoveredRadios[index].guiClients.enumerated().reversed() {
+    for (i, client) in discoveryPackets[index].guiClients.enumerated().reversed() {
 
       // is it in the new packet?
       if findGuiClient(by: client.handle, in: newPacket.guiClients) == nil {
         // NO, it must be removed from the current packet
         let station = client.station
         let handle = client.handle
-        discoveredRadios[index].guiClients.remove(at: i)
+        discoveryPackets[index].guiClients.remove(at: i)
 
         // log and notify for GuiClient removal
-        _log("GuiClient removed: Handle = \(handle.hex), Station = \(station)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenRemoved, object: discoveredRadios[index].guiClients as Any?)
+        _log("Discovery, GuiClient removed: Handle = \(handle.hex), Station = \(station)", .debug, #function, #file, #line)
+        NC.post(.guiClientHasBeenRemoved, object: discoveryPackets[index].guiClients as Any?)
       }
     }
   }
@@ -405,7 +296,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   private func findRadioPacket(with serialNumber: String, and isWan: Bool) -> Int? {
     
     // is the Radio already in the discoveredRadios array?
-    for (i, packet) in discoveredRadios.enumerated() {
+    for (i, packet) in discoveryPackets.enumerated() {
       // by serialNumber & isWan (same radio can be visible both locally and via SmartLink)
       if packet.serialNumber == serialNumber && packet.isWan == isWan { return i }
     }
@@ -446,37 +337,34 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     // is there a matching known packet?
     if let radioIndex = findRadioPacket(with: newPacket.serialNumber, and: newPacket.isWan) {
       // YES, update timestamp
-      discoveredRadios[radioIndex].lastSeen = Date()
-      
+      discoveryPackets[radioIndex].lastSeen = Date()
+      discoveryPackets[radioIndex].guiClientStations = newPacket.guiClientStations
+      discoveryPackets[radioIndex].guiClientPrograms = newPacket.guiClientPrograms
+      discoveryPackets[radioIndex].guiClientHandles = newPacket.guiClientHandles
+      discoveryPackets[radioIndex].status = newPacket.status
+
       // update and notify for GuiClient additions / removals
       processAdditions(newPacket, radioIndex)
       processRemovals(newPacket, radioIndex)
       
     } else {
       // NO, it's a previously unknown packet (radio)
-      discoveredRadios.append(newPacket)
+      discoveryPackets.append(newPacket)
       
       // notify for additions
       processNewAdditions(newPacket)
       
       // log and notify for Radio addition
-      _log("Radio discovered: \(newPacket.nickname) v\(newPacket.firmwareVersion) \(newPacket.isWan ? "SMARTLINK" : "LOCAL")", .info, #function, #file, #line)
-      NC.post(.discoveredRadios, object: discoveredRadios as Any?)
+      _log("Discovery, radio discovered: \(newPacket.nickname) v\(newPacket.firmwareVersion) \(newPacket.isWan ? "SMARTLINK" : "LOCAL")", .info, #function, #file, #line)
+      NC.post(.discoveredRadios, object: discoveryPackets as Any?)
     }
    }
-  
-  
-  
-  
-  
-  
   
   // ----------------------------------------------------------------------------
   // *** Backing properties (Do NOT use) ***
   
-  private var _discoveredRadios = [DiscoveryPacket]()
+  private var _discoveryPackets = [DiscoveryPacket]()
 }
-
 
 /// DiscoveryPacket class implementation
 ///
