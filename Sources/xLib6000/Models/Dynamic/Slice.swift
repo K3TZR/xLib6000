@@ -192,7 +192,7 @@ public final class Slice  : NSObject, DynamicModel {
         
         _txEnabled = newValue
         
-        _log("Enabling TX for Slice \(sliceLetter ?? ""): id = \(id)", .debug, #function, #file, #line)
+        _log("Slice \(sliceLetter ?? "") TX enabled: id = \(id)", .debug, #function, #file, #line)
         sliceCmd( .txEnabled, newValue.as1or0)
       }
     }
@@ -773,7 +773,7 @@ public final class Slice  : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-        _log("Cannot change Filter width in FM mode", .info, #function, #file, #line)
+        _log("Slice cannot change Filter width in FM mode", .info, #function, #file, #line)
         newValue = value
         
       case .CW:
@@ -810,7 +810,7 @@ public final class Slice  : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-        _log("Cannot change Filter width in FM mode", .info, #function, #file, #line)
+        _log("Slice cannot change Filter width in FM mode", .info, #function, #file, #line)
         newValue = value
         
       case .CW:
@@ -889,7 +889,7 @@ public final class Slice  : NSObject, DynamicModel {
       case .fmToneMode:               _fmToneMode = property.value
       case .fmToneFreq:               _fmToneFreq = property.value.fValue
       case .frequency:                _frequency = property.value.mhzToHz
-      case .ghost:                    _log("Unprocessed Slice property: \( property.key).\(property.value)", .warning, #function, #file, #line)
+      case .ghost:                    _log("Slice unprocessed property: \( property.key).\(property.value)", .warning, #function, #file, #line)
       case .inUse:                    _inUse = property.value.bValue
       case .locked:                   _locked = property.value.bValue
       case .loopAEnabled:             _loopAEnabled = property.value.bValue

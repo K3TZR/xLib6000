@@ -316,7 +316,7 @@ public final class UsbCable : NSObject, DynamicModel {
     } else {
       
       // NO, log the error
-      _log("Status type: \(properties[0].key) != Cable type: \(cableType.rawValue)", .warning, #function, #file, #line)
+      _log("USBCable status type: \(properties[0].key) != Cable type: \(cableType.rawValue)", .warning, #function, #file, #line)
     }
     
     // is the waterfall initialized?

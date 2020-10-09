@@ -329,7 +329,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       if vita.sequence != expectedSequenceNumber {
         
         // NO, log the issue
-        _log( Self.className() + " missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
+        _log( "DaxRxAudioStream missing packet(s): expected \(expectedSequenceNumber), received \(vita.sequence) ", .warning, #function, #file, #line)
         
         _rxSeq = nil
         rxLostPacketCount += 1

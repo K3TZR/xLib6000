@@ -289,7 +289,7 @@ public final class AudioStream : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      _log("missing packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", .debug, #function, #file, #line)
+      _log("AudioStream missing packet(s): expected \(expectedSequenceNumber), received \(vita.sequence)", .debug, #function, #file, #line)
       
       _rxSeq = nil
       rxLostPacketCount += 1

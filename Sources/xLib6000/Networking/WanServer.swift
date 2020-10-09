@@ -228,7 +228,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      _log("WanServer Not connected, unable to send Connect Message", .warning, #function, #file, #line)
+      _log("WanServer NOT connected, unable to send Connect Message", .warning, #function, #file, #line)
       return
     }
     // send a command to SmartLink to request a connection to the specified Radio
@@ -242,7 +242,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      _log("WanServer Not connected, unable to send Disconnect Message", .warning, #function, #file, #line)
+      _log("WanServer NOT connected, unable to send Disconnect Message", .warning, #function, #file, #line)
       return
     }
     // send a command to SmartLink to request disconnection from the specified Radio
@@ -256,10 +256,10 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
 
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      _log("WanServer Not connected, unable to send Test message", .warning, #function, #file, #line)
+      _log("WanServer NOT connected, unable to send Test message", .warning, #function, #file, #line)
       return
     }
-    _log("WanServer SmartLink Test initiated", .debug, #function, #file, #line)
+    _log("WanServer smartLink test initiated", .debug, #function, #file, #line)
 
     // send a command to SmartLink to test the connection for the specified Radio
     sendTlsCommand("application test_connection serial" + "=\(packet.serialNumber)", timeout: _timeout , tag: kTestTag)
@@ -391,7 +391,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   private func parseRegistrationInvalid(_ msg: String) {
     
-    _log("WanServer invalid registration: \(msg)", .warning, #function, #file, #line)
+    _log("WanServer, invalid registration: \(msg)", .warning, #function, #file, #line)
   }
   /// Parse User properties
   ///
@@ -507,7 +507,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
           dateFormatter.dateFormat = "M/d/yyy_H:mm:ss_a"
 
           guard let date = dateFormatter.date(from: property.value.lowercased()) else {
-            _log("LastSeen date mismatched format: \(property.value)", .error, #function, #file, #line)
+            _log("WanServer LastSeen date mismatched format: \(property.value)", .error, #function, #file, #line)
             break
           }
           // use date constant here
@@ -563,7 +563,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       }
       currentPacketList.append(packet)
     }
-    Log.sharedInstance.logMessage("WanServer  : Radio List received", .debug, #function, #file, #line)
+    Log.sharedInstance.logMessage("WanServer Radio List received", .debug, #function, #file, #line)
     
     for (i, _) in currentPacketList.enumerated() {
       currentPacketList[i].isWan = true
@@ -629,7 +629,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // start the timer
     _pingTimer?.resume()
 
-    _log("WanServer  \(_currentHost), port \(_currentPort): Started pinging", .debug, #function, #file, #line)
+    _log("WanServer \(_currentHost):\(_currentPort) started pinging", .debug, #function, #file, #line)
   }
   /// Stop pinging the server
   ///
@@ -639,7 +639,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     _pingTimer?.cancel()
     _pingTimer = nil
 
-    _log("WanServer  \(_currentHost), port \(_currentPort): Stopped pinging", .debug, #function, #file, #line)
+    _log("WanServer \(_currentHost):\(_currentPort) stopped pinging", .debug, #function, #file, #line)
   }
   /// Send a command to the server
   ///
@@ -680,14 +680,14 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     _currentHost = sock.connectedHost ?? ""
     _currentPort = sock.connectedPort
     
-    _log("WanServer \(_currentHost), port \(_currentPort): Connected", .debug, #function, #file, #line)
+    _log("WanServer \(_currentHost):\(_currentPort) connected", .debug, #function, #file, #line)
 
     // initiate a secure (TLS) connection to the SmartLink server
     var tlsSettings = [String : NSObject]()
     tlsSettings[kCFStreamSSLPeerName as String] = kHostName as NSObject
     _tlsSocket.startTLS(tlsSettings)
     
-    _log("WanServer TLS connection: requested", .debug, #function, #file, #line)
+    _log("WanServer TLS connection requested", .debug, #function, #file, #line)
 
 
     _isConnected = true
@@ -700,7 +700,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   @objc public func socketDidSecure(_ sock: GCDAsyncSocket) {
     
-    _log("WanServer TLS connection: secured", .debug, #function, #file, #line)
+    _log("WanServer TLS connection secured", .debug, #function, #file, #line)
 
     // start pinging SmartLink server (if needed)
     if _ping { startPinging() }
@@ -738,7 +738,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
     // Disconnected from the SmartLink server
     let error = (err == nil ? "" : " with error: " + err!.localizedDescription)
-    _log("WanServer \(_currentHost), port \(_currentPort): Disconnected\(error)", .debug, #function, #file, #line)
+    _log("WanServer \(_currentHost):\(_currentPort) disconnected\(error)", .debug, #function, #file, #line)
 
     _isConnected = false
     _currentHost = ""
@@ -755,13 +755,13 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   /// - Returns:        additional time to allocate
   ///
   @objc public func socket(_ sock: GCDAsyncSocket, shouldTimeoutWriteWithTag tag: Int, elapsed: TimeInterval, bytesDone length: UInt) -> TimeInterval {
-    _log("WanServer \(_currentHost), port \(_currentPort): Write timeout", .warning, #function, #file, #line)
+    _log("WanServer \(_currentHost):\(_currentPort) write timeout", .warning, #function, #file, #line)
   
     return 0
   }
   
   @objc public func socket(_ sock: GCDAsyncSocket, shouldTimeoutReadWithTag tag: Int, elapsed: TimeInterval, bytesDone length: UInt) -> TimeInterval {
-    _log("WanServer \(_currentHost), port \(_currentPort): Read timeout", .warning, #function, #file, #line)
+    _log("WanServer \(_currentHost):\(_currentPort) read timeout", .warning, #function, #file, #line)
     
     return 30.0
   }

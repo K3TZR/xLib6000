@@ -401,7 +401,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // Anything other than 0 is an error
     guard responseValue == Api.kNoError else {
       // log it and ignore the Reply
-      _log("\(command), non-zero reply: \(responseValue), \(flexErrorString(errorCode: responseValue))", .warning, #function, #file, #line)
+      _log("Panadapter \(command), non-zero reply: \(responseValue), \(flexErrorString(errorCode: responseValue))", .warning, #function, #file, #line)
       return
     }
     // parse out the values
@@ -711,12 +711,12 @@ public class PanadapterFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log("Panadapter: Ignored frame(s), expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Panadapter ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       return false
       
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
-      _log("Panadapter: Missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Panadapter missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       expectedFrame = received
       fallthrough
       

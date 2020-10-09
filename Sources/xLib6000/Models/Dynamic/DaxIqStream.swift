@@ -285,7 +285,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       if vita.sequence != expectedSequenceNumber {
         
         // NO, log the issue
-        _log( "Missing IqStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", .warning, #function, #file, #line)
+        _log("DaxIqStream missing packet(s): expected \(expectedSequenceNumber), received \(vita.sequence)", .warning, #function, #file, #line)
         _rxSeq = nil
         rxLostPacketCount += 1
       } else {

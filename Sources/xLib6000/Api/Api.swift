@@ -334,7 +334,7 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
     switch state {
       
     case .clientDisconnected:
-      _log("Api, Client Disconnected", .debug, #function, #file, #line)
+      _log("Api client disconnected", .debug, #function, #file, #line)
       
     case .clientConnected (let radio) where radio.packet.isWan:
         // when connecting to a WAN radio, the public IP address of the connected
@@ -353,7 +353,7 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
     case .tcpDisconnected (let reason):
       // inform observers
       NC.post(.tcpDidDisconnect, object: reason)
-      _log("Api, Tcp Disconnected: reason = \(reason)", .debug, #function, #file, #line)
+      _log("Api Tcp Disconnected: reason = \(reason)", .debug, #function, #file, #line)
 
       // close the UDP port (it won't be reused with a new connection)
       udp.unbind(reason: "TCP Disconnected")
@@ -362,11 +362,11 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
       NC.post(.tcpDidConnect, object: nil)
       let wanStatus = radio!.packet.isWan ? "SMARTLINK" : "LOCAL"
       let guiStatus = isGui ? "(GUI) " : "(NON-GUI)"
-      _log("Api, TCP connected to: \(host), port \(port) \(guiStatus)(\(wanStatus))", .debug, #function, #file, #line)
+      _log("Api TCP connected to: \(host), port \(port) \(guiStatus)(\(wanStatus))", .debug, #function, #file, #line)
 
       if radio!.packet.isWan {
         send("wan validate handle=" + radio!.packet.wanHandle, replyTo: wanValidateReplyHandler)
-        _log("Api, Validate Wan handle: \(radio!.packet.wanHandle)", .debug, #function, #file, #line)
+        _log("Api Validate Wan handle: \(radio!.packet.wanHandle)", .debug, #function, #file, #line)
 
       } else {
         // bind a UDP port for the Streams
@@ -375,15 +375,15 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
       
     case .wanHandleValidated (let success):
       if success {
-        _log("Api, Wan handle validated", .debug, #function, #file, #line)
+        _log("Api Wan handle validated", .debug, #function, #file, #line)
         if udp.bind(radio!.packet, clientHandle: connectionHandle) == false { tcp.disconnect() }
       } else {
-        _log("Api, Wan handle validation FAILED", .debug, #function, #file, #line)
+        _log("Api Wan handle validation FAILED", .debug, #function, #file, #line)
         tcp.disconnect()
       }
       
     case .udpBound (let receivePort, let sendPort):
-      _log("Api, UDP bound: receive port \(receivePort), send port \(sendPort)", .debug, #function, #file, #line)
+      _log("Api UDP bound: receive port \(receivePort), send port \(sendPort)", .debug, #function, #file, #line)
       
       // if a Wan connection, register
       if radio!.packet.isWan { udp.register(clientHandle: connectionHandle) }
@@ -394,11 +394,11 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
       NC.post(.udpDidBind, object: nil)
       
     case .udpUnbound (let reason):
-      _log("Api, UDP unbound: reason = \(reason)", .debug, #function, #file, #line)
+      _log("Api UDP unbound: reason = \(reason)", .debug, #function, #file, #line)
       updateState(to: .clientDisconnected)
       
     case .update:
-      fatalError("Api, Update not supported")
+      fatalError("Api Update not supported")
     }
   }
   /// Disconnect the active Radio
@@ -408,7 +408,7 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
   public func disconnect(reason: String = "User Initiated") {
     
     let name = radio?.packet.nickname ?? "Unknown"
-    _log("Api, Disconnect initiated:", .debug, #function, #file, #line)
+    _log("Api disconnect initiated:", .debug, #function, #file, #line)
 
     guard radio != nil else { return }
     
@@ -470,7 +470,7 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
   ///
   private func connectionCompletion(radio: Radio) {
     
-    _log("Api, Client connected: \(radio.packet.nickname)\(_params.pendingDisconnect != .none ? " (Pending Disconnection)" : "")", .debug, #function, #file, #line)
+    _log("Api client connected: \(radio.packet.nickname)\(_params.pendingDisconnect != .none ? " (Pending Disconnection)" : "")", .debug, #function, #file, #line)
     
     // send the initial commands if a normal connection
     if _params.pendingDisconnect == .none { sendCommands() }
@@ -552,7 +552,7 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
     let radioVersion = Version(packet.firmwareVersion)
 
     if Api.kVersionSupported < radioVersion  {
-      _log("Api, Radio may need to be downgraded: Radio version = \(radioVersion.longString), API supports version = \(Api.kVersionSupported.string)", .warning, #function, #file, #line)
+      _log("Api Radio may need to be downgraded: Radio version = \(radioVersion.longString), API supports version = \(Api.kVersionSupported.string)", .warning, #function, #file, #line)
       NC.post(.radioDowngrade, object: (apiVersion: Api.kVersionSupported.string, radioVersion: radioVersion.string))
     }
   }
