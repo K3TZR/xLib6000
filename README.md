@@ -10,8 +10,8 @@
 
 ##### Built on:
 
-*  macOS 10.15.6
-*  Xcode 12.0 beta 4 (12A8179i)
+*  macOS 10.15.7
+*  Xcode 12.0.1 (12A7300)
 *  Swift 5.3 / AppKit
 *  CocoaAsyncSocket 7.6.3
 
