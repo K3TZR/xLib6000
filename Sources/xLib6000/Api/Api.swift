@@ -35,7 +35,7 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersionSupported = Version("3.1.12")
+  public static let kVersionSupported = Version("3.2.14")
 
   public static let kBundleIdentifier = "net.k3tzr." + Api.kName
   public static let kDaxChannels      = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]

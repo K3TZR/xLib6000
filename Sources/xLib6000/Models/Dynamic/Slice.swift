@@ -158,6 +158,9 @@ public final class Slice  : NSObject, DynamicModel {
   @objc dynamic public var rxAnt: Radio.AntennaPort {
     get { _rxAnt }
     set { if _rxAnt != newValue { _rxAnt = newValue ; sliceCmd( .rxAnt, newValue) }}}
+  @objc dynamic public var sampleRate: Int {
+    get { _sampleRate }
+    set { if _sampleRate != newValue { _sampleRate = newValue ; sliceCmd( .sampleRate, newValue) }}}
   @objc dynamic public var step: Int {
     get { _step }
     set { if _step != newValue { _step = newValue ; sliceCmd( .step, newValue) }}}
@@ -504,6 +507,9 @@ public final class Slice  : NSObject, DynamicModel {
   var _rxAntList : [String] {
     get { Api.objectQ.sync { __rxAntList } }
     set { if newValue != _rxAntList { willChangeValue(for: \.rxAntList) ; Api.objectQ.sync(flags: .barrier) { __rxAntList = newValue } ; didChangeValue(for: \.rxAntList)}}}
+  var _sampleRate : Int {
+    get { Api.objectQ.sync { __sampleRate } }
+    set { if newValue != __sampleRate { willChangeValue(for: \.sampleRate) ; Api.objectQ.sync(flags: .barrier) { __sampleRate = newValue } ; didChangeValue(for: \.sampleRate)}}}
   var _sliceLetter : String? {
     get { Api.objectQ.sync { __sliceLetter } }
     set { if newValue != _sliceLetter { willChangeValue(for: \.sliceLetter) ; Api.objectQ.sync(flags: .barrier) { __sliceLetter = newValue } ; didChangeValue(for: \.sliceLetter)}}}
@@ -609,6 +615,7 @@ public final class Slice  : NSObject, DynamicModel {
     case rttyShift                  = "rtty_shift"
     case rxAnt                      = "rxant"
     case rxAntList                  = "ant_list"
+    case sampleRate                 = "sample_rate"
     case sliceLetter                = "index_letter"
     case squelchEnabled             = "squelch"
     case squelchLevel               = "squelch_level"
@@ -917,6 +924,7 @@ public final class Slice  : NSObject, DynamicModel {
       case .rttyShift:                _rttyShift = property.value.iValue
       case .rxAnt:                    _rxAnt = property.value
       case .rxAntList:                _rxAntList = property.value.list
+      case .sampleRate:               _sampleRate = property.value.iValue           // FIXME: ????? not in v3.2.15 source code
       case .sliceLetter:              _sliceLetter = property.value
       case .squelchEnabled:           _squelchEnabled = property.value.bValue
       case .squelchLevel:             _squelchLevel = property.value.iValue
@@ -1103,6 +1111,7 @@ public final class Slice  : NSObject, DynamicModel {
   private var __rttyShift               = 0
   private var __rxAnt                   = ""
   private var __rxAntList               = [String]()
+  private var __sampleRate              = 0
   private var __sliceLetter             : String?
   private var __step                    = 0
   private var __squelchEnabled          = false

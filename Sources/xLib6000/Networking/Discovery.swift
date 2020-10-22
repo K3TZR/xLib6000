@@ -121,12 +121,11 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
               
               let nickname = self.discoveryPackets[i].nickname
               let firmwareVersion = self.discoveryPackets[i].firmwareVersion
-              let wanState = self.discoveryPackets[i].isWan ? "SMARTLINK" : "LOCAL"
 
               // remove a Radio
               self.discoveryPackets.remove(at: i)
 
-              self._log("Discovery radio removed: \(nickname) v\(firmwareVersion) \(wanState)", .debug, #function, #file, #line)
+              self._log("Discovery radio removed: \(nickname) v\(firmwareVersion) \(self.discoveryPackets[i].connectionString)", .debug, #function, #file, #line)
             }
             // send the current list of radios to all observers
             NC.post(.discoveredRadios, object: self.discoveryPackets as Any?)
@@ -243,7 +242,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   private func processNewAdditions(_ newPacket: DiscoveryPacket) {
     // log and notify for GuiClient addition(s)
     for client in newPacket.guiClients {
-      _log("Discovery GuiClient added: \(client.handle.hex),  Station = \(client.station), Packet = \(newPacket.isWan ? "wan" : "local").\(newPacket.serialNumber)", .debug, #function, #file, #line)
+      _log("Discovery GuiClient added: \(client.handle.hex),  Station = \(client.station), Packet = \(newPacket.connectionString)", .debug, #function, #file, #line)
       NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients as Any?)
     }
   }
@@ -258,7 +257,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         discoveryPackets[index].guiClients.append(client)
         
         // log and notify for GuiClient addition
-        _log("Discovery GuiClient added: \(client.handle.hex), Station = \(client.station), Packet = \(newPacket.isWan ? "wan" : "local").\(newPacket.serialNumber)", .debug, #function, #file, #line)
+        _log("Discovery GuiClient added: \(client.handle.hex), Station = \(client.station), Packet = \(newPacket.connectionString)", .debug, #function, #file, #line)
         NC.post(.guiClientHasBeenAdded, object: discoveryPackets[index].guiClients as Any?)
       }
     }
@@ -284,7 +283,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         discoveryPackets[index].guiClients.remove(at: i)
 
         // log and notify for GuiClient removal
-        _log("Discovery GuiClient removed: Handle = \(handle.hex), Station = \(station), Packet = \(newPacket.isWan ? "wan" : "local").\(newPacket.serialNumber)", .debug, #function, #file, #line)
+        _log("Discovery GuiClient removed: Handle = \(handle.hex), Station = \(station), Packet = \(newPacket.connectionString)", .debug, #function, #file, #line)
         NC.post(.guiClientHasBeenRemoved, object: discoveryPackets[index].guiClients as Any?)
       }
     }
@@ -355,7 +354,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       processNewAdditions(newPacket)
       
       // log and notify for Radio addition
-      _log("Discovery radio found: \(newPacket.nickname) v\(newPacket.firmwareVersion) Packet = \(newPacket.isWan ? "wan" : "local").\(newPacket.serialNumber)", .info, #function, #file, #line)
+      _log("Discovery radio found: \(newPacket.nickname) v\(newPacket.firmwareVersion) Packet = \(newPacket.connectionString)", .info, #function, #file, #line)
       NC.post(.discoveredRadios, object: discoveryPackets as Any?)
     }
    }
@@ -521,7 +520,9 @@ public struct DiscoveryPacket : Equatable, Hashable {
     Stations:\t\(guiClientStations)
     """
   }
-    
+  
+  public var connectionString : String { "\(isWan ? "wan" : "local").\(serialNumber)" }
+  
   public static func ==(lhs: DiscoveryPacket, rhs: DiscoveryPacket) -> Bool {
     
     // same serial number

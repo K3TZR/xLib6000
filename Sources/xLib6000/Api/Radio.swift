@@ -916,7 +916,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         Discovery.sharedInstance.discoveryPackets[i].guiClients[j].isLocalPtt = isLocalPtt
         
         // log and notify of GuiClient update
-        _log("Radio guiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.isWan ? "wan" : "local").\(packet.serialNumber)", .debug, #function, #file, #line)
+        _log("Radio guiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
         NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveryPackets[i].guiClients as Any?)
         
       }
@@ -927,7 +927,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         Discovery.sharedInstance.discoveryPackets[i].guiClients.append(client)
         
         // log and notify of GuiClient update
-        _log("Radio guiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.isWan ? "wan" : "local").\(packet.serialNumber)", .debug, #function, #file, #line)
+        _log("Radio guiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
         NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveryPackets[i].guiClients as Any?)
       }
     }
@@ -1807,41 +1807,41 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       Meter.vitaProcessor(vitaPacket, radio: self)
       
     case .panadapter:
-      if let object = panadapters[vitaPacket.streamId]          { procesStream( object, object.className) }
+      if let object = panadapters[vitaPacket.streamId]          { procesStream( object, "Panadapter") }
       
     case .waterfall:
-      if let object = waterfalls[vitaPacket.streamId]           { procesStream( object, object.className) }
+      if let object = waterfalls[vitaPacket.streamId]           { procesStream( object, "Waterfall") }
       
     // ----- New API versions -----
     case .daxAudio where version.isNewApi:
-      if let object = daxRxAudioStreams[vitaPacket.streamId]    { procesStream( object, object.className) }
-      if let object = daxMicAudioStreams[vitaPacket.streamId]   { procesStream( object, object.className) }
-      if let object = remoteRxAudioStreams[vitaPacket.streamId] { procesStream( object, object.className) }
+      if let object = daxRxAudioStreams[vitaPacket.streamId]    { procesStream( object, "DaxRxAudio") }
+      if let object = daxMicAudioStreams[vitaPacket.streamId]   { procesStream( object, "DaxMicAudio") }
+      if let object = remoteRxAudioStreams[vitaPacket.streamId] { procesStream( object, "RemoteRxAudio") }
       
     case .daxReducedBw where version.isNewApi:
-      if let object = daxRxAudioStreams[vitaPacket.streamId]    { procesStream( object, object.className) }
-      if let object = daxMicAudioStreams[vitaPacket.streamId]   { procesStream( object, object.className) }
+      if let object = daxRxAudioStreams[vitaPacket.streamId]    { procesStream( object, "DaxRxAudio (reduced BW)") }
+      if let object = daxMicAudioStreams[vitaPacket.streamId]   { procesStream( object, "DaxMicAudio (reduced BW)") }
       
     case .opus where version.isNewApi:
-      if let object = remoteRxAudioStreams[vitaPacket.streamId] { procesStream( object, object.className) }
+      if let object = remoteRxAudioStreams[vitaPacket.streamId] { procesStream( object, "RemoteRxAudio (Opus)") }
       
     case .daxIq24 where version.isNewApi, .daxIq48 where version.isNewApi, .daxIq96 where version.isNewApi, .daxIq192 where version.isNewApi:
-      if let object = daxIqStreams[vitaPacket.streamId]         { procesStream( object, object.className) }
+      if let object = daxIqStreams[vitaPacket.streamId]         { procesStream( object, "DaxIq") }
       
     // ----- Old API versions -----
     case .daxAudio:
-      if let object = audioStreams[vitaPacket.streamId]         { procesStream( object, object.className) }
-      if let object = micAudioStreams[vitaPacket.streamId]      { procesStream( object, object.className) }
+      if let object = audioStreams[vitaPacket.streamId]         { procesStream( object, "Audio") }
+      if let object = micAudioStreams[vitaPacket.streamId]      { procesStream( object, "MicAudio") }
       
     case .daxReducedBw:
-      if let object = audioStreams[vitaPacket.streamId]         { procesStream( object, object.className) }
-      if let object = micAudioStreams[vitaPacket.streamId]      { procesStream( object, object.className) }
+      if let object = audioStreams[vitaPacket.streamId]         { procesStream( object, "Audio (reduced BW)") }
+      if let object = micAudioStreams[vitaPacket.streamId]      { procesStream( object, "MicAudio (reduced BW)") }
       
     case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
-      if let object = daxIqStreams[vitaPacket.streamId]         { procesStream( object, object.className) }
+      if let object = daxIqStreams[vitaPacket.streamId]         { procesStream(object, "DaxIq") }
       
     case .opus:
-      if let object = opusAudioStreams[vitaPacket.streamId]     { procesStream( object, object.className) }
+      if let object = opusAudioStreams[vitaPacket.streamId]     { procesStream( object, "Opus") }
       
     default:
       // log the error

@@ -3,6 +3,7 @@
 
 
 ### WARNING: I'm in the process of significant changes to GuiClients & Discovery. This may break your code. (sorry!)
+### UPDATE - this is complete now
 
 
 
@@ -42,6 +43,11 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.4.0 Release Notes
+* raised the supported version to 3.2.14
+* added "connectionString" computed property to DiscoveryPacket
+* updated log messages to use connectionString consistently
+
 ##### 1.3.11 Release Notes
 * changed discoveredRadios to discoveryPackets throughout
 * reworked guiClients
