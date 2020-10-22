@@ -3,7 +3,7 @@
 
 
 ### WARNING: I'm in the process of significant changes to GuiClients & Discovery. This may break your code. (sorry!)
-### UPDATE - this is complete now
+### UPDATE: this is complete now
 
 
 
@@ -12,7 +12,7 @@
 ##### Built on:
 
 *  macOS 10.15.7
-*  Xcode 12.0.1 (12A7300)
+*  Xcode 12.1 (12A7403)
 *  Swift 5.3 / AppKit
 *  CocoaAsyncSocket 7.6.3
 
