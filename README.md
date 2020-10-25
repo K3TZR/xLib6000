@@ -9,8 +9,9 @@
 *  Swift 5.3 / AppKit
 *  CocoaAsyncSocket 7.6.3
 
-##### Runs on:  
-* macOS 10.13 and higher
+##### Runs on:
+* macOS 10.15 and higher
+* NOTE: for macOS 10.13 or 10.14 use xLib6000 v1.4.0 (which does not contain xLibClient)
 
 ##### Usage:
 xLib6000 is a Swift Package. It includes two targets, xLib6000 and CocoaAsyncSocket.
