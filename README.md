@@ -43,6 +43,15 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.5.2 Release Notes
+* removed SwiftyUserDefaults dependencies
+
+##### 1.5.1 Release Notes
+* added XCGLogger and SwiftyUserDefaults dependencies
+
+##### 1.5.0 Release Notes
+* added xLibClient target
+
 ##### 1.4.0 Release Notes
 * raised the supported version to 3.2.14
 * added "connectionString" computed property to DiscoveryPacket
