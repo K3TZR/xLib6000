@@ -43,7 +43,7 @@ final class BaseTests: XCTestCase {
 
     let discovery = Discovery.sharedInstance
     sleep(2)
-    if discovery.discoveredRadios.count == 0 {
+    if discovery.discoveryPackets.count == 0 {
       XCTFail("----->>>>> No Radio(s) discovered <<<<<-----\n", file: #function)
     }
   }
@@ -57,9 +57,9 @@ final class BaseTests: XCTestCase {
 
     let discovery = Discovery.sharedInstance
     sleep(2)
-    if discovery.discoveredRadios.count > 0 {
+    if discovery.discoveryPackets.count > 0 {
       
-      let radio = Radio(discovery.discoveredRadios[0], api: Api.sharedInstance)
+      let radio = Radio(discovery.discoveryPackets[0], api: Api.sharedInstance)
       
       XCTAssertNotNil(radio, "\n***** Failed to instantiate Radio *****\n", file: #function)
       

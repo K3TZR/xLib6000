@@ -17,11 +17,11 @@ class OldApiTests: XCTestCase {
   func discoverRadio(logState: Api.NSLogging = .normal) -> Radio? {
     let discovery = Discovery.sharedInstance
     sleep(2)
-    if discovery.discoveredRadios.count > 0 {
+    if discovery.discoveryPackets.count > 0 {
       
-      Swift.print("***** Radio found: \(discovery.discoveredRadios[0].nickname) (v\(discovery.discoveredRadios[0].firmwareVersion)) @ \(discovery.discoveredRadios[0].publicIp)")
+      Swift.print("***** Radio found: \(discovery.discoveryPackets[0].nickname) (v\(discovery.discoveryPackets[0].firmwareVersion)) @ \(discovery.discoveryPackets[0].publicIp)")
 
-      Api.sharedInstance.connect(discovery.discoveredRadios[0], program: "v2Tests", isGui: connectAsGui, logState: logState)
+      Api.sharedInstance.connect(discovery.discoveryPackets[0], program: "v2Tests", isGui: connectAsGui, logState: logState)
         sleep(2)        
         Swift.print("***** Connected")
         return Api.sharedInstance.radio
