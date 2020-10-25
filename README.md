@@ -1,12 +1,5 @@
 ### xLib6000 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://en.wikipedia.org/wiki/MIT_License)
 
-
-
-### WARNING: I'm in the process of significant changes to GuiClients & Discovery. This may break your code. (sorry!)
-### UPDATE: this is complete now
-
-
-
 #### Mac version of FlexLib (TM) for the Flex 6000 (TM) series radios.
 
 ##### Built on:
