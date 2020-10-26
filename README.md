@@ -14,7 +14,7 @@
 * NOTE: for macOS 10.13 or 10.14 use xLib6000 v1.4.0 (which does not contain xLibClient)
 
 ##### Usage:
-xLib6000 is a Swift Package. It includes two targets, xLib6000 and CocoaAsyncSocket.
+xLib6000 is a Swift Package. It includes two targets, xLib6000 and xLibClient.
 
 ##### Comments / Questions
 Please send any bugs / comments / questions to support@k3tzr.net
@@ -25,11 +25,12 @@ Flex Radios can have one of four different version groups:
 *  v1.x.x, the ***v1 API*** - untested at this time
 *  v2.0.x thru v2.4.9, the ***v2 API*** <<-- CURRENTLY SUPPORTED
 *  v2.5.1 to less than v3.0.0, the ***v3 API without MultiFlex*** <<-- CURRENTLY SUPPORTED
-*  v3.x.x thru v3.1.12, the ***v3 API with MultiFlex*** <<-- CURRENTLY SUPPORTED
-*  greater than v3.1.12 - untested at this time
+*  v3.x.x thru v3.2.14, the ***v3 API with MultiFlex*** <<-- CURRENTLY SUPPORTED
+*  greater than v3.2.14 - untested at this time
 
 ##### Credits:
-[CocoaAsyncSocket](https://github.com/robbiehanson/CocoaAsyncSocket) is embedded in this project as source code. It provides TCP and UDP connectivity.
+[CocoaAsyncSocket](https://github.com/robbiehanson/CocoaAsyncSocket) is a package dependency in the xLib6000 target. It provides TCP and UDP connectivity.
+[XCGLogger](https://github.com/DaveWoodCom/XCGLogger.git) is a package dependency in the xLibClient target. It provides logging.
 
 ##### Other software
 [![xSDR6000](https://img.shields.io/badge/K3TZR-xSDR6000-informational)]( https://github.com/K3TZR/xSDR6000) A SmartSDR-like client for the Mac.   
