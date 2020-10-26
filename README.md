@@ -37,6 +37,11 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.6.0 Release Notes
+* replace CocoaAsyncSocket source code with a package reference
+* eliminated CocoaAsyncSocket target
+* corrected access level for AlertParams initializer
+
 ##### 1.5.3 Release Notes
 * removed openRadio() and closeRadio from RadioManagerDelegate protocol
 * added displayAlert() to RadioManagerDelegate protocol
