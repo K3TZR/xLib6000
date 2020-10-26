@@ -16,6 +16,8 @@
 ##### Usage:
 xLib6000 is a Swift Package. It includes two targets, xLib6000 and xLibClient.
 
+xLibClient can be used as a basis for apps using xLib6000. It provides much of the "boilerplate" needed in an app.
+
 ##### Comments / Questions
 Please send any bugs / comments / questions to support@k3tzr.net
 
