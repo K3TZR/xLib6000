@@ -43,14 +43,18 @@ public struct Station : Identifiable {
 }
 
 public struct AlertParams {
-  var style : NSAlert.Style = .informational
-  var msg = ""
-  var text = ""
-  var button1 = ""
-  var button2 = ""
-  var button3 = ""
-  var button4 = ""
-  var handler : (NSApplication.ModalResponse) -> Void
+  public var style : NSAlert.Style = .informational
+  public var msg = ""
+  public var text = ""
+  public var button1 = ""
+  public var button2 = ""
+  public var button3 = ""
+  public var button4 = ""
+  public var handler : (NSApplication.ModalResponse) -> Void
+  
+  public init(handler: @escaping (NSApplication.ModalResponse) -> Void) {
+    self.handler = handler
+  }
 }
 
 // ----------------------------------------------------------------------------

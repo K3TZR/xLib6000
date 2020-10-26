@@ -16,13 +16,11 @@ let package = Package(
     .library(
       name: "xLib6000",
       targets: ["xLib6000"]),
-    .library(
-      name: "CocoaAsyncSocket",
-      targets: ["CocoaAsyncSocket"]),
   ],
   dependencies: [
     // Dependencies declare other packages that this package depends on.
-    .package(url: "https://github.com/DaveWoodCom/XCGLogger.git", from: "7.0.1"),
+    .package(url: "https://github.com/robbiehanson/CocoaAsyncSocket", from: "7.6.4"),
+    .package(url: "https://github.com/DaveWoodCom/XCGLogger.git", from: "7.0.1")
   ],
   targets: [
     // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -33,9 +31,6 @@ let package = Package(
     .target(
       name: "xLib6000",
       dependencies: ["CocoaAsyncSocket"]),
-    .target(
-      name: "CocoaAsyncSocket",
-      dependencies: []),
     .testTarget(
       name: "xLib6000Tests",
       dependencies: ["xLib6000"]),
