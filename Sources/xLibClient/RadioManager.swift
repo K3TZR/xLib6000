@@ -9,8 +9,6 @@ import Foundation
 import SwiftUI
 import xLib6000
 
-public typealias OpenCloseStatus = (isNewApi: Bool, status: ConnectionStatus, connectionCount: Int)
-
 public struct PickerPacket : Identifiable, Equatable {
   public var id         = 0
   var packetIndex       = 0
@@ -42,6 +40,17 @@ public struct Station : Identifiable {
   public var id        = 0
   public var name      = ""
   public var clientId  : String?
+}
+
+public struct AlertParams {
+  var style : NSAlert.Style = .informational
+  var msg = ""
+  var text = ""
+  var button1 = ""
+  var button2 = ""
+  var button3 = ""
+  var button4 = ""
+  var handler : (NSApplication.ModalResponse) -> Void
 }
 
 // ----------------------------------------------------------------------------
@@ -87,8 +96,7 @@ public protocol RadioManagerDelegate {
   func refreshTokenSet(service: String, account: String, refreshToken: String)
   func refreshTokenDelete(service: String, account: String)
   
-  func openStatus(_ status: OpenCloseStatus, _ clients: [GuiClient], handler: @escaping (NSApplication.ModalResponse) -> Void )
-  func closeStatus(_ status: OpenCloseStatus, _ clients: [GuiClient], handler: @escaping (NSApplication.ModalResponse) -> Void )
+  func displayAlert(_ params: AlertParams)
   
   var clientId              : String  {get}
   var connectAsGui          : Bool    {get}
@@ -317,6 +325,10 @@ public final class RadioManager : ObservableObject {
     }
   }
   
+  public func clientDisconnect(packet: DiscoveryPacket, handle: Handle) {
+    _api.requestClientDisconnect( packet: packet, handle: handle)
+  }
+  
   /// Determine the state of the Radio being opened and allow the user to choose how to proceed
   /// - Parameter packet:     the packet describing the Radio to be opened
   ///
@@ -329,14 +341,11 @@ public final class RadioManager : ObservableObject {
     
     switch (Version(packet.firmwareVersion).isNewApi, packet.status.lowercased(), packet.guiClients.count) {
     case (false, kAvailable, _):          // oldApi, not connected to another client
-      delegate.openStatus( (false, ConnectionStatus.available, 0), packet.guiClients )
-      { [self] _ in
-        connectRadio(packet, isGui: delegate.connectAsGui, station: delegate.stationName)
-      }
-      
+      connectRadio(packet, isGui: delegate.connectAsGui, station: delegate.stationName)
+
     case (false, kInUse, _):              // oldApi, connected to another client
-      delegate.openStatus( (false, ConnectionStatus.inUse, 1), packet.guiClients )
-      { [self] response in
+      var params = AlertParams(handler: {
+        [self] response in
         switch response {
         case NSApplication.ModalResponse.alertFirstButtonReturn:
           connectRadio(packet, isGui: delegate.connectAsGui, pendingDisconnect: .oldApi, station: delegate.stationName)
@@ -346,33 +355,47 @@ public final class RadioManager : ObservableObject {
           connectUsingPicker()
         default:  break
         }
-      }
+      })
+      params.msg = "Radio is connected to another Client"
+      params.text = "Close the other Client?"
+      params.button1 = "Close this client"
+      params.button2 = "Cancel"
+      delegate.displayAlert(params)
       
     case (true, kAvailable, 0):           // newApi, not connected to another client
-      delegate.openStatus( (true, ConnectionStatus.available, 0), packet.guiClients )
-      { [self] _ in
-        connectRadio(packet, station: delegate.stationName)
-      }
+      connectRadio(packet, station: delegate.stationName)
       
     case (true, kAvailable, _):           // newApi, connected to another client
-      delegate.openStatus( (true, ConnectionStatus.available, 1), packet.guiClients)
-      { [self] response in
+      var params = AlertParams(handler: {
+        [self] response in
         switch response {
         case NSApplication.ModalResponse.alertFirstButtonReturn:  connectRadio(packet, isGui: delegate.connectAsGui, pendingDisconnect: .newApi(handle: packet.guiClients[0].handle), station: delegate.stationName)
         case NSApplication.ModalResponse.alertSecondButtonReturn: connectRadio(packet, isGui: delegate.connectAsGui, station: delegate.stationName)
         default:  break
         }
-      }
-      
+      })
+      params.msg = "Radio is connected to Station: \(packet.guiClients[0].station)"
+      params.text = "Close the Station . . Or . . Connect using Multiflex"
+      params.button1 = "Close \(packet.guiClients[0].station)"
+      params.button2 = "Multiflex Connect"
+      params.button3 = "Cancel"
+      delegate.displayAlert(params)
+
     case (true, kInUse, 2):               // newApi, connected to 2 clients
-      delegate.openStatus( (true, ConnectionStatus.inUse, 2), packet.guiClients)
-      { [self] response in
+      var params = AlertParams(handler: {
+        [self] response in
         switch response {
         case NSApplication.ModalResponse.alertFirstButtonReturn:  connectRadio(packet, isGui: delegate.connectAsGui, pendingDisconnect: .newApi(handle: packet.guiClients[0].handle), station: delegate.stationName)
         case NSApplication.ModalResponse.alertSecondButtonReturn: connectRadio(packet, isGui: delegate.connectAsGui, pendingDisconnect: .newApi(handle: packet.guiClients[1].handle), station: delegate.stationName)
         default:  break
         }
-      }
+      })
+      params.msg = "Radio is connected to multiple Stations"
+      params.text = "Close one of the Stations"
+      params.button1 = "Close \(packet.guiClients[0].station)"
+      params.button2 = "Close \(packet.guiClients[1].station)"
+      params.button3 = "Cancel"
+      delegate.displayAlert(params)
       
     default:
       break
@@ -406,26 +429,39 @@ public final class RadioManager : ObservableObject {
         // FIXME: don't think this code can ever be executed???
         
         // NO, let the user choose what to do
-        delegate.closeStatus( (true, ConnectionStatus.inUse, 1), packet.guiClients)
-        { [self] response in
+        var params = AlertParams(handler: {
+          [self] response in
           switch response {
-          case NSApplication.ModalResponse.alertFirstButtonReturn:  _api.requestClientDisconnect( packet: packet, handle: packet.guiClients[0].handle)
+          case NSApplication.ModalResponse.alertFirstButtonReturn:  clientDisconnect( packet: packet, handle: packet.guiClients[0].handle)
           case NSApplication.ModalResponse.alertSecondButtonReturn: disconnect()
           default:  break
           }
-        }
+        })
+        params.msg = "Radio is connected to one Station"
+        params.text = "Close the Station . . Or . . Disconnect " + _appNameTrimmed
+        params.button1 = "Close \(packet.guiClients[0].station)"
+        params.button2 = "Disconnect " + _appNameTrimmed
+        params.button3 = "Cancel"
+        delegate.displayAlert(params)
       }
       
     case (true, kInUse, 2):           // newApi, 2 clients
-      delegate.closeStatus( (true, ConnectionStatus.inUse, 2), packet.guiClients)
-      { [self] response in
+      var params = AlertParams(handler: {
+        [self] response in
         switch response {
-        case NSApplication.ModalResponse.alertFirstButtonReturn:  _api.requestClientDisconnect( packet: packet, handle: packet.guiClients[0].handle)
-        case NSApplication.ModalResponse.alertSecondButtonReturn: _api.requestClientDisconnect( packet: packet, handle: packet.guiClients[1].handle)
+        case NSApplication.ModalResponse.alertFirstButtonReturn:  clientDisconnect( packet: packet, handle: packet.guiClients[0].handle)
+        case NSApplication.ModalResponse.alertSecondButtonReturn: clientDisconnect( packet: packet, handle: packet.guiClients[1].handle)
         case NSApplication.ModalResponse.alertThirdButtonReturn:  disconnect()
         default:  break
         }
-      }
+      })
+      params.msg = "Radio is connected to multiple Stations"
+      params.text = "Close a Station . . Or . . Disconnect "  + _appNameTrimmed
+      params.button1 = (packet.guiClients[0].station == _appNameTrimmed ? "---" : "Close \(packet.guiClients[0].station)")
+      params.button2 = (packet.guiClients[1].station == _appNameTrimmed ? "---" : "Close \(packet.guiClients[1].station)")
+      params.button3 = "Disconnect " + _appNameTrimmed
+      params.button4 = "Cancel"
+      delegate.displayAlert(params)
       
     default:
       self.disconnect()

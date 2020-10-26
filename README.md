@@ -37,6 +37,11 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.5.3 Release Notes
+* removed openRadio() and closeRadio from RadioManagerDelegate protocol
+* added displayAlert() to RadioManagerDelegate protocol
+* modified openRadio() and closeRadio in RadioManager.swift
+
 ##### 1.5.2 Release Notes
 * removed SwiftyUserDefaults dependencies
 

@@ -39,6 +39,5 @@ class MockRadioManagerDelegate : RadioManagerDelegate {
   func connectionState(_ connected: Bool, _ connection: String, _ msg: String) { /* stub */ }
   func disconnectionState(_ msg: String) { /* stub */ }
 
-  func openStatus(_ status: OpenCloseStatus, _ clients: [GuiClient], handler: @escaping (NSApplication.ModalResponse) -> Void) { /* stub */ }
-  func closeStatus(_ status: OpenCloseStatus, _ clients: [GuiClient], handler: @escaping (NSApplication.ModalResponse) -> Void) { /* stub */ }
+  func displayAlert(_ params: AlertParams) { /* stub */ }
 }
