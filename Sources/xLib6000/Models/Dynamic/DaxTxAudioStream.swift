@@ -236,28 +236,10 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
     let kMaxSamplesToSend = 128     // maximum packet samples (per channel)
     let kNumberOfChannels = 2       // 2 channels
     
-    var payloadData = [UInt8]()
-    
-    // create new array for payload (interleaved L/R samples)
     if sendReducedBW {
+      
       // create new array for payload (mono samples)
-      payloadData = [UInt8](repeating: 0, count: kMaxSamplesToSend * MemoryLayout<Float>.size)
-    } else {
-      // create new array for payload (interleaved L/R stereo samples)
-      payloadData = [UInt8](repeating: 0, count: kMaxSamplesToSend * kNumberOfChannels * MemoryLayout<Float>.size)
-    }
-    
-    
-    // get a raw pointer to the start of the payload
-    let payloadPtr = UnsafeMutableRawPointer(mutating: payloadData)
-    
-    if sendReducedBW {
-      
-      // get a pointer to 16-bit chunks in the payload
-      let wordsPtr = payloadPtr.bindMemory(to: Int16.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
-      
-      // get a pointer to Float chunks in the payload
-      //let floatPtr = payloadPtr.bindMemory(to: Float.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
+      var uint16Array = [UInt16](repeating: 0, count: kMaxSamplesToSend)
       
       var samplesSent = 0
       while samplesSent < samples {
@@ -277,13 +259,10 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
           }
           
           let intSample = Int16(floatSample * 32767.0)
-          let uIntSample = CFSwapInt16HostToBig(UInt16(bitPattern: intSample))
-          
-          wordsPtr.advanced(by: i).pointee = Int16(bitPattern: uIntSample)
-        }
-        
-        _vita!.payloadData = payloadData
-        
+          uint16Array[i] = CFSwapInt16HostToBig(UInt16(bitPattern: intSample))
+        }        
+        _vita!.payloadData = uint16Array.withUnsafeBytes { Array($0) }
+
         // set the length of the packet
         _vita!.payloadSize = numSamplesToSend * MemoryLayout<Int16>.size            // 16-Bit mono samples
         _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size
@@ -303,13 +282,11 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
         // adjust the samples sent
         samplesSent += numSamplesToSend
       }
+      
     } else {
       
-      // get a pointer to 32-bit chunks in the payload
-      let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
-      
-      // get a pointer to Float chunks in the payload
-      let floatPtr = payloadPtr.bindMemory(to: Float.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
+      // create new array for payload (interleaved L/R stereo samples)
+      var floatArray = [Float](repeating: 0, count: kMaxSamplesToSend * kNumberOfChannels)
       
       var samplesSent = 0
       while samplesSent < samples {
@@ -320,17 +297,20 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
         
         // interleave the payload & scale with tx gain
         for i in 0..<numSamplesToSend {                                         // TODO: use Accelerate
-          floatPtr.advanced(by: 2 * i).pointee = left[i + samplesSent] * _txGainScalar
-          floatPtr.advanced(by: (2 * i) + 1).pointee = left[i + samplesSent] * _txGainScalar
+          floatArray[2 * i] = left[i + samplesSent] * _txGainScalar
+          floatArray[(2 * i) + 1] = left[i + samplesSent] * _txGainScalar
         }
-        
-        // swap endianess of the samples
-        for i in 0..<numFloatsToSend {
-          wordsPtr.advanced(by: i).pointee = CFSwapInt32HostToBig(wordsPtr.advanced(by: i).pointee)
-        }
-        
-        _vita!.payloadData = payloadData
-        
+
+        floatArray.withUnsafeMutableBytes{ bytePtr in
+          let uint32Ptr = bytePtr.bindMemory(to: UInt32.self)
+
+          // swap endianess of the samples
+          for i in 0..<numFloatsToSend {
+            uint32Ptr[i] = CFSwapInt32HostToBig(uint32Ptr[i])
+          }
+        }        
+        _vita!.payloadData = floatArray.withUnsafeBytes { Array($0) }
+
         // set the length of the packet
         _vita!.payloadSize = numFloatsToSend * MemoryLayout<UInt32>.size            // 32-Bit L/R samples
         _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size

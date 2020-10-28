@@ -1,3 +1,9 @@
+//
+//  ObjectTests.swift
+//  xLib6000Tests
+//
+//  Created by Douglas Adams on 2/11/20.
+//
 import XCTest
 @testable import xLib6000
 

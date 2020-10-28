@@ -100,15 +100,18 @@ public protocol RadioManagerDelegate {
   func refreshTokenSet(service: String, account: String, refreshToken: String)
   func refreshTokenDelete(service: String, account: String)
   
+  /// Called to request a decision
+  /// - Parameter params:     struct containing choices and actions
+  ///
   func displayAlert(_ params: AlertParams)
   
-  var clientId              : String  {get}
-  var connectAsGui          : Bool    {get}
-  var smartLinkAuth0Email   : String  {get set}
-  var smartLinkEnabled      : Bool    {get}
-  var stationName           : String  {get}     
-  var defaultConnection     : String  {get set}
-  var defaultGuiConnection  : String  {get set}
+  var clientId              : String  {get}         // the app's ClientId
+  var connectAsGui          : Bool    {get}         // whether to connect as a Gui client
+  var smartLinkAuth0Email   : String  {get set}     // the saved email address
+  var smartLinkEnabled      : Bool    {get}         // whether SmartLink should be initialized
+  var stationName           : String  {get}         // the name of the Station
+  var defaultConnection     : String  {get set}     // the default Non-Gui connection string
+  var defaultGuiConnection  : String  {get set}     // the default Gui connection string
 }
 
 // ----------------------------------------------------------------------------
@@ -119,13 +122,14 @@ public final class RadioManager : ObservableObject {
   
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
+    
+  public static let kUserInitiated      = "User initiated"
   
   static let kAuth0Domain               = "https://frtest.auth0.com/"
   static let kAuth0ClientId             = "4Y9fEIIsVYyQo5u6jr7yBWc4lV5ugC2m"
   static let kRedirect                  = "https://frtest.auth0.com/mobile"
   static let kResponseType              = "token"
   static let kScope                     = "openid%20offline_access%20email%20given_name%20family_name%20picture"
-  public static let kUserInitiated             = "User initiated"
   
   // ----------------------------------------------------------------------------
   // MARK: - Published properties
@@ -135,14 +139,14 @@ public final class RadioManager : ObservableObject {
   @Published public var activePacket           : DiscoveryPacket?
   @Published public var activeRadio            : Radio?
   @Published public var stations               = [Station]()
-  @Published public var stationChoices         = [Station]()
-  @Published public var bindingChoices         = [Station]()
+//  @Published public var stationChoices         = [Station]()
+//  @Published public var bindingChoices         = [Station]()
   
   @Published public var pickerPackets          = [PickerPacket]()
   @Published public var showPickerSheet        = false
   @Published public var pickerSelection        = Set<Int>()
   @Published public var stationSelection       = 0
-  @Published public var bindingSelection       = 0
+//  @Published public var bindingSelection       = 0
   
   @Published public var showAuth0Sheet         = false
   
@@ -319,7 +323,7 @@ public final class RadioManager : ObservableObject {
       activePacket = nil
       activeRadio = nil
       stationSelection = 0
-      bindingSelection = 0
+//      bindingSelection = 0
       stations.removeAll()
       
     }
@@ -747,10 +751,11 @@ public final class RadioManager : ObservableObject {
           if delegate.connectAsGui {
             // as Gui
             stationSelection = 0
-          } else {
-            // as Non-Gui
-            bindingSelection = 0
           }
+//          else {
+//            // as Non-Gui
+//            bindingSelection = 0
+//          }
         }
       }
     }

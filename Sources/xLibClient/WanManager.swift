@@ -77,8 +77,8 @@ public final class WanManager : WanServerDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Internal methods
   
-  /// SmartLink log in
-  /// - Parameter auth0Email:     saved email (if any)
+  /// SmartLink log in using an email address
+  /// - Parameter auth0Email:     saved email address (if any)
   ///
   func smartLinkLogin(using auth0Email: String?) -> Bool {
     
@@ -101,7 +101,7 @@ public final class WanManager : WanServerDelegate {
     _wanServer = nil
   }
   
-  /// Show the Web page for SmartLink Login (Auth0)
+  /// Show the Web page for SmartLink Login (Auth0Sheet)
   ///
   func validateAuth0Credentials() {
     // clear all cookies to prevent falling back to earlier saved login credentials
@@ -124,15 +124,24 @@ public final class WanManager : WanServerDelegate {
     // cause the sheet to appear
     _radioManager!.showAuth0Sheet = true
   }
-
+  
+  /// Called to establish the SmartLink connection to the targeted Radio
+  /// - Parameter packet:   the packet of the targeted Radio
+  ///
   func validateWanRadio(_ packet: DiscoveryPacket) {
     _wanServer?.sendConnectMessage(for: packet)
   }
   
+  /// Called to close the SmartLink connected Radio
+  /// - Parameter packet:   the packet of the targeted Radio
+  ///
   func closeRadio(_ packet: DiscoveryPacket) {
     _wanServer?.sendDisconnectMessage(for: packet)
   }
   
+  /// Called to test the connection to the SmartLInk server
+  /// - Parameter packet:   the packet of the targeted Radio
+  ///
   func sendTestConnection(for packet: DiscoveryPacket) {
     _wanServer?.sendTestConnection(for: packet)
   }
@@ -355,7 +364,7 @@ public final class WanManager : WanServerDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Auth0Delegate methods
   
-  /// Set the id and refresh token
+  /// Receives the ID and Refresh token from the Auth0 login
   ///
   /// - Parameters:
   ///   - idToken:        id Token string
@@ -408,7 +417,9 @@ public final class WanManager : WanServerDelegate {
     
     _radioManager!.delegate.smartLinkLoginState(true)
   }
-
+  
+  /// Close the Auth0 sheet
+  ///
   func closeAuth0() {
     _radioManager!.showAuth0Sheet = false
     // display the RadioPicker
@@ -418,6 +429,11 @@ public final class WanManager : WanServerDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - WanServerDelegate methods
   
+  /// Receives the SmartLink UserName and Callsign from the WanServer
+  /// - Parameters:
+  ///   - name:       the SmartLInk User name
+  ///   - call:       the SmartLink Callsign
+  ///
   public func wanUserSettings(name: String, call: String) {
     DispatchQueue.main.async{ [self] in
       _radioManager!.smartLinkName = name
@@ -425,6 +441,11 @@ public final class WanManager : WanServerDelegate {
     }
   }
   
+  /// Receives the Wan Handle from the WanServer
+  /// - Parameters:
+  ///   - handle:     the Wan handle
+  ///   - serial:     the serial number of the Radio
+  ///
   public func wanRadioConnectReady(handle: String, serial: String) {
     for (i, packet) in Discovery.sharedInstance.discoveryPackets.enumerated() where packet.serialNumber == serial && packet.isWan {
       Discovery.sharedInstance.discoveryPackets[i].wanHandle = handle
@@ -432,6 +453,9 @@ public final class WanManager : WanServerDelegate {
     }
   }
   
+  /// Receives the SmartLink test results from the WanServer
+  /// - Parameter results:    the test results
+  ///
   public func wanTestResultsReceived(results: WanTestConnectionResults) {
     // assess the result
     let status = (results.forwardTcpPortWorking == true &&

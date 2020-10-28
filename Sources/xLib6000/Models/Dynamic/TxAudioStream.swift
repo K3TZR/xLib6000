@@ -54,7 +54,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
       }
     }
   }
-
+  
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
   
@@ -83,9 +83,9 @@ public final class TxAudioStream : NSObject, DynamicModel {
     case inUse          = "in_use"
     case ip
     case port
-
+    
   }
-
+  
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -123,7 +123,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
           
           // NO, is it for this client?
           if !isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) { return }
-
+          
           // create a new object & add it to the collection
           radio.txAudioStreams[id] = TxAudioStream(radio: radio, id: id)
         }
@@ -134,7 +134,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
         
         // NOTE: This code will never be called
         //    TxAudioStream does not send status on removal
-
+        
         // does the object exist?
         if radio.txAudioStreams[id] != nil {
           
@@ -188,7 +188,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
       }
       // known keys, in alphabetical order
       switch token {
-        
+      
       case .clientHandle: _clientHandle = property.value.handle ?? 0
       case .daxTx:        _transmit = property.value.bValue
       case .inUse:        break   // included to inhibit unknown token warnings
@@ -201,9 +201,9 @@ public final class TxAudioStream : NSObject, DynamicModel {
       
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
-                  
+      
       _log("TxAudioStream added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
-
+      
       // notify all observers
       NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)
     }
@@ -245,68 +245,57 @@ public final class TxAudioStream : NSObject, DynamicModel {
     let kNumberOfChannels = 2       // 2 channels
     
     // create new array for payload (interleaved L/R samples)
-    let payloadData = [UInt8](repeating: 0, count: kMaxSamplesToSend * kNumberOfChannels * MemoryLayout<Float>.size)
+    var floatArray = [Float](repeating: 0, count: kMaxSamplesToSend * kNumberOfChannels)
     
-    // get a raw pointer to the start of the payload
-    let payloadPtr = UnsafeMutableRawPointer(mutating: payloadData)
-//    payloadData.withUnsafeMutableBytes { (payloadPtr) in
+    var samplesSent = 0
+    while samplesSent < samples {
       
-      // get a pointer to 32-bit chunks in the payload
-      let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
+      // how many samples this iteration? (kMaxSamplesToSend or remainder if < kMaxSamplesToSend)
+      let numSamplesToSend = min(kMaxSamplesToSend, samples - samplesSent)
+      let numFloatsToSend = numSamplesToSend * kNumberOfChannels
       
-      // get a pointer to Float chunks in the payload
-      let floatPtr = payloadPtr.bindMemory(to: Float.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
+      // interleave the payload & scale with tx gain
+      for i in 0..<numSamplesToSend {                                         // TODO: use Accelerate
+        floatArray[2 * i] = left[i + samplesSent] * _txGainScalar
+        floatArray[(2 * i) + 1] = left[i + samplesSent] * _txGainScalar
+      }
       
-      var samplesSent = 0
-      while samplesSent < samples {
-        
-        // how many samples this iteration? (kMaxSamplesToSend or remainder if < kMaxSamplesToSend)
-        let numSamplesToSend = min(kMaxSamplesToSend, samples - samplesSent)
-        let numFloatsToSend = numSamplesToSend * kNumberOfChannels
-        
-        // interleave the payload & scale with tx gain
-        for i in 0..<numSamplesToSend {                                         // TODO: use Accelerate
-          floatPtr[2 * i] = left[i + samplesSent] * _txGainScalar
-          floatPtr[(2 * i) + 1] = left[i + samplesSent] * _txGainScalar
-          
-          //        payload[(2 * i)] = left[i + samplesSent] * _txGainScalar
-          //        payload[(2 * i) + 1] = right[i + samplesSent] * _txGainScalar
-        }
+      floatArray.withUnsafeMutableBytes{ bytePtr in
+        let uint32Ptr = bytePtr.bindMemory(to: UInt32.self)
         
         // swap endianess of the samples
         for i in 0..<numFloatsToSend {
-          wordsPtr[i] = CFSwapInt32HostToBig(wordsPtr[i])
+          uint32Ptr[i] = CFSwapInt32HostToBig(uint32Ptr[i])
         }
-        
-        _vita!.payloadData = payloadData
-        
-        // set the length of the packet
-        _vita!.payloadSize = numFloatsToSend * MemoryLayout<UInt32>.size            // 32-Bit L/R samples
-        _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size
-        
-        // set the sequence number
-        _vita!.sequence = _txSeq
-        
-        // encode the Vita class as data and send to radio
-        if let data = Vita.encodeAsData(_vita!) {
-          
-          // send packet to radio
-          //        _api.sendVitaData(data)
-          _radio.sendVita(data)
-        }
-        // increment the sequence number (mod 16)
-        _txSeq = (_txSeq + 1) % 16
-        
-        // adjust the samples sent
-        samplesSent += numSamplesToSend
       }
-//    }
+      _vita!.payloadData = floatArray.withUnsafeBytes { Array($0) }
+      
+      // set the length of the packet
+      _vita!.payloadSize = numFloatsToSend * MemoryLayout<UInt32>.size            // 32-Bit L/R samples
+      _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size
+      
+      // set the sequence number
+      _vita!.sequence = _txSeq
+      
+      // encode the Vita class as data and send to radio
+      if let data = Vita.encodeAsData(_vita!) {
+        
+        // send packet to radio
+        //        _api.sendVitaData(data)
+        _radio.sendVita(data)
+      }
+      // increment the sequence number (mod 16)
+      _txSeq = (_txSeq + 1) % 16
+      
+      // adjust the samples sent
+      samplesSent += numSamplesToSend
+    }
     return true
   }
-
+  
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
-
+  
   /// Send a command to Set a TxAudioStream property
   ///
   /// - Parameters:
@@ -321,7 +310,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
   // *** Backing properties (Do NOT use) ***
   
   private var _isStreaming    = false
-
+  
   private var __clientHandle  : Handle = 0
   private var __ip            = ""
   private var __port          = 0
