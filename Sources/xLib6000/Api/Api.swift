@@ -311,7 +311,7 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
   /// Alternate form of connect
   /// - Parameter params:     connection parameters struct
   ///
-public func connectAfterDisconnect(_ params: ApiConnectionParams) {
+  public func connectAfterDisconnect(_ params: ApiConnectionParams) {
       
     connect(params.packet,
             station           : params.station,
@@ -458,9 +458,6 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
 
     // register to be notified when reply received
     delegate?.addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
-    
-//    // pass it to xAPITester (if present)
-//    testerDelegate?.addReplyHandler( sequenceNumber, replyTuple: (replyTo: callback, command: command) )
   }
 
   // ----------------------------------------------------------------------------
@@ -601,7 +598,6 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
   /// - Parameter msg:        text of the message
   ///
   func didReceive(_ msg: String) {
-    
     // is it a non-empty message?
     if msg.count > 1 {
       
@@ -628,13 +624,12 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
   }
   
   func didConnect(host: String, port: UInt16) {
-      updateState(to: .tcpConnected (host: host, port: port))
-    
+    updateState(to: .tcpConnected (host: host, port: port))
     tcp.readNext()
   }
 
   func didDisconnect(reason: String) {
-      updateState(to: .tcpDisconnected(reason: reason))
+    updateState(to: .tcpDisconnected(reason: reason))
   }
 
   // ----------------------------------------------------------------------------
@@ -648,7 +643,6 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
   ///   - port:   a port number
   ///
   func didBind(receivePort: UInt16, sendPort: UInt16) {
-    
       updateState(to: .udpBound(receivePort: receivePort, sendPort: sendPort))
   }
   /// Respond to a UDP unbind event
@@ -669,18 +663,15 @@ public func connectAfterDisconnect(_ params: ApiConnectionParams) {
   func udpStreamHandler(_ vitaPacket: Vita) {
     
     delegate?.vitaParser(vitaPacket)
-
-//    // pass it to xAPITester (if present)
-//    testerDelegate?.vitaParser(vitaPacket)
   }
   
   // ----------------------------------------------------------------------------
   // *** Backing properties (Do NOT use) ***
   
-  private var _radio         : Radio? = nil
   private var _delegate      : ApiDelegate? = nil
+  private var _guiClients    = [Handle: GuiClient]()
   private var _localIP       = "0.0.0.0"
   private var _localUDPPort  : UInt16 = 0
+  private var _radio         : Radio? = nil
 
-  private var _guiClients             = [Handle: GuiClient]()
 }

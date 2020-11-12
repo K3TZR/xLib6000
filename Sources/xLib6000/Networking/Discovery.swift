@@ -61,7 +61,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     
     // if created
     if let sock = _udpSocket {
-      
       // set socket options
       sock.setPreferIPv4()
       sock.setIPv6Enabled(false)
@@ -69,7 +68,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       // enable port reuse (allow multiple apps to use same port)
       do {
         try sock.enableReusePort(true)
-        
       } catch let error as NSError {
         fatalError("Port reuse not enabled: \(error.localizedDescription)")
       }
@@ -95,19 +93,15 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         
         // set the event handler
         _timeoutTimer.setEventHandler { [ unowned self] in
-          
           var deleteList = [Int]()
           
           // check the timestamps of the Discovered radios
           for i in 0..<self.discoveryPackets.count {
-            
             if !self.discoveryPackets[i].isWan {
-              
               let interval = abs(self.discoveryPackets[i].lastSeen.timeIntervalSinceNow)
               
               // is it past expiration?
-              if interval > notSeenInterval {                
-                
+              if interval > notSeenInterval {
                 // YES, add to the delete list
                 deleteList.append(i)
               }
@@ -115,10 +109,8 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
           }
           // are there any deletions?
           if deleteList.count > 0 {
-                        
             // YES, remove the Radio(s)
             for i in deleteList.reversed() {
-              
               let nickname = self.discoveryPackets[i].nickname
               let firmwareVersion = self.discoveryPackets[i].firmwareVersion
 
@@ -142,7 +134,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   
   deinit {
     _timeoutTimer?.cancel()
-    
     _udpSocket?.close()
   }
   
@@ -152,9 +143,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   /// Pause the collection of UDP broadcasts
   ///
   public func pause() {
-  
     if let sock = _udpSocket {
-      
       // pause receiving UDP broadcasts
       sock.pauseReceiving()
       
@@ -165,9 +154,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   /// Resume the collection of UDP broadcasts
   ///
   public func resume() {
-    
     if let sock = _udpSocket {
-      
       // restart receiving UDP broadcasts
       try! sock.beginReceiving()
       
@@ -177,7 +164,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   }
   
   public func defaultFound(_ defaultString: String?) -> DiscoveryPacket? {
- 
     let components = defaultString!.split(separator: ".")
     if components.count == 2 {
       let isWan = (components[0] == "wan")
@@ -185,8 +171,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     }
     return nil
   }
-  
-  
   /// force a Notification containing a list of current radios
   ///
   public func updateDiscoveredRadios() {
@@ -250,7 +234,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   private func processAdditions(_ newPacket: DiscoveryPacket, _ index: Int) {
     // examine each GuiClient in the new packet
     for client in newPacket.guiClients {
-
       // is it in the current packet?
       if findGuiClient(by: client.handle, in: discoveryPackets[index].guiClients) == nil {
         // NO, it must be added to the current packet
@@ -274,7 +257,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   private func processRemovals(_ newPacket: DiscoveryPacket, _ index: Int) {
     // examine each GuiClient in the current packet
     for (i, client) in discoveryPackets[index].guiClients.enumerated().reversed() {
-
       // is it in the new packet?
       if findGuiClient(by: client.handle, in: newPacket.guiClients) == nil {
         // NO, it must be removed from the current packet
@@ -293,7 +275,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   /// - Returns:                    the index of the radio in Discovered Radios
   ///
   private func findRadioPacket(with serialNumber: String, and isWan: Bool) -> Int? {
-    
     // is the Radio already in the discoveredRadios array?
     for (i, packet) in discoveryPackets.enumerated() {
       // by serialNumber & isWan (same radio can be visible both locally and via SmartLink)
@@ -317,7 +298,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   ///   - filterContext:  the FilterContext
   ///
   @objc public func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
-    
     // VITA encoded Discovery packet?
     guard let vita = Vita.decodeFrom(data: data) else { return }
     
@@ -325,14 +305,12 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     if var packet = Vita.parseDiscovery(vita) {
       // populate the packet's guiClients
       packet.guiClients = parseGuiClients(packet)
-
+      
       processPacket(packet)
     }
- }
-  
-  
-  func processPacket(_ newPacket: DiscoveryPacket) {
+  }
     
+  func processPacket(_ newPacket: DiscoveryPacket) {
     // is there a matching known packet?
     if let radioIndex = findRadioPacket(with: newPacket.serialNumber, and: newPacket.isWan) {
       // YES, update timestamp
@@ -523,8 +501,7 @@ public struct DiscoveryPacket : Equatable, Hashable {
   
   public var connectionString : String { "\(isWan ? "wan" : "local").\(serialNumber)" }
   
-  public static func ==(lhs: DiscoveryPacket, rhs: DiscoveryPacket) -> Bool {
-    
+  public static func ==(lhs: DiscoveryPacket, rhs: DiscoveryPacket) -> Bool {    
     // same serial number
     return lhs.serialNumber == rhs.serialNumber && lhs.isWan == rhs.isWan
   }

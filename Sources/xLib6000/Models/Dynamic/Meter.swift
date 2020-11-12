@@ -153,7 +153,6 @@ public final class Meter : NSObject, DynamicModel {
     //        multiple copies of meters, this code ignores the duplicates
     
     vita.payloadData.withUnsafeBytes { (payloadPtr) in
-      
       // four bytes per Meter
       let numberOfMeters = Int(vita.payloadSize / 4)
       
@@ -162,14 +161,12 @@ public final class Meter : NSObject, DynamicModel {
       
       // for each meter in the Meters packet
       for i in 0..<numberOfMeters {
-        
         // get the Meter id and the Meter value
         let id: UInt16 = CFSwapInt16BigToHost(ptr16[2 * i])
         let value: UInt16 = CFSwapInt16BigToHost(ptr16[(2 * i) + 1])
         
         // is this a duplicate?
         if !meterIds.contains(id) {
-          
           // NO, add it to the list
           meterIds.append(id)
           
@@ -177,9 +174,7 @@ public final class Meter : NSObject, DynamicModel {
           //        if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", number)] {
           if let meter = radio.meters[id] {
             //          meter.streamHandler( value)
-            
             let newValue = Int16(bitPattern: value)
-            
             let previousValue = meter.value
             
             // check for unknown Units
@@ -191,8 +186,7 @@ public final class Meter : NSObject, DynamicModel {
             var adjNewValue: Float = 0.0
             switch token {
               
-            case .db, .dbm, .dbfs, .swr:
-              adjNewValue = Float(exactly: newValue)! / kDbDbmDbfsSwrDenom
+            case .db, .dbm, .dbfs, .swr:        adjNewValue = Float(exactly: newValue)! / kDbDbmDbfsSwrDenom
               
             case .volts, .amps:
               var denom :Float = 256.0
@@ -201,37 +195,22 @@ public final class Meter : NSObject, DynamicModel {
               }
               adjNewValue = Float(exactly: newValue)! / denom
               
-            case .degc, .degf:
-              adjNewValue = Float(exactly: newValue)! / kDegDenom
+            case .degc, .degf:                  adjNewValue = Float(exactly: newValue)! / kDegDenom
               
-            case .rpm, .watts, .percent, .none:
-              adjNewValue = Float(exactly: newValue)!
+            case .rpm, .watts, .percent, .none: adjNewValue = Float(exactly: newValue)!
             }
             // did it change?
             if adjNewValue != previousValue {
               meter.value = adjNewValue
-              
               // notify appropriate observers
               switch meter.name {
               // specific cases
-              case Meter.ShortName.signalPassband.rawValue:
-                NC.post(.sliceMeterUpdated, object: meter as Any?)
-              
-              case Meter.ShortName.powerForward.rawValue, Meter.ShortName.swr.rawValue:
-                NC.post(.txMeterUpdated, object: meter as Any?)
-              
-              case Meter.ShortName.temperaturePa.rawValue, Meter.ShortName.voltageAfterFuse.rawValue:
-                NC.post(.paramMeterUpdated, object: meter as Any?)
-              
-              case Meter.ShortName.microphoneAverage.rawValue, Meter.ShortName.microphonePeak.rawValue, Meter.ShortName.postClipper.rawValue:
-                NC.post(.pcwMeterUpdated, object: meter as Any?)
-              
-              case Meter.ShortName.voltageHwAlc.rawValue:
-                  NC.post(.cwMeterUpdated, object: meter as Any?)
-
-              // non-specific case
-              default:
-                NC.post(.meterUpdated, object: meter as Any?)
+              case Meter.ShortName.signalPassband.rawValue:   NC.post(.sliceMeterUpdated, object: meter as Any?)
+              case Meter.ShortName.powerForward.rawValue, Meter.ShortName.swr.rawValue:   NC.post(.txMeterUpdated, object: meter as Any?)
+              case Meter.ShortName.temperaturePa.rawValue, Meter.ShortName.voltageAfterFuse.rawValue:   NC.post(.paramMeterUpdated, object: meter as Any?)
+              case Meter.ShortName.microphoneAverage.rawValue, Meter.ShortName.microphonePeak.rawValue, Meter.ShortName.postClipper.rawValue:   NC.post(.pcwMeterUpdated, object: meter as Any?)
+              case Meter.ShortName.voltageHwAlc.rawValue:   NC.post(.cwMeterUpdated, object: meter as Any?)
+              default:  NC.post(.meterUpdated, object: meter as Any?)
               }
             }
           }
@@ -253,24 +232,19 @@ public final class Meter : NSObject, DynamicModel {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-    
     // is the object in use?
     if inUse {
-      
       // YES, extract the Meter Number from the first KeyValues entry
       let components = properties[0].key.components(separatedBy: ".")
       if components.count != 2 {return }
       
       // the Meter Number is the 0th item
       if let id = components[0].objectId {
-        
         // does the meter exist?
         if radio.meters[id] == nil {
-          
           // NO, create a new Meter & add it to the Meters collection
           radio.meters[id] = Meter(radio: radio, id: id)
         }
-        
         // pass the key values to the Meter for parsing
         radio.meters[id]!.parseProperties(radio, properties )
       }
@@ -279,36 +253,21 @@ public final class Meter : NSObject, DynamicModel {
       
       // NO, extract the Id
       if let id = properties[0].key.components(separatedBy: " ")[0].objectId {
-        
         // does it exist?
         if radio.meters[id] != nil {
-
           let name = radio.meters[id]!.name
           radio.meters[id] = nil
-          
-          Log.sharedInstance.logMessage("Meter removed: id = \(id)", .debug, #function, #file, #line)
 
           // notify appropriate observers
+          Log.sharedInstance.logMessage("Meter removed: id = \(id)", .debug, #function, #file, #line)
           switch name {
           // specific cases
-          case Meter.ShortName.signalPassband.rawValue:
-            NC.post(.sliceMeterRemoved, object: id as Any?)
-          
-          case Meter.ShortName.powerForward.rawValue, Meter.ShortName.swr.rawValue:
-            NC.post(.txMeterRemoved, object: id as Any?)
-          
-          case Meter.ShortName.temperaturePa.rawValue, Meter.ShortName.voltageAfterFuse.rawValue:
-            NC.post(.paramMeterRemoved, object: id as Any?)
-          
-          case Meter.ShortName.microphoneAverage.rawValue, Meter.ShortName.microphonePeak.rawValue, Meter.ShortName.postClipper.rawValue:
-            NC.post(.pcwMeterRemoved, object: id as Any?)
-          
-          case Meter.ShortName.voltageHwAlc.rawValue:
-              NC.post(.cwMeterRemoved, object: id as Any?)
-
-          // non-specific case
-          default:
-            NC.post(.meterRemoved, object: id as Any?)
+          case Meter.ShortName.signalPassband.rawValue:   NC.post(.sliceMeterRemoved, object: id as Any?)
+          case Meter.ShortName.powerForward.rawValue, Meter.ShortName.swr.rawValue:   NC.post(.txMeterRemoved, object: id as Any?)
+          case Meter.ShortName.temperaturePa.rawValue, Meter.ShortName.voltageAfterFuse.rawValue:   NC.post(.paramMeterRemoved, object: id as Any?)
+          case Meter.ShortName.microphoneAverage.rawValue, Meter.ShortName.microphonePeak.rawValue, Meter.ShortName.postClipper.rawValue:   NC.post(.pcwMeterRemoved, object: id as Any?)
+          case Meter.ShortName.voltageHwAlc.rawValue:   NC.post(.cwMeterRemoved, object: id as Any?)
+          default:    NC.post(.meterRemoved, object: id as Any?)
           }
         }
       }
@@ -325,7 +284,6 @@ public final class Meter : NSObject, DynamicModel {
   ///   - id:           a Meter Id
   ///
   public init(radio: Radio, id: MeterId) {
-    
     _radio = radio
     self.id = id
     
@@ -345,10 +303,8 @@ public final class Meter : NSObject, DynamicModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <n.key=value>
     for property in properties {
-      
       // separate the Meter Number from the Key
       let numberAndKey = property.key.components(separatedBy: ".")
       
@@ -361,7 +317,6 @@ public final class Meter : NSObject, DynamicModel {
         _log("unknown Meter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
-      
       // known Keys, in alphabetical order
       switch token {
         
@@ -376,33 +331,21 @@ public final class Meter : NSObject, DynamicModel {
       }
     }
     if !_initialized && group != "" && units != "" {
-      
       // the Radio (hardware) has acknowledged this Meter
       _initialized = true
       
-      _log("Meter added: id = \(id), \(name)", .debug, #function, #file, #line)
-
       // notify appropriate observers
+      _log("Meter added: id = \(id), \(name)", .debug, #function, #file, #line)
       switch name {
       // specific cases
 //      case Meter.ShortName.signalPassband.rawValue:
 //        NC.post(.sliceMeterAdded, object: self as Any?)
       
-      case Meter.ShortName.powerForward.rawValue, Meter.ShortName.swr.rawValue:
-        NC.post(.txMeterAdded, object: self as Any?)
-      
-      case Meter.ShortName.temperaturePa.rawValue, Meter.ShortName.voltageAfterFuse.rawValue:
-        NC.post(.paramMeterAdded, object: self as Any?)
-      
-      case Meter.ShortName.microphoneAverage.rawValue, Meter.ShortName.microphonePeak.rawValue, Meter.ShortName.postClipper.rawValue:
-        NC.post(.pcwMeterAdded, object: self as Any?)
-      
-      case Meter.ShortName.voltageHwAlc.rawValue:
-          NC.post(.cwMeterAdded, object: self as Any?)
-
-      // non-specific case
-      default:
-        NC.post(.meterAdded, object: self as Any?)
+      case Meter.ShortName.powerForward.rawValue, Meter.ShortName.swr.rawValue:   NC.post(.txMeterAdded, object: self as Any?)
+      case Meter.ShortName.temperaturePa.rawValue, Meter.ShortName.voltageAfterFuse.rawValue:   NC.post(.paramMeterAdded, object: self as Any?)
+      case Meter.ShortName.microphoneAverage.rawValue, Meter.ShortName.microphonePeak.rawValue, Meter.ShortName.postClipper.rawValue:   NC.post(.pcwMeterAdded, object: self as Any?)
+      case Meter.ShortName.voltageHwAlc.rawValue:   NC.post(.cwMeterAdded, object: self as Any?)
+      default:    NC.post(.meterAdded, object: self as Any?)
       }
     }
   }

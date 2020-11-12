@@ -203,17 +203,14 @@ public final class UsbCable : NSObject, DynamicModel {
     
     // is the object in use?
     if inUse {
-      
       // YES, does it exist?
       if radio.usbCables[id] == nil {
         // NO, is it a valid cable type?
         if let cableType = UsbCable.UsbCableType(rawValue: properties[1].value) {
-          
           // YES, create a new UsbCable & add it to the UsbCables collection
           radio.usbCables[id] = UsbCable(radio: radio, id: id, cableType: cableType)
           
         } else {
-          
           // NO, log the error and ignore it
           Log.sharedInstance.logMessage("USBCable invalid Type: \(properties[1].value)", .warning, #function, #file, #line)
           return
@@ -223,17 +220,14 @@ public final class UsbCable : NSObject, DynamicModel {
       radio.usbCables[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
       
     } else {
-      
       // does the object exist?
       if radio.usbCables[id] != nil {
-        
         // YES, remove it, notify observers
         NC.post(.usbCableWillBeRemoved, object: radio.usbCables[id] as Any?)
 
         radio.usbCables[id] = nil
         
         Log.sharedInstance.logMessage("USBCable removed: id = \(id)", .debug, #function, #file, #line)
-        
         NC.post(.usbCableHasBeenRemoved, object: id as Any?)
       }
     }
@@ -250,7 +244,6 @@ public final class UsbCable : NSObject, DynamicModel {
   ///   - cableType:          the type of UsbCable
   ///
   public init(radio: Radio, id: UsbCableId, cableType: UsbCableType) {
-    
     _radio = radio
     self.id = id
     self.cableType = cableType
@@ -278,11 +271,9 @@ public final class UsbCable : NSObject, DynamicModel {
     
     // is the Status for a cable of this type?
     if cableType.rawValue == properties[0].value {
-      
       // YES,
       // process each key/value pair, <key=value>
       for property in properties {
-        
         // check for unknown Keys
         guard let token = Token(rawValue: property.key) else {
           // log it and ignore the Key
@@ -314,20 +305,17 @@ public final class UsbCable : NSObject, DynamicModel {
       }
       
     } else {
-      
       // NO, log the error
       _log("USBCable status type: \(properties[0].key) != Cable type: \(cableType.rawValue)", .warning, #function, #file, #line)
     }
     
     // is the waterfall initialized?
     if !_initialized {
-      
       // YES, the Radio (hardware) has acknowledged this UsbCable
       _initialized = true
 
-      _log("USBCable added: id = \(id)", .debug, #function, #file, #line)
-
       // notify all observers
+      _log("USBCable added: id = \(id)", .debug, #function, #file, #line)
       NC.post(.usbCableHasBeenAdded, object: self as Any?)
     }
   }
@@ -337,8 +325,6 @@ public final class UsbCable : NSObject, DynamicModel {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func remove(callback: ReplyHandler? = nil){
-    
-    // tell the Radio to remove a USB Cable
     _radio.sendCommand("usb_cable " + "remove" + " \(id)")
     
     // notify all observers

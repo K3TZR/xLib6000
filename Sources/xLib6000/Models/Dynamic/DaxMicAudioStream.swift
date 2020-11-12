@@ -28,11 +28,9 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   public var isStreaming  : Bool {
     get { Api.objectQ.sync { _isStreaming } }
     set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
-
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var clientHandle : Handle {
     get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue }}}
@@ -74,7 +72,6 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   var _micGain : Int {
     get { Api.objectQ.sync { __micGain } }
     set { if newValue != _micGain { willChangeValue(for: \.micGain) ; Api.objectQ.sync(flags: .barrier) { __micGain = newValue } ; didChangeValue(for: \.micGain)}}}
-
   var _micGainScalar : Float {
     get { Api.objectQ.sync { __micGainScalar } }
     set { if newValue != _micGainScalar { Api.objectQ.sync(flags: .barrier) { __micGainScalar = newValue }}}}
@@ -91,7 +88,9 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   private var _initialized      = false
   private let _log              = Log.sharedInstance.logMessage
   private let _radio            : Radio
-  private var _rxSeq            : Int?
+  private var _rxPacketCount      = 0
+  private var _rxLostPacketCount  = 0
+  private var _rxSequenceNumber   = -1
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -111,16 +110,13 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
     
     // get the Id
     if let id =  properties[0].key.streamId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, is it for this client?
         guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
         
         // does it exist?
         if radio.daxMicAudioStreams[id] == nil {
-          
           // NO, create a new object & add it to the collection
           radio.daxMicAudioStreams[id] = DaxMicAudioStream(radio: radio, id: id)
         }
@@ -130,12 +126,10 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
       } else {
         // NO, does it exist?
         if radio.daxMicAudioStreams[id] != nil {
-          
           // YES, remove it
           radio.daxMicAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage("DaxMicAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
-          
           NC.post(.daxMicAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
@@ -152,7 +146,6 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   ///   - id:           a DaxMicAudioStream Id
   ///
   init(radio: Radio, id: DaxMicStreamId) {
-    
     _radio = radio
     self.id = id
     super.init()
@@ -171,7 +164,6 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
     
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
@@ -188,13 +180,11 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
     }
     // is the AudioStream acknowledged by the radio?
     if _initialized == false && _clientHandle != 0 {
-      
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
-      
-      _log("DaxMicAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("DaxMicAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.daxMicAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -204,8 +194,6 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   /// - Returns:              success / failure
   ///
   public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove this Stream
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
 
     // notify all observers
@@ -225,92 +213,42 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   ///   - vitaPacket:         a Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    var dataFrame: MicAudioStreamFrame?
-    
-    if let delegate = delegate {
+    // is this the first packet?
+    if _rxSequenceNumber == -1 {
+      _rxSequenceNumber = vita.sequence
+      _rxPacketCount = 1
+      _rxLostPacketCount = 0
+    } else {
+      _rxPacketCount += 1
+    }
+
+    switch (_rxSequenceNumber, vita.sequence) {
+
+    case (let expected, let received) where received < expected:
+      // from a previous group, ignore it
+      _log("DaxMicAudioStream delayed frame(s) ignored: expected \(expected), received \(received)", .warning, #function, #file, #line)
+      return
       
-      vita.payloadData.withUnsafeBytes { (payloadPtr) in
-        
-        // initialize a data frame
-        if vita.classCode == .daxReducedBw {
-          
-          let samples = vita.payloadSize / 2    // payload is Int16 mono
-          dataFrame = MicAudioStreamFrame(payload: payloadPtr, numberOfSamples: samples)
-        } else {          // .daxAudio
-          
-          let samples = vita.payloadSize / (4 * 2)   // payload is Float (4 Byte) stereo
-          dataFrame = MicAudioStreamFrame(payload: payloadPtr, numberOfSamples: samples)
-        }
-        
-        if dataFrame == nil { return }
-        
-        if vita.classCode == .daxReducedBw {
-          
-          //Int16 Mono Samples
-          let oneOverMax: Float = 1.0 / Float(Int16.max)
-          
-          // get a pointer to the data in the payload
-          let wordsPtr = payloadPtr.bindMemory(to: Int16.self)
-          
-          // allocate temporary data arrays
-          var dataLeft = [Float](repeating: 0, count: dataFrame!.samples)
-          var dataRight = [Float](repeating: 0, count: dataFrame!.samples)
-          
-          // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
-          for i in 0..<dataFrame!.samples {
-            
-            let uIntVal = CFSwapInt16BigToHost(UInt16(bitPattern: wordsPtr[i]))
-            let intVal = Int16(bitPattern: uIntVal)
-            
-            let floatVal = Float(intVal) * oneOverMax
-            
-            dataLeft[i] = floatVal
-            dataRight[i] = floatVal
-          }
-          
-          // copy the data as is -- it is already floating point
-          memcpy(&(dataFrame!.leftAudio), &dataLeft, dataFrame!.samples * 4)
-          memcpy(&(dataFrame!.rightAudio), &dataRight, dataFrame!.samples * 4)
-        } else {          // .daxAudio
-          
-          // 32-bit Float stereo samples
-          // get a pointer to the data in the payload
-          let wordsPtr = payloadPtr.bindMemory(to: UInt32.self)
-          
-          // allocate temporary data arrays
-          var dataLeft = [UInt32](repeating: 0, count: dataFrame!.samples)
-          var dataRight = [UInt32](repeating: 0, count: dataFrame!.samples)
-          
-          // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
-          for i in 0..<dataFrame!.samples {
-            
-            dataLeft[i] = CFSwapInt32BigToHost(wordsPtr[2*i])
-            dataRight[i] = CFSwapInt32BigToHost(wordsPtr[(2*i) + 1])
-          }
-          
-          // copy the data as is -- it is already floating point
-          memcpy(&(dataFrame!.leftAudio), &dataLeft, dataFrame!.samples * 4)
-          memcpy(&(dataFrame!.rightAudio), &dataRight, dataFrame!.samples * 4)
-        }
-        
-        // Pass the data frame to this AudioSream's delegate
-        delegate.streamHandler(dataFrame)
-      }
+    case (let expected, let received) where received > expected:
+      _rxLostPacketCount += 1
       
+      // from a later group, jump forward
+      let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
+      _log("DaxMicAudioStream missing frame(s) skipped: expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+
+      _rxSequenceNumber = received
+      fallthrough
+
+    default:
+      // received == expected
       // calculate the next Sequence Number
-      let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
+      _rxSequenceNumber = (_rxSequenceNumber + 1) % 16
+
+      if vita.classCode == .daxReducedBw {
+        delegate?.streamHandler( DaxRxReducedAudioFrame(payload: vita.payloadData, numberOfSamples: vita.payloadSize / 2 ))
       
-      // is the received Sequence Number correct?
-      if vita.sequence != expectedSequenceNumber {
-        
-        // NO, log the issue
-        _log("DaxMicAudioStream missing packet(s): expected \(expectedSequenceNumber), received \(vita.sequence)", .warning, #function, #file, #line)
-        
-        _rxSeq = nil
-        rxLostPacketCount += 1
       } else {
-        
-        _rxSeq = expectedSequenceNumber
+        delegate?.streamHandler( DaxRxAudioFrame(payload: vita.payloadData, numberOfSamples: vita.payloadSize / (4 * 2) ))
       }
     }
   }

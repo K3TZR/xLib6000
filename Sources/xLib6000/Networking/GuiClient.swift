@@ -47,7 +47,6 @@ public struct GuiClient {
   ///   - id:           a Tnf Id
   ///
   public init(handle: Handle, station: String, program: String, clientId: String? = nil, host: String = "", ip: String = "", isLocalPtt: Bool = false, isThisClient: Bool = false) {
-
     _handle = handle
     _station = station
     _program = program
@@ -58,7 +57,6 @@ public struct GuiClient {
     _isThisClient = isThisClient
   }
   
-
   // ----------------------------------------------------------------------------
   // *** Backing properties (Do NOT use) ***
   

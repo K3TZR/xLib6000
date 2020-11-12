@@ -48,7 +48,6 @@ public final class Log {
   ///   - line:       the line where the message originated
   ///
   public func logMessage(_ msg: String, _ level: MessageLevel, _ function: StaticString, _ file: StaticString, _ line: Int ) {
-    
     // pass the entry to the delegate (if any)
     if delegate != nil {
       delegate!.logMessage("(xLib6000) " + msg, level, function, file, line)
@@ -84,8 +83,7 @@ public enum MessageLevel: Int {
     var value = MessageLevel.verbose            // "1" is converted to .verbose
     
     // is the response "informational"
-    if response.first != "1" {
-      
+    if response.first != "1" {      
       // NO, convert the hex String to an Int
       let number = Int(response, radix: 16) ?? 0
       

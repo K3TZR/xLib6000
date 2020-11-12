@@ -29,38 +29,28 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   public var isStreaming : Bool {
     get { Api.objectQ.sync { _isStreaming } }
     set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
-
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var autoBlackEnabled: Bool {
     get { _autoBlackEnabled }
     set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; waterfallCmd( .autoBlackEnabled, newValue.as1or0) }}}
-  
   @objc dynamic public var autoBlackLevel: UInt32 {
     return _autoBlackLevel }
-  
   @objc dynamic public var blackLevel: Int {
     get { _blackLevel }
     set { if _blackLevel != newValue { _blackLevel = newValue ; waterfallCmd( .blackLevel, newValue) }}}
-  
   @objc dynamic public var clientHandle: Handle { _clientHandle }
-  
   @objc dynamic public var colorGain: Int {
     get { _colorGain }
     set { if _colorGain != newValue { _colorGain = newValue ; waterfallCmd( .colorGain, newValue) }}}
-  
   @objc dynamic public var gradientIndex: Int {
     get { _gradientIndex }
     set { if _gradientIndex != newValue { _gradientIndex = newValue ; waterfallCmd( .gradientIndex, newValue) }}}
-  
   @objc dynamic public var lineDuration: Int {
     get { _lineDuration }
     set { if _lineDuration != newValue { _lineDuration = newValue ; waterfallCmd( .lineDuration, newValue) }}}
-  
   @objc dynamic public var panadapterId: PanadapterStreamId { _panadapterId }
-  
   public private(set) var droppedPackets  = 0
   public private(set) var packetFrame     = -1
 
@@ -91,8 +81,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   var _panadapterId: PanadapterStreamId {
     get { Api.objectQ.sync { __panadapterId } }
     set { if newValue != _panadapterId { willChangeValue(for: \.panadapterId) ; Api.objectQ.sync(flags: .barrier) { __panadapterId = newValue } ; didChangeValue(for: \.panadapterId)}}}
-  
-  
+    
   enum Token : String {
     case clientHandle         = "client_handle"   // New Api only
 
@@ -127,7 +116,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _index              = 0
+  private var _frameNumber        = 0
   private var _initialized        = false
   private let _log                = Log.sharedInstance.logMessage
   private let _numberOfDataFrames = 10
@@ -144,7 +133,6 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   ///   - id:           a Waterfall Id
   ///
   public init(radio: Radio, id: WaterfallStreamId) {
-    
     _radio = radio
     self.id = id
     
@@ -184,13 +172,10 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     
     // get the Id
     if let id = properties[1].key.streamId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, does it exist?
         if radio.waterfalls[id] == nil {
-          
           // Create a Waterfall & add it to the Waterfalls collection
           radio.waterfalls[id] = Waterfall(radio: radio, id: id)
         }
@@ -198,17 +183,14 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
         radio.waterfalls[id]!.parseProperties(radio, Array(properties.dropFirst(2)))
         
       } else {
-        
         // does it exist?
         if radio.waterfalls[id] != nil {
-          
           // YES, remove the Panadapter & Waterfall, notify all observers
           let panadapterId = radio.waterfalls[id]!.panadapterId
                     
           radio.panadapters[panadapterId] = nil
           
           Log.sharedInstance.logMessage("Panadapter removed: id = \(panadapterId.hex)", .debug, #function, #file, #line)
-
           NC.post(.panadapterHasBeenRemoved, object: id as Any?)
 
           NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[id] as Any?)
@@ -216,7 +198,6 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
           radio.waterfalls[id] = nil
           
           Log.sharedInstance.logMessage("Waterfall removed: id = \(id.hex)", .debug, #function, #file, #line)
-          
           NC.post(.waterfallHasBeenRemoved, object: id as Any?)
         }
       }
@@ -233,10 +214,8 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -259,13 +238,11 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     }
     // is the waterfall initialized?
     if !_initialized && panadapterId != 0 {
-      
       // YES, the Radio (hardware) has acknowledged this Waterfall
       _initialized = true
-      
-      _log("Waterfall added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("Waterfall added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.waterfallHasBeenAdded, object: self as Any?)
     }
   }
@@ -283,18 +260,16 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   ///   - vita:       a Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    
     // convert the Vita struct and accumulate a WaterfallFrame    
-    if _waterfallframes[_index].accumulate(version: _radio.version, vita: vita, expectedFrame: &packetFrame) {
-
+    if _waterfallframes[_frameNumber].accumulate(version: _radio.version, vita: vita, expectedFrame: &packetFrame) {
       // save the auto black level
-      _autoBlackLevel = _waterfallframes[_index].autoBlackLevel
+      _autoBlackLevel = _waterfallframes[_frameNumber].autoBlackLevel
       
       // Pass the data frame to this Waterfall's delegate
-      delegate?.streamHandler(_waterfallframes[_index])
+      delegate?.streamHandler(_waterfallframes[_frameNumber])
 
       // use the next dataframe
-      _index = (_index + 1) % _numberOfDataFrames
+      _frameNumber = (_frameNumber + 1) % _numberOfDataFrames
     }
   }
 
@@ -332,7 +307,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
 ///
 ///   populated by the Waterfall vitaHandler
 ///
-public class WaterfallFrame {
+public struct WaterfallFrame {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -340,7 +315,7 @@ public class WaterfallFrame {
   public private(set) var firstBinFreq      : CGFloat   = 0.0               // Frequency of first Bin (Hz)
   public private(set) var binBandwidth      : CGFloat   = 0.0               // Bandwidth of a single bin (Hz)
   public private(set) var lineDuration      = 0                             // Duration of this line (ms)
-  public private(set) var numberOfBins      = 0                             // Number of bins
+  public private(set) var         binsInThisFrame      = 0                             // Number of bins
   public private(set) var height            = 0                             // Height of frame (pixels)
   public private(set) var receivedFrame     = 0                             // Time code
   public private(set) var autoBlackLevel    : UInt32 = 0                    // Auto black level
@@ -385,7 +360,6 @@ public class WaterfallFrame {
   /// - Parameter frameSize:    max number of Waterfall samples
   ///
   public init(frameSize: Int) {
-    
     // allocate the bins array
     self.bins = [UInt16](repeating: 0, count: frameSize)
   }
@@ -398,10 +372,7 @@ public class WaterfallFrame {
   /// - Parameter vita:         incoming Vita object
   /// - Returns:                true if entire frame processed
   ///
-  public func accumulate(version: Version, vita: Vita, expectedFrame: inout Int) -> Bool {
-    
-//    let payloadPtr = UnsafeRawPointer(vita.payloadData)
-    
+  public mutating func accumulate(version: Version, vita: Vita, expectedFrame: inout Int) -> Bool {
     if version.isGreaterThanV22 {
       // 2.3.x or greater
       // Bins are just beyond the payload
@@ -416,7 +387,7 @@ public class WaterfallFrame {
         firstBinFreq = CGFloat(CFSwapInt64BigToHost(hdr[0].firstBinFreq)) / 1.048576E6
         binBandwidth = CGFloat(CFSwapInt64BigToHost(hdr[0].binBandwidth)) / 1.048576E6
         lineDuration = Int( CFSwapInt32BigToHost(hdr[0].lineDuration) )
-        numberOfBins = Int( CFSwapInt16BigToHost(hdr[0].numberOfBins) )
+        binsInThisFrame = Int( CFSwapInt16BigToHost(hdr[0].numberOfBins) )
         height = Int( CFSwapInt16BigToHost(hdr[0].height) )
         receivedFrame = Int( CFSwapInt32BigToHost(hdr[0].receivedFrame) )
         autoBlackLevel = CFSwapInt32BigToHost(hdr[0].autoBlackLevel)
@@ -438,17 +409,17 @@ public class WaterfallFrame {
         firstBinFreq = CGFloat(CFSwapInt64BigToHost(hdr[0].firstBinFreq)) / 1.048576E6
         binBandwidth = CGFloat(CFSwapInt64BigToHost(hdr[0].binBandwidth)) / 1.048576E6
         lineDuration = Int( CFSwapInt32BigToHost(hdr[0].lineDuration) )
-        numberOfBins = Int( CFSwapInt16BigToHost(hdr[0].numberOfBins) )
+        binsInThisFrame = Int( CFSwapInt16BigToHost(hdr[0].numberOfBins) )
         height = Int( CFSwapInt16BigToHost(hdr[0].lineHeight) )
         receivedFrame = Int( CFSwapInt32BigToHost(hdr[0].receivedFrame) )
         autoBlackLevel = CFSwapInt32BigToHost(hdr[0].autoBlackLevel)
-        totalBins = numberOfBins
+        totalBins = binsInThisFrame
         startingBin = 0
       }
     }
     // validate the packet (could be incomplete at startup)
     if totalBins == 0 { return false }
-    if startingBin + numberOfBins > totalBins { return false }
+    if startingBin + binsInThisFrame > totalBins { return false }
 
     // initial frame?
     if expectedFrame == -1 { expectedFrame = receivedFrame }
@@ -457,12 +428,12 @@ public class WaterfallFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log("Waterfall: Ignored frame(s), expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Waterfall delayed frame(s) ignored: expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       return false
       
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
-      _log("Waterfall: Missing frame(s), expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Waterfall missing frame(s) skipped: expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       expectedFrame = received
       fallthrough
       
@@ -470,14 +441,16 @@ public class WaterfallFrame {
       // received == expected
       vita.payloadData.withUnsafeBytes { ptr in
         // Swap the byte ordering of the data & place it in the bins
-        for i in 0..<numberOfBins {
+        for i in 0..<binsInThisFrame {
           bins[i+startingBin] = CFSwapInt16BigToHost( ptr.load(fromByteOffset: _byteOffsetToBins + (2 * i), as: UInt16.self) )
         }
       }      
-      // reset the count if the entire frame has been accumulated
-      if startingBin + numberOfBins == totalBins { numberOfBins = totalBins  ; expectedFrame += 1 }
+      binsInThisFrame += startingBin
+     
+      // increment the frame count if the entire frame has been accumulated
+      if binsInThisFrame == totalBins { expectedFrame += 1 }
     }
     // return true if the entire frame has been accumulated
-    return numberOfBins == totalBins
+    return binsInThisFrame == totalBins
   }
 }

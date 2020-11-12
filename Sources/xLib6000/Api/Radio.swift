@@ -513,7 +513,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     get { Api.objectQ.sync { __tnfsEnabled } }
     set { if newValue != _tnfsEnabled { willChangeValue(for: \.tnfsEnabled) ; Api.objectQ.sync(flags: .barrier) { __tnfsEnabled = newValue } ; didChangeValue(for: \.tnfsEnabled)}}}
   
-  
   enum ClientToken : String {
     case host
     case id                       = "client_id"
@@ -584,11 +583,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   }
   enum RadioFilterSharpness: String {
     case cw
-    //    case CW
     case digital
-    //    case DIGITAL
     case voice
-    //    case VOICE
     case autoLevel        = "auto_level"
     case level
   }
@@ -668,7 +664,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case txAudio
   }
   
-  
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -677,10 +672,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _clientInitialized            = false
   private var _gpsPresent                   = false
   private var _hardwareVersion              : String?
-  private var _radioInitialized             = false
-  
-  private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
   private let _log                          = Log.sharedInstance.logMessage
+  private var _radioInitialized             = false
+  private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
   
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -748,7 +742,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       _api.udp.sendData(dataToSend)
     }
   }
-  
   /// Remove all Radio objects
   ///
   public func removeAllObjects() {
@@ -816,15 +809,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     } )
     
     equalizers.removeAll()
-    
     memories.removeAll()
-    
     meters.removeAll()
-    
     replyHandlers.removeAll()
-    
     usbCables.removeAll()
-    
     xvtrs.removeAll()
     
     nickname = ""
@@ -850,7 +838,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   /// - Parameter state:            a new Interloack state
   ///
   func interlockStateChange(_ state: String) {
-    
     let currentMox = _mox
     
     // if PTT_REQUESTED or TRANSMITTING
@@ -874,8 +861,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     var station = ""
     var isLocalPtt = false
     
-    //    print("+++++ Properties = \(properties)")
-    
     // parse remaining properties
     for property in properties.dropFirst(2) {
       
@@ -888,17 +873,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Known keys, in alphabetical order
       switch token {
       
-      case .clientId:
-        clientId = property.value
-        
-      case .localPttEnabled:
-        isLocalPtt = property.value.bValue
-        
-      case .program:
-        program = property.value.trimmingCharacters(in: .whitespaces)
-        
-      case .station:
-        station = property.value.replacingOccurrences(of: "\u{007f}", with: "").trimmingCharacters(in: .whitespaces)
+      case .clientId:         clientId = property.value
+      case .localPttEnabled:  isLocalPtt = property.value.bValue
+      case .program:          program = property.value.trimmingCharacters(in: .whitespaces)
+      case .station:          station = property.value.replacingOccurrences(of: "\u{007f}", with: "").trimmingCharacters(in: .whitespaces)
       }
     }
     var handleWasFound = false
@@ -918,7 +896,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         // log and notify of GuiClient update
         _log("Radio guiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
         NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveryPackets[i].guiClients as Any?)
-        
       }
       
       if handleWasFound == false {
@@ -981,7 +958,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - commandSuffix:      a Command Suffix
   ///
   private func parseMessage(_ commandSuffix: String) {
-    
     // separate it into its components
     let components = commandSuffix.components(separatedBy: "|")
     
@@ -1006,7 +982,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - commandSuffix:      a Reply Suffix
   ///
   private func parseReply(_ replySuffix: String) {
-    
     // separate it into its components
     let components = replySuffix.components(separatedBy: "|")
     
@@ -1052,7 +1027,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - commandSuffix:      a Command Suffix
   ///
   private func parseStatus(_ commandSuffix: String) {
-    
     // separate it into its components ( [0] = <apiHandle>, [1] = <remainder> )
     let components = commandSuffix.components(separatedBy: "|")
     
@@ -1132,7 +1106,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - inUse:          false = "to be deleted"
   ///
   private func parseClient(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-    
     // is there a valid handle"
     if let handle = properties[0].key.handle {
       
@@ -1183,7 +1156,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - inUse:          false = "to be deleted"
   ///
   private func parseDisplay(_ radio: Radio, _ keyValues: KeyValuesArray, _ inUse: Bool = true) {
-    
     switch keyValues[0].key {
     
     case DisplayToken.panadapter.rawValue:  Panadapter.parseStatus(radio, keyValues, inUse)
@@ -1203,7 +1175,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - inUse:          false = "to be deleted"
   ///
   private func parseStream(_ radio: Radio, _ remainder: String) {
-    
     let properties = remainder.keyValuesArray()
     
     // is the 1st KeyValue a StreamId?
@@ -1280,10 +1251,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - inUse:          false = "to be deleted"
   ///
   private func parseInterlock(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-    
     // is it a Band Setting?
     if properties[0].key == "band" {
-      
       // YES, drop the "band", pass it to BandSetting
       BandSetting.parseStatus(self, Array(properties.dropFirst()), inUse )
       
@@ -1302,10 +1271,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - inUse:          false = "to be deleted"
   ///
   private func parseTransmit(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-    
     // is it a Band Setting?
     if properties[0].key == "band" {
-      
       // YES, drop the "band", pass it to BandSetting
       BandSetting.parseStatus(self, Array(properties.dropFirst()), inUse )
       
@@ -1322,10 +1289,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - properties:          a KeyValuesArray
   ///
   private func parseInfoReply(_ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = InfoToken(rawValue: property.key) else {
         // log it and ignore the Key
@@ -1364,7 +1329,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - keyValues:          a KeyValuesArray
   ///
   private func parseGuiReply(_ properties: KeyValuesArray) {
-    
     // only v3 returns a Client Id
     for property in properties {
       // save the returned ID
@@ -1380,7 +1344,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - keyValues:          a KeyValuesArray
   ///
   private func parseIpReply(_ keyValues: KeyValuesArray) {
-    
     // save the returned ip address
     _clientIp = keyValues[0].key
     
@@ -1393,7 +1356,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - keyValues:          a KeyValuesArray
   ///
   private func parseVersionReply(_ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
       
@@ -1428,7 +1390,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // Check for Unknown Keys
       guard let token = RadioFilterSharpness(rawValue: property.key.lowercased())  else {
         // log it and ignore the Key
@@ -1461,10 +1422,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - properties:      a KeyValuesArray
   ///
   private func parseStaticNetProperties(_ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // Check for Unknown Keys
       guard let token = RadioStaticNet(rawValue: property.key)  else {
         // log it and ignore the Key
@@ -1488,10 +1447,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - properties:      a KeyValuesArray
   ///
   private func parseOscillatorProperties(_ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // Check for Unknown Keys
       guard let token = RadioOscillator(rawValue: property.key)  else {
         // log it and ignore the Key
@@ -1528,7 +1485,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // separate by category
     if let category = RadioTokenCategory(rawValue: properties[0].key) {
-      
       // drop the first property
       let adjustedProperties = Array(properties[1...])
       
@@ -1540,10 +1496,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
       
     } else {
-      
       // process each key/value pair, <key=value>
       for property in properties {
-        
         // Check for Unknown Keys
         guard let token = RadioToken(rawValue: property.key)  else {
           // log it and ignore the Key
@@ -1582,7 +1536,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
     // is the Radio initialized?
     if !_radioInitialized {
-      
       // YES, the Radio (hardware) has acknowledged this Radio
       _radioInitialized = true
       
@@ -1601,7 +1554,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   /// - Parameter msg:        the Message String
   ///
   public func receivedMessage(_ msg: String) {
-    
     // get all except the first character
     let suffix = String(msg.dropFirst())
     
@@ -1613,10 +1565,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case "R", "r":  parseReply(suffix)
     case "S", "s":  parseStatus(suffix)
     case "V", "v":  _hardwareVersion = suffix
-      
-    default:    // Unknown Type
-      _log("Radio unexpected message: \(msg)", .warning, #function, #file, #line)
-    }
+    default:        _log("Radio unexpected message: \(msg)", .warning, #function, #file, #line) }
   }
   /// Process outbound Tcp messages
   ///
@@ -1634,7 +1583,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - replyTuple:     a Reply Tuple
   ///
   public func addReplyHandler(_ seqNumber: UInt, replyTuple: ReplyTuple) {
-    
     // add the handler
     replyHandlers[seqNumber] = replyTuple
   }
@@ -1649,12 +1597,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - reply:          the reply
   ///
   public func defaultReplyHandler(_ command: String, sequenceNumber: SequenceNumber, responseValue: String, reply: String) {
-    
     guard responseValue == Api.kNoError else {
       
       // ignore non-zero reply from "client program" command
       if !command.hasPrefix("client program ") {
-        
         // Anything other than 0 is an error, log it and ignore the Reply
         let errorLevel = flexErrorLevel(errorCode: responseValue)
         _log("Radio reply to c\(sequenceNumber), \(command): non-zero reply \(responseValue), \(flexErrorString(errorCode: responseValue))", errorLevel, #function, #file, #line)
@@ -1687,56 +1633,15 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // which command?
     switch command {
     
-    case "client gui":          // (V3 only)
-      // process the reply
-      parseGuiReply( reply.keyValuesArray() )
-      
-    case "client ip":
-      // process the reply
-      parseIpReply( reply.keyValuesArray() )
-      
-    case "info":
-      // process the reply
-      parseInfoReply( (reply.replacingOccurrences(of: "\"", with: "")).keyValuesArray(delimiter: ",") )
-      
-    case "ant list":
-      // save the list
-      antennaList = reply.valuesArray( delimiter: "," )
-      
-    //    case Api.Command.meterList.rawValue:                  // no longer in use
-    //      // process the reply
-    //      parseMeterListReply( reply )
-    
-    case "mic list":
-      // save the list
-      micList = reply.valuesArray(  delimiter: "," )
-      
-    case "slice list":
-      // save the list
-      sliceList = reply.valuesArray().compactMap {$0.objectId}
-      
-    case "radio uptime":
-      // save the returned Uptime (seconds)
-      uptime = Int(reply) ?? 0
-      
-    case "version":
-      // process the reply
-      parseVersionReply( reply.keyValuesArray(delimiter: "#") )
-      
-    //    case Api.Command.profileMic.rawValue:
-    //      // save the list
-    //      profile.profiles[.mic] = reply.valuesArray(  delimiter: "^" )
-    //
-    //    case Api.Command.profileGlobal.rawValue:
-    //      // save the list
-    //      profile.profiles[.global] = reply.valuesArray(  delimiter: "^" )
-    //
-    //    case Api.Command.profileTx.rawValue:
-    //      // save the list
-    //      profile.profiles[.tx] = reply.valuesArray(  delimiter: "^" )
-    
+    case "client gui":    parseGuiReply( reply.keyValuesArray() )         // (V3 only)
+    case "client ip":     parseIpReply( reply.keyValuesArray() )
+    case "info":          parseInfoReply( (reply.replacingOccurrences(of: "\"", with: "")).keyValuesArray(delimiter: ",") )
+    case "ant list":      antennaList = reply.valuesArray( delimiter: "," )
+    case "mic list":      micList = reply.valuesArray(  delimiter: "," )
+    case "slice list":    sliceList = reply.valuesArray().compactMap {$0.objectId}
+    case "radio uptime":  uptime = Int(reply) ?? 0
+    case "version":       parseVersionReply( reply.keyValuesArray(delimiter: "#") )
     default:
-      
       if command.hasPrefix("display pan " + "create") {
         // ignore, Panadapter & Waterfall will be created when Status reply is seen
         break
@@ -1746,7 +1651,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         let components = command.components(separatedBy: " ")
         
         if let tnfId = components[2].objectId {
-          
           // if it's valid and the Tnf has not been removed
           if components.count == 3 {
             // notify all observers
@@ -1756,27 +1660,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
             tnfs[tnfId] = nil
           }
         }
-        
-      } else if command.hasPrefix("stream create " + "dax=") {
-        // TODO: add code
-        break
-        
-      } else if command.hasPrefix("stream create " + "daxmic") {
-        // TODO: add code
-        break
-        
-      } else if command.hasPrefix("stream create " + "daxtx") {
-        // TODO: add code
-        break
-        
-      } else if command.hasPrefix("stream create " + "daxiq") {
-        // TODO: add code
-        break
-        
       } else if command.hasPrefix("slice " + "get_error"){
-        // save the errors, format: <rx_error_value>,<tx_error_value>
         sliceErrors = reply.valuesArray( delimiter: "," )
-      }
+      
+      // TODO: add code
+      } else if command.hasPrefix("stream create ") { break }
     }
   }
   /// Process received UDP Vita packets
@@ -1786,7 +1674,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   /// - Parameter vitaPacket:       a Vita packet
   ///
   public func vitaParser(_ vitaPacket: Vita) {
-    
     // embedded func for Stream handling & Logging
     func procesStream(_ object : DynamicModelWithStream, _ name: String) {
       object.vitaProcessor(vitaPacket)
@@ -1795,8 +1682,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         // log the start of the stream
         _log("Radio " + name + " Stream started id = \(object.id.hex)", .info, #function, #file, #line)
       }
-    }
-    
+    }    
     // Pass the stream to the appropriate object (checking for existence of the object first)
     switch (vitaPacket.classCode) {
     

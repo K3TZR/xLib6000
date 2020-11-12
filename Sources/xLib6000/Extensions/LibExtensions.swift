@@ -54,7 +54,6 @@ public extension NotificationCenter {
   ///
   class func post(_ name: String, object: Any?) {
     NotificationCenter.default.post(name: NSNotification.Name(rawValue: name), object: object)
-    
   }
   /// post a Notification by Type
   ///
@@ -64,7 +63,6 @@ public extension NotificationCenter {
   ///
   class func post(_ notification: NotificationType, object: Any?) {
     NotificationCenter.default.post(name: Notification.Name(rawValue: notification.rawValue), object: object)
-    
   }
   /// setup a Notification Observer by Name
   ///
@@ -164,7 +162,6 @@ public extension String {
       
       // when "delimiter" is last character there will be an empty entry, don't include it
       if kv[0] != "" {
-        
         // if no "=", set value to empty String (helps with strings with a prefix to KeyValues)
         // make sure there are no whitespaces before or after the entries
         if kv.count == 1 {
@@ -173,7 +170,6 @@ public extension String {
           kvArray.append( (kv[0].trimmingCharacters(in: NSCharacterSet.whitespaces),"") )
         }
         if kv.count == 2 {
-          
           // lowercase as needed
           if keysToLower { kv[0] = kv[0].lowercased() }
           if valuesToLower { kv[1] = kv[1].lowercased() }
@@ -193,7 +189,6 @@ public extension String {
   /// - Returns:              a values array
   ///
   func valuesArray(delimiter: String = " ", valuesToLower: Bool = false) -> ValuesArray {
-    
     guard self != "" else {return [String]() }
     
     // split it into an array of <value> values, lowercase as needed
@@ -237,7 +232,6 @@ public extension String {
     var newString: String = ""
     
     for char in self {
-      
       if char == Character(spaceReplacement) {
         newString += " "
         
@@ -255,7 +249,6 @@ public extension String {
   /// - Returns:          the result of the check as Bool
   ///
   func isValidIP4() -> Bool {
-    
     // check for 4 values separated by period
     let parts = self.components(separatedBy: ".")
     
@@ -316,7 +309,6 @@ public extension Int {
   }
 
   func rangeCheck(_ range: ClosedRange<Int>) -> Int {
-    
     if self < range.lowerBound { return range.lowerBound }
     if self > range.upperBound { return range.upperBound }
     return self
@@ -361,7 +353,6 @@ public extension CGFloat {
   /// - Returns:      CGFloat value of String or 0
   ///
   init(_ string: String) {
-    
     self = CGFloat(Float(string) ?? 0)
   }
   /// Format a String with the value of a CGFloat
@@ -373,7 +364,6 @@ public extension CGFloat {
   /// - Returns:      a String representation of the CGFloat
   ///
   private func floatToString(width: Int, precision: Int, divisor: CGFloat) -> String {
-    
     return String(format: "%\(width).\(precision)f", self / divisor)
   }
 }
@@ -390,7 +380,6 @@ public struct Version {
   var build     : Int = 1
 
   public init(_ versionString: String = "1.0.0") {
-    
     let components = versionString.components(separatedBy: ".")
     switch components.count {
     case 3:
@@ -433,7 +422,6 @@ public struct Version {
   static func ==(lhs: Version, rhs: Version) -> Bool { lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.patch == rhs.patch }
   
   static func <(lhs: Version, rhs: Version) -> Bool {
-    
     switch (lhs, rhs) {
       
     case (let l, let r) where l == r: return false
@@ -481,12 +469,14 @@ public func isForThisClient(_ properties: KeyValuesArray, connectionHandle: Hand
   
   // find the handle property
   for property in properties.dropFirst(2) where property.key == "client_handle" {
-    
     clientHandle = property.value.handle ?? 0
   }
   return clientHandle == connectionHandle
 }
 
+
+// ----------------------------------------------------------------------------
+// PropertyWrappers
 
 @propertyWrapper
 /// Protect a property using a concurrent queue and a barrier for writes
@@ -519,12 +509,35 @@ struct BarrierClamped<Element: Comparable> {
   }
   
   init(_ value: Element, _ queue: DispatchQueue, range: ClosedRange<Element>) {
-
     _q = queue
     _range = range
     _value = min( max(_range.lowerBound, value), _range.upperBound)
   }
 }
+
+@propertyWrapper
+class Atomic {
+  
+  var projectedValue: Atomic { return self }
+  
+  private let q     : DispatchQueue
+  private var value : Int
+  
+  init(_ wrappedValue: Int, q: DispatchQueue) {
+    self.value = wrappedValue
+    self.q = q
+  }
+  
+  var wrappedValue: Int {
+    get { q.sync { value }}
+    set { q.sync(flags: .barrier) { value = newValue }} }
+    
+  func mutate(_ mutation: (inout Int) -> Void) {
+    return q.sync(flags: .barrier) { mutation(&value) }
+  }
+}
+
+// ----------------------------------------------------------------------------
 
 /// Compare the properties of two instances of the same class
 /// - Parameters:
@@ -541,9 +554,7 @@ public func compare<T>(_ a: T, to b: T, ignoring: [String] ) {
   for aProperty in Mirror(reflecting: a).children {
     
     if !ignoring.contains( aProperty.label!) {
-      
       for bProperty in Mirror(reflecting: b).children where bProperty.label == aProperty.label {
-        
         if let value = bProperty.value as? String {
           if value != aProperty.value as? String { printProperty(aProperty.label!, bProperty.value, aProperty.value) }
           
@@ -559,9 +570,7 @@ public func compare<T>(_ a: T, to b: T, ignoring: [String] ) {
         } else if let value = bProperty.value as? Date {
           if value != aProperty.value as? Date { printProperty(aProperty.label!, bProperty.value, aProperty.value) }
           
-        } else {
-          Swift.print("aProperty.label >\(aProperty.label!)< has unknown type")
-        }
+        } else { Swift.print("aProperty.label >\(aProperty.label!)< has unknown type") }
       }
     }
   }

@@ -36,7 +36,6 @@ final class Pinger : NSObject {
   ///   - tcpManager:     a TcpManager class instance
   ///
   init(tcpManager: TcpManager) {
-    
     _tcpManager = tcpManager
     super.init()
     
@@ -50,7 +49,6 @@ final class Pinger : NSObject {
   /// Stop the Pinger
   ///
   func stop() {
-    
     // stop Pinging
     _pingTimer?.cancel()
     _responseCount = 0
@@ -59,8 +57,7 @@ final class Pinger : NSObject {
   /// Process the Response to a Ping
   ///
   func pingReply(_ command: String, seqNum: UInt, responseValue: String, reply: String) {
-    
-    _responseCount += 1
+        _responseCount += 1
     // notification can be used to signal that the Radio is now fully initialized
     if _responseCount == kResponseCount { NC.post(.tcpPingResponse, object: nil) }
 
@@ -76,7 +73,6 @@ final class Pinger : NSObject {
   /// Start the Pinger
   ///
   func start() {
-    
     _log("Pinger started", .debug, #function, #file, #line)
 
     // tell the Radio to expect pings
@@ -96,21 +92,18 @@ final class Pinger : NSObject {
     
     // set the event handler
     _pingTimer.setEventHandler { [ unowned self] in
-      
       // get current datetime
       let now = Date(timeIntervalSinceNow:0)
       
       // has it been 4 seconds since the last response?
       if now.timeIntervalSince(self._lastPingRxTime) > 4.0 {
-        
         // YES, timeout, inform observers
         NC.post(.tcpPingTimeout, object: nil)
         
         // stop the Timer
         self.stop()
         
-      } else {
-        
+      } else {        
         // NO, send another Ping
         Api.sharedInstance.send("ping", replyTo: self.pingReply)
       }

@@ -39,32 +39,28 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public let id : OpusStreamId
-  
-  public var isStreaming : Bool {
-    get { Api.objectQ.sync { _isStreaming } }
-    set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
-
   public enum RxState {
     case start
     case stop
   }
 
+  public let id : OpusStreamId
+  
+  public var isStreaming : Bool {
+    get { Api.objectQ.sync { _isStreaming } }
+    set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var clientHandle: UInt32 {
     get { _clientHandle }
     set { if _clientHandle != newValue { _clientHandle = newValue }}}
   @objc dynamic public var ip: String {
     get { _ip }
     set { if _ip != newValue { _ip = newValue } } }
-
   @objc dynamic public var port: Int {
     get { _port }
     set { if _port != newValue { _port = newValue } } }
-
   @objc dynamic public var rxStopped: Bool {
     get { _rxStopped }
     set { if _rxStopped != newValue { _rxStopped = newValue }}}
@@ -77,20 +73,10 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
 
   // ------------------------------------------------------------------------------
   // MARK: - Internal properties
-  
-  var _expectedFrame     : Int? {
-    get { Api.objectQ.sync { __expectedFrame } }
-    set { if newValue != _expectedFrame { Api.objectQ.sync(flags: .barrier) { __expectedFrame = newValue }}}}
-  var _rxLostPacketCount : Int {
-    get { Api.objectQ.sync { __rxLostPacketCount } }
-    set { if newValue != _rxLostPacketCount { Api.objectQ.sync(flags: .barrier) { __rxLostPacketCount = newValue }}}}
 
   var _rxEnabled : Bool {
     get { Api.objectQ.sync { __rxEnabled } }
     set { if newValue != _rxEnabled { willChangeValue(for: \.rxEnabled) ; Api.objectQ.sync(flags: .barrier) { __rxEnabled = newValue } ; didChangeValue(for: \.rxEnabled)}}}
-  var _rxPacketCount : Int {
-    get { Api.objectQ.sync { __rxPacketCount } }
-    set { if newValue != _rxPacketCount { Api.objectQ.sync(flags: .barrier) { __rxPacketCount = newValue } }}}
   var _rxStopped : Bool {
     get { Api.objectQ.sync { __rxStopped } }
     set { if newValue != _rxStopped { willChangeValue(for: \.rxStopped) ; Api.objectQ.sync(flags: .barrier) { __rxStopped = newValue } ; didChangeValue(for: \.rxStopped)}}}
@@ -110,17 +96,21 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _initialized                  = false
-  private let _log                          = Log.sharedInstance.logMessage
-  private var _radio                        : Radio
+  private var _initialized         = false
+  private let _log                 = Log.sharedInstance.logMessage
+  private var _radio               : Radio
 
-  private var _clientHandle                 : UInt32 = 0
-  private var _ip                           = ""
-  private var _port                         = 0
-  private var _vita                         : Vita?
-  private var _txSeq                        = 0
-  private var _txSampleCount                = 0
-  
+  private var _clientHandle       : UInt32 = 0
+  private var _ip                 = ""
+  private var _port               = 0
+  private var _vita               : Vita?
+  private var _txSequenceNumber   = 0
+  private var _txSampleCount      = 0
+
+  private var _rxLostPacketCount  = 0
+  private var _rxPacketCount      = 0
+  private var _rxSequenceNumber   = -1
+
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
@@ -136,16 +126,12 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   ///   - inUse:              false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-    
     // get the Id
     if let id =  properties[0].key.streamId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, does the object exist?
         if  radio.opusAudioStreams[id] == nil {
-          
           // NO, create a new Opus & add it to the OpusStreams collection
           radio.opusAudioStreams[id] = OpusAudioStream(radio: radio, id: id)
         }
@@ -159,7 +145,6 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
 
         // NO, does it exist?
         if radio.opusAudioStreams[id] != nil {
-          
           // YES, remove it, notify observers
           NC.post(.opusAudioStreamWillBeRemoved, object: radio.opusAudioStreams[id] as Any?)
           
@@ -167,7 +152,6 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
           radio.opusAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage("OpusAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
-          
           NC.post(.opusAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
@@ -184,7 +168,6 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   ///   - id:           an Opus Id
   ///
   init(radio: Radio, id: OpusStreamId) {
-    
     _radio = radio
     self.id = id
     super.init()
@@ -202,7 +185,6 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   /// - Returns:              success / failure
   ///
   public func sendTxAudio(buffer: [UInt8], samples: Int) {
-    
     if _radio.interlock.state == "TRANSMITTING" {
     
       // get an OpusTx Vita
@@ -216,16 +198,15 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
       _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size    // payload size + header size
       
       // set the sequence number
-      _vita!.sequence = _txSeq
+      _vita!.sequence = _txSequenceNumber
 
       // encode the Vita class as data and send to radio
       if let data = Vita.encodeAsData(_vita!) {
-        
         // send packet to radio
         _radio.sendVita(data)
       }
       // increment the sequence number (mod 16)
-      _txSeq = (_txSeq + 1) % 16
+      _txSequenceNumber = (_txSequenceNumber + 1) % 16
     }
   }
   
@@ -239,10 +220,8 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   /// - Parameter properties: a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -262,13 +241,11 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
     }
     // the Radio (hardware) has acknowledged this Opus
     if !_initialized && _ip != "" {
-      
       // YES, the Radio (hardware) has acknowledged this Opus
       _initialized = true
-      
-      _log("OpusAudioStream added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("OpusAudioStream added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.opusAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -278,8 +255,6 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   ///   - callback:           ReplyHandler (optional)
   ///
   public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove the Stream
     _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
     
     // notify all observers
@@ -289,7 +264,6 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
     _radio.opusAudioStreams[id] = nil
     
     Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
-    
     NC.post(.opusAudioStreamHasBeenRemoved, object: id as Any?)
   }
   /// Receive Opus encoded RX audio
@@ -302,43 +276,42 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   ///   - vita:               an Opus Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    
     // is this the first packet?
-    if _expectedFrame == nil {
-      _expectedFrame = vita.sequence
+    if _rxSequenceNumber == -1 {
+      _rxSequenceNumber = vita.sequence
       _rxPacketCount = 1
       _rxLostPacketCount = 0
     } else {
       _rxPacketCount += 1
     }
 
-    switch (_expectedFrame!, vita.sequence) {
+    switch (_rxSequenceNumber, vita.sequence) {
 
-//    case (let expected, let received) where received < expected:
-//      // from a previous group, ignore it
-//      _log("Delayed frame(s): expected \(expected), received \(received)", .warning, #function, #file, #line)
-//      return
+    case (let expected, let received) where received < expected:
+      // from a previous group, ignore it
+      _log("OpusAudioStream delayed frame(s) ignored: expected \(expected), received \(received)", .warning, #function, #file, #line)
+      return
       
     case (let expected, let received) where received > expected:
       _rxLostPacketCount += 1
       
       // from a later group, jump forward
       let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
-      _log("OpusAudioStream missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+      _log("OpusAudioStream missing frame(s) skipped: expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
 
       // Pass an error frame (count == 0) to the Opus delegate
-      delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: 0) )
+      delegate?.streamHandler( RemoteRxAudioFrame(payload: vita.payloadData, sampleCount: 0) )
 
-      _expectedFrame = received
+      _rxSequenceNumber = received
       fallthrough
 
     default:
       // received == expected
       // calculate the next Sequence Number
-      _expectedFrame = (_expectedFrame! + 1) % 16
+      _rxSequenceNumber = (_rxSequenceNumber + 1) % 16
 
       // Pass the data frame to the Opus delegate
-      delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: vita.payloadSize) )
+      delegate?.streamHandler( RemoteRxAudioFrame(payload: vita.payloadData, sampleCount: vita.payloadSize) )
     }
   }
   
@@ -351,8 +324,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   ///   - token:      the parse token
   ///   - value:      the new value
   ///
-  private func opusCmd(_ token: Token, _ value: Any) {
-    
+  private func opusCmd(_ token: Token, _ value: Any) {    
     Api.sharedInstance.send(OpusAudioStream.kCmd + token.rawValue + " \(value)")
   }
   
@@ -362,64 +334,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   private var _delegate           : StreamHandler? = nil
   private var _isStreaming        = false
 
-  private var __expectedFrame     : Int? = nil
   private var __rxEnabled         = false
-  private var __rxLostPacketCount = 0
-  private var __rxPacketCount     = 0
   private var __rxStopped         = false
   private var __txEnabled         = false
 }
-
-/// Struct containing Opus Stream data
-///
-public struct OpusFrame {
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties
-  
-  public var samples: [UInt8]                     // array of samples
-  public var numberOfSamples: Int                 // number of samples
-//  public var duration: Float                     // frame duration (ms)
-//  public var channels: Int                       // number of channels (1 or 2)
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize an OpusFrame
-  ///
-  /// - Parameters:
-  ///   - payload:            pointer to the Vita packet payload
-  ///   - numberOfSamples:    number of Samples in the payload
-  ///
-  public init(payload: [UInt8], sampleCount: Int) {
-    
-    // allocate the samples array
-    samples = [UInt8](repeating: 0, count: sampleCount)
-    
-    // save the count and copy the data
-    numberOfSamples = sampleCount
-    memcpy(&samples, payload, sampleCount)
-    
-    // Flex 6000 series uses:
-    //     duration = 10 ms
-    //     channels = 2 (stereo)
-    
-//    // determine the frame duration
-//    let durationCode = (samples[0] & 0xF8)
-//    switch durationCode {
-//    case 0xC0:
-//      duration = 2.5
-//    case 0xC8:
-//      duration = 5.0
-//    case 0xD0:
-//      duration = 10.0
-//    case 0xD8:
-//      duration = 20.0
-//    default:
-//      duration = 0
-//    }
-//    // determine the number of channels (mono = 1, stereo = 2)
-//    channels = (samples[0] & 0x04) == 0x04 ? 2 : 1
-  }
-}
-

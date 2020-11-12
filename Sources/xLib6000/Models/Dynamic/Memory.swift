@@ -212,16 +212,12 @@ public final class Memory                   : NSObject, DynamicModel {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-    
     // get the Id
     if let id = properties[0].key.objectId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, does it exist?
         if radio.memories[id] == nil {
-          
           // NO, create a new object & add it to the collection
           radio.memories[id] = Memory(radio: radio, id: id)
         }
@@ -229,17 +225,14 @@ public final class Memory                   : NSObject, DynamicModel {
         radio.memories[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
         
       } else {
-        
         // does it exist?
         if radio.memories[id] != nil {
-          
           // YES, remove it, notify observers
           NC.post(.memoryWillBeRemoved, object: radio.memories[id] as Any?)
           
           radio.memories[id] = nil
           
           Log.sharedInstance.logMessage("Memory removed: id = \(id)", .debug, #function, #file, #line)
-          
           NC.post(.memoryHasBeenRemoved, object: id as Any?)
         }
       }
@@ -256,7 +249,6 @@ public final class Memory                   : NSObject, DynamicModel {
   ///   - id:           a Memory Id
   ///
   init(radio: Radio, id: MemoryId) {
-    
     _radio = radio
     self.id = id
     super.init()
@@ -280,17 +272,13 @@ public final class Memory                   : NSObject, DynamicModel {
         
       case .CW:
         newValue = (newValue > 12_000 - _radio.transmit.cwPitch ? 12_000 - _radio.transmit.cwPitch : newValue)
-        
       case .RTTY:
         newValue = (newValue > 4_000 ? 4_000 : newValue)
-        
       case .AM, .SAM, .FM, .NFM, .DFM:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
         newValue = (newValue < 10 ? 10 : newValue)
-        
       case .LSB, .DIGL:
         newValue = (newValue > 0 ? 0 : newValue)
-        
       case .USB, .DIGU:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
       }
@@ -312,17 +300,13 @@ public final class Memory                   : NSObject, DynamicModel {
         
       case .CW:
         newValue = (newValue < -12_000 - _radio.transmit.cwPitch ? -12_000 - _radio.transmit.cwPitch : newValue)
-        
       case .RTTY:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
-        
       case .AM, .SAM, .FM, .NFM, .DFM:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         newValue = (newValue > -10 ? -10 : newValue)
-        
       case .LSB, .DIGL:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
-        
       case .USB, .DIGU:
         newValue = (newValue < 0 ? 0 : newValue)
       }
@@ -346,10 +330,8 @@ public final class Memory                   : NSObject, DynamicModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray)  {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -383,13 +365,11 @@ public final class Memory                   : NSObject, DynamicModel {
     }
     // is the Memory initialized?
     if !_initialized  {
-      
       // YES, the Radio (hardware) has acknowledged this Memory
       _initialized = true
-                  
-      _log("Memory added: id = \(id), name = \(_name)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("Memory added: id = \(id), name = \(_name)", .debug, #function, #file, #line)
       NC.post(.memoryHasBeenAdded, object: self as Any?)
     }
   }
@@ -398,8 +378,6 @@ public final class Memory                   : NSObject, DynamicModel {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func apply(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to apply the Memory
     _radio.sendCommand("memory apply " + "\(id)", replyTo: callback)
   }
   /// Remove a Memory
@@ -408,8 +386,6 @@ public final class Memory                   : NSObject, DynamicModel {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove the Memory
     _radio.sendCommand("memory remove " + "\(id)", replyTo: callback)
     
     // notify all observers

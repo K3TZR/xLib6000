@@ -139,13 +139,10 @@ public final class BandSetting  : NSObject, DynamicModel {
     
     // get the Id
     if let id = properties[0].key.objectId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, does it exist?
         if radio.bandSettings[id] == nil {
-          
           // NO, create a new BandSetting & add it to the BandSettings collection
           radio.bandSettings[id] = BandSetting(radio: radio, id: id)
         }
@@ -153,17 +150,14 @@ public final class BandSetting  : NSObject, DynamicModel {
         radio.bandSettings[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
       
       } else {
-
         // does it exist?
         if radio.bandSettings[id] != nil {
-          
           // YES, remove it, notify observers
           NC.post(.bandSettingWillBeRemoved, object: radio.bandSettings[id] as Any?)
           
           radio.bandSettings[id] = nil
           
           Log.sharedInstance.logMessage("BandSetting removed: id = \(id)", .debug, #function, #file, #line)
-          
           NC.post(.bandSettingHasBeenRemoved, object: id as Any?)
         }
       }
@@ -180,7 +174,6 @@ public final class BandSetting  : NSObject, DynamicModel {
   ///   - queue:              Concurrent queue
   ///
   public init(radio: Radio, id: BandId) {
-    
     _radio = radio
     self.id = id    
     super.init()
@@ -196,10 +189,8 @@ public final class BandSetting  : NSObject, DynamicModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -224,13 +215,11 @@ public final class BandSetting  : NSObject, DynamicModel {
     }
     // is the BandSetting initialized?
     if _initialized == false {
-      
       // YES, the Radio (hardware) has acknowledged this BandSetting
       _initialized = true
-            
-      _log("BandSetting added: id = \(id), bandName = \(_bandName)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("BandSetting added: id = \(id), bandName = \(_bandName)", .debug, #function, #file, #line)
       NC.post(.bandSettingHasBeenAdded, object: self as Any?)
     }
   }
@@ -259,7 +248,6 @@ public final class BandSetting  : NSObject, DynamicModel {
   ///   - value:      the new value
   ///
   private func transmitSet(_ token: Token, _ value: Any) {
-    
     _radio.sendCommand("transmit bandset \(id) " + token.rawValue + "=\(value)")
   }
   /// Set a nInterlock property on the Radio
@@ -268,8 +256,7 @@ public final class BandSetting  : NSObject, DynamicModel {
   ///   - token:      the parse token
   ///   - value:      the new value
   ///
-  private func interlockSet(_ token: Token, _ value: Any) {
-    
+  private func interlockSet(_ token: Token, _ value: Any) {    
     _radio.sendCommand("interlock bandset \(id) " + token.rawValue + "=\(value)")
   }
   

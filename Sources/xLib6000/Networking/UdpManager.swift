@@ -16,15 +16,6 @@ protocol UdpManagerDelegate                 : class {
   
   // if any of theses are not needed, implement a stub in the delegate that does nothing
   
-  /// Process a change of Udp state
-  ///
-  /// - Parameters:
-  ///   - bound:                    is Bound
-  ///   - port:                     Port number
-  ///   - error:                    error message (may be blank)
-  ///
-//  func udpState(bound: Bool, port: UInt16, error: String)
-
   /// Process a Udp bind
   ///
   /// - Parameters:
@@ -99,7 +90,6 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   ///   - enableBroadcast:    whether to allow Broadcasts
   ///
   init(udpReceiveQ: DispatchQueue, udpRegisterQ: DispatchQueue, delegate: UdpManagerDelegate, udpRcvPort: UInt16 = 4991) {
-    
     _udpReceiveQ = udpReceiveQ
     _udpRegisterQ = udpRegisterQ
     _delegate = delegate
@@ -131,7 +121,6 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   ///   - clientHandle:       handle
   ///
   func bind(_ packet: DiscoveryPacket, clientHandle: Handle? = nil) -> Bool {
-    
     var success               = false
     var portToUse             : UInt16 = 0
     var tries                 = kMaxBindAttempts
@@ -154,15 +143,12 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
 
     // Find a UDP port to receive on, scan from the default Port Number up looking for an available port
     for _ in 0..<tries {
-      
       do {
         try _udpSocket.bind(toPort: portToUse)
-        
         _log("UdpManager bound to port \(portToUse)", .debug, #function, #file, #line)
         success = true
         
       } catch {
-        
         // We didn't get the port we wanted
         _log("UdpManager FAILED to bind to port \(portToUse)", .debug, #function, #file, #line)
 
@@ -174,7 +160,6 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
     
     // was a port bound?
     if success {
-      
       // YES, save the actual port & ip in use
       _udpRcvPort = portToUse
       _udpSendIP = packet.publicIp
@@ -196,7 +181,6 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   /// Begin receiving UDP data
   ///
   func beginReceiving() {
-    
     do {
       // Begin receiving
       try _udpSocket.beginReceiving()
@@ -209,7 +193,6 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   /// Unbind from the UDP port
   ///
   func unbind(reason: String) {
-    
     _udpBound = false
     
     // tell the receive socket to close
@@ -226,16 +209,13 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   ///   - clientHandle:       our client handle
   ///
   func register(clientHandle: Handle?) {
-    
     guard clientHandle != nil else {
       // should not happen
       _log("UdpManager, No client handle in register UDP", .error, #function, #file, #line)
-
       return
     }
     // register & keep open the router (on a background queue)
     _udpRegisterQ.async { [unowned self] in
-      
       while self._udpSocket != nil && !self.udpSuccessfulRegistration && self._udpBound {
         
         self._log("UdpManager, Register Wan initiated", .debug, #function, #file, #line)
@@ -281,11 +261,9 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   ///   - filterContext:      a filter context (if any)
   ///
   @objc func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
-    
     _streamQ.async { [weak self] in
 
       if let vita = Vita.decodeFrom(data: data) {
-        
         // TODO: Packet statistics - received, dropped
         
         // ensure the packet has our OUI
@@ -296,20 +274,11 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
 
         switch vita.packetType {
           
-        case .ifDataWithStream, .extDataWithStream:
-          
-          // stream of data, pass it to the delegate
-          self?._delegate?.udpStreamHandler(vita)
-
-        case .ifData, .extData, .ifContext, .extContext:
-          
-          // log the error
-          self?._log("UdpManager, Unexpected Vita packetType - \(vita.packetType.rawValue)", .warning, #function, #file, #line)
+        case .ifDataWithStream, .extDataWithStream:       self?._delegate?.udpStreamHandler(vita)
+        case .ifData, .extData, .ifContext, .extContext:  self?._log("UdpManager, Unexpected Vita packetType - \(vita.packetType.rawValue)", .warning, #function, #file, #line)
         }
         
       } else {
-        
-        // log the error
         self?._log("UdpManager, Unable to decode Vita packet", .warning, #function, #file, #line)
       }
     }

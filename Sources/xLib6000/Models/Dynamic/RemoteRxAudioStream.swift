@@ -46,7 +46,6 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var clientHandle: Handle {
     get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue}}}
@@ -79,7 +78,6 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _expectedFrame                : Int?
   private var _initialized                  = false
   private let _log                          = Log.sharedInstance.logMessage
   private let _radio                        : Radio
@@ -87,7 +85,7 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   private var _rxPacketCount                = 0
   private var _rxLostPacketCount            = 0
   private var _txSampleCount                = 0
-  private var _txSeq                        = 0
+  private var _rxSequenceNumber             = -1
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -107,16 +105,13 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
     
     // get the Id
     if let id =  properties[0].key.streamId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, is it for this client?
         guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
 
         // does it exist?
         if radio.remoteRxAudioStreams[id] == nil {
-          
           // create a new object & add it to the collection
           radio.remoteRxAudioStreams[id] = RemoteRxAudioStream(radio: radio, id: id)
         }
@@ -124,15 +119,12 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
         radio.remoteRxAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(2)) )
       
       } else {
-
         // NO, does it exist?
         if radio.remoteRxAudioStreams[id] != nil {
-          
           // YES, remove it
           radio.remoteRxAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage("RemoteRxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
-          
           NC.post(.remoteRxAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
@@ -149,7 +141,6 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   ///   - id:           a RemoteRxAudioStream Id
   ///
   init(radio: Radio, id: RemoteRxStreamId) {
-    
     _radio = radio
     self.id = id
     super.init()
@@ -167,10 +158,8 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   /// - Parameter properties: a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -187,13 +176,11 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
     }
     // the Radio (hardware) has acknowledged this RxRemoteAudioStream
     if _initialized == false && _clientHandle != 0 {
-      
       // YES, the Radio (hardware) has acknowledged this RxRemoteAudioStream
       _initialized = true
-                  
-      _log("RemoteRxAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("RemoteRxAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.remoteRxAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -203,8 +190,6 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   /// - Returns:              success / failure
   ///
   public func remove(callback: ReplyHandler? = nil) {
-
-    // tell the Radio to remove the Stream
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
 
     // notify all observers
@@ -224,43 +209,50 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   ///   - vita:               an Opus Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    
-    // is this the first packet?
-    if _expectedFrame == nil {
-      _expectedFrame = vita.sequence
-      _rxPacketCount = 1
-      _rxLostPacketCount = 0
+
+    // FIXME: This assumes Opus encoded audio
+
+    if compression == "opus" {
+      // is this the first packet?
+      if _rxSequenceNumber == -1 {
+        _rxSequenceNumber = vita.sequence
+        _rxPacketCount = 1
+        _rxLostPacketCount = 0
+      } else {
+        _rxPacketCount += 1
+      }
+      
+      switch (_rxSequenceNumber, vita.sequence) {
+      
+      case (let expected, let received) where received < expected:
+        // from a previous group, ignore it
+        _log("RemoteRxAudioStream delayed frame(s) ignored: expected \(expected), received \(received)", .warning, #function, #file, #line)
+        return
+        
+      case (let expected, let received) where received > expected:
+        _rxLostPacketCount += 1
+        
+        // from a later group, jump forward
+        let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
+        _log("RemoteRxAudioStream missing frame(s) skipped: expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+        
+        // Pass an error frame (count == 0) to the Opus delegate
+        delegate?.streamHandler( RemoteRxAudioFrame(payload: vita.payloadData, sampleCount: 0) )
+        
+        _rxSequenceNumber = received
+        fallthrough
+        
+      default:
+        // received == expected
+        // calculate the next Sequence Number
+        _rxSequenceNumber = (_rxSequenceNumber + 1) % 16
+        
+        // Pass the data frame to the Opus delegate
+        delegate?.streamHandler( RemoteRxAudioFrame(payload: vita.payloadData, sampleCount: vita.payloadSize) )
+      }
+      
     } else {
-      _rxPacketCount += 1
-    }
-
-    switch (_expectedFrame!, vita.sequence) {
-
-//    case (let expected, let received) where received < expected:
-//      // from a previous group, ignore it
-//      _log("Delayed frame(s): expected \(expected), received \(received)", .warning, #function, #file, #line)
-//      return
-      
-    case (let expected, let received) where received > expected:
-      _rxLostPacketCount += 1
-      
-      // from a later group, jump forward
-      let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
-      _log("RemoteRxAudioStream missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
-
-      // Pass an error frame (count == 0) to the Opus delegate
-      delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: 0) )
-
-      _expectedFrame = received
-      fallthrough
-
-    default:
-      // received == expected
-      // calculate the next Sequence Number
-      _expectedFrame = (_expectedFrame! + 1) % 16
-
-      // Pass the data frame to the Opus delegate
-      delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: vita.payloadSize) )
+      _log("RemoteRxAudioStream compression != opus: frame ignored", .warning, #function, #file, #line)
     }
   }
   
@@ -273,6 +265,58 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   private var __clientHandle : Handle = 0
   private var __compression  : String = RemoteRxAudioStream.Compression.none.rawValue
   private var __ip           = ""
+}
+
+/// Struct containing RemoteRxAudio (Opus) Stream data
+///
+public struct RemoteRxAudioFrame {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
+  public var samples: [UInt8]                     // array of samples
+  public var numberOfSamples: Int                 // number of samples
+//  public var duration: Float                     // frame duration (ms)
+//  public var channels: Int                       // number of channels (1 or 2)
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize a RemoteRxAudioFrame
+  ///
+  /// - Parameters:
+  ///   - payload:            pointer to the Vita packet payload
+  ///   - numberOfSamples:    number of Samples in the payload
+  ///
+  public init(payload: [UInt8], sampleCount: Int) {    
+    // allocate the samples array
+    samples = [UInt8](repeating: 0, count: sampleCount)
+    
+    // save the count and copy the data
+    numberOfSamples = sampleCount
+    memcpy(&samples, payload, sampleCount)
+    
+    // Flex 6000 series always uses:
+    //     duration = 10 ms
+    //     channels = 2 (stereo)
+    
+//    // determine the frame duration
+//    let durationCode = (samples[0] & 0xF8)
+//    switch durationCode {
+//    case 0xC0:
+//      duration = 2.5
+//    case 0xC8:
+//      duration = 5.0
+//    case 0xD0:
+//      duration = 10.0
+//    case 0xD8:
+//      duration = 20.0
+//    default:
+//      duration = 0
+//    }
+//    // determine the number of channels (mono = 1, stereo = 2)
+//    channels = (samples[0] & 0x04) == 0x04 ? 2 : 1
+  }
 }
 
 

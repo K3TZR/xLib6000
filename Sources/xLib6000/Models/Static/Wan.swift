@@ -54,7 +54,6 @@ public final class Wan : NSObject, StaticModel {
   ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
-
     _radio = radio
     super.init()
   }
@@ -69,10 +68,8 @@ public final class Wan : NSObject, StaticModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key
@@ -88,13 +85,11 @@ public final class Wan : NSObject, StaticModel {
     }
     // is it initialized?
     if !_initialized {
-
       // YES, the Radio (hardware) has acknowledged it
       _initialized = true
 
-      _log("Wan status: ServerConnected = \(_serverConnected), RadioAuthenticated = \(_radioAuthenticated)", .debug, #function, #file, #line)
-
       // notify all observers
+      _log("Wan status: ServerConnected = \(_serverConnected), RadioAuthenticated = \(_radioAuthenticated)", .debug, #function, #file, #line)
       NC.post(.wanHasBeenAdded, object: self as Any?)
     }
   }

@@ -84,7 +84,6 @@ public final class Profile                  : NSObject, StaticModel {
   ///   - inUse:              false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-
     let components = properties[0].key.split(separator: " ")
     
     // get the Id
@@ -102,7 +101,6 @@ public final class Profile                  : NSObject, StaticModel {
     
     // does the object exist?
     if  radio.profiles[id] == nil {
-      
       // NO, create a new Profile & add it to the Profiles collection
       radio.profiles[id] = Profile(radio: radio, id: id)
     }
@@ -120,7 +118,6 @@ public final class Profile                  : NSObject, StaticModel {
   ///   - id:                 a Profile Id
   ///
   public init(radio: Radio, id: ProfileId) {
-    
     _radio = radio
     self.id = id
     super.init()
@@ -158,13 +155,11 @@ public final class Profile                  : NSObject, StaticModel {
     }
     // is the Profile initialized?
     if !_initialized && _list.count > 0 {
-      
       // YES, the Radio (hardware) has acknowledged this Panadapter
       _initialized = true
-      
-      _log("Profile added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("Profile added: id = \(id)", .debug, #function, #file, #line)
       NC.post(.profileHasBeenAdded, object: self as Any?)
     }
   }
@@ -176,8 +171,6 @@ public final class Profile                  : NSObject, StaticModel {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func remove(_ name: String, callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to delete the Profile name in the specified Profile type
     _radio.sendCommand("profile "  + "\(id)" + " delete \"" + name + "\"", replyTo: callback)
     
     // notify all observers
@@ -191,8 +184,6 @@ public final class Profile                  : NSObject, StaticModel {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func saveProfile(_ name: String, callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to save the Profile name in the specified Profile type
     _radio.sendCommand("profile "  + "\(id)" + " save \"" + name + "\"", replyTo: callback)
   }
 

@@ -657,16 +657,12 @@ public final class Slice  : NSObject, DynamicModel {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-    
     // get the Id
     if let id = properties[0].key.objectId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, does it exist?
         if radio.slices[id] == nil {
-          
          // create a new Slice & add it to the Slices collection
           radio.slices[id] = xLib6000.Slice(radio: radio, id: id)
           
@@ -685,17 +681,14 @@ public final class Slice  : NSObject, DynamicModel {
         radio.slices[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
         
       } else {
-        
         // does it exist?
         if radio.slices[id] != nil {
-          
           // YES, remove it, notify observers
           NC.post(.sliceWillBeRemoved, object: radio.slices[id] as Any?)
 
           radio.slices[id] = nil
           
           Log.sharedInstance.logMessage("Slice removed: id = \(id)", .debug, #function, #file, #line)
-
           NC.post(.sliceHasBeenRemoved, object: id as Any?)
         }
       }
@@ -712,7 +705,6 @@ public final class Slice  : NSObject, DynamicModel {
   ///   - id:           a Slice Id
   ///
   public init(radio: Radio, id: SliceId) {
-
     _radio = radio
     self.id = id
     super.init()
@@ -735,7 +727,6 @@ public final class Slice  : NSObject, DynamicModel {
   ///   - mode:       demod mode
   ///
   func setupDefaultFilters(_ mode: String) {
-    
     if let modeValue = Mode(rawValue: mode) {
       
       switch modeValue {
@@ -743,23 +734,18 @@ public final class Slice  : NSObject, DynamicModel {
       case .CW:
         _filterLow = 450
         _filterHigh = 750
-        
       case .RTTY:
         _filterLow = -285
         _filterHigh = 115
-        
       case .AM, .SAM:
         _filterLow = -3_000
         _filterHigh = 3_000
-        
       case .FM, .NFM, .DFM:
         _filterLow = -8_000
         _filterHigh = 8_000
-        
       case .LSB, .DIGL:
         _filterLow = -2_400
         _filterHigh = -300
-        
       case .USB, .DIGU:
         _filterLow = 300
         _filterHigh = 2_400
@@ -773,7 +759,6 @@ public final class Slice  : NSObject, DynamicModel {
   /// - Returns:          adjusted value
   ///
   func filterHighLimits(_ value: Int) -> Int {
-    
     var newValue = (value < filterLow + 10 ? filterLow + 10 : value)
     
     if let modeType = Mode(rawValue: mode.lowercased()) {
@@ -782,21 +767,16 @@ public final class Slice  : NSObject, DynamicModel {
       case .FM, .NFM:
         _log("Slice cannot change Filter width in FM mode", .info, #function, #file, #line)
         newValue = value
-        
       case .CW:
         newValue = (newValue > 12_000 - _radio.transmit.cwPitch ? 12_000 - _radio.transmit.cwPitch : newValue)
-        
       case .RTTY:
         newValue = (newValue > rttyMark ? rttyMark : newValue)
         newValue = (newValue < 50 ? 50 : newValue)
-        
       case .AM, .SAM, .DFM:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
         newValue = (newValue < 10 ? 10 : newValue)
-        
       case .LSB, .DIGL:
         newValue = (newValue > 0 ? 0 : newValue)
-        
       case .USB, .DIGU:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
       }
@@ -810,7 +790,6 @@ public final class Slice  : NSObject, DynamicModel {
   /// - Returns:          adjusted value
   ///
   func filterLowLimits(_ value: Int) -> Int {
-    
     var newValue = (value > filterHigh - 10 ? filterHigh - 10 : value)
     
     if let modeType = Mode(rawValue: mode.lowercased()) {
@@ -819,21 +798,16 @@ public final class Slice  : NSObject, DynamicModel {
       case .FM, .NFM:
         _log("Slice cannot change Filter width in FM mode", .info, #function, #file, #line)
         newValue = value
-        
       case .CW:
         newValue = (newValue < -12_000 - _radio.transmit.cwPitch ? -12_000 - _radio.transmit.cwPitch : newValue)
-        
       case .RTTY:
         newValue = (newValue < -12_000 + rttyMark ? -12_000 + rttyMark : newValue)
         newValue = (newValue > -(50 + rttyShift) ? -(50 + rttyShift) : newValue)
-        
       case .AM, .SAM, .DFM:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         newValue = (newValue > -10 ? -10 : newValue)
-        
       case .LSB, .DIGL:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
-        
       case .USB, .DIGU:
         newValue = (newValue < 0 ? 0 : newValue)
       }
@@ -847,10 +821,8 @@ public final class Slice  : NSObject, DynamicModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -943,20 +915,17 @@ public final class Slice  : NSObject, DynamicModel {
       }
     }
     if _initialized == false && inUse == true && panadapterId != 0 && frequency != 0 && mode != "" {
-      
       // mark it as initialized
       _initialized = true
-      
-      _log("Slice added: id = \(id), frequency = \(_frequency), panadapter = \(_panadapterId.hex)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("Slice added: id = \(id), frequency = \(_frequency), panadapter = \(_panadapterId.hex)", .debug, #function, #file, #line)
       NC.post(.sliceHasBeenAdded, object: self)
     }
   }
   /// Remove this Slice
   ///
   public func remove() {
-    // tell the Radio to remove this Slice
     _radio.sendCommand("slice remove \(id)")
     
     // notify all observers
@@ -969,8 +938,6 @@ public final class Slice  : NSObject, DynamicModel {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func errorRequest(_ id: SliceId, callback: ReplyHandler? = nil) {
-    
-    // ask the Radio for the current frequency error
     _radio.sendCommand("slice " + "get_error" + " \(id)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
   }
   /// Request a list of slice Stream Id's
@@ -978,17 +945,13 @@ public final class Slice  : NSObject, DynamicModel {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func listRequest(callback: ReplyHandler? = nil) {
-    
-    // ask the Radio for a list of Slices
     _radio.sendCommand("slice " + "list", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
   }
   public func setRecord(_ value: Bool) {
-    
     _radio.sendCommand("slice set " + "\(id) record=\(value.as1or0)")
   }
   
   public func setPlay(_ value: Bool) {
-    
     _radio.sendCommand("slice set " + "\(id) play=\(value.as1or0)")
   }
   /// Set a Slice tune property on the Radio
@@ -997,7 +960,6 @@ public final class Slice  : NSObject, DynamicModel {
   ///   - value:      the new value
   ///
   public func sliceTuneCmd(_ value: Any) {
-    
     _radio.sendCommand("slice tune " + "\(id) \(value) autopan=\(_autoPan.as1or0)")
   }
   /// Set a Slice Lock property on the Radio
@@ -1006,7 +968,6 @@ public final class Slice  : NSObject, DynamicModel {
   ///   - value:      the new value (lock / unlock)
   ///
   public func sliceLock(_ value: String) {
-    
     _radio.sendCommand("slice " + value + " \(id)")
   }
   
@@ -1014,7 +975,6 @@ public final class Slice  : NSObject, DynamicModel {
   // MARK: - Private methods
   
   private func sliceCmd(_ token: Token, _ value: Any) {
-    
     _radio.sendCommand("slice set " + "\(id) " + token.rawValue + "=\(value)")
   }
   
@@ -1042,8 +1002,7 @@ public final class Slice  : NSObject, DynamicModel {
     }
   }
 
-  private func filterCmd(low: Any, high: Any) {
-    
+  private func filterCmd(low: Any, high: Any) {    
     _radio.sendCommand("filt " + "\(id)" + " \(low)" + " \(high)")
   }
   

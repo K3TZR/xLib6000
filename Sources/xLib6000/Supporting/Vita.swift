@@ -124,7 +124,6 @@ public class Vita {
   /// - Returns:                a Vita class
   ///
   public class func decodeFrom(data: Data) -> Vita? {
-    
     let kVitaMinimumBytes                   = 28                                  // Minimum size of a Vita packet (bytes)
     let kPacketTypeMask                     : UInt8 = 0xf0                        // Bit masks
     let kClassIdPresentMask                 : UInt8 = 0x08
@@ -148,9 +147,7 @@ public class Vita {
     let vitaHeader = (data as NSData).bytes.bindMemory(to: VitaHeader.self, capacity: 1)
     
     // capture Packet Type
-    guard let pt = PacketType(rawValue: (vitaHeader.pointee.packetDesc & kPacketTypeMask) >> 4) else {
-      return nil
-    }
+    guard let pt = PacketType(rawValue: (vitaHeader.pointee.packetDesc & kPacketTypeMask) >> 4) else {return nil}
     vita.packetType = pt
     
     // capture ClassId & TrailerId present
@@ -158,15 +155,11 @@ public class Vita {
     vita.trailerPresent = (vitaHeader.pointee.packetDesc & kTrailerPresentMask) == kTrailerPresentMask
     
     // capture Time Stamp Integer
-    guard let intStamp = TsiType(rawValue: (vitaHeader.pointee.timeStampDesc & kTsiTypeMask) >> 6) else {
-      return nil
-    }
+    guard let intStamp = TsiType(rawValue: (vitaHeader.pointee.timeStampDesc & kTsiTypeMask) >> 6) else {return nil}
     vita.tsiType = intStamp
     
     // capture Time Stamp Fractional
-    guard let fracStamp = TsfType(rawValue: (vitaHeader.pointee.timeStampDesc & kTsfTypeMask) >> 4) else {
-      return nil
-    }
+    guard let fracStamp = TsfType(rawValue: (vitaHeader.pointee.timeStampDesc & kTsfTypeMask) >> 4) else {return nil}
     vita.tsfType = fracStamp
     
     // capture PacketCount & PacketSize
@@ -191,9 +184,7 @@ public class Vita {
       let value = CFSwapInt32BigToHost(vitaOptionals.advanced(by: headerCount + 1).pointee)
       vita.informationClassCode = (value & kInformationClassCodeMask) >> 16
       
-      guard let cc = PacketClassCode(rawValue: UInt16(value & kPacketClassCodeMask)) else {
-        return nil
-      }
+      guard let cc = PacketClassCode(rawValue: UInt16(value & kPacketClassCodeMask)) else {return nil}
       vita.classCode = cc
       
       // Increment past these items
@@ -244,7 +235,6 @@ public class Vita {
   /// - Returns:          a Data type containing the Vita stream
   ///
   public class func encodeAsData(_ vita: Vita) -> Data? {
-    
     // TODO: Handle optional fields
     
     // create a Header struct
@@ -291,11 +281,9 @@ public class Vita {
     
     // is there a Trailer?
     if vita.trailerPresent {
-      
       // YES, append the trailer bytes
       data.append( Data(bytes: &vita.trailer, count: MemoryLayout<UInt32>.size) )
     }
-    
     // return the Data type
     return data
   }
@@ -304,10 +292,8 @@ public class Vita {
   /// - Returns:        a RadioParameters struct (or nil)
   ///
   public class func parseDiscovery(_ vita: Vita) -> DiscoveryPacket? {
-
     // is this a Discovery packet?
     if vita.classIdPresent && vita.classCode == .discovery {
-      
       // YES, create a minimal DiscoveredRadio with now as "lastSeen"
       var discoveredRadio = DiscoveryPacket()
 
@@ -322,14 +308,12 @@ public class Vita {
       
       // process each key/value pair, <key=value>
       for property in properties {
-        
         // check for unknown Keys
         guard let token = DiscoveryToken(rawValue: property.key) else {
           // log it and ignore the Key
           Log.sharedInstance.logMessage("Unknown Discovery token - \(property.key) = \(property.value)", .warning, #function, #file, #line)
           continue
         }
-        
         switch token {
           
         case .availableClients:           discoveredRadio.availableClients = property.value.iValue      // newApi only
@@ -374,7 +358,6 @@ public class Vita {
       }
       // is it a valid Discovery packet?
       if discoveredRadio.publicIp != "" && discoveredRadio.port != 0 && discoveredRadio.model != "" && discoveredRadio.serialNumber != "" {
-        
         // YES, return the Discovered radio
         return discoveredRadio
       }
@@ -401,15 +384,9 @@ public class Vita {
   convenience init(type: VitaType, streamId: UInt32, reducedBW: Bool = false) {
     
     switch type {
-      case .netCW:
-      self.init(packetType: .extDataWithStream, classCode: .daxAudio, streamId: streamId, tsi: .other, tsf: .sampleCount)
-      
-    case .opusTxV2:
-      self.init(packetType: .extDataWithStream, classCode: .daxAudio, streamId: streamId, tsi: .other, tsf: .sampleCount)
-      
-    case .opusTx:
-      self.init(packetType: .extDataWithStream, classCode: .opus, streamId: streamId, tsi: .other, tsf: .sampleCount)
-      
+    case .netCW:    self.init(packetType: .extDataWithStream, classCode: .daxAudio, streamId: streamId, tsi: .other, tsf: .sampleCount)
+    case .opusTxV2: self.init(packetType: .extDataWithStream, classCode: .daxAudio, streamId: streamId, tsi: .other, tsf: .sampleCount)
+    case .opusTx:   self.init(packetType: .extDataWithStream, classCode: .opus, streamId: streamId, tsi: .other, tsf: .sampleCount)
     case .txAudio:
       var classCode = PacketClassCode.daxAudio
       if reducedBW { classCode = PacketClassCode.daxReducedBw }
@@ -427,7 +404,6 @@ public class Vita {
   /// - Returns:          a partially populated Vita struct
   ///
   init(packetType: PacketType, classCode: PacketClassCode, streamId: UInt32, tsi: TsiType, tsf: TsfType) {
-    
     assert(packetType == .extDataWithStream || packetType == .ifDataWithStream)
     
     self.packetType = packetType
@@ -435,11 +411,6 @@ public class Vita {
     self.streamId = streamId
     self.tsiType = tsi
     self.tsfType = tsf
-    
-    // default values for:  HeaderSize, Oui, InformationClassCode, TimeStamp(s), Sequence,
-    //                      PacketSize, Payload, PayloadSize, Trailer
-    
-    // to be changed later: TimeStamps, Sequence, PacketSize, Payload, PayloadSize, Trailer
   }
 
   // ----------------------------------------------------------------------------
@@ -450,7 +421,6 @@ public class Vita {
   /// - Returns:          a String describing the Vita class
   ///
   public func desc() -> String {
-
     let dateFormatter = DateFormatter()
     dateFormatter.dateStyle = .none
     dateFormatter.timeStyle = .medium
@@ -511,118 +481,97 @@ extension Vita {
   /// Discovery properties
   ///
   public enum DiscoveryToken : String {            // Discovery Tokens
-    case lastSeen                           = "last_seen"                   // not a real token
+    case lastSeen                   = "last_seen"                   // not a real token
 
-    case availableClients                   = "available_clients"           // newApi, local only
-    case availablePanadapters               = "available_panadapters"       // newApi, local only
-    case availableSlices                    = "available_slices"            // newApi, local only
+    case availableClients           = "available_clients"           // newApi, local only
+    case availablePanadapters       = "available_panadapters"       // newApi, local only
+    case availableSlices            = "available_slices"            // newApi, local only
     case callsign
-    case discoveryVersion                   = "discovery_protocol_version"  // local only
-    case firmwareVersion                    = "version"
-    case fpcMac                             = "fpc_mac"                     // local only
-    case guiClientHandles                   = "gui_client_handles"          // newApi
-    case guiClientHosts                     = "gui_client_hosts"            // newApi
-    case guiClientIps                       = "gui_client_ips"              // newApi
-    case guiClientPrograms                  = "gui_client_programs"         // newApi
-    case guiClientStations                  = "gui_client_stations"         // newApi
-
-    case inUseHostLOCAL                     = "inuse_host"                  // deprecated -- local only
-    case inUseHostSMARTLINK                 = "inusehost"                   // deprecated -- smartlink only
-
-    case inUseIpLOCAL                       = "inuse_ip"                    // deprecated -- local only
-    case inUseIpSMARTLINK                   = "inuseip"                     // deprecated -- smartlink only
-
-    case licensedClients                    = "licensed_clients"            // newApi, local only
-    case maxLicensedVersion                 = "max_licensed_version"
-    case maxPanadapters                     = "max_panadapters"             // newApi, local only
-    case maxSlices                          = "max_slices"                  // newApi, local only
+    case discoveryVersion           = "discovery_protocol_version"  // local only
+    case firmwareVersion            = "version"
+    case fpcMac                     = "fpc_mac"                     // local only
+    case guiClientHandles           = "gui_client_handles"          // newApi
+    case guiClientHosts             = "gui_client_hosts"            // newApi
+    case guiClientIps               = "gui_client_ips"              // newApi
+    case guiClientPrograms          = "gui_client_programs"         // newApi
+    case guiClientStations          = "gui_client_stations"         // newApi
+    case inUseHostLOCAL             = "inuse_host"                  // deprecated -- local only
+    case inUseHostSMARTLINK         = "inusehost"                   // deprecated -- smartlink only
+    case inUseIpLOCAL               = "inuse_ip"                    // deprecated -- local only
+    case inUseIpSMARTLINK           = "inuseip"                     // deprecated -- smartlink only
+    case licensedClients            = "licensed_clients"            // newApi, local only
+    case maxLicensedVersion         = "max_licensed_version"
+    case maxPanadapters             = "max_panadapters"             // newApi, local only
+    case maxSlices                  = "max_slices"                  // newApi, local only
     case model
-
-    case nicknameLOCAL                      = "nickname"                    // local only
-    case nicknameSMARTLINK                  = "radio_name"                  // smartlink only
-
-    case port                                                               // local only
-
-    case publicIpLOCAL                      = "ip"                          // local only
-    case publicIpSMARTLINK                  = "public_ip"                   // smartlink only
-
-    case publicTlsPort                      = "public_tls_port"             // smartlink only
-    case publicUdpPort                      = "public_udp_port"             // smartlink only
-    case publicUpnpTlsPort                  = "public_upnp_tls_port"        // smartlink only
-    case publicUpnpUdpPort                  = "public_upnp_udp_port"        // smartlink only
-    case requiresAdditionalLicense          = "requires_additional_license"
-    case radioLicenseId                     = "radio_license_id"
-    case serialNumber                       = "serial"
+    case nicknameLOCAL              = "nickname"                    // local only
+    case nicknameSMARTLINK          = "radio_name"                  // smartlink only
+    case port                                                       // local only
+    case publicIpLOCAL              = "ip"                          // local only
+    case publicIpSMARTLINK          = "public_ip"                   // smartlink only
+    case publicTlsPort              = "public_tls_port"             // smartlink only
+    case publicUdpPort              = "public_udp_port"             // smartlink only
+    case publicUpnpTlsPort          = "public_upnp_tls_port"        // smartlink only
+    case publicUpnpUdpPort          = "public_upnp_udp_port"        // smartlink only
+    case requiresAdditionalLicense  = "requires_additional_license"
+    case radioLicenseId             = "radio_license_id"
+    case serialNumber               = "serial"
     case status
-    case upnpSupported                      = "upnp_supported"              // smartlink only
-    case wanConnected                       = "wan_connected"               // Local only
+    case upnpSupported              = "upnp_supported"              // smartlink only
+    case wanConnected               = "wan_connected"               // Local only
   }
   /// Packet Types
   ///
   public enum PacketType : UInt8 {          // Packet Types
-    case ifData                             = 0x00
-    case ifDataWithStream                   = 0x01
-    case extData                            = 0x02
-    case extDataWithStream                  = 0x03
-    case ifContext                          = 0x04
-    case extContext                         = 0x05
+    case ifData             = 0x00
+    case ifDataWithStream   = 0x01
+    case extData            = 0x02
+    case extDataWithStream  = 0x03
+    case ifContext          = 0x04
+    case extContext         = 0x05
     
     func description() -> String {
       switch self {
-      case .ifData:
-        return "IfData"
-      case .ifDataWithStream:
-        return "IfDataWithStream"
-      case .extData:
-        return "ExtData"
-      case .extDataWithStream:
-        return "ExtDataWithStream"
-      case .ifContext:
-        return "IfContext"
-      case .extContext:
-        return "ExtContext"
+      case .ifData:             return "IfData"
+      case .ifDataWithStream:   return "IfDataWithStream"
+      case .extData:            return "ExtData"
+      case .extDataWithStream:  return "ExtDataWithStream"
+      case .ifContext:          return "IfContext"
+      case .extContext:         return "ExtContext"
       }
     }
   }
   /// Tsi Types
   ///
   public enum TsiType : UInt8 {             // Timestamp - Integer
-    case none                               = 0x00
-    case utc                                = 0x01
-    case gps                                = 0x02
-    case other                              = 0x03
+    case none   = 0x00
+    case utc    = 0x01
+    case gps    = 0x02
+    case other  = 0x03
     
     func description() -> String {
       switch self {
-      case .none:
-        return "None"
-      case .utc:
-        return "Utc"
-      case .gps:
-        return "Gps"
-      case .other:
-        return "Other"
+      case .none:   return "None"
+      case .utc:    return "Utc"
+      case .gps:    return "Gps"
+      case .other:  return "Other"
       }
     }
   }
   /// Tsf Types
   ///
   public enum TsfType : UInt8 {             // Timestamp - Fractional
-    case none                               = 0x00
-    case sampleCount                        = 0x01
-    case realtime                           = 0x02
-    case freeRunning                        = 0x03
+    case none         = 0x00
+    case sampleCount  = 0x01
+    case realtime     = 0x02
+    case freeRunning  = 0x03
     
     func description() -> String {
       switch self {
-      case .none:
-        return "None"
-      case .sampleCount:
-        return "SampleCount"
-      case .realtime:
-        return "Realtime"
-      case .freeRunning:
-        return "FreeRunning"
+      case .none:         return "None"
+      case .sampleCount:  return "SampleCount"
+      case .realtime:     return "Realtime"
+      case .freeRunning:  return "FreeRunning"
       }
     }
   }

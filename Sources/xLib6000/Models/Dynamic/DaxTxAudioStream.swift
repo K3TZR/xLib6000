@@ -28,14 +28,12 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   public var isStreaming  : Bool {
     get { Api.objectQ.sync { _isStreaming } }
     set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
-
   @objc dynamic public var ip : String {
     get { _ip  }
     set { if _ip != newValue { _ip = newValue }}}
   @objc dynamic public var isTransmitChannel  : Bool {
     get { _isTransmitChannel  }
     set { if _isTransmitChannel != newValue { _isTransmitChannel = newValue } } }
-  
   @objc dynamic public var txGain: Int {
     get { _txGain  }
     set {
@@ -52,7 +50,6 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       }
     }
   }
-  
   @objc dynamic public var clientHandle     : Handle {
     get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue}}}
@@ -69,7 +66,6 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   var _isTransmitChannel : Bool {
     get { Api.objectQ.sync { __isTransmitChannel } }
     set { if newValue != _isTransmitChannel { willChangeValue(for: \.isTransmitChannel) ; Api.objectQ.sync(flags: .barrier) { __isTransmitChannel = newValue } ; didChangeValue(for: \.isTransmitChannel)}}}
-
   var _txGain : Int {
     get { Api.objectQ.sync { __txGain } }
     set { if newValue != _txGain { willChangeValue(for: \.txGain) ; Api.objectQ.sync(flags: .barrier) { __txGain = newValue } ; didChangeValue(for: \.txGain)}}}
@@ -90,8 +86,8 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   private var _initialized        = false
   private let _log                = Log.sharedInstance.logMessage
   private let _radio              : Radio
-  private var _txSeq              = 0
-  
+  private var _txSequenceNumber   = 0
+
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
@@ -110,16 +106,13 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
     
     // get the Id
     if let id =  properties[0].key.streamId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, is it for this client?
         guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
         
         // does it exist?
         if radio.daxTxAudioStreams[id] == nil {
-          
           // NO, create a new object & add it to the collection
           radio.daxTxAudioStreams[id] = DaxTxAudioStream(radio: radio, id: id)
         }
@@ -129,12 +122,10 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       }  else {
         // NO, does it exist?
         if radio.daxTxAudioStreams[id] != nil {
-          
           // YES, remove it
           radio.daxTxAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage("DaxTxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
-          
           NC.post(.daxTxAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
@@ -152,7 +143,6 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   ///   - id:           a DaxTxAudioStream Id
   ///
   init(radio: Radio, id: DaxTxStreamId) {
-    
     self._radio = radio
     self.id = id
     super.init()
@@ -171,7 +161,6 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
     
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
@@ -189,13 +178,11 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
     }
     // is the AudioStream acknowledged by the radio?
     if _initialized == false && _clientHandle != 0 {
-      
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
-      _log("DaxTxAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
-      
       // notify all observers
+      _log("DaxTxAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.daxTxAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -205,8 +192,6 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   /// - Returns:              success / failure
   ///
   public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove this Stream
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
     
     // notify all observers
@@ -226,9 +211,11 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
   /// - Returns:                  success
   ///
   public func sendTXAudio(left: [Float], right: [Float], samples: Int, sendReducedBW: Bool = false) -> Bool {
+    var samplesSent = 0
+    var samplesToSend = 0
     
     // skip this if we are not the DAX TX Client
-    if !_isTransmitChannel { return false }
+    guard _isTransmitChannel else { return false }
     
     // get a TxAudio Vita
     if _vita == nil { _vita = Vita(type: .txAudio, streamId: id, reducedBW: sendReducedBW) }
@@ -237,19 +224,16 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
     let kNumberOfChannels = 2       // 2 channels
     
     if sendReducedBW {
-      
+      // REDUCED BANDWIDTH
       // create new array for payload (mono samples)
       var uint16Array = [UInt16](repeating: 0, count: kMaxSamplesToSend)
       
-      var samplesSent = 0
       while samplesSent < samples {
-        
         // how many samples this iteration? (kMaxSamplesToSend or remainder if < kMaxSamplesToSend)
-        let numSamplesToSend = min(kMaxSamplesToSend, samples - samplesSent)
+        samplesToSend = min(kMaxSamplesToSend, samples - samplesSent)
         
         // interleave the payload & scale with tx gain
-        for i in 0..<numSamplesToSend {
-          
+        for i in 0..<samplesToSend {
           var floatSample = left[i + samplesSent] * _txGainScalar
           
           if floatSample > 1.0 {
@@ -257,50 +241,43 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
           } else if floatSample < -1.0 {
             floatSample = -1.0
           }
-          
           let intSample = Int16(floatSample * 32767.0)
           uint16Array[i] = CFSwapInt16HostToBig(UInt16(bitPattern: intSample))
         }        
         _vita!.payloadData = uint16Array.withUnsafeBytes { Array($0) }
 
         // set the length of the packet
-        _vita!.payloadSize = numSamplesToSend * MemoryLayout<Int16>.size            // 16-Bit mono samples
-        _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size
+        _vita!.payloadSize = samplesToSend * MemoryLayout<Int16>.size            // 16-Bit mono samples
+        _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size   // payload size + header size
         
         // set the sequence number
-        _vita!.sequence = _txSeq
+        _vita!.sequence = _txSequenceNumber
         
         // encode the Vita class as data and send to radio
-        if let data = Vita.encodeAsData(_vita!) {
-          
-          // send packet to radio
-          _radio.sendVita(data)
-        }
+        if let data = Vita.encodeAsData(_vita!) { _radio.sendVita(data) }
+        
         // increment the sequence number (mod 16)
-        _txSeq = (_txSeq + 1) % 16
+        _txSequenceNumber = (_txSequenceNumber + 1) % 16
         
         // adjust the samples sent
-        samplesSent += numSamplesToSend
+        samplesSent += samplesToSend
       }
       
     } else {
-      
+      // NORMAL BANDWIDTH
       // create new array for payload (interleaved L/R stereo samples)
       var floatArray = [Float](repeating: 0, count: kMaxSamplesToSend * kNumberOfChannels)
       
-      var samplesSent = 0
       while samplesSent < samples {
-        
         // how many samples this iteration? (kMaxSamplesToSend or remainder if < kMaxSamplesToSend)
-        let numSamplesToSend = min(kMaxSamplesToSend, samples - samplesSent)
-        let numFloatsToSend = numSamplesToSend * kNumberOfChannels
+        samplesToSend = min(kMaxSamplesToSend, samples - samplesSent)
+        let numFloatsToSend = samplesToSend * kNumberOfChannels
         
         // interleave the payload & scale with tx gain
-        for i in 0..<numSamplesToSend {                                         // TODO: use Accelerate
+        for i in 0..<samplesToSend {                                         // TODO: use Accelerate
           floatArray[2 * i] = left[i + samplesSent] * _txGainScalar
           floatArray[(2 * i) + 1] = left[i + samplesSent] * _txGainScalar
         }
-
         floatArray.withUnsafeMutableBytes{ bytePtr in
           let uint32Ptr = bytePtr.bindMemory(to: UInt32.self)
 
@@ -316,19 +293,16 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
         _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size
         
         // set the sequence number
-        _vita!.sequence = _txSeq
+        _vita!.sequence = _txSequenceNumber
         
         // encode the Vita class as data and send to radio
-        if let data = Vita.encodeAsData(_vita!) {
-          
-          // send packet to radio
-          _radio.sendVita(data)
-        }
+        if let data = Vita.encodeAsData(_vita!) { _radio.sendVita(data) }
+        
         // increment the sequence number (mod 16)
-        _txSeq = (_txSeq + 1) % 16
+        _txSequenceNumber = (_txSequenceNumber + 1) % 16
         
         // adjust the samples sent
-        samplesSent += numSamplesToSend
+        samplesSent += samplesToSend
       }
     }
     return true

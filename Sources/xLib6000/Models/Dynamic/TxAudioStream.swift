@@ -93,7 +93,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
   private var _initialized                  = false
   private var _log                          = Log.sharedInstance.logMessage
   private let _radio                        : Radio
-  private var _txSeq                        = 0
+  private var _txSequenceNumber             = 0
   
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -114,13 +114,10 @@ public final class TxAudioStream : NSObject, DynamicModel {
     
     // get the Id
     if let id =  properties[0].key.streamId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, does it exist?
         if radio.txAudioStreams[id] == nil {
-          
           // NO, is it for this client?
           if !isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) { return }
           
@@ -131,19 +128,16 @@ public final class TxAudioStream : NSObject, DynamicModel {
         radio.txAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
         
       } else {
-        
         // NOTE: This code will never be called
         //    TxAudioStream does not send status on removal
         
         // does the object exist?
         if radio.txAudioStreams[id] != nil {
-          
           // YES, remove it
           radio.txAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage("TxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
-          
           // notify all observers
+          Log.sharedInstance.logMessage("TxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           NC.post(.txAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
@@ -160,7 +154,6 @@ public final class TxAudioStream : NSObject, DynamicModel {
   ///   - id:           a TxAudioStream Id
   ///
   init(radio: Radio, id: TxStreamId) {
-    
     _radio = radio
     self.id = id
     super.init()
@@ -176,10 +169,8 @@ public final class TxAudioStream : NSObject, DynamicModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -198,13 +189,11 @@ public final class TxAudioStream : NSObject, DynamicModel {
     }
     // is the AudioStream acknowledged by the radio?
     if !_initialized && _ip != "" {
-      
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
-      _log("TxAudioStream added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
-      
       // notify all observers
+      _log("TxAudioStream added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -214,8 +203,6 @@ public final class TxAudioStream : NSObject, DynamicModel {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove a Stream, notify observers
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
     
     NC.post(.txAudioStreamWillBeRemoved, object: self as Any?)
@@ -233,10 +220,9 @@ public final class TxAudioStream : NSObject, DynamicModel {
   ///   - samples:                number of samples
   /// - Returns:                  success
   ///
-  public func sendTXAudio(left: [Float], right: [Float], samples: Int) -> Bool {
-    
+  public func sendTXAudio(left: [Float], right: [Float], samples: Int) -> Bool {    
     // skip this if we are not the DAX TX Client
-    if !_transmit { return false }
+    guard _transmit else { return false }
     
     // get a TxAudio Vita
     if _vita == nil { _vita = Vita(type: .txAudio, streamId: id) }
@@ -249,13 +235,12 @@ public final class TxAudioStream : NSObject, DynamicModel {
     
     var samplesSent = 0
     while samplesSent < samples {
-      
       // how many samples this iteration? (kMaxSamplesToSend or remainder if < kMaxSamplesToSend)
-      let numSamplesToSend = min(kMaxSamplesToSend, samples - samplesSent)
-      let numFloatsToSend = numSamplesToSend * kNumberOfChannels
+      let samplesToSend = min(kMaxSamplesToSend, samples - samplesSent)
+      let numFloatsToSend = samplesToSend * kNumberOfChannels
       
       // interleave the payload & scale with tx gain
-      for i in 0..<numSamplesToSend {                                         // TODO: use Accelerate
+      for i in 0..<samplesToSend {                                         // TODO: use Accelerate
         floatArray[2 * i] = left[i + samplesSent] * _txGainScalar
         floatArray[(2 * i) + 1] = left[i + samplesSent] * _txGainScalar
       }
@@ -275,20 +260,16 @@ public final class TxAudioStream : NSObject, DynamicModel {
       _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size
       
       // set the sequence number
-      _vita!.sequence = _txSeq
+      _vita!.sequence = _txSequenceNumber
       
       // encode the Vita class as data and send to radio
-      if let data = Vita.encodeAsData(_vita!) {
-        
-        // send packet to radio
-        //        _api.sendVitaData(data)
-        _radio.sendVita(data)
-      }
+      if let data = Vita.encodeAsData(_vita!) { _radio.sendVita(data) }
+      
       // increment the sequence number (mod 16)
-      _txSeq = (_txSeq + 1) % 16
+      _txSequenceNumber = (_txSequenceNumber + 1) % 16
       
       // adjust the samples sent
-      samplesSent += numSamplesToSend
+      samplesSent += samplesToSend
     }
     return true
   }

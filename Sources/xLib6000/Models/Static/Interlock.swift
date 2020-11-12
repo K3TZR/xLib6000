@@ -276,18 +276,14 @@ public final class Interlock : NSObject, StaticModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // is it a Band Setting?
     if properties[0].key == "band" {
-      
       // YES, drop the "band", parse in BandSetting model
       BandSetting.parseStatus(radio, Array(properties.dropFirst()))
     
     } else {
-      
       // NO, process each key/value pair, <key=value>
-      for property in properties {
-        
+      for property in properties {        
         // Check for Unknown Keys
         guard let token = Token(rawValue: property.key)  else {
           // log it and ignore the Key

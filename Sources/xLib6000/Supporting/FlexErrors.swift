@@ -59,7 +59,6 @@ public func flexErrorString(errorCode: String) -> String {
 /// Enum of all possible Error codes returned by the Radio
 ///
 enum FlexErrors: UInt32 {
-  
   // Fatal
   case SLM_F_MAX_CLIENTS                              = 0xF3000001
   case SLM_F_FPGA_TEMP_ERR                            = 0xF3000002
@@ -285,8 +284,7 @@ enum FlexErrors: UInt32 {
   ///
   /// - Returns:                the explanation
   ///
-  func toString() -> String {
-    
+  func toString() -> String {    
     switch self {
       
     // Fatal

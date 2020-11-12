@@ -29,11 +29,9 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   public var isStreaming  : Bool {
     get { Api.objectQ.sync { _isStreaming } }
     set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
-
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var ip : String {
     get { _ip  }
     set { if _ip != newValue { _ip = newValue }}}
@@ -48,12 +46,10 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       }
     }
   }
-  
   @objc dynamic public var channel      : Int     { _channel }
   @objc dynamic public var clientHandle : Handle  { _clientHandle }
   @objc dynamic public var pan          : PanadapterStreamId { _pan }
   @objc dynamic public var isActive     : Bool    { _isActive  }
-
   public private(set)  var rxLostPacketCount   = 0
 
   // ------------------------------------------------------------------------------
@@ -91,12 +87,13 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private      var _initialized       = false
-  private      let _log               = Log.sharedInstance.logMessage
-  public       let _radio             : Radio
-  private      var _rxSeq             : Int?
-
-  private      var _kOneOverZeroDBfs  : Float = 1.0 / pow(2.0, 15.0)
+  private var _initialized        = false
+  private let _log                = Log.sharedInstance.logMessage
+  public  let _radio              : Radio
+  private var _rxPacketCount      = 0
+  private var _rxLostPacketCount  = 0
+  private var _txSampleCount      = 0
+  private var _rxSequenceNumber   = -1
   
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -116,16 +113,13 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
 
     // get the Id
     if let id =  properties[0].key.streamId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, is it for this client?
         guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
 
         // does it exist?
         if radio.daxIqStreams[id] == nil {
-          
           // create a new object & add it to the collection
           radio.daxIqStreams[id] = DaxIqStream(radio: radio, id: id)
         }
@@ -135,12 +129,10 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
       } else {
         // NO, does it exist?
         if radio.daxIqStreams[id] != nil {
-          
           // YES, remove it
           radio.daxIqStreams[id] = nil
           
           Log.sharedInstance.logMessage("DaxIqStream removed: id = \(id.hex)", .debug, #function, #file, #line)
-          
           NC.post(.daxIqStreamHasBeenRemoved, object: id as Any?)
         }
       }
@@ -157,7 +149,6 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   ///   - id:           a DaxIqStream Id
   ///
   init(radio: Radio, id: DaxIqStreamId) {
-    
     _radio = radio
     self.id = id
     super.init()
@@ -173,7 +164,6 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
       
@@ -196,13 +186,11 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
     }
     // is the Stream initialized?
     if _initialized == false && _clientHandle != 0 {
-      
       // YES, the Radio (hardware) has acknowledged this Stream
       _initialized = true
 
-      _log("DaxIqStream added: id = \(id.hex), channel = \(_channel)", .debug, #function, #file, #line)
-
       // notify all observers
+      _log("DaxIqStream added: id = \(id.hex), channel = \(_channel)", .debug, #function, #file, #line)
       NC.post(.daxIqStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -212,8 +200,6 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   /// - Returns:              success / failure
   ///
   public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove this Stream
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
 
     // notify all observers
@@ -226,7 +212,6 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func getError(callback: ReplyHandler? = nil) {
-    // tell the Radio to ???
     _radio.sendCommand("stream get_error \(id.hex)", replyTo: callback)
   }
 
@@ -242,56 +227,40 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   /// - Parameters:
   ///   - vita:       a Vita struct
   ///
-  func vitaProcessor(_ vita: Vita) {
-    
-    // if there is a delegate, process the Panadapter stream
-    if let delegate = delegate {
+  func vitaProcessor(_ vita: Vita) {    
+    // is this the first packet?
+    if _rxSequenceNumber == -1 {
+      _rxSequenceNumber = vita.sequence
+      _rxPacketCount = 1
+      _rxLostPacketCount = 0
+    } else {
+      _rxPacketCount += 1
+    }
+
+    switch (_rxSequenceNumber, vita.sequence) {
+
+    case (let expected, let received) where received < expected:
+      // from a previous group, ignore it
+      _log("DaxIqStream delayed frame(s) ignored: expected \(expected), received \(received)", .warning, #function, #file, #line)
+      return
       
-      //      let payloadPtr = UnsafeRawPointer(vita.payloadData)
-      vita.payloadData.withUnsafeBytes { (payloadPtr) in
-        
-        // initialize a data frame
-        var dataFrame = IqStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
-        
-        dataFrame.daxIqChannel = channel
-        
-        // get a pointer to the data in the payload
-        let wordsPtr = payloadPtr.bindMemory(to: Float32.self)
-        
-        // allocate temporary data arrays
-        var dataLeft = [Float32](repeating: 0, count: dataFrame.samples)
-        var dataRight = [Float32](repeating: 0, count: dataFrame.samples)
-        
-        // FIXME: is there a better way
-        // de-interleave the data
-        for i in 0..<dataFrame.samples {
-          
-          dataLeft[i] = wordsPtr[2*i]
-          dataRight[i] = wordsPtr[(2*i) + 1]
-        }
-        
-        // copy & normalize the data
-        vDSP_vsmul(&dataLeft, 1, &_kOneOverZeroDBfs, &(dataFrame.realSamples), 1, vDSP_Length(dataFrame.samples))
-        vDSP_vsmul(&dataRight, 1, &_kOneOverZeroDBfs, &(dataFrame.imagSamples), 1, vDSP_Length(dataFrame.samples))
-        
-        // Pass the data frame to this AudioSream's delegate
-        delegate.streamHandler(dataFrame)
-      }
+    case (let expected, let received) where received > expected:
+      _rxLostPacketCount += 1
       
+      // from a later group, jump forward
+      let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
+      _log("DaxIqStream missing frame(s) skipped: expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+
+      _rxSequenceNumber = received
+      fallthrough
+
+    default:
+      // received == expected
       // calculate the next Sequence Number
-      let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
-      
-      // is the received Sequence Number correct?
-      if vita.sequence != expectedSequenceNumber {
-        
-        // NO, log the issue
-        _log("DaxIqStream missing packet(s): expected \(expectedSequenceNumber), received \(vita.sequence)", .warning, #function, #file, #line)
-        _rxSeq = nil
-        rxLostPacketCount += 1
-      } else {
-        
-        _rxSeq = expectedSequenceNumber
-      }
+      _rxSequenceNumber = (_rxSequenceNumber + 1) % 16
+
+      // Pass the data frame to the Opus delegate
+      delegate?.streamHandler( IqStreamFrame(payload: vita.payloadData, numberOfBytes: vita.payloadSize, daxIqChannel: channel ))
     }
   }
 

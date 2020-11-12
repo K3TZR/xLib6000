@@ -41,7 +41,6 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var clientHandle: Handle {
     get { _clientHandle  }
     set { if _clientHandle != newValue { _clientHandle = newValue}}}
@@ -66,7 +65,7 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
     set { if newValue != _ip { willChangeValue(for: \.ip) ; Api.objectQ.sync(flags: .barrier) { __ip = newValue } ; didChangeValue(for: \.ip)}}}
   
   enum Token : String {
-    case clientHandle         = "client_handle"
+    case clientHandle = "client_handle"
     case compression
     case ip
   }
@@ -74,16 +73,11 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _radio                        : Radio
-  private let _log                          = Log.sharedInstance.logMessage
-  private var _initialized                  = false                         // True if initialized by Radio hardware
-
-  private var _vita                         : Vita?                         // a Vita class
-  private var _rxPacketCount                = 0                             // Rx total packet count
-  private var _rxLostPacketCount            = 0                             // Rx lost packet count
-  private var _expectedFrame                : Int?                          // Rx sequence number
-  private var _txSeq                        = 0                             // Tx sequence number
-  private var _txSampleCount                = 0                             // Tx sample count
+  private var _initialized      = false
+  private let _log              = Log.sharedInstance.logMessage
+  private let _radio            : Radio
+  private var _txSequenceNumber = 0
+  private var _vita             : Vita?
   
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -103,16 +97,13 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
     
     // get the Id
     if let id =  properties[0].key.streamId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, is it for this client?
         guard isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) else { return }
 
         // does it exist?
         if radio.remoteTxAudioStreams[id] == nil {
-          
           // create a new object & add it to the collection
           radio.remoteTxAudioStreams[id] = RemoteTxAudioStream(radio: radio, id: id)
         }
@@ -122,12 +113,10 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
       } else {
         // NO, does it exist?
         if radio.remoteTxAudioStreams[id] != nil {
-          
           // YES, remove it
           radio.remoteTxAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage("RemoteTxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
-          
           NC.post(.remoteTxAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
@@ -144,7 +133,6 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
   ///   - id:           a RemoteTxAudioStream Id
   ///
   init(radio: Radio, id: RemoteTxStreamId) {
-    
     _radio = radio
     self.id = id
     super.init()
@@ -162,10 +150,8 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
   /// - Parameter properties: a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -184,13 +170,11 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
     }
     // the Radio (hardware) has acknowledged this Stream
     if _initialized == false && _clientHandle != 0 {
-      
       // YES, the Radio (hardware) has acknowledged this Opus
       _initialized = true
-                  
-      _log("RemoteTxAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("RemoteTxAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.remoteTxAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -200,8 +184,6 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
   /// - Returns:              success / failure
   ///
   public func remove(callback: ReplyHandler? = nil) {
-
-    // tell the Radio to remove the Stream
     _radio.sendCommand("stream remove \(id.hex)", replyTo: callback)
 
     // notify all observers
@@ -211,19 +193,21 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Stream methods
   
-  /// Send a RemoteTxAudioStream to the Radio (hardware)
+  /// Send Tx Audio to the Radio
   ///
   /// - Parameters:
   ///   - buffer:             array of encoded audio samples
   /// - Returns:              success / failure
   ///
-  public func sendRemoteTxAudioStream(buffer: [UInt8], samples: Int) {
+  public func sendTxAudio(buffer: [UInt8], samples: Int) {
     
-    if _radio.interlock.state == "TRANSMITTING" {
+    guard _radio.interlock.state == "TRANSMITTING" else { return }
     
+    // FIXME: This assumes Opus encoded audio
+    if compression == "opus" {
       // get an OpusTx Vita
       if _vita == nil { _vita = Vita(type: .opusTx, streamId: id) }
-    
+      
       // create new array for payload (interleaved L/R samples)
       _vita!.payloadData = buffer
       
@@ -232,16 +216,16 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
       _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size    // payload size + header size
       
       // set the sequence number
-      _vita!.sequence = _txSeq
-
+      _vita!.sequence = _txSequenceNumber
+      
       // encode the Vita class as data and send to radio
-      if let data = Vita.encodeAsData(_vita!) {
-        
-        // send packet to radio
-        _radio.sendVita(data)
-      }
+      if let data = Vita.encodeAsData(_vita!) { _radio.sendVita(data) }
+      
       // increment the sequence number (mod 16)
-      _txSeq = (_txSeq + 1) % 16
+      _txSequenceNumber = (_txSequenceNumber + 1) % 16
+      
+    } else {
+      _log("RemoteTxAudioStream compression != opus: frame ignored", .warning, #function, #file, #line)
     }
   }
   

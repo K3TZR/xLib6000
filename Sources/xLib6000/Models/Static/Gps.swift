@@ -103,8 +103,6 @@ public final class Gps : NSObject, StaticModel {
   ///   - callback:           ReplyHandler (optional)
   ///
   public class func gpsInstall(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to install the GPS device
     Api.sharedInstance.send(kGpsCmd + "install", replyTo: callback)
   }
   /// Gps Un-Install
@@ -113,8 +111,6 @@ public final class Gps : NSObject, StaticModel {
   ///   - callback:           ReplyHandler (optional)
   ///
   public class func gpsUnInstall(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove the GPS device
     Api.sharedInstance.send(kGpsCmd + "uninstall", replyTo: callback)
   }
 
@@ -127,7 +123,6 @@ public final class Gps : NSObject, StaticModel {
   ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
-
     _radio = radio
     super.init()
   }
@@ -144,10 +139,8 @@ public final class Gps : NSObject, StaticModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
-    for property in properties {
-      
+    for property in properties {      
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key

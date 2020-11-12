@@ -383,7 +383,6 @@ public final class Transmit : NSObject, StaticModel {
   ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
-
     _radio = radio
     super.init()
   }
@@ -405,11 +404,8 @@ public final class Transmit : NSObject, StaticModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
-    
-    // NO, process each key/value pair, <key=value>
+    // process each key/value pair, <key=value>
     for property in properties {
-      
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key
@@ -478,12 +474,10 @@ public final class Transmit : NSObject, StaticModel {
   }
   
   func txFilterHighLimits(_ low: Int, _ high: Int) -> Int {
-    
     let newValue = ( high < low + 50 ? low + 50 : high )
     return newValue > 10_000 ? 10_000 : newValue
   }
   func txFilterLowLimits(_ low: Int, _ high: Int) -> Int {
-    
     let newValue = ( low > high - 50 ? high - 50 : low )
     return newValue < 0 ? 0 : newValue
   }
@@ -535,7 +529,6 @@ public final class Transmit : NSObject, StaticModel {
   ///   - value:      the new value
   ///
   private func tuneCmd(_ token: Token, _ value: Any) {
-    
     Api.sharedInstance.send("transmit " + token.rawValue + " \(value)")
   }
   /// Set a Transmit property on the Radio
@@ -545,7 +538,6 @@ public final class Transmit : NSObject, StaticModel {
   ///   - value:      the new value
   ///
   private func transmitCmd(_ token: Token, _ value: Any) {
-    
     Api.sharedInstance.send("transmit set " + token.rawValue + "=\(value)")
   }
   /// Set a Transmit property on the Radio
@@ -566,12 +558,10 @@ public final class Transmit : NSObject, StaticModel {
   ///   - value:      the new value
   ///
   private func cwCmd(_ token: Token, _ value: Any) {
-    
     Api.sharedInstance.send("cw " + token.rawValue + " \(value)")
   }
   // alternate form for commands that do not use the Token raw value in outgoing messages
   private func cwCmd(_ token: String, _ value: Any) {
-    
     Api.sharedInstance.send("cw " + token + " \(value)")
   }
   /// Set a MIC property on the Radio
@@ -581,12 +571,10 @@ public final class Transmit : NSObject, StaticModel {
   ///   - value:      the new value
   ///
   private func micCmd(_ token: Token, _ value: Any) {
-    
     Api.sharedInstance.send("mic " + token.rawValue + " \(value)")
   }
   // alternate form for commands that do not use the Token raw value in outgoing messages
-  private func micCmd(_ token: String, _ value: Any) {
-    
+  private func micCmd(_ token: String, _ value: Any) {    
     Api.sharedInstance.send("mic " + token + " \(value)")
   }
   

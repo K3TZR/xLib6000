@@ -27,39 +27,29 @@ public final class Xvtr : NSObject, DynamicModel {
   @objc dynamic public var ifFrequency: Hz {
     get { _ifFrequency }
     set { if _ifFrequency != newValue { _ifFrequency = newValue ; xvtrCmd( .ifFrequency, newValue) }}}
-
   @objc dynamic public var isValid: Bool { _isValid }
-
   @objc dynamic public var loError: Int {
     get { _loError }
     set { if _loError != newValue { _loError = newValue ; xvtrCmd( .loError, newValue) }}}
-
   @objc dynamic public var name: String {
     get { _name }
     set { if _name != newValue { _name = newValue ; xvtrCmd( .name, _name) }}}
-
   @objc dynamic public var maxPower: Int {
     get { _maxPower }
     set { if _maxPower != newValue { _maxPower = newValue ; xvtrCmd( .maxPower, newValue) }}}
-
   @objc dynamic public var order: Int {
     get { _order }
     set { if _order != newValue { _order = newValue ; xvtrCmd( .order, newValue) }}}
-
   @objc dynamic public var preferred: Bool { _preferred }
-
   @objc dynamic public var rfFrequency: Hz {
     get { _rfFrequency }
     set { if _rfFrequency != newValue { _rfFrequency = newValue ; xvtrCmd( .rfFrequency, newValue) }}}
-
   @objc dynamic public var rxGain: Int {
     get { _rxGain }
     set { if _rxGain != newValue { _rxGain = newValue ; xvtrCmd( .rxGain, newValue) }}}
-
   @objc dynamic public var rxOnly: Bool {
     get { _rxOnly }
     set { if _rxOnly != newValue { _rxOnly = newValue ; xvtrCmd( .rxOnly, newValue) }}}
-
   @objc dynamic public var twoMeterInt: Int { _twoMeterInt }
   
   // ----------------------------------------------------------------------------
@@ -157,13 +147,10 @@ public final class Xvtr : NSObject, DynamicModel {
     
     // get the id
     if let id = properties[0].key.objectId {
-      
       // isthe Xvtr in use?
       if inUse {
-        
         // YES, does the object exist?
         if radio.xvtrs[id] == nil {
-          
           // NO, create a new Xvtr & add it to the Xvtrs collection
           radio.xvtrs[id] = Xvtr(radio: radio, id: id)
         }
@@ -171,17 +158,14 @@ public final class Xvtr : NSObject, DynamicModel {
         radio.xvtrs[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
         
       } else {
-        
         // does it exist?
         if radio.xvtrs[id] != nil {
-          
           // YES, remove it, notify all observers
           NC.post(.xvtrWillBeRemoved, object: radio.xvtrs[id] as Any?)
 
           radio.xvtrs[id] = nil
           
           Log.sharedInstance.logMessage("Xvtr removed: id = \(id)", .debug, #function, #file, #line)
-          
           NC.post(.xvtrHasBeenRemoved, object: id as Any?)
         }
       }
@@ -198,10 +182,8 @@ public final class Xvtr : NSObject, DynamicModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -226,13 +208,11 @@ public final class Xvtr : NSObject, DynamicModel {
     }
     // is the waterfall initialized?
     if !_initialized {
-      
       // YES, the Radio (hardware) has acknowledged this Waterfall
       _initialized = true
-      
-      _log("Xvtr added: id = \(id), name = \(name)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("Xvtr added: id = \(id), name = \(name)", .debug, #function, #file, #line)
       NC.post(.xvtrHasBeenAdded, object: self as Any?)
     }
   }

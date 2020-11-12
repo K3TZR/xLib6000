@@ -12,7 +12,7 @@ import Cocoa
 // MARK: - Protocols
 
 /// Logging is deferred to the hosting application
-////
+///
 public protocol LogHandler: class {
   /// Method to process Log entries
   ///

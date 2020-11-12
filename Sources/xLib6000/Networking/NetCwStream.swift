@@ -30,12 +30,12 @@ public final class NetCwStream : NSObject {
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
-  
-  private let _radio        : Radio
-  private let _log          = Log.sharedInstance.logMessage
-  private var _txIndex      = -1
-  private var _txSeq        = 0
-  private let _objectQ      = DispatchQueue(label: Api.kName + ".NetCw.objectQ", attributes: [.concurrent])
+
+  private let _log              = Log.sharedInstance.logMessage
+  private let _objectQ          = DispatchQueue(label: Api.kName + ".NetCw.objectQ", attributes: [.concurrent])
+  private let _radio            : Radio
+  private var _txIndex          = -1
+  private var _txSequenceNumber = 0
   
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
@@ -46,7 +46,6 @@ public final class NetCwStream : NSObject {
   ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
-
     _radio = radio
     super.init()
   }
@@ -60,7 +59,6 @@ public final class NetCwStream : NSObject {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func remove(callback: ReplyHandler? = nil) -> Void {
-    
     _radio.sendCommand("stream remove " + id.hex, replyTo: callback)
     
     // notify all observers
@@ -84,7 +82,6 @@ public final class NetCwStream : NSObject {
   ///   - guiClientHandle:  clientHandle
   ///
   func cwKey(state: Bool, timestamp: String, guiClientHandle: Handle) -> Void {
-    
     _txIndex = _txIndex + 1
     
     let cmd = "cw key " + state.as1or0 + " time=0x" + timestamp + " index=\(_txIndex) client_handle=" + guiClientHandle.hex
@@ -92,7 +89,6 @@ public final class NetCwStream : NSObject {
     sendVitaCommand(cmd)
     
     _objectQ.async {
-      
       // brute force (as in FlexLib): send UDP VITA command again 3 times every 5 ms
       usleep(5_000)
       self.sendVitaCommand(cmd)
@@ -101,7 +97,6 @@ public final class NetCwStream : NSObject {
       usleep(5_000)
       self.sendVitaCommand(cmd)
     }
-    
     // send command via TCP also
     _radio.sendCommand(cmd)
   }
@@ -112,7 +107,6 @@ public final class NetCwStream : NSObject {
   ///   - guiClientHandle:  clientHandle
   ///
   func cwPTT(state: Bool, timestamp: String, guiClientHandle: Handle) -> Void {
-    
     _txIndex = _txIndex + 1
     
     let cmd = "cw ptt " + state.as1or0 + " time=" + timestamp + " index=\(_txIndex) client_handle=" + guiClientHandle.hex
@@ -120,7 +114,6 @@ public final class NetCwStream : NSObject {
     sendVitaCommand(cmd)
     
     _objectQ.async {
-      
       // brute force (as in FlexLib): send UDP VITA command again 3 times every 5 ms
       usleep(5_000)
       self.sendVitaCommand(cmd)
@@ -129,7 +122,6 @@ public final class NetCwStream : NSObject {
       usleep(5_000)
       self.sendVitaCommand(cmd)
     }
-    
     // send command via TCP also
     _radio.sendCommand(cmd)
   }
@@ -140,17 +132,13 @@ public final class NetCwStream : NSObject {
   ///   - responseValue:  the reponse value
   ///   - reply:          the reply value
   ///
-  func updateStreamId(_ command: String, _ seqNumber: SequenceNumber, _ responseValue: String, _ reply: String) -> Void {
-    
+  func updateStreamId(_ command: String, _ seqNumber: SequenceNumber, _ responseValue: String, _ reply: String) -> Void {    
     guard responseValue == "0" else {
-      
       _log("NetCwStream: Response value != 0 for: \(command)", .error, #function, #file, #line)
       isActive = false
       return
     }
-    
     if let streamId = reply.streamId {
-      
       id = streamId
       isActive = true
       
@@ -160,7 +148,6 @@ public final class NetCwStream : NSObject {
       NC.post(.netCwStreamHasBeenAdded, object: self as Any?)
 
     } else {
-      
       _log("NetCwStream, Error parsing Stream ID (" + reply + ")", .error, #function, #file, #line)
       isActive = false
     }
@@ -176,8 +163,7 @@ public final class NetCwStream : NSObject {
   ///   - cmd:          the command to send as string
   ///
   private func sendVitaCommand(_ cmd: String) -> Void {
-    
-    // convert the string to ASCII bytes
+    // convert to Data containing ASCII bytes
     let txData = cmd.data(using: String.Encoding.utf8, allowLossyConversion: false)!
     
     let bytesToSend = txData.count
@@ -193,20 +179,16 @@ public final class NetCwStream : NSObject {
     
     // set the length of the packet
     _vita!.payloadSize = bytesToSend
-    _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size
+    _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size
     
     // set the sequence number
-    _vita!.sequence = _txSeq
+    _vita!.sequence = _txSequenceNumber
     
     // encode the Vita class as data and send to radio
-    if let data = Vita.encodeAsData(_vita!) {
-      
-      // send packet to radio
-      //        _api.sendVitaData(data)
-      _radio.sendVita(data)
-    }
+    if let data = Vita.encodeAsData(_vita!) { _radio.sendVita(data) }
+    
     // increment the sequence number (mod 16)
-    _txSeq = (_txSeq + 1) % 16
+    _txSequenceNumber = (_txSequenceNumber + 1) % 16
   }
   
   // ----------------------------------------------------------------------------

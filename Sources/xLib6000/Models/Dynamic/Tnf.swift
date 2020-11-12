@@ -27,9 +27,6 @@ public final class Tnf : NSObject, DynamicModel {
   static let kWidthDefault  : Hz = 100
   static let kWidthMax      : Hz = 6_000
   
-//  static let kNormal    = Depth.normal.rawValue
-//  static let kVeryDeep  = Depth.veryDeep.rawValue
-  
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
@@ -94,7 +91,6 @@ public final class Tnf : NSObject, DynamicModel {
   ///   - id:           a Tnf Id
   ///
   public init(radio: Radio, id: TnfId) {
-    
     _radio = radio
     self.id = id
     
@@ -116,13 +112,10 @@ public final class Tnf : NSObject, DynamicModel {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-
     // get the Id
     if let id = properties[0].key.objectId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, does it exist?
         if radio.tnfs[id] == nil {
           
@@ -133,20 +126,17 @@ public final class Tnf : NSObject, DynamicModel {
         radio.tnfs[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
         
       } else {
-        
         // NOTE: This code will never be called
         //    Tnf does not send status on removal
 
         // does it exist?
         if radio.tnfs[id] != nil {
-          
           // YES, remove it, notify observers
           NC.post(.tnfWillBeRemoved, object: radio.tnfs[id] as Any?)
 
           radio.tnfs[id]  = nil
           
           Log.sharedInstance.logMessage("Tnf removed: id = \(id)", .debug, #function, #file, #line)
-
           NC.post(.tnfHasBeenRemoved, object: id as Any?)
         }
       }
@@ -163,10 +153,8 @@ public final class Tnf : NSObject, DynamicModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -183,13 +171,11 @@ public final class Tnf : NSObject, DynamicModel {
       }
       // is the Tnf initialized?
       if !_initialized && _frequency != 0 {
-        
         // YES, the Radio (hardware) has acknowledged this Tnf
         _initialized = true
-        
-        _log("Tnf added: id = \(id), frequency = \(_frequency)", .debug, #function, #file, #line)
 
         // notify all observers
+        _log("Tnf added: id = \(id), frequency = \(_frequency)", .debug, #function, #file, #line)
         NC.post(.tnfHasBeenAdded, object: self as Any?)
       }
     }
@@ -201,8 +187,6 @@ public final class Tnf : NSObject, DynamicModel {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove the Tnf
     _radio.sendCommand("tnf remove " + " \(id)", replyTo: callback)
     
     // notify all observers
@@ -212,7 +196,6 @@ public final class Tnf : NSObject, DynamicModel {
     _radio.tnfs[id] = nil
 
     _log("Tnf removed: id = \(id)", .debug, #function, #file, #line)
-
     NC.post(.tnfHasBeenRemoved, object: id as Any?)
   }
 

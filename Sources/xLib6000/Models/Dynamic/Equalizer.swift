@@ -137,25 +137,13 @@ public final class Equalizer : NSObject, DynamicModel {
     // determine the type of Equalizer
     switch type {
       
-    case EqType.txsc.rawValue:
-      // transmit equalizer
-      equalizer = radio.equalizers[.txsc]
-      
-    case EqType.rxsc.rawValue:
-      // receive equalizer
-      equalizer = radio.equalizers[.rxsc]
-      
-    case EqType.rx.rawValue, EqType.tx.rawValue:
-      // obslete type, ignore it
-      break
-      
-    default:
-      // unknown type, log & ignore it
-      Log.sharedInstance.logMessage("Unknown Equalizer type: \(type)", .warning, #function, #file, #line)
+    case EqType.txsc.rawValue:  equalizer = radio.equalizers[.txsc]
+    case EqType.rxsc.rawValue:  equalizer = radio.equalizers[.rxsc]
+    case EqType.rx.rawValue, EqType.tx.rawValue:  break // obslete types, ignore
+    default: Log.sharedInstance.logMessage("Unknown Equalizer type: \(type)", .warning, #function, #file, #line)
     }
     // if an equalizer was found
     if let equalizer = equalizer {
-      
       // pass the key values to the Equalizer for parsing (dropping the Type)
       equalizer.parseProperties(radio, Array(properties.dropFirst(1)) )
     }
@@ -171,7 +159,6 @@ public final class Equalizer : NSObject, DynamicModel {
   ///   - id:           an Equalizer Id
   ///
   init(radio: Radio, id: EqualizerId) {
-    
     self._radio = radio
     self.id = id
     super.init()
@@ -190,7 +177,6 @@ public final class Equalizer : NSObject, DynamicModel {
     
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -215,10 +201,9 @@ public final class Equalizer : NSObject, DynamicModel {
     if !_initialized {
       // NO, the Radio (hardware) has acknowledged this Equalizer
       _initialized = true
-      
-      _log("Equalizer added: id = \(id)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("Equalizer added: id = \(id)", .debug, #function, #file, #line)
       NC.post(.equalizerHasBeenAdded, object: self as Any?)
     }
   }
@@ -232,8 +217,7 @@ public final class Equalizer : NSObject, DynamicModel {
   ///   - token:      the parse token
   ///   - value:      the new value
   ///
-  private func eqCmd(_ token: Token, _ value: Any) {
-    
+  private func eqCmd(_ token: Token, _ value: Any) {    
     _radio.sendCommand("eq " + id + " " + token.rawValue + "=\(value)")
   }
   /// Set an Equalizer property on the Radio

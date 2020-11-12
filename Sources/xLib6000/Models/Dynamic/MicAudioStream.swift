@@ -25,11 +25,9 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
   public var isStreaming  : Bool {
     get { Api.objectQ.sync { _isStreaming } }
     set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
-
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var clientHandle: Handle {
     return _clientHandle }
   @objc dynamic public var ip: String {
@@ -54,7 +52,6 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
         }
       }
   }
-
   public      var rxLostPacketCount        = 0
 
   // ------------------------------------------------------------------------------
@@ -72,7 +69,6 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
   var _micGain : Int {
     get { Api.objectQ.sync { __micGain } }
     set { if newValue != _micGain { willChangeValue(for: \.micGain) ; Api.objectQ.sync(flags: .barrier) { __micGain = newValue } ; didChangeValue(for: \.micGain)}}}
-
   var _micGainScalar : Float {
     get { Api.objectQ.sync { __micGainScalar } }
     set { if newValue != _micGainScalar { Api.objectQ.sync(flags: .barrier) { __micGainScalar = newValue }}}}
@@ -87,11 +83,14 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _initialized   = false
-  private var _log           = Log.sharedInstance.logMessage
-  private let _radio         : Radio
-  private var _rxSeq         : Int?
-  
+  private var _initialized        = false
+  private var _log                = Log.sharedInstance.logMessage
+  private let _radio              : Radio
+  private var _rxPacketCount      = 0
+  private var _rxLostPacketCount  = 0
+  private var _txSampleCount      = 0
+  private var _rxSequenceNumber   = -1
+
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
@@ -107,16 +106,12 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ radio: Radio, _ properties: KeyValuesArray, _ inUse: Bool = true) {
-    
     // get the Id
     if let id =  properties[0].key.streamId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, does it exist?
         if radio.micAudioStreams[id] == nil {
-          
           // NO, is it for this client?
           if !isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) { return }
 
@@ -127,15 +122,12 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
         radio.micAudioStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
         
       } else {
-        
         // does it exist?
         if radio.micAudioStreams[id] != nil {
-          
           // YES, remove it
           radio.micAudioStreams[id] = nil
           
           Log.sharedInstance.logMessage("MicAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
-
           NC.post(.micAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
@@ -152,7 +144,6 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
   ///   - id:           a MicAudioStream Id
   ///
   init(radio: Radio, id: DaxMicStreamId) {
-    
     _radio = radio
     self.id = id
     super.init()
@@ -168,10 +159,8 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -189,13 +178,11 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
     }
     // is the AudioStream acknowledged by the radio?
     if !_initialized && _ip != "" {
-      
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
-      
-      _log("MicAudioStream added: id = \(id.hex), ip = \(_ip)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("MicAudioStream added: id = \(id.hex), ip = \(_ip)", .debug, #function, #file, #line)
       NC.post(.micAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -205,8 +192,6 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove the Stream
     _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
     
     // notify all observers
@@ -225,63 +210,40 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
   /// - Parameters:
   ///   - vitaPacket:         a Vita struct
   ///
-  func vitaProcessor(_ vita: Vita) {
-    
-    // if there is a delegate, process the Mic Audio stream
-    if let delegate = delegate {
+  func vitaProcessor(_ vita: Vita) {    
+    // is this the first packet?
+    if _rxSequenceNumber == -1 {
+      _rxSequenceNumber = vita.sequence
+      _rxPacketCount = 1
+      _rxLostPacketCount = 0
+    } else {
+      _rxPacketCount += 1
+    }
+
+    switch (_rxSequenceNumber, vita.sequence) {
+
+    case (let expected, let received) where received < expected:
+      // from a previous group, ignore it
+      _log("AudioStream delayed frame(s) ignored: expected \(expected), received \(received)", .warning, #function, #file, #line)
+      return
       
-      vita.payloadData.withUnsafeBytes { (payloadPtr) in
-        
-        // initialize a data frame
-        var dataFrame = MicAudioStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
-        
-        // get a pointer to the data in the payload
-        let wordsPtr = payloadPtr.bindMemory(to: UInt32.self)
-        
-        // allocate temporary data arrays
-        var dataLeft = [UInt32](repeating: 0, count: dataFrame.samples)
-        var dataRight = [UInt32](repeating: 0, count: dataFrame.samples)
-        
-        // swap endianess on the bytes
-        // for each sample if we are dealing with DAX audio
-        
-        // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
-        for i in 0..<dataFrame.samples {
-          
-          dataLeft[i] = CFSwapInt32BigToHost(wordsPtr[2*i])
-          dataRight[i] = CFSwapInt32BigToHost(wordsPtr[(2*i) + 1])
-        }
-        // copy the data as is -- it is already floating point
-        memcpy(&(dataFrame.leftAudio), &dataLeft, dataFrame.samples * 4)
-        memcpy(&(dataFrame.rightAudio), &dataRight, dataFrame.samples * 4)
-        
-        // scale with rx gain
-        let scale = self._micGainScalar
-        for i in 0..<dataFrame.samples {
-          
-          dataFrame.leftAudio[i] = dataFrame.leftAudio[i] * scale
-          dataFrame.rightAudio[i] = dataFrame.rightAudio[i] * scale
-        }
-        
-        // Pass the data frame to this AudioSream's delegate
-        delegate.streamHandler(dataFrame)
-      }
+    case (let expected, let received) where received > expected:
+      _rxLostPacketCount += 1
       
+      // from a later group, jump forward
+      let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
+      _log("AudioStream missing frame(s) skipped: expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+
+      _rxSequenceNumber = received
+      fallthrough
+
+    default:
+      // received == expected
       // calculate the next Sequence Number
-      let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
-      
-      // is the received Sequence Number correct?
-      if vita.sequence != expectedSequenceNumber {
-        
-        // NO, log the issue
-        _log("MicAudioStream missing packet(s): expected \(expectedSequenceNumber), received \(vita.sequence)", .debug, #function, #file, #line)
-        
-        _rxSeq = nil
-        rxLostPacketCount += 1
-      } else {
-        
-        _rxSeq = expectedSequenceNumber
-      }
+      _rxSequenceNumber = (_rxSequenceNumber + 1) % 16
+
+      // Pass the data frame to the Opus delegate
+      delegate?.streamHandler( DaxRxAudioFrame(payload: vita.payloadData, numberOfSamples: vita.payloadSize / (4 * 2) ))
     }
   }
   
@@ -296,50 +258,4 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
   private var __port          = 0
   private var __micGain       = 50
   private var __micGainScalar : Float = 1.0
-}
-
-/// Struct containing Mic Audio Stream data
-///
-public struct MicAudioStreamFrame {
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties
-  
-  public private(set) var samples           = 0                             // number of samples (L/R) in this frame
-  public var leftAudio                      = [Float]()                     // Array of left audio samples
-  public var rightAudio                     = [Float]()                     // Array of right audio samples
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize a MicAudioStreamFrame
-  ///
-  /// - Parameters:
-  ///   - payload:        pointer to a Vita packet payload
-  ///   - numberOfWords:  number of 32-bit Words in the payload
-  ///
-  public init(payload: UnsafeRawBufferPointer, numberOfBytes: Int) {
-
-    // 4 byte each for left and right sample (4 * 2)
-    self.samples = numberOfBytes / (4 * 2)
-
-    // allocate the samples arrays
-    self.leftAudio = [Float](repeating: 0, count: samples)
-    self.rightAudio = [Float](repeating: 0, count: samples)
-  }
-  /// Initialize an MicAudioStreamFrame
-  ///
-  /// - Parameters:
-  ///   - payload:          pointer to a Vita packet payload
-  ///   - numberOfSamples:  number of samples (L/R) needed
-  ///
-  public init(payload: UnsafeRawBufferPointer, numberOfSamples: Int) {
-
-    // 4 byte each for left and right sample (4 * 2)
-    self.samples = numberOfSamples
-
-    // allocate the samples arrays
-    self.leftAudio = [Float](repeating: 0, count: samples)
-    self.rightAudio = [Float](repeating: 0, count: samples)
-  }
 }

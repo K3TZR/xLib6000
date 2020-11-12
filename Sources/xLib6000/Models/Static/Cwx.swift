@@ -72,7 +72,6 @@ public final class Cwx : NSObject, StaticModel {
   ///   - radio:        the Radio instance
   ///
   init(radio: Radio) {
-    
     _radio = radio
     macros = [String](repeating: "", count: kMaxNumberOfMacros)
     
@@ -94,11 +93,9 @@ public final class Cwx : NSObject, StaticModel {
   /// - Returns:              true if found, false otherwise
   ///
   public func getMacro(index: Int, macro: inout String) -> Bool {
-    
     if index < 0 || index > kMaxNumberOfMacros - 1 { return false }
     
     macro = macros[index]
-    
     return true
   }
   
@@ -136,14 +133,12 @@ public final class Cwx : NSObject, StaticModel {
     }
 
     if components == 1 {
-      
       // 1 component - no block number
       
       // inform the Event Handler (if any), use 0 as a block identifier
       messageQueuedEventHandler?(charPos!, 0)
       
     } else {
-      
       // 2 components - get the block number
       let block = Int(values[1])
       
@@ -165,10 +160,8 @@ public final class Cwx : NSObject, StaticModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray)  {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // is it a Macro?
       if property.key.hasPrefix("macro") && property.key.lengthOfBytes(using: String.Encoding.ascii) > 5 {
         
@@ -184,7 +177,6 @@ public final class Cwx : NSObject, StaticModel {
         macros[index - 1] = property.value.unfix()
         
       } else {
-        
         // Check for Unknown Keys
         guard let token = Token(rawValue: property.key) else {
           // log it and ignore the Key
@@ -241,16 +233,13 @@ public final class Cwx : NSObject, StaticModel {
   ///   - block:                  an optional block
   ///
   public func insert(_ string: String, index: Int, block: Int? = nil) {
-    
     // replace spaces with 0x7f
     let msg = String(string.map { $0 == " " ? "\u{7f}" : $0 })
     
     if let block = block {
-      
       _radio.sendCommand("cwx insert " + "\(index) \"" + msg + "\" \(block)", replyTo: replyHandler)
       
     } else {
-      
       _radio.sendCommand("cwx insert " + "\(index) \"" + msg + "\"", replyTo: replyHandler)
     }
   }
@@ -266,11 +255,9 @@ public final class Cwx : NSObject, StaticModel {
   /// - Returns:              true if found, false otherwise
   ///
   public func saveMacro(index: Int, msg: String) -> Bool {
-    
     if index < 0 || index > kMaxNumberOfMacros - 1 { return false }
     
     macros[index] = msg
-    
     _radio.sendCommand("cwx macro " + "save \(index+1)" + " \"" + msg + "\"")
     
     return true
@@ -282,16 +269,13 @@ public final class Cwx : NSObject, StaticModel {
   ///   - block:          an optional block
   ///
   public func send(_ string: String, block: Int? = nil) {
-    
     // replace spaces with 0x7f
     let msg = String(string.map { $0 == " " ? "\u{7f}" : $0 })
     
     if let block = block {
-      
       _radio.sendCommand("cwx send " + "\"" + msg + "\" \(block)", replyTo: replyHandler)
       
     } else {
-      
       _radio.sendCommand("cwx send " + "\"" + msg + "\"", replyTo: replyHandler)
     }
   }
@@ -302,15 +286,12 @@ public final class Cwx : NSObject, StaticModel {
   ///   - block: an optional block ( > 0)
   ///
   public func sendMacro(index: Int, block: Int? = nil) {
-    
     if index < 0 || index > kMaxNumberOfMacros { return }
     
     if let block = block {
-      
       _radio.sendCommand("cwx macro " + "send \(index) \(block)", replyTo: replyHandler)
       
     } else {
-      
       _radio.sendCommand("cwx macro " + "send \(index)", replyTo: replyHandler)
     }
   }
@@ -325,7 +306,6 @@ public final class Cwx : NSObject, StaticModel {
   ///   - value:      the new value
   ///
   private func cwxCmd(_ token: Token, _ value: Any) {
-    
     _radio.sendCommand("cwx " + token.rawValue + " \(value)")
   }
   /// Send a command to Set a Cwx property

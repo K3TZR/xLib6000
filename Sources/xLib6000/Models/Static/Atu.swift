@@ -26,24 +26,15 @@ public final class Atu : NSObject, StaticModel {
     var value = ""
     guard let token = Status(rawValue: _status) else { return "Unknown" }
     switch token {
-    case .none, .tuneNotStarted:
-      break
-    case .tuneInProgress:
-      value = "Tuning"
-    case .tuneBypass:
-      value = "Success Byp"
-    case .tuneSuccessful:
-      value = "Success"
-    case .tuneOK:
-      value = "OK"
-    case .tuneFailBypass:
-      value = "Fail Byp"
-    case .tuneFail:
-      value = "Fail"
-    case .tuneAborted:
-      value = "Aborted"
-    case .tuneManualBypass:
-      value = "Manual Byp"
+    case .none, .tuneNotStarted:  break
+    case .tuneInProgress:   value = "Tuning"
+    case .tuneBypass:       value = "Success Byp"
+    case .tuneSuccessful:   value = "Success"
+    case .tuneOK:           value = "OK"
+    case .tuneFailBypass:   value = "Fail Byp"
+    case .tuneFail:         value = "Fail"
+    case .tuneAborted:      value = "Aborted"
+    case .tuneManualBypass: value = "Manual Byp"
     }
     return value }
   
@@ -100,7 +91,6 @@ public final class Atu : NSObject, StaticModel {
   ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
-    
     _radio = radio
     super.init()
   }
@@ -116,10 +106,8 @@ public final class Atu : NSObject, StaticModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key
@@ -141,8 +129,6 @@ public final class Atu : NSObject, StaticModel {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func atuClear(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to clear the ATU
     _radio.sendCommand("atu clear", replyTo: callback)
   }
   /// Start the ATU
@@ -150,8 +136,6 @@ public final class Atu : NSObject, StaticModel {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func atuStart(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to start the ATU
     _radio.sendCommand("atu start", replyTo: callback)
   }
   /// Bypass the ATU
@@ -159,8 +143,6 @@ public final class Atu : NSObject, StaticModel {
   /// - Parameter callback:   ReplyHandler (optional)
   ///
   public func atuBypass(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to bypass the ATU
     _radio.sendCommand("atu bypass", replyTo: callback)
   }
 

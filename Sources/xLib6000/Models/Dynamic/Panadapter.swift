@@ -38,7 +38,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var average: Int {
     get { _average }
     set {if _average != newValue { _average = newValue ; panadapterSet( .average, newValue) }}}
@@ -116,7 +115,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     set { if _yPixels != newValue { _yPixels = newValue ; panadapterSet( "ypixels", newValue) }}}
   @objc dynamic public var antList: [String] {
     return _antList }
-  
   @objc dynamic public var clientHandle: Handle {       // (V3 only)
     return _clientHandle }
   
@@ -297,13 +295,13 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _index                        = 0
-  private var _initialized                  = false
-  private let _log                          = Log.sharedInstance.logMessage
-  private var _panadapterframes             = [PanadapterFrame]()
-  private let _radio                        : Radio
+  private var _frameNumber              = 0
+  private var _initialized              = false
+  private let _log                      = Log.sharedInstance.logMessage
+  private var _panadapterframes         = [PanadapterFrame]()
+  private let _radio                    : Radio
 
-  private let _numberOfPanadapterFrames     = 6
+  private let _numberOfPanadapterFrames = 6
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -337,13 +335,10 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     
     //get the Id
     if let id =  properties[1].key.streamId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, does it exist?
         if radio.panadapters[id] == nil {
-          
           // create a new object & add it to the collection
           radio.panadapters[id] = Panadapter(radio: radio, id: id)
         }
@@ -351,10 +346,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
         radio.panadapters[id]!.parseProperties(radio, Array(properties.dropFirst(2)) )
       
       } else {
-        
         // does it exist?
         if radio.panadapters[id] != nil {
-          
           // YES, notify all observers
           NC.post(.panadapterWillBeRemoved, object: self as Any?)
         }
@@ -372,7 +365,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - id:                 a Panadapter Id
   ///
   init(radio: Radio, id: PanadapterStreamId) {
-    
     self._radio = radio
     self.id = id
 
@@ -380,9 +372,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     for _ in 0..<_numberOfPanadapterFrames {
       _panadapterframes.append(PanadapterFrame(frameSize: Panadapter.kMaxBins))
     }
-
     super.init()
-    
     isStreaming = false
   }
   
@@ -397,7 +387,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - reply:          the reply
   ///
   func rfGainReplyHandler(_ command: String, sequenceNumber: SequenceNumber, responseValue: String, reply: String) {
-
     // Anything other than 0 is an error
     guard responseValue == Api.kNoError else {
       // log it and ignore the Reply
@@ -418,10 +407,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -463,13 +450,11 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     }
     // is the Panadapter initialized?
     if !_initialized && center != 0 && bandwidth != 0 && (minDbm != 0.0 || maxDbm != 0.0) {
-      
       // YES, the Radio (hardware) has acknowledged this Panadapter
       _initialized = true
-      
-      _log("Panadapter added: id = \(id.hex) center = \(center.hzToMhz), bandwidth = \(bandwidth.hzToMhz)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("Panadapter added: id = \(id.hex) center = \(center.hzToMhz), bandwidth = \(bandwidth.hzToMhz)", .debug, #function, #file, #line)
       NC.post(.panadapterHasBeenAdded, object: self as Any?)
     }
   }
@@ -479,8 +464,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove a Panafall
     _radio.sendCommand("display panafall remove \(id.hex)", replyTo: callback)
     
     // notify all observers
@@ -496,20 +479,15 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - vita:        a Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    
     // convert the Vita struct to a PanadapterFrame
-    if _panadapterframes[_index].accumulate(version: _radio.version, vita: vita, expectedFrame: &packetFrame) {
-      
+    if _panadapterframes[_frameNumber].accumulate(version: _radio.version, vita: vita, expectedFrame: &packetFrame) {
       // Pass the data frame to this Panadapter's delegate
-      delegate?.streamHandler(_panadapterframes[_index])
+      delegate?.streamHandler(_panadapterframes[_frameNumber])
 
       // use the next dataframe
-      _index = (_index + 1) % _numberOfPanadapterFrames
+      _frameNumber = (_frameNumber + 1) % _numberOfPanadapterFrames
     }
   }
-
-  
-  
   /// Request Click Tune
   ///
   /// - Parameters:
@@ -517,7 +495,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func clickTune(_ frequency: Hz, callback: ReplyHandler? = nil) {
-    
     // FIXME: ???
     _radio.sendCommand("slice " + "m " + "\(frequency.hzToMhz)" + " pan=\(id.hex)", replyTo: callback)
   }
@@ -526,8 +503,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   public func requestRfGainInfo() {
     _radio.sendCommand("display pan " + "rf_gain_info " + "\(id.hex)", replyTo: rfGainReplyHandler)
   }
-
-  
   
   // ----------------------------------------------------------------------------
   // Mark: - Private methods
@@ -539,7 +514,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - value:      the new value
   ///
   private func panadapterSet(_ token: Token, _ value: Any) {
-    
     _radio.sendCommand("display panafall set " + "\(id.hex) " + token.rawValue + "=\(value)")
   }
   /// Set a Panadapter property on the Radio
@@ -605,13 +579,13 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 ///
 ///   populated by the Panadapter vitaHandler
 ///
-public class PanadapterFrame {
+public struct PanadapterFrame {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public private(set) var startingBin       = 0                             // Index of first bin
-  public private(set) var numberOfBins      = 0                             // Number of bins
+  public private(set) var binsInThisFrame      = 0                             // Number of bins
   public private(set) var binSize           = 0                             // Bin size in bytes
   public private(set) var totalBins         = 0                             // number of bins in the complete frame
   public private(set) var receivedFrame     = 0                             // Frame number
@@ -647,7 +621,6 @@ public class PanadapterFrame {
   /// - Parameter frameSize:    max number of Panadapter samples
   ///
   public init(frameSize: Int) {
-    
     // allocate the bins array
     self.bins = [UInt16](repeating: 0, count: frameSize)
   }
@@ -660,10 +633,7 @@ public class PanadapterFrame {
   /// - Parameter vita:         incoming Vita object
   /// - Returns:                true if entire frame processed
   ///
-  public func accumulate(version: Version, vita: Vita, expectedFrame: inout Int) -> Bool {
-    
-//    let payloadPtr = UnsafeRawPointer(vita.payloadData)
-    
+  public mutating func accumulate(version: Version, vita: Vita, expectedFrame: inout Int) -> Bool {    
     if version.isGreaterThanV22 {
       // 2.3.x or greater
       // Bins are just beyond the payload
@@ -675,13 +645,12 @@ public class PanadapterFrame {
         let hdr = ptr.bindMemory(to: PayloadHeader.self)
 
         startingBin = Int(CFSwapInt16BigToHost(hdr[0].startingBin))
-        numberOfBins = Int(CFSwapInt16BigToHost(hdr[0].numberOfBins))
+        binsInThisFrame = Int(CFSwapInt16BigToHost(hdr[0].numberOfBins))
         binSize = Int(CFSwapInt16BigToHost(hdr[0].binSize))
         totalBins = Int(CFSwapInt16BigToHost(hdr[0].totalBins))
         receivedFrame = Int(CFSwapInt32BigToHost(hdr[0].frameIndex))
       }
-      
-      
+            
     } else {
       // pre 2.3.x
       // Bins are just beyond the payload
@@ -694,15 +663,15 @@ public class PanadapterFrame {
         
         // byte swap and convert each payload component
         startingBin = Int(CFSwapInt32BigToHost(hdr[0].startingBin))
-        numberOfBins = Int(CFSwapInt32BigToHost(hdr[0].numberOfBins))
+        binsInThisFrame = Int(CFSwapInt32BigToHost(hdr[0].numberOfBins))
         binSize = Int(CFSwapInt32BigToHost(hdr[0].binSize))
-        totalBins = numberOfBins
+        totalBins = binsInThisFrame
         receivedFrame = Int(CFSwapInt32BigToHost(hdr[0].frameIndex))
       }
     }
     // validate the packet (could be incomplete at startup)
     if totalBins == 0 { return false }
-    if startingBin + numberOfBins > totalBins { return false }
+    if startingBin + binsInThisFrame > totalBins { return false }
 
     // initial frame?
     if expectedFrame == -1 { expectedFrame = receivedFrame }
@@ -711,12 +680,12 @@ public class PanadapterFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log("Panadapter ignored frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Panadapter delayed frame(s) ignored: expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       return false
       
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
-      _log("Panadapter missing frame(s): expected = \(expected), received = \(received)", .warning, #function, #file, #line)
+      _log("Panadapter missing frame(s) skipped: expected = \(expected), received = \(received)", .warning, #function, #file, #line)
       expectedFrame = received
       fallthrough
       
@@ -724,14 +693,16 @@ public class PanadapterFrame {
       // received == expected
       vita.payloadData.withUnsafeBytes { ptr in
         // Swap the byte ordering of the data & place it in the bins
-        for i in 0..<numberOfBins {
+        for i in 0..<binsInThisFrame {
           bins[i+startingBin] = CFSwapInt16BigToHost( ptr.load(fromByteOffset: _byteOffsetToBins + (2 * i), as: UInt16.self) )
         }
       }
-      // reset the count if the entire frame has been accumulated
-      if startingBin + numberOfBins == totalBins { numberOfBins = totalBins  ; expectedFrame += 1 }
+      binsInThisFrame += startingBin
+     
+      // increment the frame count if the entire frame has been accumulated
+      if binsInThisFrame == totalBins { expectedFrame += 1 }
     }
     // return true if the entire frame has been accumulated
-    return numberOfBins == totalBins
+    return binsInThisFrame == totalBins
   }
 }

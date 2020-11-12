@@ -27,11 +27,9 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   public var isStreaming  : Bool {
     get { Api.objectQ.sync { _isStreaming } }
     set { Api.objectQ.sync(flags: .barrier) {_isStreaming = newValue }}}
-
   public var delegate : StreamHandler? {
     get { Api.objectQ.sync { _delegate } }
     set { Api.objectQ.sync(flags: .barrier) {_delegate = newValue }}}
-
   @objc dynamic public var rate: Int {
     get { _rate }
     set {
@@ -52,7 +50,6 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   @objc dynamic public var port         : Int     { _port  }
   @objc dynamic public var pan          : PanadapterStreamId { _pan }
   @objc dynamic public var streaming    : Bool    { _streaming  }
-  
   public private(set) var rxLostPacketCount = 0
 
   // ------------------------------------------------------------------------------
@@ -103,12 +100,13 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private      var _initialized       = false
-  private      let _log               = Log.sharedInstance.logMessage
-  private      let _radio             : Radio
-  private      var _rxSeq             : Int?
-
-  private      var _kOneOverZeroDBfs  : Float = 1.0 / pow(2.0, 15.0)
+  private var _initialized        = false
+  private let _log                = Log.sharedInstance.logMessage
+  private let _radio              : Radio
+  private var _rxPacketCount      = 0
+  private var _rxLostPacketCount  = 0
+  private var _txSampleCount      = 0
+  private var _rxSequenceNumber   = -1
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -127,15 +125,10 @@ public final class IqStream : NSObject, DynamicModelWithStream {
     
     // get the Id
     if let id =  properties[0].key.streamId {
-      
       // is the object in use?
       if inUse {
-        
         // YES, does it exist?
         if radio.iqStreams[id] == nil {
-
-          // NO, is it for this client?
-//          if !isForThisClient(properties, connectionHandle: Api.sharedInstance.connectionHandle) { return }
 
           // create a new object & add it to the collection
           radio.iqStreams[id] = IqStream(radio: radio, id: id)
@@ -144,15 +137,12 @@ public final class IqStream : NSObject, DynamicModelWithStream {
         radio.iqStreams[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
         
       } else {
-        
         // does it exist?
         if radio.iqStreams[id] != nil {
-          
           // YES, remove it
           radio.iqStreams[id] = nil
           
           Log.sharedInstance.logMessage("IqStream removed: id = \(id.hex)", .debug, #function, #file, #line)
-
           NC.post(.iqStreamHasBeenRemoved, object: id as Any?)
         }
       }
@@ -169,7 +159,6 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   ///   - id:           an IqStream Id
   ///
   init(radio: Radio, id: DaxIqStreamId) {
-    
     _radio = radio
     self.id = id
     super.init()
@@ -185,10 +174,8 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -213,15 +200,13 @@ public final class IqStream : NSObject, DynamicModelWithStream {
     }
     // is the Stream initialized?
     if !_initialized && _ip != "" {
-      
       // YES, the Radio (hardware) has acknowledged this Stream
       _initialized = true
       
       _pan = _radio.findPanadapterId(using: _daxIqChannel) ?? 0
-                  
-      _log("IqStream added: id = \(id.hex), channel = \(_daxIqChannel)", .debug, #function, #file, #line)
 
       // notify all observers
+      _log("IqStream added: id = \(id.hex), channel = \(_daxIqChannel)", .debug, #function, #file, #line)
       NC.post(.iqStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -232,7 +217,6 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   ///
   public func remove(callback: ReplyHandler? = nil) {
 
-    // tell the Radio to remove the Stream
     _radio.sendCommand("stream remove " + "\(id.hex)", replyTo: callback)
     
     // notify all observers
@@ -252,54 +236,39 @@ public final class IqStream : NSObject, DynamicModelWithStream {
   ///   - vita:       a Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    
-    // if there is a delegate, process the Panadapter stream
-    if let delegate = delegate {
+    // is this the first packet?
+    if _rxSequenceNumber == -1 {
+      _rxSequenceNumber = vita.sequence
+      _rxPacketCount = 1
+      _rxLostPacketCount = 0
+    } else {
+      _rxPacketCount += 1
+    }
+
+    switch (_rxSequenceNumber, vita.sequence) {
+
+    case (let expected, let received) where received < expected:
+      // from a previous group, ignore it
+      _log("IqStream delayed frame(s) ignored: expected \(expected), received \(received)", .warning, #function, #file, #line)
+      return
       
-      vita.payloadData.withUnsafeBytes { (payloadPtr) in
-        // initialize a data frame
-        var dataFrame = IqStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
-        
-        dataFrame.daxIqChannel = self.daxIqChannel
-        
-        // get a pointer to the data in the payload
-        let wordsPtr = payloadPtr.bindMemory(to: Float32.self)
-        
-        // allocate temporary data arrays
-        var dataLeft = [Float32](repeating: 0, count: dataFrame.samples)
-        var dataRight = [Float32](repeating: 0, count: dataFrame.samples)
-        
-        // FIXME: is there a better way
-        // de-interleave the data
-        for i in 0..<dataFrame.samples {
-          
-          dataLeft[i] = wordsPtr[2*i]
-          dataRight[i] = wordsPtr[(2*i) + 1]
-        }
-        
-        // copy & normalize the data
-        vDSP_vsmul(&dataLeft, 1, &_kOneOverZeroDBfs, &(dataFrame.realSamples), 1, vDSP_Length(dataFrame.samples))
-        vDSP_vsmul(&dataRight, 1, &_kOneOverZeroDBfs, &(dataFrame.imagSamples), 1, vDSP_Length(dataFrame.samples))
-        
-        // Pass the data frame to this AudioSream's delegate
-        delegate.streamHandler(dataFrame)
-      }
+    case (let expected, let received) where received > expected:
+      _rxLostPacketCount += 1
       
+      // from a later group, jump forward
+      let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
+      _log("IqStream missing frame(s) skipped: expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+
+      _rxSequenceNumber = received
+      fallthrough
+
+    default:
+      // received == expected
       // calculate the next Sequence Number
-      let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
-      
-      // is the received Sequence Number correct?
-      if vita.sequence != expectedSequenceNumber {
-        
-        // NO, log the issue
-        _log("IqStream missing packet(s): expected \(expectedSequenceNumber), received \(vita.sequence)", .warning, #function, #file, #line)
-        
-        _rxSeq = nil
-        rxLostPacketCount += 1
-      } else {
-        
-        _rxSeq = expectedSequenceNumber
-      }
+      _rxSequenceNumber = (_rxSequenceNumber + 1) % 16
+
+      // Pass the data frame to the Opus delegate
+      delegate?.streamHandler( IqStreamFrame(payload: vita.payloadData, numberOfBytes: vita.payloadSize, daxIqChannel: daxIqChannel ))
     }
   }
   
@@ -344,10 +313,15 @@ public struct IqStreamFrame {
   // MARK: - Public properties
   
   public var daxIqChannel                   = -1
-  public private(set) var samples           = 0                             // number of samples (L/R) in this frame
-  public var realSamples                    = [Float]()                     // Array of real (I) samples
-  public var imagSamples                    = [Float]()                     // Array of imag (Q) samples
+  public private(set) var numberOfSamples   = 0
+  public var realSamples                    = [Float]()
+  public var imagSamples                    = [Float]()
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Private properties
+  
+    private var _kOneOverZeroDBfs  : Float = 1.0 / pow(2.0, 15.0)
+
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -357,14 +331,34 @@ public struct IqStreamFrame {
   ///   - payload:        pointer to a Vita packet payload
   ///   - numberOfBytes:  number of bytes in the payload
   ///
-  public init(payload: UnsafeRawBufferPointer, numberOfBytes: Int) {
+  public init(payload: [UInt8], numberOfBytes: Int, daxIqChannel: Int) {
     
     // 4 byte each for left and right sample (4 * 2)
-    self.samples = numberOfBytes / (4 * 2)
-    
+    numberOfSamples = numberOfBytes / (4 * 2)
+    self.daxIqChannel = daxIqChannel
+
     // allocate the samples arrays
-    self.realSamples = [Float](repeating: 0, count: samples)
-    self.imagSamples = [Float](repeating: 0, count: samples)
+    realSamples = [Float](repeating: 0, count: numberOfSamples)
+    imagSamples = [Float](repeating: 0, count: numberOfSamples)
+    
+    payload.withUnsafeBytes { (payloadPtr) in            
+      // get a pointer to the data in the payload
+      let wordsPtr = payloadPtr.bindMemory(to: Float32.self)
+      
+      // allocate temporary data arrays
+      var dataLeft = [Float32](repeating: 0, count: numberOfSamples)
+      var dataRight = [Float32](repeating: 0, count: numberOfSamples)
+      
+      // FIXME: is there a better way
+      // de-interleave the data
+      for i in 0..<numberOfSamples {
+        dataLeft[i] = wordsPtr[2*i]
+        dataRight[i] = wordsPtr[(2*i) + 1]
+      }
+      // copy & normalize the data
+      vDSP_vsmul(&dataLeft, 1, &_kOneOverZeroDBfs, &realSamples, 1, vDSP_Length(numberOfSamples))
+      vDSP_vsmul(&dataRight, 1, &_kOneOverZeroDBfs, &imagSamples, 1, vDSP_Length(numberOfSamples))
+    }
   }
 }
 

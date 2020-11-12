@@ -47,7 +47,6 @@ public final class Waveform : NSObject, StaticModel {
   ///   - radio:        the Radio instance
   ///
   public init(radio: Radio) {
-
     _radio = radio
     super.init()
   }
@@ -63,10 +62,8 @@ public final class Waveform : NSObject, StaticModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
-    for property in properties {
-      
+    for property in properties {      
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key

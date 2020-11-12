@@ -118,13 +118,10 @@ public final class Amplifier  : NSObject, DynamicModel {
         
     // get the handle
     if let id = properties[0].key.handle {
-      
       // is the object in use
       if inUse {
-        
         // YES, does it exist?
         if radio.amplifiers[id] == nil {
-          
           // NO, create a new Amplifier & add it to the Amplifiers collection
           radio.amplifiers[id] = Amplifier(radio: radio, id: id)
         }
@@ -132,17 +129,13 @@ public final class Amplifier  : NSObject, DynamicModel {
         radio.amplifiers[id]!.parseProperties(radio, Array(properties.dropFirst(1)) )
         
       } else {
-        
         // does it exist?
         if radio.amplifiers[id] != nil {
-          
           // YES, remove it, notify observers
           NC.post(.amplifierWillBeRemoved, object: radio.amplifiers[id] as Any?)
           
           radio.amplifiers[id] = nil
-          
           Log.sharedInstance.logMessage("Amplifier removed: id = \(id.hex)", .debug, #function, #file, #line)
-          
           NC.post(.amplifierHasBeenRemoved, object: id as Any?)
         }
       }
@@ -159,7 +152,6 @@ public final class Amplifier  : NSObject, DynamicModel {
   ///   - id:           an Amplifier Id
   ///
   public init(radio: Radio, id: AmplifierId) {
-    
     _radio = radio
     self.id = id
     super.init()
@@ -175,10 +167,8 @@ public final class Amplifier  : NSObject, DynamicModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ radio: Radio, _ properties: KeyValuesArray) {
-    
     // process each key/value pair, <key=value>
     for property in properties {
-      
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
@@ -199,13 +189,11 @@ public final class Amplifier  : NSObject, DynamicModel {
     }
     // is the Amplifier initialized?
     if !_initialized && _ip != "" && _port != 0 {
-      
       // YES, the Radio (hardware) has acknowledged this Amplifier
       _initialized = true
                   
-      _log("Amplifier added: id = \(id.hex), model = \(_model)", .debug, #function, #file, #line)
-
       // notify all observers
+      _log("Amplifier added: id = \(id.hex), model = \(_model)", .debug, #function, #file, #line)
       NC.post(.amplifierHasBeenAdded, object: self as Any?)
     }
   }
@@ -237,8 +225,7 @@ public final class Amplifier  : NSObject, DynamicModel {
   ///   - mode:           mode (String)
   ///   - callback:       ReplyHandler (optional)
   ///
-  public func setMode(_ mode: Bool, callback: ReplyHandler? = nil) {
-    
+  public func setMode(_ mode: Bool, callback: ReplyHandler? = nil) {    
     // TODO: add code
   }
 

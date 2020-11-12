@@ -48,7 +48,6 @@ protocol TcpManagerDelegate: class {
   func didDisconnect(reason: String)
 }
 
-
 ///  TcpManager Class implementation
 ///
 ///      manages all TCP communication between the API and the Radio (hardware)
@@ -91,7 +90,6 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   ///   - timeout:        connection timeout (seconds)
   ///
   init(tcpReceiveQ: DispatchQueue, tcpSendQ: DispatchQueue, delegate: TcpManagerDelegate, timeout: Double = 0.5) {
-    
     _tcpReceiveQ = tcpReceiveQ
     _tcpSendQ = tcpSendQ
     _delegate = delegate
@@ -129,7 +127,6 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
     // attempt a connection
     do {
       if packet.isWan && packet.requiresHolePunch {
-
         // insure that the localInterfaceIp has been specified
         guard packet.localInterfaceIP != "0.0.0.0" else { return false }
         // create the localInterfaceIp value
@@ -139,7 +136,6 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
         try _tcpSocket.connect(toHost: packet.publicIp, onPort: UInt16(portToUse), viaInterface: localInterface, withTimeout: _timeout)
         
       } else {
-        
         // connect on the default interface
         try _tcpSocket.connect(toHost: packet.publicIp, onPort: UInt16(portToUse), withTimeout: _timeout)
       }
@@ -170,7 +166,6 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
     var command = ""
     
     _tcpSendQ.sync {
-      
       // assemble the command
       command =  "C" + "\(diagnostic ? "D" : "")" + "\(self._seqNum)|" + cmd + "\n"
       
@@ -207,7 +202,6 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   ///   - err:        the error
   ///
   @objc func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
-    
     _delegate?.didDisconnect(reason: (err == nil) ? "User Initiated" : err!.localizedDescription)
   }
   /// Called after the TCP/IP connection has been established
@@ -218,13 +212,11 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   ///   - port:       the port
   ///
   @objc func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
-    
     // Connected
     interfaceIpAddress = sock.localHost!
     
     // is this a Wan connection?
     if _isWan {
-      
       // TODO: Is this needed? Could we call with no param and skip the didReceiveTrust?
       
       // YES, secure the connection using TLS
@@ -243,7 +235,6 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   ///   - tag:        the Tag associated with this receipt
   ///
   @objc func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
-    
     // pass the bytes read to the delegate
     if let text = String(data: data, encoding: .ascii) {
       _delegate?.didReceive(text)
@@ -263,7 +254,6 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   /// - Parameter sock:       the socket that was secured
   ///
   @objc public func socketDidSecure(_ sock: GCDAsyncSocket) {
-    
     // should not happen but...
     guard _isWan else { return }
     
@@ -287,8 +277,7 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
    * The completionHandler block is thread-safe, and may be invoked from a background queue/thread.
    * It is safe to invoke the completionHandler block even if the socket has been closed.
    **/
-  @objc public func socket(_ sock: GCDAsyncSocket, didReceive trust: SecTrust, completionHandler: @escaping (Bool) -> Void) {
-    
+  @objc public func socket(_ sock: GCDAsyncSocket, didReceive trust: SecTrust, completionHandler: @escaping (Bool) -> Void) {    
     // should not happen but...
     guard _isWan else { completionHandler(false) ; return }
     
