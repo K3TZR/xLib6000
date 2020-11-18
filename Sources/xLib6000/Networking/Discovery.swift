@@ -113,11 +113,12 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
             for i in deleteList.reversed() {
               let nickname = self.discoveryPackets[i].nickname
               let firmwareVersion = self.discoveryPackets[i].firmwareVersion
-
+              let connectionString = self.discoveryPackets[i].connectionString
+              
               // remove a Radio
               self.discoveryPackets.remove(at: i)
 
-              self._log("Discovery radio removed: \(nickname) v\(firmwareVersion) \(self.discoveryPackets[i].connectionString)", .debug, #function, #file, #line)
+              self._log("Discovery radio removed: \(nickname) v\(firmwareVersion) \(connectionString)", .debug, #function, #file, #line)
             }
             // send the current list of radios to all observers
             NC.post(.discoveredRadios, object: self.discoveryPackets as Any?)
