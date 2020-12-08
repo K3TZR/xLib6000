@@ -53,7 +53,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   ///   - checkInterval:        how often to check
   ///   - notSeenInterval:      timeout interval
   ///
-  private init(discoveryPort: UInt16 = 4992, checkInterval: TimeInterval = 1.0, notSeenInterval: TimeInterval = 3.0) {
+  private init(discoveryPort: UInt16 = 4992, checkInterval: TimeInterval = 1.0, notSeenInterval: TimeInterval = 5.0) {
     super.init()
     
     // create a Udp socket
@@ -228,7 +228,8 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     // log and notify for GuiClient addition(s)
     for client in newPacket.guiClients {
       _log("Discovery GuiClient added: \(client.handle.hex),  Station = \(client.station), Packet = \(newPacket.connectionString)", .debug, #function, #file, #line)
-      NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients as Any?)
+//      NC.post(.guiClientHasBeenAdded, object: newPacket.guiClients as Any?)
+      NC.post(.guiClientHasBeenAdded, object: client as Any?)
     }
   }
   
@@ -242,7 +243,8 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         
         // log and notify for GuiClient addition
         _log("Discovery GuiClient added: \(client.handle.hex), Station = \(client.station), Packet = \(newPacket.connectionString)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenAdded, object: discoveryPackets[index].guiClients as Any?)
+//        NC.post(.guiClientHasBeenAdded, object: discoveryPackets[index].guiClients as Any?)
+        NC.post(.guiClientHasBeenAdded, object: client as Any?)
       }
     }
   }
@@ -267,7 +269,8 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
 
         // log and notify for GuiClient removal
         _log("Discovery GuiClient removed: Handle = \(handle.hex), Station = \(station), Packet = \(newPacket.connectionString)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenRemoved, object: discoveryPackets[index].guiClients as Any?)
+//        NC.post(.guiClientHasBeenRemoved, object: discoveryPackets[index].guiClients as Any?)
+        NC.post(.guiClientHasBeenRemoved, object: client as Any?)
       }
     }
   }

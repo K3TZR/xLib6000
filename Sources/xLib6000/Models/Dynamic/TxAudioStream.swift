@@ -8,7 +8,7 @@
 
 public typealias TxStreamId = StreamId
 
-import Cocoa
+import Foundation
 
 /// TxAudioStream Class implementation
 ///

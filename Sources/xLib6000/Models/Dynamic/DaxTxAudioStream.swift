@@ -8,7 +8,7 @@
 
 public typealias DaxTxStreamId = StreamId
 
-import Cocoa
+import Foundation
 
 /// DaxTxAudioStream Class implementation
 ///

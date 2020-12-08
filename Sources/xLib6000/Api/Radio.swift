@@ -138,14 +138,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) }}}
   @objc dynamic public var boundClientId: String? {
     get { _boundClientId }
-    set { if _boundClientId != newValue {
-      if !_api.isGui && newValue != nil {
-        _boundClientId = newValue
-        bindGuiClient(_boundClientId!)
-      }
-    }
-    }
-  }
+    set { if _boundClientId != newValue { _boundClientId = newValue ; bindGuiClient(_boundClientId!) }}}
   @objc dynamic public var calFreq: Hz {
     get { _calFreq }
     set { if _calFreq != newValue { _calFreq = newValue ; radioSetCmd( .calFreq, newValue.hzToMhz) }}}
@@ -895,7 +888,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
         // log and notify of GuiClient update
         _log("Radio guiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveryPackets[i].guiClients as Any?)
+//        NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveryPackets[i].guiClients as Any?)
+        NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveryPackets[i].guiClients[j] as Any?)
       }
       
       if handleWasFound == false {
@@ -905,7 +899,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
         // log and notify of GuiClient update
         _log("Radio guiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
-        NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveryPackets[i].guiClients as Any?)
+//        NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveryPackets[i].guiClients as Any?)
+        NC.post(.guiClientHasBeenUpdated, object: client as Any?)
       }
     }
   }

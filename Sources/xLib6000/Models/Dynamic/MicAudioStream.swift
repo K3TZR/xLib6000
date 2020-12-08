@@ -6,7 +6,7 @@
 //  Copyright © 2017 Douglas Adams & Mario Illgen. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 /// MicAudioStream Class implementation
 ///

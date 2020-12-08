@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreGraphics
 
 extension Radio {
 
@@ -204,7 +205,7 @@ extension Radio {
   ///   - callback:           ReplyHandler (optional)
   ///
   public func bindGuiClient(_ clientId: String, callback:  ReplyHandler? = nil) {
-    if Api.sharedInstance.isGui { return }
+    guard Api.sharedInstance.isGui == false && clientId != "" else { return }
     
     sendCommand("client bind client_id=" + clientId, replyTo: callback)
     _boundClientId = clientId

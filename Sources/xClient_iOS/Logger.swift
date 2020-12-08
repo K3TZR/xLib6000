@@ -6,7 +6,7 @@
 //  Copyright © 2020 Douglas Adams. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 import XCGLogger
 import xLib6000
 import SwiftUI
@@ -36,7 +36,7 @@ import SwiftUI
 public protocol LoggerDelegate {
   
   var logWindowIsVisible  : Bool      {get set}
-  var logWindow           : NSWindow? {get}
+//  var logWindow           : NSWindow? {get}
 }
 
 // ----------------------------------------------------------------------------
@@ -99,9 +99,10 @@ public class Logger : LogHandler, ObservableObject {
   ///
   ///     NOTE: this must be called after the sharedInstance is created and before the Logger is used
   ///
-  public func config(delegate: LoggerDelegate, domain: String, appName: String) {
+//  public func config(delegate: LoggerDelegate, domain: String, appName: String) {
+    public func config(domain: String, appName: String) {
 
-    self.delegate = delegate
+//    self.delegate = delegate
     _domain = domain
     _appName = appName
     
@@ -227,131 +228,131 @@ public class Logger : LogHandler, ObservableObject {
   private var _logString          : String!
   private var _linesArray         = [String.SubSequence]()
 
-  public func loadLog(at logUrl: URL? = nil) {
-    guard _initialized else { fatalError("Logger was not configured before first use.") }
-    
-    if let url = logUrl {
-      // read it & populate the textView
-      do {
-        logLines.removeAll()
-        
-        _logString = try String(contentsOf: url, encoding: .ascii)
-        _linesArray = _logString.split(separator: "\n")
-        _openFileUrl = url
-        delegate?.logWindow?.title = "Log Window,  " + url.lastPathComponent
-        
-        filterLog()
-        
-      } catch {
-        let alert = NSAlert()
-        alert.messageText = "Unable to load Log"
-        alert.informativeText = "Log file\n\n\(url)\n\nNOT found"
-        alert.alertStyle = .critical
-        alert.addButton(withTitle: "Ok")
-        
-        let _ = alert.runModal()
-      }
-      
-    } else {
-      
-      // allow the user to select a Log file
-      let openPanel = NSOpenPanel()
-      openPanel.canChooseFiles = true
-      openPanel.canChooseDirectories = false
-      openPanel.allowsMultipleSelection = false
-      openPanel.allowedFileTypes = ["log"]
-      openPanel.directoryURL = URL(fileURLWithPath: URL.appSupport.path + "/" + _domain + "." + _appName + "/Logs")
-      
-      // open an Open Dialog
-      openPanel.beginSheetModal(for: delegate!.logWindow!) { [unowned self] (result: NSApplication.ModalResponse) in
-        
-        // if the user selects Open
-        if result == NSApplication.ModalResponse.OK {
-          if let url = openPanel.url {
-            do {
-              self.logLines.removeAll()
-              
-              self._logString = try String(contentsOf: url, encoding: .ascii)
-              self._linesArray = self._logString.split(separator: "\n")
-              _openFileUrl = url
-              delegate?.logWindow?.title = "Log Window,  " + url.lastPathComponent
-              
-              filterLog()
-            
-            } catch {
-              let alert = NSAlert()
-              alert.messageText = "Unable to load Log file"
-              alert.informativeText = "File\n\n\(url)\n\nNOT loaded"
-              alert.alertStyle = .critical
-              alert.addButton(withTitle: "Ok")
-              
-              let _ = alert.runModal()
-            }
-          }
-        }
-      }
-    }
-  }
+//  public func loadLog(at logUrl: URL? = nil) {
+//    guard _initialized else { fatalError("Logger was not configured before first use.") }
+//
+//    if let url = logUrl {
+//      // read it & populate the textView
+//      do {
+//        logLines.removeAll()
+//
+//        _logString = try String(contentsOf: url, encoding: .ascii)
+//        _linesArray = _logString.split(separator: "\n")
+//        _openFileUrl = url
+//        delegate?.logWindow?.title = "Log Window,  " + url.lastPathComponent
+//
+//        filterLog()
+//
+//      } catch {
+//        let alert = NSAlert()
+//        alert.messageText = "Unable to load Log"
+//        alert.informativeText = "Log file\n\n\(url)\n\nNOT found"
+//        alert.alertStyle = .critical
+//        alert.addButton(withTitle: "Ok")
+//
+//        let _ = alert.runModal()
+//      }
+//
+//    } else {
+//
+//      // allow the user to select a Log file
+//      let openPanel = NSOpenPanel()
+//      openPanel.canChooseFiles = true
+//      openPanel.canChooseDirectories = false
+//      openPanel.allowsMultipleSelection = false
+//      openPanel.allowedFileTypes = ["log"]
+//      openPanel.directoryURL = URL(fileURLWithPath: URL.appSupport.path + "/" + _domain + "." + _appName + "/Logs")
+//
+//      // open an Open Dialog
+//      openPanel.beginSheetModal(for: delegate!.logWindow!) { [unowned self] (result: NSApplication.ModalResponse) in
+//
+//        // if the user selects Open
+//        if result == NSApplication.ModalResponse.OK {
+//          if let url = openPanel.url {
+//            do {
+//              self.logLines.removeAll()
+//
+//              self._logString = try String(contentsOf: url, encoding: .ascii)
+//              self._linesArray = self._logString.split(separator: "\n")
+//              _openFileUrl = url
+//              delegate?.logWindow?.title = "Log Window,  " + url.lastPathComponent
+//
+//              filterLog()
+//
+//            } catch {
+//              let alert = NSAlert()
+//              alert.messageText = "Unable to load Log file"
+//              alert.informativeText = "File\n\n\(url)\n\nNOT loaded"
+//              alert.alertStyle = .critical
+//              alert.addButton(withTitle: "Ok")
+//
+//              let _ = alert.runModal()
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
   
-  public func refresh() {
-    guard _initialized else { fatalError("Logger was not configured before first use.") }
-    
-    if let url = _openFileUrl {
-      do {
-        logLines.removeAll()
-        
-        _logString = try String(contentsOf: url, encoding: .ascii)
-        _linesArray = _logString.split(separator: "\n")
-        delegate?.logWindow?.title = "Log Window,  " + url.lastPathComponent
-
-        filterLog()
-      
-      } catch {
-        let alert = NSAlert()
-        alert.messageText = "Unable to refresh Log"
-        alert.informativeText = "Log file\n\n\(url)\n\nNOT found"
-        alert.alertStyle = .critical
-        alert.addButton(withTitle: "Ok")
-        
-        let _ = alert.runModal()
-      }
-    }
-  }
+//  public func refresh() {
+//    guard _initialized else { fatalError("Logger was not configured before first use.") }
+//
+//    if let url = _openFileUrl {
+//      do {
+//        logLines.removeAll()
+//
+//        _logString = try String(contentsOf: url, encoding: .ascii)
+//        _linesArray = _logString.split(separator: "\n")
+//        delegate?.logWindow?.title = "Log Window,  " + url.lastPathComponent
+//
+//        filterLog()
+//
+//      } catch {
+//        let alert = NSAlert()
+//        alert.messageText = "Unable to refresh Log"
+//        alert.informativeText = "Log file\n\n\(url)\n\nNOT found"
+//        alert.alertStyle = .critical
+//        alert.addButton(withTitle: "Ok")
+//
+//        let _ = alert.runModal()
+//      }
+//    }
+//  }
   
-  public func saveLog() {
-    guard _initialized else { fatalError("Logger was not configured before first use.") }
-    
-    // Allow the User to save a copy of the Log file
-    let savePanel = NSSavePanel()
-    savePanel.allowedFileTypes = ["log"]
-    savePanel.allowsOtherFileTypes = false
-    savePanel.nameFieldStringValue = _openFileUrl?.lastPathComponent ?? ""
-    savePanel.directoryURL = URL(fileURLWithPath: "~/Desktop".expandingTilde)
-    
-    // open a Save Dialog
-    savePanel.beginSheetModal(for: delegate!.logWindow!) { [unowned self] (result: NSApplication.ModalResponse) in
-      
-      // if the user pressed Save
-      if result == NSApplication.ModalResponse.OK {
-        
-        if let url = savePanel.url {
-          // write it to the File
-          do {
-            try self._logString.write(to: url, atomically: true, encoding: .ascii)
-            
-          } catch {
-            let alert = NSAlert()
-            alert.messageText = "Unable to save Log file"
-            alert.informativeText = "File\n\n\(url)\n\nNOT saved"
-            alert.alertStyle = .critical
-            alert.addButton(withTitle: "Ok")
-            
-            let _ = alert.runModal()
-          }
-        }
-      }
-    }
-  }
+//  public func saveLog() {
+//    guard _initialized else { fatalError("Logger was not configured before first use.") }
+//    
+//    // Allow the User to save a copy of the Log file
+//    let savePanel = NSSavePanel()
+//    savePanel.allowedFileTypes = ["log"]
+//    savePanel.allowsOtherFileTypes = false
+//    savePanel.nameFieldStringValue = _openFileUrl?.lastPathComponent ?? ""
+//    savePanel.directoryURL = URL(fileURLWithPath: "~/Desktop".expandingTilde)
+//    
+//    // open a Save Dialog
+//    savePanel.beginSheetModal(for: delegate!.logWindow!) { [unowned self] (result: NSApplication.ModalResponse) in
+//      
+//      // if the user pressed Save
+//      if result == NSApplication.ModalResponse.OK {
+//        
+//        if let url = savePanel.url {
+//          // write it to the File
+//          do {
+//            try self._logString.write(to: url, atomically: true, encoding: .ascii)
+//            
+//          } catch {
+//            let alert = NSAlert()
+//            alert.messageText = "Unable to save Log file"
+//            alert.informativeText = "File\n\n\(url)\n\nNOT saved"
+//            alert.alertStyle = .critical
+//            alert.addButton(withTitle: "Ok")
+//            
+//            let _ = alert.runModal()
+//          }
+//        }
+//      }
+//    }
+//  }
   
   /// Filter the displayed Log
   /// - Parameter level:    log level

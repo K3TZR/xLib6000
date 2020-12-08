@@ -5,7 +5,7 @@
 //  Created by Douglas Adams on 9/5/20.
 //
 
-import Cocoa
+import Foundation
 import xLib6000
 
 class MockRadioManagerDelegate : RadioManagerDelegate {

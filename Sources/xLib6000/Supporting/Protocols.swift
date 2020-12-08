@@ -6,7 +6,7 @@
 //  Copyright © 2018 Douglas Adams. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Protocols

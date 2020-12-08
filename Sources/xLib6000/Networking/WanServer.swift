@@ -6,7 +6,7 @@
 //  Copyright © 2018 Mario Illgen. All rights reserved.
 //
 
-import Cocoa
+import Foundation
 import CocoaAsyncSocket
 
 

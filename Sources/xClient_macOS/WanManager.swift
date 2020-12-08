@@ -6,7 +6,7 @@
 //  Copyright © 2020 Douglas Adams. All rights reserved.
 //
 
-import Cocoa
+import AppKit
 import xLib6000
 
 public struct Token {
@@ -41,7 +41,6 @@ public final class WanManager : WanServerDelegate {
   private let _log                          = Logger.sharedInstance.logMessage
   private var _wanServer                    : WanServer?
   private var _previousToken                : Token?
-  private var _mainWindow                   : NSWindow { NSApplication.shared.mainWindow! }
   private var _state                        : String {String.random(length: 16)}
   
   // constants
@@ -255,10 +254,10 @@ public final class WanManager : WanServerDelegate {
   /// - Returns:            the image or nil
   ///
   private func getUserImage( tokenValue: String) -> NSImage? {
-    
+
     // try to get the JSON Web Token
     if let jwt = try? decode(jwt: tokenValue) {
-      
+
       // get the Log On image (if any) from the token
       let claim = jwt.claim(name: kClaimPicture)
       if let gravatar = claim.string, let url = URL(string: gravatar) {
@@ -474,13 +473,18 @@ public final class WanManager : WanServerDelegate {
       _radioManager!.smartLinkTestStatus = status    // set the indicator
       
       let msg =
-        """
-          Forward Tcp Port:\t\(results.forwardTcpPortWorking)
-          Forward Udp Port:\t\(results.forwardUdpPortWorking)
-          UPNP Tcp Port:\t\t\(results.upnpTcpPortWorking)
-          UPNP Udp Port:\t\(results.upnpUdpPortWorking)
-          Nat Hole Punch:\t\(results.natSupportsHolePunch)
-          """
+"""
+Forward Tcp Port:  \(results.forwardTcpPortWorking)
+Forward Udp Port:  \(results.forwardUdpPortWorking)
+UPNP Tcp Port:     \(results.upnpTcpPortWorking)
+UPNP Udp Port:     \(results.upnpUdpPortWorking)
+Nat Hole Punch:    \(results.natSupportsHolePunch)
+"""
+      if status == false {
+        _radioManager?.showPickerSheet = false
+        _radioManager?.alertParams = AlertParams(style: .error, title: "SmartLink test failed", message: msg, buttons: [("Ok", nil)])
+        _radioManager?.showingAlertView = true
+      }
       _radioManager!.delegate.smartLinkTestResults(status: status, msg: msg)
     }
   }

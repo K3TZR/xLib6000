@@ -8,7 +8,7 @@
 
 public typealias DaxMicStreamId = StreamId
 
-import Cocoa
+import Foundation
 
 /// DaxMicAudioStream Class implementation
 ///

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreGraphics
 import simd
 
 public typealias PanadapterStreamId = StreamId

@@ -29,6 +29,10 @@ public struct StubView: View {
           Auth0View()
             .environmentObject(radioManager)
         }
+      Text("")
+        .sheet(isPresented: $radioManager.showingAlertView) {
+          AlertView(params: radioManager.alertParams)
+        }
     }
   }
 }

@@ -263,7 +263,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
     // remove it immediately (OpusAudioStream does not send status on removal)
     _radio.opusAudioStreams[id] = nil
     
-    Log.sharedInstance.logMessage(Self.className() + " removed: id = \(id.hex)", .debug, #function, #file, #line)
+    Log.sharedInstance.logMessage("OpusAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
     NC.post(.opusAudioStreamHasBeenRemoved, object: id as Any?)
   }
   /// Receive Opus encoded RX audio

@@ -335,7 +335,7 @@ public final class Meter : NSObject, DynamicModel {
       _initialized = true
       
       // notify appropriate observers
-      _log("Meter added: id = \(id), \(name)", .debug, #function, #file, #line)
+      _log("Meter added: id = \(id), \(name), source = \(source), group = \(group)", .debug, #function, #file, #line)
       switch name {
       // specific cases
 //      case Meter.ShortName.signalPassband.rawValue:
