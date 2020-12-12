@@ -27,7 +27,7 @@ struct PickerButtonsView: View {
       Spacer()
       Button(action: {
         presentationMode.wrappedValue.dismiss()
-        radioManager.connectToSelection()
+        radioManager.connect( to: radioManager.pickerSelection)
       }) {Text("Connect")}
       .disabled(radioManager.pickerSelection.isEmpty)
       .padding(.trailing, 20)

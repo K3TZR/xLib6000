@@ -83,7 +83,7 @@ public final class WanManager : WanServerDelegate {
     
     if let tokenValue = getToken(using: auth0Email) {
       
-//      _radioManager!.smartLinkImage = getUserImage(tokenValue: tokenValue)
+      _radioManager!.smartLinkImage = getUserImage(tokenValue: tokenValue)
       
       // have a token, try to connect
       return _wanServer!.connectToSmartLinkServer(appName: _appNameTrimmed, platform: kPlatform, token: tokenValue, ping: true)
@@ -398,7 +398,7 @@ public final class WanManager : WanServerDelegate {
       if let gravatar = claim.string, let url = URL(string: gravatar) {
         // get the image
         if let data = try? Data(contentsOf: url) {
-          _radioManager!.smartLinkImage = UIImage(data: data)
+          _radioManager!.smartLinkImage = NSImage(data: data)
         }
       }
       // get the expiry date (if any)

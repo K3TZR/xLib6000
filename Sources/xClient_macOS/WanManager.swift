@@ -79,11 +79,11 @@ public final class WanManager : WanServerDelegate {
   /// SmartLink log in using an email address
   /// - Parameter auth0Email:     saved email address (if any)
   ///
-  func smartLinkLogin(using auth0Email: String?) -> Bool {
+  func smartLinkLogin(using auth0Email: String) -> Bool {
     
     if let tokenValue = getToken(using: auth0Email) {
       
-      _radioManager!.smartLinkImage = getUserImage(tokenValue: tokenValue)
+      DispatchQueue.main.async { [self] in _radioManager!.smartLinkImage = getUserImage(tokenValue: tokenValue) }
       
       // have a token, try to connect
       return _wanServer!.connectToSmartLinkServer(appName: _appNameTrimmed, platform: kPlatform, token: tokenValue, ping: true)
@@ -100,9 +100,9 @@ public final class WanManager : WanServerDelegate {
     _wanServer = nil
   }
   
-  /// Show the Web page for SmartLink Login (Auth0Sheet)
+  /// Show the Web page for Auth0Sheet validation
   ///
-  func validateAuth0Credentials() {
+  func setupAuth0Credentials() {
     // clear all cookies to prevent falling back to earlier saved login credentials
     let storage = HTTPCookieStorage.shared
     if let cookies = storage.cookies {
@@ -120,8 +120,6 @@ public final class WanManager : WanServerDelegate {
       &state=\(_state)\
       &device=\(_appNameTrimmed)
       """
-    // cause the sheet to appear
-    _radioManager!.showAuth0Sheet = true
   }
   
   /// Called to establish the SmartLink connection to the targeted Radio
@@ -152,7 +150,7 @@ public final class WanManager : WanServerDelegate {
   /// - Parameter auth0Email:     saved email (if any)
   /// - Returns:                  a Token (if any)
   ///
-  private func getToken(using auth0Email: String?) -> String? {
+  private func getToken(using auth0Email: String) -> String? {
     var tokenValue : String? = nil
     
     // is there a saved Auth0 token which has not expired?
@@ -160,27 +158,27 @@ public final class WanManager : WanServerDelegate {
       // YES, we can log into SmartLink, use the saved token
       tokenValue = previousToken.value
       
-      _log("Smartlink login: previous token is unexpired", .debug,  #function, #file, #line)
+      _log("Smartlink login: using unexpired previous token", .debug,  #function, #file, #line)
 
-    } else if auth0Email != nil {
+    } else if auth0Email != "" {
       
       let service = _appNameTrimmed + WanManager.kServiceName
       
-      // there is a saved email, use it to obtain a Refresh Token
-      if let refreshToken = _radioManager!.delegate.refreshTokenGet(service: service, account: auth0Email!) {
+      // there is a saved email, is there is a saved Refresh Token?
+      if let refreshToken = _radioManager!.delegate.refreshTokenGet(service: service, account: auth0Email) {
 
-        // can we get a Token Value from the Refresh Token?
+        // YES, can we get a Token Value from the Refresh Token?
         if let value = getTokenValue(from: refreshToken) {
           // YES, we can use the saved token to Log in
           tokenValue = value
 
-          _log("Smartlink login: token obtained from refresh token", .debug,  #function, #file, #line)
+          _log("Smartlink login: using token obtained from refresh token", .debug,  #function, #file, #line)
 
         } else {
           // NO, the Refresh Token is no longer valid, delete it
-          _radioManager!.delegate.refreshTokenDelete(service: service, account: auth0Email!)
+          _radioManager!.delegate.refreshTokenDelete(service: service, account: auth0Email)
 
-          _log("Smartlink login: refresh token invalid", .debug,  #function, #file, #line)
+          _log("Smartlink login: refresh token is invalid", .debug,  #function, #file, #line)
         }
       } else {
 
@@ -188,7 +186,7 @@ public final class WanManager : WanServerDelegate {
       }
       
     } else {
-      _log("Smartlink login: refresh email empty", .debug,  #function, #file, #line)
+      _log("Smartlink login: saved email is empty", .debug,  #function, #file, #line)
     }
     return tokenValue
   }
@@ -369,7 +367,7 @@ public final class WanManager : WanServerDelegate {
   ///   - idToken:        id Token string
   ///   - refreshToken:   refresh Token string
   ///
-  func setTokens(idToken: String, refreshToken: String) {
+  func processAuth0Tokens(idToken: String, refreshToken: String) {
     var expireDate = Date()
     
     do {
@@ -398,7 +396,7 @@ public final class WanManager : WanServerDelegate {
       if let gravatar = claim.string, let url = URL(string: gravatar) {
         // get the image
         if let data = try? Data(contentsOf: url) {
-          _radioManager!.smartLinkImage = NSImage(data: data)
+          DispatchQueue.main.async { [self] in _radioManager!.smartLinkImage = NSImage(data: data) }
         }
       }
       // get the expiry date (if any)
@@ -414,15 +412,21 @@ public final class WanManager : WanServerDelegate {
     // save id token with expiry date
     _previousToken = Token(value: idToken, expiresAt: expireDate)
     
-    _radioManager!.delegate.smartLinkLoginState(true)
+//    _radioManager!.delegate.smartLinkLoginState(true)
   }
   
   /// Close the Auth0 sheet
   ///
-  func closeAuth0() {
-    _radioManager!.showAuth0Sheet = false
-    // display the RadioPicker
-//    _radioManager!.showPickerSheet = true
+  func closeAuth0LoginView() {
+    DispatchQueue.main.async { [self] in
+      _radioManager!.showAuth0Sheet = false
+      
+      // use the saved tokens to do a SmartLink Login
+      _radioManager!.smartLinkLogin()
+      
+      // display the RadioPicker
+      _radioManager!.showPickerSheet = true
+    }
   }
   
   // ----------------------------------------------------------------------------
@@ -481,11 +485,13 @@ UPNP Udp Port:     \(results.upnpUdpPortWorking)
 Nat Hole Punch:    \(results.natSupportsHolePunch)
 """
       if status == false {
-        _radioManager?.showPickerSheet = false
-        _radioManager?.alertParams = AlertParams(style: .error, title: "SmartLink test failed", message: msg, buttons: [("Ok", nil)])
-        _radioManager?.showingAlertView = true
+        DispatchQueue.main.async { [self] in
+          _radioManager?.showPickerSheet = false
+          _radioManager?.alertParams = AlertParams(style: .error, title: "SmartLink test failed", message: msg, buttons: [("Ok", nil)])
+          _radioManager?.showingAlertView = true
+          _radioManager!.smartLinkTestResults(status: status, msg: msg)
+        }
       }
-      _radioManager!.delegate.smartLinkTestResults(status: status, msg: msg)
     }
   }
 }

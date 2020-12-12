@@ -68,9 +68,11 @@ struct RadioListView : View {
           .frame(width: 200, alignment: .leading)
       }.padding(.top, 10)
       
+      Divider()
+
       HStack {
         List(radioManager.pickerPackets, id: \.id, selection: $radioManager.pickerSelection) { packet in
-          let color : Color = packet.isDefault ? .red : .primary
+          let color : Color = packet.isDefault ? Color(.linkColor) : Color(.textColor)
           
           HStack{
             

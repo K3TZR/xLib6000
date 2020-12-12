@@ -22,13 +22,10 @@ public struct LogView: View {
 
     VStack {
       ScrollView {
-        VStack {
-          ForEach(logger.logLines) { line in
-            Text(line.text)
-              .font(.system(.subheadline, design: .monospaced))
-              .frame(minWidth: width, maxWidth: .infinity, alignment: .leading)
-          }
-//          .padding(.leading, 5)
+        ForEach(logger.logLines) { line in
+          Text(line.text)
+            .font(.system(size: CGFloat(logger.fontSize), weight: .regular, design: .monospaced))
+            .frame(minWidth: width, maxWidth: .infinity, alignment: .leading)
         }
       }
       HStack {
@@ -62,7 +59,7 @@ public struct LogView: View {
       }
       .padding(.bottom, 10)
     }
-    .frame(minWidth: width, maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, minHeight: 400, maxHeight: .infinity)
+    .frame(minWidth: width, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)
   }
 }
 

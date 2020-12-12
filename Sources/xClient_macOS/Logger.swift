@@ -55,6 +55,7 @@ public class Logger : LogHandler, ObservableObject {
   // MARK: - Public properties
 
   public var delegate : LoggerDelegate?
+  public var fontSize = 12
 
   // ----------------------------------------------------------------------------
   // MARK: - Published properties

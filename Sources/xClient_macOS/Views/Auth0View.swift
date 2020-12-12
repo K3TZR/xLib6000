@@ -48,9 +48,9 @@ public struct WebBrowserView {
 
   var webView = WKWebView()
   
-  func closeAuth0(idToken: String, refreshToken: String) {
-    radioManager.wanManager!.setTokens(idToken: idToken, refreshToken: refreshToken)
-    radioManager.wanManager!.closeAuth0()
+  func auth0LoginSuccess(idToken: String, refreshToken: String) {
+    radioManager.wanManager!.processAuth0Tokens(idToken: idToken, refreshToken: refreshToken)
+    radioManager.wanManager!.closeAuth0LoginView()
   }
   
   func load(urlString: String) {
@@ -76,13 +76,13 @@ public struct WebBrowserView {
     }
     
     public func webView(_: WKWebView, didFailProvisionalNavigation: WKNavigation!, withError: Error) {
-//      let nsError = (withError as NSError)
-//      if (nsError.domain == "WebKitErrorDomain" && nsError.code == 102) || (nsError.domain == "WebKitErrorDomain" && nsError.code == 101) {
-//        // Error code 102 "Frame load interrupted" is raised by the WKWebView
-//        // when the URL is from an http redirect. This is a common pattern when
-//        // implementing OAuth with a WebView.
-//        return
-//      }
+      let nsError = (withError as NSError)
+      if (nsError.domain == "WebKitErrorDomain" && nsError.code == 102) || (nsError.domain == "WebKitErrorDomain" && nsError.code == 101) {
+        // Error code 102 "Frame load interrupted" is raised by the WKWebView
+        // when the URL is from an http redirect. This is a common pattern when
+        // implementing OAuth with a WebView.
+        return
+      }
     }
     
     //    public func webView(_: WKWebView, didFinish: WKNavigation!) {
@@ -112,7 +112,7 @@ public struct WebBrowserView {
           if let idToken = responseParameters[kKeyIdToken], let refreshToken = responseParameters[kKeyRefreshToken] {
             
             // YES, pass them back
-            parent.closeAuth0(idToken: idToken, refreshToken: refreshToken)
+            parent.auth0LoginSuccess(idToken: idToken, refreshToken: refreshToken)
           }
           decisionHandler(.cancel)
           

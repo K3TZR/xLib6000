@@ -13,9 +13,8 @@ public struct PickerView: View {
   @EnvironmentObject var radioManager: RadioManager
   
   public init() {
-    
   }
-  
+    
   public var body: some View {
       VStack {
         if radioManager.delegate.smartLinkEnabled { SmartLinkView() }

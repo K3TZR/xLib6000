@@ -19,17 +19,17 @@ public struct StubView: View {
 
   public var body: some View {
     ZStack {
-      Text("")
+      EmptyView()
         .sheet(isPresented: $radioManager.showPickerSheet) {
           PickerView()
             .environmentObject(radioManager)
         }
-      Text("")
+      EmptyView()
         .sheet(isPresented: $radioManager.showAuth0Sheet ) {
           Auth0View()
             .environmentObject(radioManager)
         }
-      Text("")
+      EmptyView()
         .sheet(isPresented: $radioManager.showingAlertView) {
           AlertView(params: radioManager.alertParams)
         }

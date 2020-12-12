@@ -221,24 +221,24 @@ public final class RadioManager : ObservableObject {
     }
   }
 
-  public func smartLinkDisable() {
-    if smartLinkIsLoggedIn {
-      // remove any SmartLink radios from Discovery
-      Discovery.sharedInstance.removeSmartLinkRadios()
-
-      // close out the connection
-      wanManager?.smartLinkLogout()
-    }
-    wanManager = nil
-    
-    // remember the current state
-    smartLinkIsLoggedIn = false
-    
-    // remove the current user info
-    smartLinkName = ""
-    smartLinkCallsign = ""
+//  public func smartLinkDisable() {
+//    if smartLinkIsLoggedIn {
+//      // remove any SmartLink radios from Discovery
+//      Discovery.sharedInstance.removeSmartLinkRadios()
+//
+//      // close out the connection
+//      wanManager?.smartLinkLogout()
+//    }
+//    wanManager = nil
+//
+//    // remember the current state
+//    smartLinkIsLoggedIn = false
+//
+//    // remove the current user info
+//    smartLinkName = ""
+//    smartLinkCallsign = ""
 //    smartLinkImage = nil
-  }
+//  }
 
   /// Initiate a Logout from the SmartLink server
   ///
@@ -256,13 +256,15 @@ public final class RadioManager : ObservableObject {
     }
     wanManager = nil
     
-    // remember the current state
-    smartLinkIsLoggedIn = false
-    
-    // remove the current user info
-    smartLinkName = ""
-    smartLinkCallsign = ""
-//    smartLinkImage = nil
+    DispatchQueue.main.async { [self] in
+      // remember the current state
+      smartLinkIsLoggedIn = false
+      
+      // remove the current user info
+      smartLinkName = ""
+      smartLinkCallsign = ""
+      smartLinkImage = nil
+    }
   }
   
   /// Initiate a connection to a Radio

@@ -90,19 +90,20 @@ public protocol RadioManagerDelegate {
   
   /// Called by the SmartLinkView to initiate a SmartLink Login | Logout
   ///
-  func smartLinkLogin()
-  
+//  func smartLinkLogin()
+//  func smartLinkLogout()
+
   /// Called asynchronously by WanManager to indicate success / failure for a SmartLink server connection attempt
   /// - Parameter state:      true if connected
   ///
-  func smartLinkLoginState(_ state: Bool)
+//  func smartLinkLoginState(_ state: Bool)
   
   /// Called asynchronously by WanManager to return the results of a SmartLInk Test
   /// - Parameters:
   ///   - status:   success / failure
   ///   - msg:      a string describing the result
   ///
-  func smartLinkTestResults(status: Bool, msg: String)
+//  func smartLinkTestResults(status: Bool, msg: String)
   
   /// Called by WanManager or RadioManager to Get / Set / Delete the saved Refresh Token
   /// - Parameters:
@@ -112,11 +113,6 @@ public protocol RadioManagerDelegate {
   func refreshTokenGet(service: String, account: String) -> String?
   func refreshTokenSet(service: String, account: String, refreshToken: String)
   func refreshTokenDelete(service: String, account: String)
-  
-  /// Called to request a decision
-  /// - Parameter params:     struct containing choices and actions
-  ///
-//  func displayAlert(_ params: AlertParams)
   
   var clientId              : String  {get}         // the app's ClientId
   var connectAsGui          : Bool    {get}         // whether to connect as a Gui client
@@ -202,128 +198,83 @@ public final class RadioManager : ObservableObject {
     
     // start listening to notifications
     addNotifications()
+    
+    // if SmartLink enabled, attemp to Log in
+    if delegate.smartLinkEnabled {
+      smartLinkLogin()
+    } else {
+      smartLinkName = ""
+      smartLinkCallsign = ""
+      smartLinkImage = nil
+    }
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal methods
-  
-  /// Initiate a Login to the SmartLink server
-  /// - Parameter auth0Email: an Auth0 email address
-  ///
-  public func smartLinkLogin(with auth0Email: String) {
-    // start the WanManager
-    wanManager = WanManager(radioManager: self, appNameTrimmed: _appNameTrimmed)
+  // MARK: - Public methods
 
-    if wanManager!.smartLinkLogin(using: auth0Email) {
-      smartLinkIsLoggedIn = true
+  /// Initiate a connection to the first Radio found
+  ///
+  public func connectToFirstFound() {
+    // NO, were one or more radios found?
+    if packets.count > 0 {
+      // YES, attempt a connection to the first
+      connect(to: 0)
     } else {
-      wanManager!.validateAuth0Credentials()
+      // NO, no radios found
+      alertParams = AlertParams(style: .warning, title: "Connection failed", message: "No Radios found", buttons: [("Ok", nil)])
+      showingAlertView = true
+      delegate.connectionState(false, "", "No Radios found")
     }
   }
-
-  public func smartLinkDisable() {
-    if smartLinkIsLoggedIn {
-      // remove any SmartLink radios from Discovery
-      Discovery.sharedInstance.removeSmartLinkRadios()
-
-      // close out the connection
-      wanManager?.smartLinkLogout()
-    }
-    wanManager = nil
-    
-    // remember the current state
-    smartLinkIsLoggedIn = false
-    
-    // remove the current user info
-    smartLinkName = ""
-    smartLinkCallsign = ""
-//    smartLinkImage = nil
-  }
-
-  /// Initiate a Logout from the SmartLink server
-  ///
-  public func smartLinkLogout() {
-    if smartLinkIsLoggedIn {
-      // remove any SmartLink radios from Discovery
-      Discovery.sharedInstance.removeSmartLinkRadios()
-      
-      if delegate.smartLinkAuth0Email != "" {
-        // remove the RefreshToken
-        delegate.refreshTokenDelete( service: _appNameTrimmed + ".oauth-token", account: delegate.smartLinkAuth0Email)
-      }
-      // close out the connection
-      wanManager?.smartLinkLogout()
-    }
-    wanManager = nil
-    
-    // remember the current state
-    smartLinkIsLoggedIn = false
-    
-    // remove the current user info
-    smartLinkName = ""
-    smartLinkCallsign = ""
-//    smartLinkImage = nil
-  }
-  
   /// Initiate a connection to a Radio
   /// - Parameter connection:   a connection string (in the form <type>.<serialNumber>)
   ///
-  public func connect(to connection: String = "") {
+  public func connect(to connection: String) {
     
-    // was a connection specified?
-    if connection == "" {
-      // NO, were one or more radios found?
-      if packets.count > 0 {
-        // YES, attempt a connection to the first
-        connectTo(index: 0)
-      } else {
-        // NO, no radios found
-        alertParams = AlertParams(style: .warning, title: "Connection failed", message: "No Radios found", buttons: [("Ok", nil)])
-        showingAlertView = true
-        delegate.connectionState(false, connection, "No Radios found")
-      }
-    } else {
-      // YES, is it a valid connection string?
-      if let conn = parseConnection(connection) {
-        // VALID, find the matching packet
-        var foundIndex : Int? = nil
-        for (i, packet) in pickerPackets.enumerated() {
-          if packet.serialNumber == conn.serialNumber && packet.type.rawValue == conn.type {
-            if delegate.connectAsGui {
-              foundIndex = i
-            } else if packet.stations == conn.station {
-              foundIndex = i
-            }
+    // YES, is it a valid connection string?
+    if let conn = parseConnection(connection) {
+      // VALID, find the matching packet
+      var foundIndex : Int? = nil
+      for (i, packet) in pickerPackets.enumerated() {
+        if packet.serialNumber == conn.serialNumber && packet.type.rawValue == conn.type {
+          if delegate.connectAsGui {
+            foundIndex = i
+          } else if packet.stations == conn.station {
+            foundIndex = i
           }
         }
-        // is there a match?
-        if let index = foundIndex {
-          // YES, attempt a connection to it
-          connectTo(index: index)
-        } else {
-          // NO, no match found
-          alertParams = AlertParams(style: .warning, title: "Connection failed", message: "No matching radio for: \(connection)", buttons: [("Ok", nil)])
-          showingAlertView = true
-          delegate.connectionState(false, connection, "No matching radio")
-        }
-      } else {
-        // NO, not a valid connection string
-        alertParams = AlertParams(style: .warning, title: "Connection failed", message: "Invalid connection string: \(connection)", buttons: [("Ok", nil)])
-        showingAlertView = true
-        delegate.connectionState(false, connection, "Invalid connection string")
       }
+      // is there a match?
+      if let index = foundIndex {
+        // YES, attempt a connection to it
+        connect(to: index)
+      } else {
+        // NO, no match found
+        alertParams = AlertParams(style: .warning, title: "Connection failed", message: "No matching radio for: \(connection)", buttons: [("Ok", nil)])
+        showingAlertView = true
+        delegate.connectionState(false, connection, "No matching radio")
+      }
+    } else {
+      // NO, not a valid connection string
+      alertParams = AlertParams(style: .warning, title: "Connection failed", message: "Invalid connection string: \(connection)", buttons: [("Ok", nil)])
+      showingAlertView = true
+      delegate.connectionState(false, connection, "Invalid connection string")
     }
   }
   
   /// Initiate a connection to a Radio using the RadioPicker
   ///
-  public func connectUsingPicker() {
+  public func showPicker() {
     loadPickerPackets()
     smartLinkTestStatus = false
     pickerSelection = Set<Int>()
-    showPickerSheet = true
+    DispatchQueue.main.async { self.showPickerSheet = true }
   }
   
+  public func removeSmartLinkRadios() {
+    Discovery.sharedInstance.removeSmartLinkRadios()
+  }
+
   /// Disconnect the current connection
   /// - Parameter msg:    explanation
   ///
@@ -357,7 +308,63 @@ public final class RadioManager : ObservableObject {
     }
   }
   
-  public func clientDisconnect(packet: DiscoveryPacket, handle: Handle) {
+  // ----------------------------------------------------------------------------
+  // MARK: - Internal methods
+
+  /// Initiate a Login to the SmartLink server
+  ///
+  func smartLinkLogin() {
+    // start the WanManager
+    wanManager = WanManager(radioManager: self, appNameTrimmed: _appNameTrimmed)
+
+    // did SmartLink Login with saved credentials succeed?
+    if wanManager!.smartLinkLogin(using: delegate.smartLinkAuth0Email) {
+      // YES
+      DispatchQueue.main.async { [self] in
+        smartLinkIsLoggedIn = true
+        showPickerSheet = true
+      }
+    } else {
+      // NO, show the Auth0View to allow the user to enter SmartLink credentials
+      wanManager!.setupAuth0Credentials()
+      // cause the sheet to appear
+      DispatchQueue.main.async { [self] in
+        showAuth0Sheet = true
+      }
+    }
+  }
+
+  /// Initiate a Logout from the SmartLink server
+  ///
+  func smartLinkLogout() {
+    // remove any SmartLink radios from Discovery
+    Discovery.sharedInstance.removeSmartLinkRadios()
+    
+    // close out the connection
+    wanManager?.smartLinkLogout()
+    wanManager = nil
+    
+    DispatchQueue.main.async { [self] in
+      // remember the current state
+      smartLinkIsLoggedIn = false
+      
+      // remove the current user info
+      smartLinkName = ""
+      smartLinkCallsign = ""
+      smartLinkImage = nil
+      
+      showPickerSheet = true
+    }
+  }
+  
+  func smartLinkTestResults(status: Bool, msg: String) {
+    if status == false {
+      alertParams = AlertParams(style: .warning, title: "SmartLink Test FAILED", message: msg, buttons: [("Ok", nil)])
+      showingAlertView = true
+    }
+  }
+  
+  func clientDisconnect(packet: DiscoveryPacket, handle: Handle) {
     _api.requestClientDisconnect( packet: packet, handle: handle)
   }
   
@@ -381,7 +388,7 @@ public final class RadioManager : ObservableObject {
         sleep(1)
         _api.disconnect()
         sleep(1)
-        connectUsingPicker()
+        showPicker()
       }
       alertParams = AlertParams(style: .informational,
                                 title: "Radio is connected to another Client",
@@ -411,7 +418,7 @@ public final class RadioManager : ObservableObject {
                                   ( "Cancel", {})
                                 ])
       //      delegate.displayAlert(params)
-      showingAlertView = true
+      DispatchQueue.main.async {self.showingAlertView = true}
       
     case (true, kInUse, 2):               // newApi, connected to 2 clients
       let firstButtonAction = { [self] in
@@ -426,7 +433,7 @@ public final class RadioManager : ObservableObject {
                                   ( "Close \(packet.guiClients[1].station)", secondButtonAction),
                                   ( "Cancel", {})
                                 ])
-      showingAlertView = true
+      DispatchQueue.main.async {self.showingAlertView = true}
       
     default:
       break
@@ -474,7 +481,7 @@ public final class RadioManager : ObservableObject {
                                     ( "Disconnect " + _appNameTrimmed, secondButtonAction),
                                     ( "Cancel", {})
                                   ])
-        showingAlertView = true
+        DispatchQueue.main.async {self.showingAlertView = true}
       }
       
     case (true, kInUse, 2):           // newApi, 2 clients
@@ -496,7 +503,7 @@ public final class RadioManager : ObservableObject {
                                   ( "Disconnect " + _appNameTrimmed, thirdButtonAction),
                                   ( "Cancel", {})
                                 ])
-      showingAlertView = true
+      DispatchQueue.main.async {self.showingAlertView = true}
       
     default:
       self.disconnect()
@@ -508,7 +515,7 @@ public final class RadioManager : ObservableObject {
   /// Called when the Picker's Close button is clicked
   ///
   func closePicker() {
-    showPickerSheet = false
+    DispatchQueue.main.async { self.showPickerSheet = false }
   }
   
   /// Called when the Picker's Test button is clicked
@@ -522,11 +529,11 @@ public final class RadioManager : ObservableObject {
   
   /// Called when the Picker's Select button is clicked
   ///
-  func connectToSelection() {
-    if let i = pickerSelection.first {
+  func connect(to selection: Set<Int>) {
+    if let i = selection.first {
       // remove the selection highlight
       pickerSelection = Set<Int>()
-      connectTo(index: i)
+      connect(to: i)
     }
   }
   
@@ -540,7 +547,7 @@ public final class RadioManager : ObservableObject {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Private methods
+  // MARK: - Private
   
   private func bind(to id: String) {
     // cause a bind command to be sent
@@ -550,7 +557,7 @@ public final class RadioManager : ObservableObject {
   /// Connect to the Radio found at the specified index in the Discovered Radios
   /// - Parameter index:    an index into the discovered radios array
   ///
-  private func connectTo(index: Int) {
+  private func connect(to index: Int) {
     
     guard activePacket == nil else { disconnect() ; return }
     
@@ -689,7 +696,6 @@ public final class RadioManager : ObservableObject {
     default:
       // unknown, not a valid connection string
       return nil
-
     }
   }
   
@@ -704,7 +710,7 @@ public final class RadioManager : ObservableObject {
     NotificationCenter.makeObserver(self, with: #selector(clientDidDisconnect(_:)),   of: .clientDidDisconnect)
     NotificationCenter.makeObserver(self, with: #selector(reload(_:)),   of: .guiClientHasBeenAdded)
     NotificationCenter.makeObserver(self, with: #selector(guiClientHasBeenUpdated(_:)), of: .guiClientHasBeenUpdated)
-    NotificationCenter.makeObserver(self, with: #selector(guiClientHasBeenRemoved(_:)), of: .guiClientHasBeenRemoved)
+    NotificationCenter.makeObserver(self, with: #selector(reload(_:)), of: .guiClientHasBeenRemoved)
   }
   
   @objc private func reload(_ note: Notification) {
@@ -724,13 +730,11 @@ public final class RadioManager : ObservableObject {
 
   @objc private func clientDidDisconnect(_ note: Notification) {
     if let reason = note.object as? String {
-      
       disconnect(reason: reason)
     }
   }
   
   @objc private func guiClientHasBeenUpdated(_ note: Notification) {
-
     loadPickerPackets()
 
     if let guiClient = note.object as? GuiClient {
@@ -744,9 +748,5 @@ public final class RadioManager : ObservableObject {
         }
       }
     }
-  }
-  
-  @objc private func guiClientHasBeenRemoved(_ note: Notification) {
-    loadPickerPackets()
   }
 }

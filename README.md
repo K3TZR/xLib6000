@@ -4,19 +4,18 @@
 
 ##### Built on:
 
-*  macOS 10.15.7
-*  Xcode 12.1 (12A7403)
-*  Swift 5.3 / AppKit
-*  CocoaAsyncSocket 7.6.3
+*  macOS 11.0.1
+*  Xcode 12.2 (12B45b)
+*  Swift 5.3
 
 ##### Runs on:
 * macOS 10.15 and higher
 * NOTE: for macOS 10.13 or 10.14 use xLib6000 v1.4.0 (which does not contain xLibClient)
 
 ##### Usage:
-xLib6000 is a Swift Package. It includes two targets, xLib6000 and xLibClient.
+xLib6000 is a Swift Package. It includes three targets, xLib6000, xClient_iOS and xClient_macOS
 
-xLibClient can be used as a basis for apps using xLib6000. It provides much of the "boilerplate" needed in an app.
+xClient... can be used as a basis for apps using xLib6000. It provides much of the "boilerplate" needed in an app.
 
 ##### Comments / Questions
 Please send any bugs / comments / questions to support@k3tzr.net
@@ -32,7 +31,7 @@ Flex Radios can have one of four different version groups:
 
 ##### Credits:
 [CocoaAsyncSocket](https://github.com/robbiehanson/CocoaAsyncSocket) is a package dependency in the xLib6000 target. It provides TCP and UDP connectivity.
-[XCGLogger](https://github.com/DaveWoodCom/XCGLogger.git) is a package dependency in the xLibClient target. It provides logging.
+[XCGLogger](https://github.com/DaveWoodCom/XCGLogger.git) is a package dependency in the xClient... targets. It provides logging.
 
 ##### Other software
 [![xSDR6000](https://img.shields.io/badge/K3TZR-xSDR6000-informational)]( https://github.com/K3TZR/xSDR6000) A SmartSDR-like client for the Mac.   
@@ -40,6 +39,10 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.6.4 Release Notes
+* corrections in xClient_macOS as a result of debugging / changes
+* ----->>>>> NOTE: xClient_iOS is not functional at this time
+
 ##### 1.6.3 Release Notes
 * corrected bug in Discovery line 120
 

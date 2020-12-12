@@ -22,7 +22,7 @@ class MockRadioManagerDelegate : RadioManagerDelegate {
 
   var smartLinkAuth0Email   = ""
   var smartLinkEnabled      = true
-  var smartLinkWasLoggedIn  = false
+//  var smartLinkWasLoggedIn  = false
   
 // ----------------------------------------------------------------------------
 // MARK: - Internal methods
