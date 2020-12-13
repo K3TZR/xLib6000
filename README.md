@@ -39,6 +39,11 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.6.5 Release Notes
+* removed xLib_iOS and xClient_macOS (created stand-alone packages for them)
+* removed dependency on xCGLogger (now in xClient... packages)
+* updated CocoaAsyncSocket to require 7.6.5 (fixes iOS 8 issue in xClientIos)
+
 ##### 1.6.4 Release Notes
 * corrections in xClient_macOS as a result of debugging / changes
 * ----->>>>> NOTE: xClient_iOS is not functional at this time
