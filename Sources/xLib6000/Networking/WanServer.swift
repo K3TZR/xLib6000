@@ -239,7 +239,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   /// - Parameter packet:         a radio Discovery packet
   ///
-  public func sendTestConnection(for packet: DiscoveryPacket) {
+  public func sendTestConnection(for serialNumber: String) {
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
       _log("WanServer NOT connected, unable to send Test message", .warning, #function, #file, #line)
@@ -248,7 +248,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     _log("WanServer smartLink test initiated", .debug, #function, #file, #line)
 
     // send a command to SmartLink to test the connection for the specified Radio
-    sendTlsCommand("application test_connection serial" + "=\(packet.serialNumber)", timeout: _timeout , tag: kTestTag)
+    sendTlsCommand("application test_connection serial" + "=\(serialNumber)", timeout: _timeout , tag: kTestTag)
   }
 
   // ------------------------------------------------------------------------------

@@ -39,6 +39,9 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.6.6 Release Notes
+* in WanServer.swift changed sendTestConnection(for packet: DiscoveryPacket) to sendTestConnection(for serialNumber: String)
+
 ##### 1.6.5 Release Notes
 * removed xLib_iOS and xClient_macOS (created stand-alone packages for them)
 * removed dependency on xCGLogger (now in xClient... packages)
