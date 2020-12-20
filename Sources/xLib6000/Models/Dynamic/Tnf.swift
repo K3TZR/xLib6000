@@ -78,7 +78,7 @@ public final class Tnf : NSObject, DynamicModel {
   // MARK: - Private properties
 
   private var _initialized  = false
-  private let _log          = Log.sharedInstance.logMessage
+  private let _log          = LogProxy.sharedInstance.logMessage
   private let _radio        : Radio
     
   // ----------------------------------------------------------------------------
@@ -136,7 +136,7 @@ public final class Tnf : NSObject, DynamicModel {
 
           radio.tnfs[id]  = nil
           
-          Log.sharedInstance.logMessage("Tnf removed: id = \(id)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.logMessage("Tnf removed: id = \(id)", .debug, #function, #file, #line)
           NC.post(.tnfHasBeenRemoved, object: id as Any?)
         }
       }

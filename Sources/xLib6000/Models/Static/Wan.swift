@@ -42,7 +42,7 @@ public final class Wan : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _log          = Log.sharedInstance.logMessage
+  private let _log          = LogProxy.sharedInstance.logMessage
   private var _radio        : Radio
 
   // ------------------------------------------------------------------------------

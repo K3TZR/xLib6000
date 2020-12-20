@@ -73,7 +73,7 @@ extension Radio {
   
   public func requestNetCwStream() -> Void {
     if netCwStream.isActive {
-      Log.sharedInstance.logMessage("NetCwStream was already requested", .error, #function, #file, #line)
+      LogProxy.sharedInstance.logMessage("NetCwStream was already requested", .error, #function, #file, #line)
       return
     }
     // send the command to the radio to create the object...need to change this..

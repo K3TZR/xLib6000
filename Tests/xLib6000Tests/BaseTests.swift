@@ -30,7 +30,7 @@ final class BaseTests: XCTestCase {
     
     Swift.print("\n-------------------- \(#function) --------------------\n")
 
-    let log = Log.sharedInstance
+    let log = LogProxy.sharedInstance
     XCTAssertNotNil(log, "\n***** Log singleton not present *****\n", file: #function)
   }
   

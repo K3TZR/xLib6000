@@ -298,7 +298,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   
   private var _frameNumber              = 0
   private var _initialized              = false
-  private let _log                      = Log.sharedInstance.logMessage
+  private let _log                      = LogProxy.sharedInstance.logMessage
   private var _panadapterframes         = [PanadapterFrame]()
   private let _radio                    : Radio
 
@@ -595,7 +595,7 @@ public struct PanadapterFrame {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance.logMessage
+  private var _log                          = LogProxy.sharedInstance.logMessage
   
   private struct PayloadHeaderOld {                                        // struct to mimic payload layout
     var startingBin                         : UInt32

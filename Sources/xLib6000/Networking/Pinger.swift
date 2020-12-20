@@ -23,7 +23,7 @@ final class Pinger : NSObject {
   private var _pingTimer                    : DispatchSourceTimer!          // periodic timer for ping
   private var _tcpManager                   : TcpManager                    // a TcpManager instance
 
-  private let _log                          = Log.sharedInstance.logMessage
+  private let _log                          = LogProxy.sharedInstance.logMessage
   private let _pingQ                        = DispatchQueue(label: Api.kName + ".pingQ")
   private let kResponseCount                = 2
   

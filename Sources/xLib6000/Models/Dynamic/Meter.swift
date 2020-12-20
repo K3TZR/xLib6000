@@ -129,7 +129,7 @@ public final class Meter : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized                  = false
-  private let _log                          = Log.sharedInstance.logMessage
+  private let _log                          = LogProxy.sharedInstance.logMessage
   private let _radio                        : Radio
   private var _voltsAmpsDenom               : Float = 256.0  // denominator for voltage/amperage depends on API version
 
@@ -259,7 +259,7 @@ public final class Meter : NSObject, DynamicModel {
           radio.meters[id] = nil
 
           // notify appropriate observers
-          Log.sharedInstance.logMessage("Meter removed: id = \(id)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.logMessage("Meter removed: id = \(id)", .debug, #function, #file, #line)
           switch name {
           // specific cases
           case Meter.ShortName.signalPassband.rawValue:   NC.post(.sliceMeterRemoved, object: id as Any?)

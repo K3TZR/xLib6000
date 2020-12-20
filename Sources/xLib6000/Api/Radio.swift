@@ -665,7 +665,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _clientInitialized            = false
   private var _gpsPresent                   = false
   private var _hardwareVersion              : String?
-  private let _log                          = Log.sharedInstance.logMessage
+  private let _log                          = LogProxy.sharedInstance.logMessage
   private var _radioInitialized             = false
   private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
   

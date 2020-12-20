@@ -1,5 +1,5 @@
 //
-//  Log.swift
+//  LogProxy.swift
 //  CommonCode
 //
 //  Created by Douglas Adams on 9/6/15.
@@ -9,7 +9,7 @@
 import Foundation
 
 // ----------------------------------------------------------------------------
-// MARK: - Log implementation
+// MARK: - LogProxy implementation
 //
 //      provides a singleton Log instance which optionally, given a delegate,
 //      forwards log messages to the Client for processing by the Client's
@@ -17,7 +17,7 @@ import Foundation
 //
 // ----------------------------------------------------------------------------
 
-public final class Log {
+public final class LogProxy {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -29,7 +29,7 @@ public final class Log {
   
   /// Provide access to the Log singleton
   ///
-  public static var sharedInstance = Log()
+  public static var sharedInstance = LogProxy()
   
   private init() {
     // "private" prevents others from calling init()

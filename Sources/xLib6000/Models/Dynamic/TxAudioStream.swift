@@ -91,7 +91,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
   
   private var _api                          = Api.sharedInstance
   private var _initialized                  = false
-  private var _log                          = Log.sharedInstance.logMessage
+  private var _log                          = LogProxy.sharedInstance.logMessage
   private let _radio                        : Radio
   private var _txSequenceNumber             = 0
   
@@ -137,7 +137,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
           radio.txAudioStreams[id] = nil
           
           // notify all observers
-          Log.sharedInstance.logMessage("TxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.logMessage("TxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           NC.post(.txAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }

@@ -100,7 +100,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private       let _log            = Log.sharedInstance.logMessage
+  private       let _log            = LogProxy.sharedInstance.logMessage
 
   private let _api                  = Api.sharedInstance
   private var _appName              = ""
@@ -245,7 +245,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       _log("WanServer NOT connected, unable to send Test message", .warning, #function, #file, #line)
       return
     }
-    _log("WanServer smartLink test initiated", .debug, #function, #file, #line)
+    _log("WanServer smartLink test initiated to serial number \(serialNumber)", .debug, #function, #file, #line)
 
     // send a command to SmartLink to test the connection for the specified Radio
     sendTlsCommand("application test_connection serial" + "=\(serialNumber)", timeout: _timeout , tag: kTestTag)
@@ -533,7 +533,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       }
       currentPacketList.append(packet)
     }
-    Log.sharedInstance.logMessage("WanServer Radio List received", .debug, #function, #file, #line)
+    LogProxy.sharedInstance.logMessage("WanServer Radio List received", .debug, #function, #file, #line)
     
     for (i, _) in currentPacketList.enumerated() {
       currentPacketList[i].isWan = true
@@ -571,6 +571,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       case .upnpUdpPortWorking:         results.upnpUdpPortWorking = property.value.tValue
       }
     }
+    _log("WanServer smartlink test results received", .warning, #function, #file, #line)
     delegate?.wanTestResultsReceived(results: results)
   }
   /// Read the next data block (with an indefinite timeout)

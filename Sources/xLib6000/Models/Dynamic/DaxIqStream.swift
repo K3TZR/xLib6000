@@ -88,7 +88,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private var _initialized        = false
-  private let _log                = Log.sharedInstance.logMessage
+  private let _log                = LogProxy.sharedInstance.logMessage
   public  let _radio              : Radio
   private var _rxPacketCount      = 0
   private var _rxLostPacketCount  = 0
@@ -132,7 +132,7 @@ public final class DaxIqStream : NSObject, DynamicModelWithStream {
           // YES, remove it
           radio.daxIqStreams[id] = nil
           
-          Log.sharedInstance.logMessage("DaxIqStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.logMessage("DaxIqStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           NC.post(.daxIqStreamHasBeenRemoved, object: id as Any?)
         }
       }

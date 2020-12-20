@@ -74,7 +74,7 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized      = false
-  private let _log              = Log.sharedInstance.logMessage
+  private let _log              = LogProxy.sharedInstance.logMessage
   private let _radio            : Radio
   private var _txSequenceNumber = 0
   private var _vita             : Vita?
@@ -116,7 +116,7 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
           // YES, remove it
           radio.remoteTxAudioStreams[id] = nil
           
-          Log.sharedInstance.logMessage("RemoteTxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.logMessage("RemoteTxAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           NC.post(.remoteTxAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
