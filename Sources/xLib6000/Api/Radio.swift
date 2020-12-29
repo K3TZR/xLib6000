@@ -1000,7 +1000,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       } else {
         
         // send it to the default reply handler
-        defaultReplyHandler(replyTuple.command, sequenceNumber: components[0].sequenceNumber, responseValue: components[1], reply: replySuffix)
+        defaultReplyHandler(replyTuple.command, sequenceNumber: components[0].sequenceNumber, responseValue: components[1], reply: (components.count == 3) ? components[2] : "")
       }
       // Remove the object from the notification list
       replyHandlers[components[0].sequenceNumber] = nil
