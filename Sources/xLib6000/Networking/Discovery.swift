@@ -53,7 +53,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   ///   - checkInterval:        how often to check
   ///   - notSeenInterval:      timeout interval
   ///
-  private init(discoveryPort: UInt16 = 4992, checkInterval: TimeInterval = 1.0, notSeenInterval: TimeInterval = 5.0) {
+  private init(discoveryPort: UInt16 = 4992, checkInterval: TimeInterval = 1.0, notSeenInterval: TimeInterval = 10.0) {
     super.init()
     
     // create a Udp socket
@@ -86,10 +86,10 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         try sock.beginReceiving()
         
         // create the timer's dispatch source
-        _timeoutTimer = DispatchSource.makeTimerSource(flags: [.strict], queue: Discovery.timerQ)
+        _timeoutTimer = DispatchSource.makeTimerSource(queue: Discovery.timerQ)
         
         // Set timer with 100 millisecond leeway
-        _timeoutTimer.schedule(deadline: DispatchTime.now(), repeating: checkInterval, leeway: .milliseconds(100))      // Every second +/- 10%
+        _timeoutTimer.schedule(deadline: DispatchTime.now(), repeating: checkInterval, leeway: .milliseconds(250))      // Every second +/- 10%
         
         // set the event handler
         _timeoutTimer.setEventHandler { [ unowned self] in

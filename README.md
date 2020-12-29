@@ -37,6 +37,10 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.6.9 Release Notes
+* in Discovery.swift, changed notSeenInterval default to 10 (from 5)
+* in Discovery.swift, changed timer leeway to 250 ms (was 100 ms)
+
 ##### 1.6.8 Release Notes
 * corrected bug in Radio.swift, parseReply method (line 1003)
 
