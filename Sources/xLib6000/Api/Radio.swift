@@ -886,10 +886,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
                 if station  != "" { Discovery.sharedInstance.discoveryPackets[i].guiClients[j].station = station }
                 Discovery.sharedInstance.discoveryPackets[i].guiClients[j].isLocalPtt = isLocalPtt
                 
-                // log and notify of GuiClient update
-                _log("Radio guiClient updated: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
-                NC.post(.guiClientHasBeenUpdated, object: Discovery.sharedInstance.discoveryPackets[i].guiClients[j] as Any?)
-                
                 guiClientWasEdited(handle, Discovery.sharedInstance.discoveryPackets[i].guiClients[j], packet)
             }
             
@@ -899,7 +895,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
                 Discovery.sharedInstance.discoveryPackets[i].guiClients.append(client)
                 
                 // log and notify of GuiClient update
-                _log("Radio guiClient added: \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
+                _log("Radio     guiClient added:   \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
                 NC.post(.guiClientHasBeenAdded, object: client as Any?)
                 
                 guiClientWasEdited(handle, client, packet)
@@ -908,8 +904,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
     
     private func guiClientWasEdited(_ handle: Handle, _ client: GuiClient, _ packet: DiscoveryPacket) {
+        // log & notify if all essential properties are present
         if client.handle != 0 && client.clientId != nil && client.program != "" && client.station != "" {
-            _log("Radio guiClient updated: \(client.handle.hex), \(client.station), \(client.program), \(client.clientId!), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
+            _log("Radio     guiClient updated: \(client.handle.hex), \(client.station), \(client.program), \(client.clientId!), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
             NC.post(.guiClientHasBeenUpdated, object: client as Any?)
         }
     }

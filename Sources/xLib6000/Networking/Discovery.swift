@@ -69,7 +69,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       do {
         try sock.enableReusePort(true)
       } catch let error as NSError {
-        fatalError("Port reuse not enabled: \(error.localizedDescription)")
+        fatalError("Discovery - port reuse not enabled: \(error.localizedDescription)")
       }
       
       // bind the socket to the Flex Discovery Port
@@ -77,7 +77,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         try sock.bind(toPort: discoveryPort)
       }
       catch let error as NSError {
-        fatalError("Bind to port error: \(error.localizedDescription)")
+        fatalError("Discovery - Bind to port error: \(error.localizedDescription)")
       }
       
       do {
@@ -118,7 +118,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
               // remove a Radio
               self.discoveryPackets.remove(at: i)
 
-              self._log("Discovery radio removed: \(nickname) v\(firmwareVersion) \(connectionString)", .debug, #function, #file, #line)
+              self._log("Discovery radio removed: \(nickname) v\(firmwareVersion) \(connectionString)", .info, #function, #file, #line)
             }
             // send the current list of radios to all observers
             NC.post(.discoveredRadios, object: self.discoveryPackets as Any?)
@@ -126,7 +126,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         }
         
       } catch let error as NSError {
-        fatalError("Discovery receiving error: \(error.localizedDescription)")
+        fatalError("Discovery - receiving error: \(error.localizedDescription)")
       }
       // start the timer
       _timeoutTimer.resume()
@@ -227,7 +227,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   private func processNewAdditions(_ newPacket: DiscoveryPacket) {
     // log and notify for GuiClient addition(s)
     for client in newPacket.guiClients {
-      _log("Discovery GuiClient added: \(client.handle.hex),  Station = \(client.station), Packet = \(newPacket.connectionString)", .debug, #function, #file, #line)
+      _log("Discovery guiClient added:   Handle = \(client.handle.hex), Station = \(client.station), Packet = \(newPacket.connectionString)", .info, #function, #file, #line)
       NC.post(.guiClientHasBeenAdded, object: client as Any?)
     }
   }
@@ -241,7 +241,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         discoveryPackets[index].guiClients.append(client)
         
         // log and notify for GuiClient addition
-        _log("Discovery GuiClient added: \(client.handle.hex), Station = \(client.station), Packet = \(newPacket.connectionString)", .debug, #function, #file, #line)
+        _log("Discovery guiClient added:   Handle = \(client.handle.hex), Station = \(client.station), Packet = \(newPacket.connectionString)", .info, #function, #file, #line)
         NC.post(.guiClientHasBeenAdded, object: client as Any?)
       }
     }
@@ -266,7 +266,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
         discoveryPackets[index].guiClients.remove(at: i)
 
         // log and notify for GuiClient removal
-        _log("Discovery GuiClient removed: Handle = \(handle.hex), Station = \(station), Packet = \(newPacket.connectionString)", .debug, #function, #file, #line)
+        _log("Discovery guiClient removed: Handle = \(handle.hex), Station = \(station), Packet = \(newPacket.connectionString)", .info, #function, #file, #line)
         NC.post(.guiClientHasBeenRemoved, object: client as Any?)
       }
     }
@@ -333,7 +333,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       processNewAdditions(newPacket)
       
       // log and notify for Radio addition
-      _log("Discovery radio found: \(newPacket.nickname) v\(newPacket.firmwareVersion) Packet = \(newPacket.connectionString)", .info, #function, #file, #line)
+      _log("Discovery radio added:   \(newPacket.nickname) v\(newPacket.firmwareVersion) Packet = \(newPacket.connectionString)", .info, #function, #file, #line)
       NC.post(.discoveredRadios, object: discoveryPackets as Any?)
     }
    }
