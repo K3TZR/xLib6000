@@ -895,7 +895,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
                 Discovery.sharedInstance.discoveryPackets[i].guiClients.append(client)
                 
                 // log and notify of GuiClient update
-                _log("Radio     guiClient added:   \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
+                _log("Radio     guiClient added:   \(handle.hex), \(station), \(program), \(clientId), Packet = \(packet.connectionString)", .info, #function, #file, #line)
                 NC.post(.guiClientHasBeenAdded, object: client as Any?)
                 
                 guiClientWasEdited(handle, client, packet)
@@ -906,7 +906,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     private func guiClientWasEdited(_ handle: Handle, _ client: GuiClient, _ packet: DiscoveryPacket) {
         // log & notify if all essential properties are present
         if client.handle != 0 && client.clientId != nil && client.program != "" && client.station != "" {
-            _log("Radio     guiClient updated: \(client.handle.hex), \(client.station), \(client.program), \(client.clientId!), Packet = \(packet.connectionString)", .debug, #function, #file, #line)
+            _log("Radio     guiClient updated: \(client.handle.hex), \(client.station), \(client.program), \(client.clientId!), Packet = \(packet.connectionString)", .info, #function, #file, #line)
             NC.post(.guiClientHasBeenUpdated, object: client as Any?)
         }
     }

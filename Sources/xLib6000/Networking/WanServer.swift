@@ -126,14 +126,17 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     case Received
   }
   private enum ApplicationToken: String {
+    case application                                    // dummy
     case info
     case registrationInvalid        = "registration_invalid"
     case userSettings               = "user_settings"
   }
   private enum ApplicationInfoToken: String {
+    case info                                           // dummy
     case publicIp                   = "public_ip"
   }
   private enum ApplicationUserSettingsToken: String {
+    case userSettings               = "user_settings"   // dummy
     case callsign
     case firstName                  = "first_name"
     case lastName                   = "last_name"
@@ -144,10 +147,13 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     case testConnection             = "test_connection"
   }
   private enum RadioConnectReadyToken: String {
+    case radio                                          // dummy
+    case connectReady               = "connect_ready"   // dummy
     case handle
     case serial
   }
   private enum RadioTestConnectionResultsToken: String {
+    case testConnection             = "test_connection" // dummy
     case forwardTcpPortWorking      = "forward_tcp_port_working"
     case forwardUdpPortWorking      = "forward_udp_port_working"
     case natSupportsHolePunch       = "nat_supports_hole_punch"
@@ -263,16 +269,10 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   private func parseMsg(_ text: String) {
     let msg = text.trimmingCharacters(in: .whitespacesAndNewlines)
     
-    // find the space & get the primary msgType
-    let spaceIndex = msg.firstIndex(of: " ")!
-    let msgType = String(msg[..<spaceIndex])
-    
-    // everything past the msgType is in the remainder
-    let remainderIndex = msg.index(after: spaceIndex)
-    let remainder = String(msg[remainderIndex...])
-    
+    let properties = msg.keyValuesArray()
+
     // Check for unknown Message Types
-    guard let token = Token(rawValue: msgType)  else {
+    guard let token = Token(rawValue: properties[0].key)  else {
       // log it and ignore the message
       _log("Unknown WanServer message: \(msg)", .warning, #function, #file, #line)
       return
@@ -280,8 +280,8 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // which primary message type?
     switch token {
     
-    case .application:        parseApplication(remainder)
-    case .radio:              parseRadio(remainder)
+    case .application:        parseApplication(properties)
+    case .radio:              parseRadio(msg)
     case .Received:           break   // eliminates warning message on Test connection
     }
   }
@@ -289,27 +289,21 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   /// - Parameter msg:        the message (after the primary type)
   ///
-  private func parseApplication(_ msg: String) {
-    // find the space & get the secondary msgType
-    let spaceIndex = msg.firstIndex(of: " ")!
-    let msgType = String(msg[..<spaceIndex])
-    
-    // everything past the msgType is in the remainder
-    let remainderIndex = msg.index(after: spaceIndex)
-    let remainder = String(msg[remainderIndex...])
+    private func parseApplication(_ properties: KeyValuesArray) {
     
     // Check for unknown Message Types
-    guard let token = ApplicationToken(rawValue: msgType)  else {
+    guard let token = ApplicationToken(rawValue: properties[1].key)  else {
       // log it and ignore the message
-      _log("Unknown WanServer application token: \(msg)", .warning, #function, #file, #line)
+      _log("Unknown WanServer application token: \(properties[1].key)", .warning, #function, #file, #line)
       return
     }
     // which secondary message type?
     switch token {
     
-    case .info:                   parseApplicationInfo(remainder.keyValuesArray())
-    case .registrationInvalid:    parseRegistrationInvalid(remainder)
-    case .userSettings:           parseUserSettings(remainder.keyValuesArray())
+    case .application:              break       // stops warning messages
+    case .info:                     parseApplicationInfo(properties)
+    case .registrationInvalid:      parseRegistrationInvalid(properties[0].key)
+    case .userSettings:             parseUserSettings(properties)
     }
   }
   /// Parse a received "radio" message
@@ -317,38 +311,28 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   /// - Parameter msg:        the message (after the primary type)
   ///
   private func parseRadio(_ msg: String) {
-    // find the space & get the secondary msgType
-    guard let spaceIndex = msg.firstIndex(of: " ") else {
-      // only one word/command
-      // example: "radio list" when no remote radio is registered with the server
-      // TODO: do not handle it for now
-      return
-    }
-    let msgType = String(msg[..<spaceIndex])
-    
-    // everything past the secondary msgType is in the remainder
-    let remainderIndex = msg.index(after: spaceIndex)
-    let remainder = String(msg[remainderIndex...])
+
+    let properties = msg.keyValuesArray()
     
     // Check for unknown Message Types
-    guard let token = RadioToken(rawValue: msgType)  else {
+    guard let token = RadioToken(rawValue: properties[1].key)  else {
       // log it and ignore the message
-      _log("Unknown WanServer radio token: \(msg)", .warning, #function, #file, #line)
+      _log("WanServer unknown radio token: \(properties[1].key)", .warning, #function, #file, #line)
       return
     }
     // which secondary message type?
     switch token {
     
-    case .connectReady:       parseRadioConnectReady(remainder.keyValuesArray())
-    case .list:               parseRadioList(remainder)
-    case .testConnection:     parseTestConnectionResults(remainder.keyValuesArray())
+    case .connectReady:       parseRadioConnectReady(properties)
+    case .list:               parseRadioList(msg.dropFirst(11))
+    case .testConnection:     parseTestConnectionResults(properties)
     }
   }
   /// Parse Application properties
   ///
   /// - Parameter properties:         a KeyValuesArray
   ///
-  private func parseApplicationInfo(_ properties: KeyValuesArray) {
+    private func parseApplicationInfo(_ properties: KeyValuesArray) {
     // process each key/value pair, <key=value>
     for property in properties {
       // Check for Unknown Keys
@@ -360,7 +344,8 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       // Known tokens, in alphabetical order
       switch token {
       
-      case .publicIp: _sslClientPublicIp = property.value
+      case .info:       break       // stops warning messages
+      case .publicIp:   _sslClientPublicIp = property.value
       }
     }
   }
@@ -375,7 +360,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   /// - Parameter properties:         a KeyValuesArray
   ///
-  private func parseUserSettings(_ properties: KeyValuesArray) {
+    private func parseUserSettings(_ properties: KeyValuesArray) {
     var callsign = ""
     var firstName = ""
     var lastName = ""
@@ -391,6 +376,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       // Known tokens, in alphabetical order
       switch token {
       
+      case .userSettings:   break       // stops warning messages
       case .callsign:       callsign = property.value
       case .firstName:      firstName = property.value
       case .lastName:       lastName = property.value
@@ -402,7 +388,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   /// - Parameter properties:         a KeyValuesArray
   ///
-  private func parseRadioConnectReady(_ properties: KeyValuesArray) {
+    private func parseRadioConnectReady(_ properties: KeyValuesArray) {
     var handle = ""
     var serial = ""
     
@@ -417,6 +403,8 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       // Known tokens, in alphabetical order
       switch token {
       
+      case .radio:          break       // stops warning messages
+      case .connectReady:   break       // stops warning messages
       case .handle:         handle = property.value
       case .serial:         serial = property.value
       }
@@ -430,7 +418,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   /// - Parameter msg:        the list
   ///
-  private func parseRadioList(_ msg: String) {
+    private func parseRadioList(_ msg: String.SubSequence) {
     // several radios are possible
     // separate list into its components
     let radioMessages = msg.components(separatedBy: "|")
@@ -548,7 +536,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
   ///
   /// - Parameter properties:         a KeyValuesArray
   ///
-  private func parseTestConnectionResults(_ properties: KeyValuesArray) {
+    private func parseTestConnectionResults(_ properties: KeyValuesArray) {
     var results = WanTestConnectionResults()
     
     // process each key/value pair, <key=value>
@@ -563,6 +551,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
       // Known tokens, in alphabetical order
       switch token {
         
+      case .testConnection:             break   // stops warning messages
       case .forwardTcpPortWorking:      results.forwardTcpPortWorking = property.value.tValue
       case .forwardUdpPortWorking:      results.forwardUdpPortWorking = property.value.tValue
       case .natSupportsHolePunch:       results.natSupportsHolePunch = property.value.tValue

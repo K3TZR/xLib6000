@@ -316,7 +316,7 @@ public struct WaterfallFrame {
   public private(set) var firstBinFreq      : CGFloat   = 0.0               // Frequency of first Bin (Hz)
   public private(set) var binBandwidth      : CGFloat   = 0.0               // Bandwidth of a single bin (Hz)
   public private(set) var lineDuration      = 0                             // Duration of this line (ms)
-  public private(set) var         binsInThisFrame      = 0                             // Number of bins
+  public private(set) var binsInThisFrame   = 0                             // Number of bins
   public private(set) var height            = 0                             // Height of frame (pixels)
   public private(set) var receivedFrame     = 0                             // Time code
   public private(set) var autoBlackLevel    : UInt32 = 0                    // Auto black level
