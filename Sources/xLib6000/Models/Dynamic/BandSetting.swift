@@ -194,7 +194,7 @@ public final class BandSetting  : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown BandSetting token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("BandSetting, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -219,7 +219,7 @@ public final class BandSetting  : NSObject, DynamicModel {
       _initialized = true
 
       // notify all observers
-      _log("BandSetting added: id = \(id), bandName = \(_bandName)", .debug, #function, #file, #line)
+      _log("BandSetting, added: id = \(id), bandName = \(_bandName)", .debug, #function, #file, #line)
       NC.post(.bandSettingHasBeenAdded, object: self as Any?)
     }
   }

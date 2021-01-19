@@ -111,7 +111,7 @@ public final class Atu : NSObject, StaticModel {
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log("Unknown Atu token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Atu, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order

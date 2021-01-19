@@ -335,7 +335,7 @@ public final class Memory                   : NSObject, DynamicModel {
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Memory token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Memory, unknown  token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -369,7 +369,7 @@ public final class Memory                   : NSObject, DynamicModel {
       _initialized = true
 
       // notify all observers
-      _log("Memory added: id = \(id), name = \(_name)", .debug, #function, #file, #line)
+      _log("Memory, added: id = \(id), name = \(_name)", .debug, #function, #file, #line)
       NC.post(.memoryHasBeenAdded, object: self as Any?)
     }
   }

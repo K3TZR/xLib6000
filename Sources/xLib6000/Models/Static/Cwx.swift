@@ -120,7 +120,7 @@ public final class Cwx : NSObject, StaticModel {
     
     // if zero or anything greater than 2 it's an error, log it and ignore the Reply
     guard components == 1 || components == 2 else {
-      _log("\(command), Invalid reply", .warning, #function, #file, #line)
+      _log("Cwx, Invalid reply: to \(command)", .warning, #function, #file, #line)
       return
     }
     // get the character position
@@ -128,7 +128,7 @@ public final class Cwx : NSObject, StaticModel {
     
     // if not an integer, log it and ignore the Reply
     guard charPos != nil else {
-      _log("\(command), Invalid character position", .warning, #function, #file, #line)
+      _log("Cwx, Invalid character position: for \(command)", .warning, #function, #file, #line)
       return
     }
 
@@ -145,7 +145,7 @@ public final class Cwx : NSObject, StaticModel {
       // not an integer, log it and ignore the Reply
       guard block != nil else {
         
-        _log("\(command), Invalid block", .warning, #function, #file, #line)
+        _log("Cwx, Invalid block: for \(command)", .warning, #function, #file, #line)
         return
       }
       // inform the Event Handler (if any)
@@ -180,7 +180,7 @@ public final class Cwx : NSObject, StaticModel {
         // Check for Unknown Keys
         guard let token = Token(rawValue: property.key) else {
           // log it and ignore the Key
-          _log("Unknown Cwx token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+          _log("Cwx, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
           continue
         }
         // Known tokens, in alphabetical order

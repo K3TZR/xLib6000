@@ -179,7 +179,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown IqStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("IqStream, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -206,7 +206,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       _pan = _radio.findPanadapterId(using: _daxIqChannel) ?? 0
 
       // notify all observers
-      _log("IqStream added: id = \(id.hex), channel = \(_daxIqChannel)", .debug, #function, #file, #line)
+      _log("IqStream, added: id = \(id.hex), channel = \(_daxIqChannel)", .debug, #function, #file, #line)
       NC.post(.iqStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -249,7 +249,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
 
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log("IqStream delayed frame(s) ignored: expected \(expected), received \(received)", .warning, #function, #file, #line)
+      _log("IqStream, delayed frame(s) ignored: expected \(expected), received \(received)", .warning, #function, #file, #line)
       return
       
     case (let expected, let received) where received > expected:
@@ -257,7 +257,7 @@ public final class IqStream : NSObject, DynamicModelWithStream {
       
       // from a later group, jump forward
       let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
-      _log("IqStream missing frame(s) skipped: expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+      _log("IqStream, missing frame(s) skipped: expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
 
       _rxSequenceNumber = received
       fallthrough

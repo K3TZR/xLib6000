@@ -165,7 +165,7 @@ public final class Xvtr : NSObject, DynamicModel {
 
           radio.xvtrs[id] = nil
           
-          LogProxy.sharedInstance.logMessage("Xvtr removed: id = \(id)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.logMessage("Xvtr, removed: id = \(id)", .debug, #function, #file, #line)
           NC.post(.xvtrHasBeenRemoved, object: id as Any?)
         }
       }
@@ -187,7 +187,7 @@ public final class Xvtr : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Xvtr token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Xvtr, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -212,7 +212,7 @@ public final class Xvtr : NSObject, DynamicModel {
       _initialized = true
 
       // notify all observers
-      _log("Xvtr added: id = \(id), name = \(name)", .debug, #function, #file, #line)
+      _log("Xvtr, added: id = \(id), name = \(name)", .debug, #function, #file, #line)
       NC.post(.xvtrHasBeenAdded, object: self as Any?)
     }
   }

@@ -73,7 +73,7 @@ public final class Wan : NSObject, StaticModel {
       // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log("Unknown Wan token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Wan, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -89,7 +89,7 @@ public final class Wan : NSObject, StaticModel {
       _initialized = true
 
       // notify all observers
-      _log("Wan status: ServerConnected = \(_serverConnected), RadioAuthenticated = \(_radioAuthenticated)", .debug, #function, #file, #line)
+      _log("Wan, status: ServerConnected = \(_serverConnected), RadioAuthenticated = \(_radioAuthenticated)", .debug, #function, #file, #line)
       NC.post(.wanHasBeenAdded, object: self as Any?)
     }
   }

@@ -170,7 +170,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown DaxRxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("DaxRxAudioStream, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -202,7 +202,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       _initialized = true
 
       // notify all observers
-      _log("DaxRxAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
+      _log("DaxRxAudioStream, added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.daxRxAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -244,7 +244,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
 
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log("DaxRxAudioStream delayed frame(s) ignored: expected \(expected), received \(received)", .warning, #function, #file, #line)
+      _log("DaxRxAudioStream, delayed frame(s) ignored: expected \(expected), received \(received)", .warning, #function, #file, #line)
       return
       
     case (let expected, let received) where received > expected:
@@ -252,7 +252,7 @@ public final class DaxRxAudioStream : NSObject, DynamicModelWithStream {
       
       // from a later group, jump forward
       let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
-      _log("DaxRxAudioStream missing frame(s) skipped: expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
+      _log("DaxRxAudioStream, missing frame(s) skipped: expected \(expected), received \(received), loss = \(lossPercent) %", .warning, #function, #file, #line)
 
       _rxSequenceNumber = received
       fallthrough

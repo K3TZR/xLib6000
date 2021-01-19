@@ -180,7 +180,7 @@ public final class Equalizer : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Equalizer token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Equalizer, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -203,7 +203,7 @@ public final class Equalizer : NSObject, DynamicModel {
       _initialized = true
 
       // notify all observers
-      _log("Equalizer added: id = \(id)", .debug, #function, #file, #line)
+      _log("Equalizer, added: id = \(id)", .debug, #function, #file, #line)
       NC.post(.equalizerHasBeenAdded, object: self as Any?)
     }
   }

@@ -155,7 +155,7 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown RemoteTxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("RemoteTxAudioStream, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -174,7 +174,7 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
       _initialized = true
 
       // notify all observers
-      _log("RemoteTxAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
+      _log("RemoteTxAudioStream, added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.remoteTxAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
@@ -225,7 +225,7 @@ public final class RemoteTxAudioStream  : NSObject, DynamicModel {
       _txSequenceNumber = (_txSequenceNumber + 1) % 16
       
     } else {
-      _log("RemoteTxAudioStream compression != opus: frame ignored", .warning, #function, #file, #line)
+      _log("RemoteTxAudioStream, compression != opus: frame ignored", .warning, #function, #file, #line)
     }
   }
   

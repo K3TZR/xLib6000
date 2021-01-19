@@ -174,7 +174,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown TxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("TxAudioStream, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -193,7 +193,7 @@ public final class TxAudioStream : NSObject, DynamicModel {
       _initialized = true
       
       // notify all observers
-      _log("TxAudioStream added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
+      _log("TxAudioStream, added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)
     }
   }

@@ -191,14 +191,14 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
                     
           radio.panadapters[panadapterId] = nil
           
-          LogProxy.sharedInstance.logMessage("Panadapter removed: id = \(panadapterId.hex)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.logMessage("Panadapter, removed: id = \(panadapterId.hex)", .debug, #function, #file, #line)
           NC.post(.panadapterHasBeenRemoved, object: id as Any?)
 
           NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[id] as Any?)
                     
           radio.waterfalls[id] = nil
           
-          LogProxy.sharedInstance.logMessage("Waterfall removed: id = \(id.hex)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.logMessage("Waterfall, removed: id = \(id.hex)", .debug, #function, #file, #line)
           NC.post(.waterfallHasBeenRemoved, object: id as Any?)
         }
       }
@@ -220,7 +220,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Waterfall token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Waterfall, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -243,7 +243,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
       _initialized = true
 
       // notify all observers
-      _log("Waterfall added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
+      _log("Waterfall, added: id = \(id.hex), handle = \(_clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.waterfallHasBeenAdded, object: self as Any?)
     }
   }

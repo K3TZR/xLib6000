@@ -144,7 +144,7 @@ public final class Profile                  : NSObject, StaticModel {
     // check for unknown Keys
     guard let token = Token(rawValue: properties[0].key) else {
       // log it and ignore the Key
-      _log("Unknown Profile token: \(properties[0].key) = \(properties[0].value)", .warning, #function, #file, #line)
+      _log("Profile, unknown token: \(properties[0].key) = \(properties[0].value)", .warning, #function, #file, #line)
       return
     }
     
@@ -159,7 +159,7 @@ public final class Profile                  : NSObject, StaticModel {
       _initialized = true
 
       // notify all observers
-      _log("Profile added: id = \(id)", .debug, #function, #file, #line)
+      _log("Profile, added: id = \(id)", .debug, #function, #file, #line)
       NC.post(.profileHasBeenAdded, object: self as Any?)
     }
   }

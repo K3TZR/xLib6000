@@ -314,7 +314,7 @@ public final class Meter : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: key) else {
         // log it and ignore the Key
-        _log("unknown Meter token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Meter, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -335,7 +335,7 @@ public final class Meter : NSObject, DynamicModel {
       _initialized = true
       
       // notify appropriate observers
-      _log("Meter added: id = \(id), \(name), source = \(source), group = \(group)", .debug, #function, #file, #line)
+      _log("Meter, added: id = \(id), \(name), source = \(source), group = \(group)", .debug, #function, #file, #line)
       switch name {
       // specific cases
 //      case Meter.ShortName.signalPassband.rawValue:

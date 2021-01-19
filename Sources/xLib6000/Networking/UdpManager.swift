@@ -145,12 +145,12 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
     for _ in 0..<tries {
       do {
         try _udpSocket.bind(toPort: portToUse)
-        _log("UdpManager bound to port \(portToUse)", .debug, #function, #file, #line)
+        _log("UdpManager, bound to port: \(portToUse)", .debug, #function, #file, #line)
         success = true
         
       } catch {
         // We didn't get the port we wanted
-        _log("UdpManager FAILED to bind to port \(portToUse)", .debug, #function, #file, #line)
+        _log("UdpManager, FAILED to bind to port: \(portToUse)", .debug, #function, #file, #line)
 
         // try the next Port Number
         portToUse += 1
@@ -187,7 +187,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
       
     } catch let error {
       // read error
-      _log("UdpManager receiving error - \(error.localizedDescription)", .error, #function, #file, #line)
+      _log("UdpManager, receiving error: \(error.localizedDescription)", .error, #function, #file, #line)
     }
   }
   /// Unbind from the UDP port
@@ -275,7 +275,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
         switch vita.packetType {
           
         case .ifDataWithStream, .extDataWithStream:       self?._delegate?.udpStreamHandler(vita)
-        case .ifData, .extData, .ifContext, .extContext:  self?._log("UdpManager, Unexpected Vita packetType - \(vita.packetType.rawValue)", .warning, #function, #file, #line)
+        case .ifData, .extData, .ifContext, .extContext:  self?._log("UdpManager, Unexpected Vita packetType: \(vita.packetType.rawValue)", .warning, #function, #file, #line)
         }
         
       } else {

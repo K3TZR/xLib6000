@@ -66,7 +66,7 @@ public final class NetCwStream : NSObject {
     
     // NOTE: NetCwStream remove does not receive any Status message to confirm removal
 
-    _log("NetCwStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+    _log("NetCwStream, removed: id = \(id.hex)", .debug, #function, #file, #line)
 
     // change its status
     let previousId = id
@@ -134,7 +134,7 @@ public final class NetCwStream : NSObject {
   ///
   func updateStreamId(_ command: String, _ seqNumber: SequenceNumber, _ responseValue: String, _ reply: String) -> Void {    
     guard responseValue == "0" else {
-      _log("NetCwStream: Response value != 0 for: \(command)", .error, #function, #file, #line)
+      _log("NetCwStream, Response value != 0 for: \(command)", .error, #function, #file, #line)
       isActive = false
       return
     }
@@ -142,7 +142,7 @@ public final class NetCwStream : NSObject {
       id = streamId
       isActive = true
       
-      _log("NetCwStream added: id = \(id.hex)", .debug, #function, #file, #line)
+      _log("NetCwStream, added: id = \(id.hex)", .debug, #function, #file, #line)
 
       // notify all observers
       NC.post(.netCwStreamHasBeenAdded, object: self as Any?)

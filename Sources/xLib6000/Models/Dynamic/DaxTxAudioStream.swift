@@ -164,7 +164,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _log("Unknown DaxTxAudioStream token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("DaxTxAudioStream, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -182,7 +182,7 @@ public final class DaxTxAudioStream : NSObject, DynamicModel {
       _initialized = true
       
       // notify all observers
-      _log("DaxTxAudioStream added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
+      _log("DaxTxAudioStream, added: id = \(id.hex), handle = \(clientHandle.hex)", .debug, #function, #file, #line)
       NC.post(.daxTxAudioStreamHasBeenAdded, object: self as Any?)
     }
   }

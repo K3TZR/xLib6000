@@ -158,7 +158,7 @@ public final class Tnf : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log("Unknown Tnf token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
+        _log("Tnf, unknown token: \(property.key) = \(property.value)", .warning, #function, #file, #line)
         continue
       }
       // known keys, in alphabetical order
@@ -175,7 +175,7 @@ public final class Tnf : NSObject, DynamicModel {
         _initialized = true
 
         // notify all observers
-        _log("Tnf added: id = \(id), frequency = \(_frequency)", .debug, #function, #file, #line)
+        _log("Tnf, added: id = \(id), frequency = \(_frequency)", .debug, #function, #file, #line)
         NC.post(.tnfHasBeenAdded, object: self as Any?)
       }
     }
@@ -195,7 +195,7 @@ public final class Tnf : NSObject, DynamicModel {
     // remove it immediately (Tnf does not send status on removal)
     _radio.tnfs[id] = nil
 
-    _log("Tnf removed: id = \(id)", .debug, #function, #file, #line)
+    _log("Tnf, removed: id = \(id)", .debug, #function, #file, #line)
     NC.post(.tnfHasBeenRemoved, object: id as Any?)
   }
 
