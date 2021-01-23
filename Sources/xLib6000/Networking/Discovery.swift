@@ -104,6 +104,8 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
               if interval > notSeenInterval {
                 // YES, add to the delete list
                 deleteList.append(i)
+                _log("Discovery, radio will be removed: Interval \(String(format: "%0.1f", interval)) > NotSeenInterval \(String(format: "%0.1f", notSeenInterval))", .info, #function, #file, #line)
+                
               }
             }
           }
@@ -333,7 +335,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
       processNewAdditions(newPacket)
       
       // log and notify for Radio addition
-      _log("Discovery, radio added:   \(newPacket.nickname) v\(newPacket.firmwareVersion) Packet = \(newPacket.connectionString)", .info, #function, #file, #line)
+      _log("Discovery, radio added:   \(newPacket.nickname) v\(newPacket.firmwareVersion) \(newPacket.connectionString)", .info, #function, #file, #line)
       NC.post(.discoveredRadios, object: discoveryPackets as Any?)
     }
    }
