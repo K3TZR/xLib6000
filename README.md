@@ -37,6 +37,10 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.6.15 Release Notes
+* in Discovery added logging of SmartLink radio removal
+* minor edits in Pinger.swift, WanServer.swift & Profile.swift
+
 ##### 1.6.14 Release Notes
 * corrections in WanServer
 * added logging of radio removal in Discovery

@@ -58,7 +58,7 @@ public struct WanTestConnectionResults {
 ///  WanServer Class implementation
 ///
 ///      creates a WanServer instance to communicate with the SmartLink server
-///      to get access to a remote Flexradio
+///      to obtain access to a remote Flexradio
 ///
 public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     
@@ -219,10 +219,10 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
             return
         }
         // send a command to SmartLink to request a connection to the specified Radio
-        sendTlsCommand("application connect serial" + "=\(serialNumber)" + " hole_punch_port" + "=\(holePunchPort))", timeout: _timeout, tag: kAppConnectTag)
+        sendTlsCommand("application connect serial=\(serialNumber) hole_punch_port=\(holePunchPort))", timeout: _timeout, tag: kAppConnectTag)
     }
     
-    /// Disconnect users
+    /// Disconnect a Radio
     /// - Parameter serialNumber:         the serial number of the Radio
     ///
     public func sendDisconnectMessage(for serialNumber: String) {
@@ -232,9 +232,24 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
             return
         }
         // send a command to SmartLink to request disconnection from the specified Radio
-        sendTlsCommand("application disconnect_users serial" + "=\(serialNumber)" , timeout: _timeout, tag: kAppDisconnectTag)
+        sendTlsCommand("application disconnect_users serial=\(serialNumber)" , timeout: _timeout, tag: kAppDisconnectTag)
     }
-    
+
+    /// Disconnect a single Client
+    /// - Parameters:
+    ///   - serialNumber:         the serial number of the Radio
+    ///   - handle:               the handle of the Client
+    ///
+    public func sendDisconnectClientMessage(for serialNumber: String, handle: Handle) {
+        // insure that the WanServer is connected to SmartLink
+        guard _isConnected else {
+            _log("WanServer, NOT connected, unable to send Disconnect Message", .warning, #function, #file, #line)
+            return
+        }
+        // send a command to SmartLink to request disconnection from the specified Radio
+        sendTlsCommand("application disconnect_users serial=\(serialNumber) handle=\(handle.hex)" , timeout: _timeout, tag: kAppDisconnectTag)
+    }
+
     /// Test connection
     /// - Parameter serialNumber:         the serial number of the Radio
     ///
@@ -247,14 +262,13 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
         _log("WanServer, smartLink test initiated to serial number: \(serialNumber)", .debug, #function, #file, #line)
         
         // send a command to SmartLink to test the connection for the specified Radio
-        sendTlsCommand("application test_connection serial" + "=\(serialNumber)", timeout: _timeout , tag: kTestTag)
+        sendTlsCommand("application test_connection serial=\(serialNumber)", timeout: _timeout , tag: kTestTag)
     }
     
     // ------------------------------------------------------------------------------
     // MARK: - Private methods
     
     /// Parse a received WanServer message
-    ///
     ///   called by socket(:didReadData:withTag:), executes on the socketQ
     ///
     /// - Parameter text:         the entire message
@@ -280,7 +294,6 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     }
     
     /// Parse a received "application" message
-    ///
     /// - Parameter properties:        message KeyValue pairs
     ///
     private func parseApplication(_ properties: KeyValuesArray) {
@@ -299,7 +312,6 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     }
     
     /// Parse a received "radio" message
-    ///
     /// - Parameter msg:        the message (after the primary type)
     ///
     private func parseRadio(_ properties: KeyValuesArray, msg: String) {
@@ -319,7 +331,6 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     }
     
     /// Parse Application properties
-    ///
     /// - Parameter properties:         a KeyValuesArray
     ///
     private func parseApplicationInfo(_ properties: KeyValuesArray) {
@@ -350,7 +361,6 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     }
     
     /// Parse User properties
-    ///
     /// - Parameter properties:         a KeyValuesArray
     ///
     private func parseUserSettings(_ properties: KeyValuesArray) {
@@ -378,8 +388,8 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
         }
         delegate?.wanUserSettings(name: firstName + " " + lastName, call: callsign)
     }
+    
     /// Parse Radio properties
-    ///
     /// - Parameter properties:         a KeyValuesArray
     ///
     private func parseRadioConnectReady(_ properties: KeyValuesArray) {
@@ -408,8 +418,8 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
             delegate?.wanRadioConnectReady(handle: handle, serial: serial)
         }
     }
+    
     /// Parse a list of Radios
-    ///
     /// - Parameter msg:        the list
     ///
     private func parseRadioList(_ msg: String.SubSequence) {
@@ -527,7 +537,6 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     }
     
     /// Parse a Test Connection result
-    ///
     /// - Parameter properties:         a KeyValuesArray
     ///
     private func parseTestConnectionResults(_ properties: KeyValuesArray) {
@@ -597,7 +606,6 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     }
     
     /// Send a command to the server
-    ///
     /// - Parameter cmd:                command text
     ///
     private func sendTlsCommand(_ cmd: String, timeout: TimeInterval, tag: Int = 0) {
@@ -619,7 +627,6 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     //
     
     /// Called after the TCP/IP connection has been established
-    ///
     /// - Parameters:
     ///   - sock:               the socket
     ///   - host:               the host
@@ -643,8 +650,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     }
     
     /// Called after the socket has successfully completed SSL/TLS negotiation
-    ///
-    ///       This method is not called unless you use the provided startTLS method.
+    ///   This method is not called unless you use the provided startTLS method.
     ///
     /// - Parameter sock:           the socket
     ///
@@ -655,8 +661,8 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
         if _ping { startPinging() }
         
         // register the Application / token pair with the SmartLink server
-        sendTlsCommand("application register name" + "=\(_appName)" + " platform" + "=\(_platform)" + " token" + "=\(_idToken!)", timeout: _timeout, tag: kRegisterTag)
-        
+        sendTlsCommand("application register name=\(_appName) platform=\(_platform) token=\(_idToken!)", timeout: _timeout, tag: kRegisterTag)
+
         // start reading
         readNext()
     }
@@ -679,7 +685,6 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     }
     
     /// Called when the TCP/IP connection has been disconnected
-    ///
     /// - Parameters:
     ///   - sock:             the disconnected socket
     ///   - err:              the error

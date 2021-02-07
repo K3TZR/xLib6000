@@ -155,7 +155,7 @@ public final class Profile                  : NSObject, StaticModel {
     }
     // is the Profile initialized?
     if !_initialized && _list.count > 0 {
-      // YES, the Radio (hardware) has acknowledged this Panadapter
+      // YES, the Radio (hardware) has acknowledged this Profile
       _initialized = true
 
       // notify all observers
