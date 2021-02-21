@@ -91,7 +91,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private let _log                  = LogProxy.sharedInstance.logMessage
+    private let _log                  = LogProxy.sharedInstance.libMessage
     
     private let _api                  = Api.sharedInstance
     private var _appName              = ""

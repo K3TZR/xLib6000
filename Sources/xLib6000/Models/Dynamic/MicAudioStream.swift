@@ -84,7 +84,7 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private var _initialized        = false
-  private var _log                = LogProxy.sharedInstance.logMessage
+  private var _log                = LogProxy.sharedInstance.libMessage
   private let _radio              : Radio
   private var _rxPacketCount      = 0
   private var _rxLostPacketCount  = 0
@@ -127,7 +127,7 @@ public final class MicAudioStream : NSObject, DynamicModelWithStream {
           // YES, remove it
           radio.micAudioStreams[id] = nil
           
-          LogProxy.sharedInstance.logMessage("MicAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.libMessage("MicAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           NC.post(.micAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }

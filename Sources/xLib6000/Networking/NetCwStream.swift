@@ -31,7 +31,7 @@ public final class NetCwStream : NSObject {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
-  private let _log              = LogProxy.sharedInstance.logMessage
+  private let _log              = LogProxy.sharedInstance.libMessage
   private let _objectQ          = DispatchQueue(label: Api.kName + ".NetCw.objectQ", attributes: [.concurrent])
   private let _radio            : Radio
   private var _txIndex          = -1

@@ -97,7 +97,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
   // MARK: - Private properties
   
   private var _initialized         = false
-  private let _log                 = LogProxy.sharedInstance.logMessage
+  private let _log                 = LogProxy.sharedInstance.libMessage
   private var _radio               : Radio
 
   private var _clientHandle       : UInt32 = 0
@@ -151,7 +151,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
           // remove it immediately
           radio.opusAudioStreams[id] = nil
           
-          LogProxy.sharedInstance.logMessage("OpusAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.libMessage("OpusAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           NC.post(.opusAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }
@@ -263,7 +263,7 @@ public final class OpusAudioStream                     : NSObject, DynamicModelW
     // remove it immediately (OpusAudioStream does not send status on removal)
     _radio.opusAudioStreams[id] = nil
     
-    LogProxy.sharedInstance.logMessage("OpusAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+    LogProxy.sharedInstance.libMessage("OpusAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
     NC.post(.opusAudioStreamHasBeenRemoved, object: id as Any?)
   }
   /// Receive Opus encoded RX audio

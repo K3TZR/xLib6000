@@ -86,7 +86,7 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
 
   private var _initialized      = false
-  private let _log              = LogProxy.sharedInstance.logMessage
+  private let _log              = LogProxy.sharedInstance.libMessage
   private let _radio            : Radio
   private var _rxPacketCount      = 0
   private var _rxLostPacketCount  = 0
@@ -129,7 +129,7 @@ public final class DaxMicAudioStream    : NSObject, DynamicModelWithStream {
           // YES, remove it
           radio.daxMicAudioStreams[id] = nil
           
-          LogProxy.sharedInstance.logMessage("DaxMicAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.libMessage("DaxMicAudioStream removed: id = \(id.hex)", .debug, #function, #file, #line)
           NC.post(.daxMicAudioStreamHasBeenRemoved, object: id as Any?)
         }
       }

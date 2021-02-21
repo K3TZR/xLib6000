@@ -119,7 +119,7 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
   
   private var _frameNumber        = 0
   private var _initialized        = false
-  private let _log                = LogProxy.sharedInstance.logMessage
+  private let _log                = LogProxy.sharedInstance.libMessage
   private let _numberOfDataFrames = 10
   private let _radio              : Radio
   private var _waterfallframes    = [WaterfallFrame]()
@@ -191,14 +191,14 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
                     
           radio.panadapters[panadapterId] = nil
           
-          LogProxy.sharedInstance.logMessage("Panadapter, removed: id = \(panadapterId.hex)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.libMessage("Panadapter, removed: id = \(panadapterId.hex)", .debug, #function, #file, #line)
           NC.post(.panadapterHasBeenRemoved, object: id as Any?)
 
           NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[id] as Any?)
                     
           radio.waterfalls[id] = nil
           
-          LogProxy.sharedInstance.logMessage("Waterfall, removed: id = \(id.hex)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.libMessage("Waterfall, removed: id = \(id.hex)", .debug, #function, #file, #line)
           NC.post(.waterfallHasBeenRemoved, object: id as Any?)
         }
       }
@@ -329,7 +329,7 @@ public struct WaterfallFrame {
   
   private var _binsProcessed                = 0
   private var _byteOffsetToBins             = 0
-  private var _log                          = LogProxy.sharedInstance.logMessage
+  private var _log                          = LogProxy.sharedInstance.libMessage
   
   private struct PayloadHeaderOld {                                         // struct to mimic payload layout
     var firstBinFreq                        : UInt64                        // 8 bytes

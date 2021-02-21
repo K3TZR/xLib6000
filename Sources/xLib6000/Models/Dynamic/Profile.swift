@@ -61,7 +61,7 @@ public final class Profile                  : NSObject, StaticModel {
   // MARK: - Private properties
   
   private var _initialized                  = false
-  private let _log                          = LogProxy.sharedInstance.logMessage
+  private let _log                          = LogProxy.sharedInstance.libMessage
   private var _radio                        : Radio
 
   // ------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ public final class Profile                  : NSObject, StaticModel {
     // check for unknown Keys
     guard let _ = Group(rawValue: id) else {
       // log it and ignore the Key
-      LogProxy.sharedInstance.logMessage("Unknown Profile group: \(id)", .warning, #function, #file, #line)
+      LogProxy.sharedInstance.libMessage("Unknown Profile group: \(id)", .warning, #function, #file, #line)
       return
     }
     // remove the Id from the KeyValues

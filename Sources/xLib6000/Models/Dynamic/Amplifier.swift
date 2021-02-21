@@ -94,7 +94,7 @@ public final class Amplifier  : NSObject, DynamicModel {
   
   private var _antennaDict  = [String:String]()
   private var _initialized  = false
-  private let _log          = LogProxy.sharedInstance.logMessage
+  private let _log          = LogProxy.sharedInstance.libMessage
   private let _radio        : Radio
   
   // ------------------------------------------------------------------------------
@@ -135,7 +135,7 @@ public final class Amplifier  : NSObject, DynamicModel {
           NC.post(.amplifierWillBeRemoved, object: radio.amplifiers[id] as Any?)
           
           radio.amplifiers[id] = nil
-          LogProxy.sharedInstance.logMessage("Amplifier removed: id = \(id.hex)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.libMessage("Amplifier removed: id = \(id.hex)", .debug, #function, #file, #line)
           NC.post(.amplifierHasBeenRemoved, object: id as Any?)
         }
       }

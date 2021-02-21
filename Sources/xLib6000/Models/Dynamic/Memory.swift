@@ -194,7 +194,7 @@ public final class Memory                   : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized          = false
-  private let _log                  = LogProxy.sharedInstance.logMessage
+  private let _log                  = LogProxy.sharedInstance.libMessage
   private var _radio                : Radio
 
   // ------------------------------------------------------------------------------
@@ -232,7 +232,7 @@ public final class Memory                   : NSObject, DynamicModel {
           
           radio.memories[id] = nil
           
-          LogProxy.sharedInstance.logMessage("Memory removed: id = \(id)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.libMessage("Memory removed: id = \(id)", .debug, #function, #file, #line)
           NC.post(.memoryHasBeenRemoved, object: id as Any?)
         }
       }

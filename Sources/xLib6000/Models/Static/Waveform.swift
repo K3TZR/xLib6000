@@ -35,7 +35,7 @@ public final class Waveform : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _log           = LogProxy.sharedInstance.logMessage
+  private let _log           = LogProxy.sharedInstance.libMessage
   private var _radio         : Radio
 
   // ------------------------------------------------------------------------------

@@ -60,7 +60,7 @@ public final class Cwx : NSObject, StaticModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let _log                          = LogProxy.sharedInstance.logMessage
+  private let _log                          = LogProxy.sharedInstance.libMessage
   private let _radio                        : Radio
 
   // ------------------------------------------------------------------------------

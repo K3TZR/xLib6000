@@ -81,7 +81,7 @@ public final class Atu : NSObject, StaticModel {
     // MARK: - Private properties
     
     private let _radio                        : Radio
-    private let _log                          = LogProxy.sharedInstance.logMessage
+    private let _log                          = LogProxy.sharedInstance.libMessage
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization

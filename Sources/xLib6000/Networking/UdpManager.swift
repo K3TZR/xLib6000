@@ -62,7 +62,7 @@ final class UdpManager : NSObject, GCDAsyncUdpSocketDelegate {
   
   private weak var _delegate                : UdpManagerDelegate?
 
-  private let _log                          = LogProxy.sharedInstance.logMessage
+  private let _log                          = LogProxy.sharedInstance.libMessage
   private var _udpReceiveQ                  : DispatchQueue!
   private var _udpRegisterQ                 : DispatchQueue!
   private var _udpSocket                    : GCDAsyncUdpSocket!

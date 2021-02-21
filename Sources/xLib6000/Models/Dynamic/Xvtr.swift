@@ -107,7 +107,7 @@ public final class Xvtr : NSObject, DynamicModel {
   // MARK: - Private properties
 
   private var _initialized = false
-  private let _log         = LogProxy.sharedInstance.logMessage
+  private let _log         = LogProxy.sharedInstance.libMessage
   private let _radio       : Radio
 
   // ----------------------------------------------------------------------------
@@ -165,7 +165,7 @@ public final class Xvtr : NSObject, DynamicModel {
 
           radio.xvtrs[id] = nil
           
-          LogProxy.sharedInstance.logMessage("Xvtr, removed: id = \(id)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.libMessage("Xvtr, removed: id = \(id)", .debug, #function, #file, #line)
           NC.post(.xvtrHasBeenRemoved, object: id as Any?)
         }
       }

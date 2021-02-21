@@ -35,7 +35,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
     // MARK: - Private properties
     
     private let _api                          = Api.sharedInstance
-    private let _log                          = LogProxy.sharedInstance.logMessage
+    private let _log                          = LogProxy.sharedInstance.libMessage
     private var _timeoutTimer                 : DispatchSourceTimer!
     private var _udpSocket                    : GCDAsyncUdpSocket?
     

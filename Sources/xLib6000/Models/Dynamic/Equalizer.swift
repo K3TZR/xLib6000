@@ -110,7 +110,7 @@ public final class Equalizer : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized  = false
-  private let _log          = LogProxy.sharedInstance.logMessage
+  private let _log          = LogProxy.sharedInstance.libMessage
   private let _radio        : Radio
 
   // ------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ public final class Equalizer : NSObject, DynamicModel {
     case EqType.txsc.rawValue:  equalizer = radio.equalizers[.txsc]
     case EqType.rxsc.rawValue:  equalizer = radio.equalizers[.rxsc]
     case EqType.rx.rawValue, EqType.tx.rawValue:  break // obslete types, ignore
-    default: LogProxy.sharedInstance.logMessage("Unknown Equalizer type: \(type)", .warning, #function, #file, #line)
+    default: LogProxy.sharedInstance.libMessage("Unknown Equalizer type: \(type)", .warning, #function, #file, #line)
     }
     // if an equalizer was found
     if let equalizer = equalizer {

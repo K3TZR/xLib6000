@@ -2223,54 +2223,54 @@ final class ObjectTests: XCTestCase {
     disconnect()
   }
 
-  func testTransmitExport() {
-    let type = "Transmit"
-    
-    Swift.print("\n-------------------- \(#function) --------------------\n")
-    
-    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
-    guard radio != nil else { return }
-  
-    do {
-      let json = try radio?.transmit.export()
-      Swift.print(json!)
-      
-    } catch {
-      print(error.localizedDescription)
-      XCTFail("----->>>>> Transmit export FAILED <<<<<-----", file: #function)
-    }
-    disconnect()
-  }
+//  func testTransmitExport() {
+//    let type = "Transmit"
+//
+//    Swift.print("\n-------------------- \(#function) --------------------\n")
+//
+//    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+//    guard radio != nil else { return }
+//
+//    do {
+//      let json = try radio?.transmit.export()
+//      Swift.print(json!)
+//
+//    } catch {
+//      print(error.localizedDescription)
+//      XCTFail("----->>>>> Transmit export FAILED <<<<<-----", file: #function)
+//    }
+//    disconnect()
+//  }
 
-  func testTransmitImport() {
-    let type = "Transmit"
-    
-    Swift.print("\n-------------------- \(#function) --------------------\n")
-    
-    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
-    guard radio != nil else { return }
-
-    let json =
-    """
-    {
-      "_hwAlcEnabled" : true,
-      "_tunePower" : 6,
-      "_rfPower" : 87
-    }
-    """
-    do {
-      try radio!.transmit.restore(from: json)
-
-      XCTAssertEqual(radio!.transmit.hwAlcEnabled, true, "hwAlcEnabled", file: #function)
-      XCTAssertEqual(radio!.transmit.tunePower, 6, "tunePower", file: #function)
-      XCTAssertEqual(radio!.transmit.rfPower, 87, "rfPower", file: #function)
-
-    } catch {
-      print(error.localizedDescription)
-      XCTFail("----->>>>> Transmit import FAILED <<<<<-----", file: #function)
-    }
-    disconnect()
-  }
+//  func testTransmitImport() {
+//    let type = "Transmit"
+//    
+//    Swift.print("\n-------------------- \(#function) --------------------\n")
+//    
+//    let radio = discoverRadio(logState: .limited(to: [type + ".swift"]))
+//    guard radio != nil else { return }
+//
+//    let json =
+//    """
+//    {
+//      "_hwAlcEnabled" : true,
+//      "_tunePower" : 6,
+//      "_rfPower" : 87
+//    }
+//    """
+//    do {
+//      try radio!.transmit.restore(from: json)
+//
+//      XCTAssertEqual(radio!.transmit.hwAlcEnabled, true, "hwAlcEnabled", file: #function)
+//      XCTAssertEqual(radio!.transmit.tunePower, 6, "tunePower", file: #function)
+//      XCTAssertEqual(radio!.transmit.rfPower, 87, "rfPower", file: #function)
+//
+//    } catch {
+//      print(error.localizedDescription)
+//      XCTFail("----->>>>> Transmit import FAILED <<<<<-----", file: #function)
+//    }
+//    disconnect()
+//  }
 
 
   //  static var allTests = [

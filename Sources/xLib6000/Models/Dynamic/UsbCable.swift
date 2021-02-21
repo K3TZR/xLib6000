@@ -174,7 +174,7 @@ public final class UsbCable : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private var _initialized                  = false
-  private let _log                          = LogProxy.sharedInstance.logMessage
+  private let _log                          = LogProxy.sharedInstance.libMessage
   private let _radio                        : Radio
 
   // ------------------------------------------------------------------------------
@@ -212,7 +212,7 @@ public final class UsbCable : NSObject, DynamicModel {
           
         } else {
           // NO, log the error and ignore it
-          LogProxy.sharedInstance.logMessage("USBCable invalid Type: \(properties[1].value)", .warning, #function, #file, #line)
+          LogProxy.sharedInstance.libMessage("USBCable invalid Type: \(properties[1].value)", .warning, #function, #file, #line)
           return
         }
       }
@@ -227,7 +227,7 @@ public final class UsbCable : NSObject, DynamicModel {
 
         radio.usbCables[id] = nil
         
-        LogProxy.sharedInstance.logMessage("USBCable removed: id = \(id)", .debug, #function, #file, #line)
+        LogProxy.sharedInstance.libMessage("USBCable removed: id = \(id)", .debug, #function, #file, #line)
         NC.post(.usbCableHasBeenRemoved, object: id as Any?)
       }
     }

@@ -113,7 +113,7 @@ public final class BandSetting  : NSObject, DynamicModel {
   
   private let _api                          = Api.sharedInstance
   private var _initialized                  = false
-  private let _log                          = LogProxy.sharedInstance.logMessage
+  private let _log                          = LogProxy.sharedInstance.libMessage
   private let _radio                        : Radio
 
 
@@ -157,7 +157,7 @@ public final class BandSetting  : NSObject, DynamicModel {
           
           radio.bandSettings[id] = nil
           
-          LogProxy.sharedInstance.logMessage("BandSetting removed: id = \(id)", .debug, #function, #file, #line)
+          LogProxy.sharedInstance.libMessage("BandSetting removed: id = \(id)", .debug, #function, #file, #line)
           NC.post(.bandSettingHasBeenRemoved, object: id as Any?)
         }
       }

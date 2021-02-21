@@ -66,15 +66,15 @@ final class TcpManager : NSObject, GCDAsyncSocketDelegate {
   
   private weak var _delegate    : TcpManagerDelegate?
 
-  private var _tcpReceiveQ      : DispatchQueue
-  private var _tcpSendQ         : DispatchQueue
-  private var _tcpSocket        : GCDAsyncSocket!
-  private var _timeout          = 0.0   // seconds
+  private var _tcpReceiveQ: DispatchQueue
+  private var _tcpSendQ: DispatchQueue
+  private var _tcpSocket: GCDAsyncSocket!
+  private var _timeout = 0.0   // seconds
 
-  private var _isWan : Bool {
+  private var _isWan: Bool {
     get { Api.objectQ.sync { __isWan } }
     set { Api.objectQ.sync(flags: .barrier) {__isWan = newValue }}}
-  private var _seqNum : UInt {
+  private var _seqNum: UInt {
     get { Api.objectQ.sync { __seqNum } }
     set { Api.objectQ.sync(flags: .barrier) {__seqNum = newValue }}}
 
