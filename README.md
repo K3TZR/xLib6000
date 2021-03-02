@@ -37,6 +37,9 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.7.0 Release Notes
+* WanServer function name changes
+
 ##### 1.6.16 Release Notes
 * added libMessage() in LogProxy to distinguish xLib6000 log messages from app log messages
 

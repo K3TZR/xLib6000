@@ -19,15 +19,15 @@ public protocol WanServerDelegate : class {
     
     /// Received user settings from server
     ///
-    func wanUserSettings(name: String, call: String)
+    func wanSettings(name: String, call: String)
     
     /// Radio is ready to connect
     ///
-    func wanRadioConnectReady(handle: String, serial: String)
+    func wanConnectReady(handle: String, serial: String)
     
     /// Received Wan test results
     ///
-    func wanTestResultsReceived(results: WanTestConnectionResults)
+    func wanTestResults(_ results: WanTestConnectionResults)
 }
 
 // --------------------------------------------------------------------------------
@@ -386,7 +386,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
             case .lastName:       lastName = property.value
             }
         }
-        delegate?.wanUserSettings(name: firstName + " " + lastName, call: callsign)
+        delegate?.wanSettings(name: firstName + " " + lastName, call: callsign)
     }
     
     /// Parse Radio properties
@@ -415,7 +415,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
         }
         
         if handle != "" && serial != "" {
-            delegate?.wanRadioConnectReady(handle: handle, serial: serial)
+            delegate?.wanConnectReady(handle: handle, serial: serial)
         }
     }
     
@@ -565,7 +565,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
             }
         }
         _log("WanServer, smartlink test results received", .debug, #function, #file, #line)
-        delegate?.wanTestResultsReceived(results: results)
+        delegate?.wanTestResults(results)
     }
     
     /// Read the next data block (with an indefinite timeout)
