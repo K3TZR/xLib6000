@@ -9,7 +9,7 @@
 import Foundation
 import CocoaAsyncSocket
 
-public typealias IdToken = String?
+public typealias IdToken = String
 
 // --------------------------------------------------------------------------------
 // MARK: - WanServer Delegate protocol
@@ -102,7 +102,7 @@ public final class WanServer : NSObject, GCDAsyncSocketDelegate {
     private var _pingTimer            : DispatchSourceTimer?
     private var _timeout              = 0.0                // seconds
     private var _tlsSocket            : GCDAsyncSocket!
-    private var _idToken              : IdToken = nil
+    private var _idToken              : IdToken? = nil
     
     private let kHostName             = "smartlink.flexradio.com"
     private let kHostPort             = 443

@@ -4,13 +4,13 @@
 
 ##### Built on:
 
-*  macOS 11.1
-*  Xcode 12.3 (12C33)
+*  macOS 11.2.3
+*  Xcode 12.4 (12D4e)
 *  Swift 5.3
 
 ##### Runs on:
 * macOS 10.15 and higher
-* NOTE: for macOS 10.13 or 10.14 use xLib6000 v1.4.0 (which does not contain xLibClient)
+* NOTE: for macOS 10.13 or 10.14 use xLib6000 v1.4.0
 * iOS 14 and higher
 
 ##### Usage:
@@ -37,6 +37,9 @@ Flex Radios can have one of four different version groups:
 [![W6OP](https://img.shields.io/badge/W6OP-xVoiceKeyer,_xCW-informational)](https://w6op.com) A Mac-based Voice Keyer and a CW Keyer.  
 
 ---
+##### 1.7.1 Release Notes
+* made IdToken typealias non-optional
+
 ##### 1.7.0 Release Notes
 * WanServer function name changes
 
