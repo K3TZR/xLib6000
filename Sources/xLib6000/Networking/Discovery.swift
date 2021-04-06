@@ -69,7 +69,8 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
             do {
                 try sock.enableReusePort(true)
             } catch let error as NSError {
-                fatalError("Discovery - port reuse not enabled: \(error.localizedDescription)")
+                _log("Discovery, port reuse not enabled: \(error.localizedDescription)", .error, #function, #file, #line)
+                fatalError("Discovery, port reuse not enabled: \(error.localizedDescription)")
             }
             
             // bind the socket to the Flex Discovery Port
@@ -77,7 +78,8 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
                 try sock.bind(toPort: discoveryPort)
             }
             catch let error as NSError {
-                fatalError("Discovery - Bind to port error: \(error.localizedDescription)")
+                _log("Discovery, Bind to port error: \(error.localizedDescription)", .error, #function, #file, #line)
+                fatalError("Discovery, Bind to port error: \(error.localizedDescription)")
             }
             
             do {
@@ -88,8 +90,8 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
                 // create the timer's dispatch source
                 _timeoutTimer = DispatchSource.makeTimerSource(queue: Discovery.timerQ)
                 
-                // Set timer with 100 millisecond leeway
-                _timeoutTimer.schedule(deadline: DispatchTime.now(), repeating: checkInterval, leeway: .milliseconds(250))      // Every second +/- 10%
+                // Set timer
+                _timeoutTimer.schedule(deadline: DispatchTime.now(), repeating: checkInterval, leeway: .milliseconds(250))
                 
                 // set the event handler
                 _timeoutTimer.setEventHandler { [ unowned self] in
@@ -105,7 +107,6 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
                                 // YES, add to the delete list
                                 deleteList.append(i)
                                 _log("Discovery, radio will be removed: Interval \(String(format: "%0.1f", interval)) > NotSeenInterval \(String(format: "%0.1f", notSeenInterval))", .info, #function, #file, #line)
-                                
                             }
                         }
                     }
@@ -128,6 +129,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
                 }
                 
             } catch let error as NSError {
+                _log("Discovery, receiving error: \(error.localizedDescription)", .error, #function, #file, #line)
                 fatalError("Discovery, receiving error: \(error.localizedDescription)")
             }
             // start the timer

@@ -399,7 +399,8 @@ public final class Api : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             updateState(to: .clientDisconnected)
             
         case .update:
-            fatalError("Api Update not supported")
+            _log("Api Update not supported", .warning, #function, #file, #line)
+            break   // Api Update not supported
         }
     }
     /// Disconnect the active Radio
