@@ -534,8 +534,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
             }
             _frames[_index].binsInThisFrame += _frames[_index].startingBin
         }
-        _frames[_index].binsInThisFrame += _frames[_index].startingBin
-
         // increment the frame count if the entire frame has been accumulated
         if _frames[_index].binsInThisFrame == _frames[_index].totalBins { packetFrame += 1 }
 
