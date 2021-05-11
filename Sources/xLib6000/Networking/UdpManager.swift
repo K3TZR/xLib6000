@@ -12,7 +12,7 @@ import CocoaAsyncSocket
 
 /// Delegate protocol for the UdpManager class
 ///
-protocol UdpManagerDelegate                 : class {
+protocol UdpManagerDelegate                 : AnyObject {
   
   // if any of theses are not needed, implement a stub in the delegate that does nothing
   

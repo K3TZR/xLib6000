@@ -13,7 +13,7 @@ import Foundation
 
 /// Logging is deferred to the hosting application
 ///
-public protocol LogHandler: class {
+public protocol LogHandler: AnyObject {
   /// Method to process Log entries
   ///
   /// - Parameters:
@@ -32,7 +32,7 @@ public protocol LogHandler: class {
 ///   Static Model objects are created / destroyed in the Radio class.
 ///   Static Model object properties are set in the instance's parseProperties method.
 ///
-protocol StaticModel                        : class {
+protocol StaticModel                        : AnyObject {
   
   /// Parse <key=value> arrays to set object properties
   ///
@@ -77,7 +77,7 @@ protocol DynamicModelWithStream             : DynamicModel {
 
 /// UDP Stream handler protocol
 ///
-public protocol StreamHandler               : class {
+public protocol StreamHandler               : AnyObject {
   
   /// Process a frame of Stream data
   ///

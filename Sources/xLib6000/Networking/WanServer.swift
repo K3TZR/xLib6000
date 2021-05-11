@@ -15,7 +15,7 @@ public typealias IdToken = String
 // MARK: - WanServer Delegate protocol
 // --------------------------------------------------------------------------------
 
-public protocol WanServerDelegate : class {
+public protocol WanServerDelegate : AnyObject {
     
     /// Received user settings from server
     ///
