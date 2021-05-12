@@ -303,13 +303,15 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
 
-    private var _index              = 0
+    @Atomic(0, q: Api.objectQ) var index: Int
+
+
     private var _initialized              = false
     private let _log                      = LogProxy.sharedInstance.libMessage
     private var _frames         = [PanadapterFrame]()
     private let _radio                    : Radio
 
-    private let _numberOfPanadapterFrames = 6
+    private let _numberOfFrames = 6
 
     // ------------------------------------------------------------------------------
     // MARK: - Class methods
@@ -377,7 +379,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
         self.id = id
 
         // allocate dataframes
-        for _ in 0..<_numberOfPanadapterFrames {
+        for _ in 0..<_numberOfFrames {
             _frames.append(PanadapterFrame(frameSize: Panadapter.kMaxBins))
         }
         super.init()
@@ -500,20 +502,20 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
             // map the payload to the Payload struct
             let hdr = ptr.bindMemory(to: PayloadHeader.self)
 
-            _frames[_index].startingBin = Int(CFSwapInt16BigToHost(hdr[0].startingBin))
-            _frames[_index].binsInThisFrame = Int(CFSwapInt16BigToHost(hdr[0].numberOfBins))
-            _frames[_index].binSize = Int(CFSwapInt16BigToHost(hdr[0].binSize))
-            _frames[_index].totalBins = Int(CFSwapInt16BigToHost(hdr[0].totalBins))
-            _frames[_index].receivedFrame = Int(CFSwapInt32BigToHost(hdr[0].frameIndex))
+            _frames[index].startingBin = Int(CFSwapInt16BigToHost(hdr[0].startingBin))
+            _frames[index].binsInThisFrame = Int(CFSwapInt16BigToHost(hdr[0].numberOfBins))
+            _frames[index].binSize = Int(CFSwapInt16BigToHost(hdr[0].binSize))
+            _frames[index].totalBins = Int(CFSwapInt16BigToHost(hdr[0].totalBins))
+            _frames[index].receivedFrame = Int(CFSwapInt32BigToHost(hdr[0].frameIndex))
         }
         // validate the packet (could be incomplete at startup)
-        if _frames[_index].totalBins == 0 { return }
-        if _frames[_index].startingBin + _frames[_index].binsInThisFrame > _frames[_index].totalBins { return }
+        if _frames[index].totalBins == 0 { return }
+        if _frames[index].startingBin + _frames[index].binsInThisFrame > _frames[index].totalBins { return }
 
         // initial frame?
-        if packetFrame == -1 { packetFrame = _frames[_index].receivedFrame }
+        if packetFrame == -1 { packetFrame = _frames[index].receivedFrame }
 
-        switch (packetFrame, _frames[_index].receivedFrame) {
+        switch (packetFrame, _frames[index].receivedFrame) {
 
         case (let expected, let received) where received < expected:
             // from a previous group, ignore it
@@ -528,22 +530,22 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
             // received == expected
             vita.payloadData.withUnsafeBytes { ptr in
                 // Swap the byte ordering of the data & place it in the bins
-                for i in 0..<_frames[_index].binsInThisFrame {
-                    _frames[_index].bins[i+_frames[_index].startingBin] = CFSwapInt16BigToHost( ptr.load(fromByteOffset: _byteOffsetToBins + (2 * i), as: UInt16.self) )
+                for i in 0..<_frames[index].binsInThisFrame {
+                    _frames[index].bins[i+_frames[index].startingBin] = CFSwapInt16BigToHost( ptr.load(fromByteOffset: _byteOffsetToBins + (2 * i), as: UInt16.self) )
                 }
             }
-            _frames[_index].binsInThisFrame += _frames[_index].startingBin
+            _frames[index].binsInThisFrame += _frames[index].startingBin
         }
         // increment the frame count if the entire frame has been accumulated
-        if _frames[_index].binsInThisFrame == _frames[_index].totalBins { packetFrame += 1 }
+        if _frames[index].binsInThisFrame == _frames[index].totalBins { packetFrame += 1 }
 
         // is it a complete Panadapter Frame?
-        if _frames[_index].binsInThisFrame == _frames[_index].totalBins {
+        if _frames[index].binsInThisFrame == _frames[index].totalBins {
             // YES, pass it to the delegate
-            delegate?.streamHandler(_frames[_index])
+            delegate?.streamHandler(_frames[index])
 
             // use the next dataframe
-            _index = (_index + 1) % _numberOfPanadapterFrames
+            $index.mutate { $0 += 1 ; $0 = $0 % _numberOfFrames }
         }
     }
 
