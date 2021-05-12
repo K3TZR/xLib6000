@@ -131,8 +131,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     @objc dynamic public var wnbUpdating  : Bool      { _wnbUpdating }
     @objc dynamic public var xvtrLabel    : String    { _xvtrLabel }
     
-    public private(set)   var packetFrame       = -1   // Frame index of next Vita payload
-    public private(set)   var droppedPackets    = 0
+    @Atomic(-1, q: Api.objectQ) var packetFrame: Int
+//    @Atomic(0, q: Api.objectQ) var droppedPackets: Int
 
     @objc dynamic public  let daxIqChoices      = Api.kDaxIqChannels
 
@@ -303,15 +303,13 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
 
+    private var _frames = [PanadapterFrame]()
     @Atomic(0, q: Api.objectQ) var index: Int
-
-
-    private var _initialized              = false
-    private let _log                      = LogProxy.sharedInstance.libMessage
-    private var _frames         = [PanadapterFrame]()
-    private let _radio                    : Radio
-
+    private var _initialized = false
+    private let _log = LogProxy.sharedInstance.libMessage
     private let _numberOfFrames = 6
+    private let _radio: Radio
+
 
     // ------------------------------------------------------------------------------
     // MARK: - Class methods
@@ -537,9 +535,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
             _frames[index].binsInThisFrame += _frames[index].startingBin
         }
         // increment the frame count if the entire frame has been accumulated
-        if _frames[index].binsInThisFrame == _frames[index].totalBins { packetFrame += 1 }
+        if _frames[index].binsInThisFrame == _frames[index].totalBins { $packetFrame.mutate { $0 += 1 } }
 
-        // is it a complete Panadapter Frame?
+        // is it a complete Frame?
         if _frames[index].binsInThisFrame == _frames[index].totalBins {
             // YES, pass it to the delegate
             delegate?.streamHandler(_frames[index])
