@@ -272,7 +272,6 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
     ///
     /// - Parameters:
     ///   - vita:       a Vita struct
-    ///
     func vitaProcessor(_ vita: Vita) {
         // Bins are just beyond the payload
         let byteOffsetToBins = MemoryLayout<PayloadHeader>.size
@@ -370,7 +369,6 @@ public final class Waterfall : NSObject, DynamicModelWithStream {
 /// Class containing Waterfall Stream data
 ///
 ///   populated by the Waterfall vitaHandler
-///
 public struct WaterfallFrame {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
