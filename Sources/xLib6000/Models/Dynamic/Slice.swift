@@ -304,22 +304,6 @@ public final class Slice  : NSObject, DynamicModel {
       return [AgcMode.off.rawValue, AgcMode.slow.rawValue, AgcMode.med.rawValue, AgcMode.fast.rawValue]
     }
   }
-  public enum Mode : String, CaseIterable {
-    case AM
-    case SAM
-    case CW
-    case USB
-    case LSB
-    case FM
-    case NFM
-    case DFM
-    case DIGU
-    case DIGL
-    case RTTY
-    //    case dsb
-    //    case dstr
-    //    case fdv
-  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -727,29 +711,32 @@ public final class Slice  : NSObject, DynamicModel {
   ///   - mode:       demod mode
   ///
   func setupDefaultFilters(_ mode: String) {
-    if let modeValue = Mode(rawValue: mode) {
+    switch mode.uppercased() {
       
-      switch modeValue {
-        
-      case .CW:
-        _filterLow = 450
-        _filterHigh = 750
-      case .RTTY:
-        _filterLow = -285
-        _filterHigh = 115
-      case .AM, .SAM:
-        _filterLow = -3_000
-        _filterHigh = 3_000
-      case .FM, .NFM, .DFM:
-        _filterLow = -8_000
-        _filterHigh = 8_000
-      case .LSB, .DIGL:
-        _filterLow = -2_400
-        _filterHigh = -300
-      case .USB, .DIGU:
-        _filterLow = 300
-        _filterHigh = 2_400
-      }
+    case "FM", "NFM":
+      _filterLow = -8_000
+      _filterHigh = 8_000
+    case "CW":
+      _filterLow = 450
+      _filterHigh = 750
+    case "RTTY":
+      _filterLow = -285
+      _filterHigh = 115
+    case "AM", "SAM", "DFM":
+      _filterLow = -3_000
+      _filterHigh = 3_000
+    case "LSB", "DIGL":
+      _filterLow = -2_400
+      _filterHigh = -300
+    case "USB", "DIGU":
+      _filterLow = 300
+      _filterHigh = 2_400
+    case "RAW", "ARQ":
+      _filterLow = 300
+      _filterHigh = 2_400
+    default:
+      _filterLow = 300
+      _filterHigh = 2_400
     }
   }
   /// Restrict the Filter High value
@@ -761,25 +748,29 @@ public final class Slice  : NSObject, DynamicModel {
   func filterHighLimits(_ value: Int) -> Int {
     var newValue = (value < filterLow + 10 ? filterLow + 10 : value)
     
-    if let modeType = Mode(rawValue: mode.lowercased()) {
-      switch modeType {
-        
-      case .FM, .NFM:
-        _log("Slice, cannot change Filter width in FM mode", .info, #function, #file, #line)
-        newValue = value
-      case .CW:
-        newValue = (newValue > 12_000 - _radio.transmit.cwPitch ? 12_000 - _radio.transmit.cwPitch : newValue)
-      case .RTTY:
-        newValue = (newValue > rttyMark ? rttyMark : newValue)
-        newValue = (newValue < 50 ? 50 : newValue)
-      case .AM, .SAM, .DFM:
-        newValue = (newValue > 12_000 ? 12_000 : newValue)
-        newValue = (newValue < 10 ? 10 : newValue)
-      case .LSB, .DIGL:
-        newValue = (newValue > 0 ? 0 : newValue)
-      case .USB, .DIGU:
-        newValue = (newValue > 12_000 ? 12_000 : newValue)
-      }
+    switch mode.uppercased() {
+      
+    case "FM", "NFM":
+      _log("Slice, cannot change Filter width in FM mode", .info, #function, #file, #line)
+      newValue = value
+    case "CW":
+      newValue = (newValue > 12_000 - _radio.transmit.cwPitch ? 12_000 - _radio.transmit.cwPitch : newValue)
+    case "RTTY":
+      newValue = (newValue > rttyMark ? rttyMark : newValue)
+      newValue = (newValue < 50 ? 50 : newValue)
+    case "AM", "SAM", "DFM":
+      newValue = (newValue > 12_000 ? 12_000 : newValue)
+      newValue = (newValue < 10 ? 10 : newValue)
+    case "LSB", "DIGL":
+      newValue = (newValue > 0 ? 0 : newValue)
+    case "USB", "DIGU":
+      newValue = (newValue > 12_000 ? 12_000 : newValue)
+    case "RAW", "ARQ":
+      newValue = (newValue > 12_000 ? 12_000 : newValue)
+      newValue = (newValue < 50 ? 50 : newValue)
+    default:
+      newValue = (newValue > 12_000 ? 12_000 : newValue)
+      newValue = (newValue < 50 ? 50 : newValue)
     }
     return newValue
   }
@@ -792,25 +783,27 @@ public final class Slice  : NSObject, DynamicModel {
   func filterLowLimits(_ value: Int) -> Int {
     var newValue = (value > filterHigh - 10 ? filterHigh - 10 : value)
     
-    if let modeType = Mode(rawValue: mode.lowercased()) {
-      switch modeType {
-        
-      case .FM, .NFM:
-        _log("Slice, cannot change Filter width in FM mode", .info, #function, #file, #line)
-        newValue = value
-      case .CW:
-        newValue = (newValue < -12_000 - _radio.transmit.cwPitch ? -12_000 - _radio.transmit.cwPitch : newValue)
-      case .RTTY:
-        newValue = (newValue < -12_000 + rttyMark ? -12_000 + rttyMark : newValue)
-        newValue = (newValue > -(50 + rttyShift) ? -(50 + rttyShift) : newValue)
-      case .AM, .SAM, .DFM:
-        newValue = (newValue < -12_000 ? -12_000 : newValue)
-        newValue = (newValue > -10 ? -10 : newValue)
-      case .LSB, .DIGL:
-        newValue = (newValue < -12_000 ? -12_000 : newValue)
-      case .USB, .DIGU:
-        newValue = (newValue < 0 ? 0 : newValue)
-      }
+    switch mode.uppercased() {
+      
+    case "FM", "NFM":
+      _log("Slice, cannot change Filter width in FM mode", .info, #function, #file, #line)
+      newValue = value
+    case "CW":
+      newValue = (newValue < -12_000 - _radio.transmit.cwPitch ? -12_000 - _radio.transmit.cwPitch : newValue)
+    case "RTTY":
+      newValue = (newValue < -12_000 + rttyMark ? -12_000 + rttyMark : newValue)
+      newValue = (newValue > -(50 + rttyShift) ? -(50 + rttyShift) : newValue)
+    case "AM", "SAM", "DFM":
+      newValue = (newValue < -12_000 ? -12_000 : newValue)
+      newValue = (newValue > -10 ? -10 : newValue)
+    case "LSB", "DIGL":
+      newValue = (newValue < -12_000 ? -12_000 : newValue)
+    case "USB", "DIGU":
+      newValue = (newValue < 0 ? 0 : newValue)
+    case "RAW", "ARQ":
+      newValue = (newValue < 0 ? 0 : newValue)
+    default:
+      newValue = (newValue < 0 ? 0 : newValue)
     }
     return newValue
   }
@@ -1046,7 +1039,7 @@ public final class Slice  : NSObject, DynamicModel {
   private var __locked                  = false
   private var __loopAEnabled            = false
   private var __loopBEnabled            = false
-  private var __mode                    = Mode.LSB.rawValue
+  private var __mode                    = "LSB"
   private var __modeList                = [String]()
   private var __nbEnabled               = false
   private var __nbLevel                 = 0

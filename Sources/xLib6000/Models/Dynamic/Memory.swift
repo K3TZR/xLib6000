@@ -267,21 +267,25 @@ public final class Memory                   : NSObject, DynamicModel {
     
     var newValue = (value < filterLow + 10 ? filterLow + 10 : value)
     
-    if let modeType = xLib6000.Slice.Mode(rawValue: mode.lowercased()) {
-      switch modeType {
-        
-      case .CW:
-        newValue = (newValue > 12_000 - _radio.transmit.cwPitch ? 12_000 - _radio.transmit.cwPitch : newValue)
-      case .RTTY:
-        newValue = (newValue > 4_000 ? 4_000 : newValue)
-      case .AM, .SAM, .FM, .NFM, .DFM:
-        newValue = (newValue > 12_000 ? 12_000 : newValue)
-        newValue = (newValue < 10 ? 10 : newValue)
-      case .LSB, .DIGL:
-        newValue = (newValue > 0 ? 0 : newValue)
-      case .USB, .DIGU:
-        newValue = (newValue > 12_000 ? 12_000 : newValue)
-      }
+    switch mode.uppercased() {
+      
+    case "CW":
+      newValue = (newValue > 12_000 - _radio.transmit.cwPitch ? 12_000 - _radio.transmit.cwPitch : newValue)
+    case "RTTY":
+      newValue = (newValue > 4_000 ? 4_000 : newValue)
+    case "AM", "SAM", "DFM", "FM", "NFM":
+      newValue = (newValue > 12_000 ? 12_000 : newValue)
+      newValue = (newValue < 10 ? 10 : newValue)
+    case "LSB", "DIGL":
+      newValue = (newValue > 0 ? 0 : newValue)
+    case "USB", "DIGU":
+      newValue = (newValue > 12_000 ? 12_000 : newValue)
+    case "RAW", "ARQ":
+      newValue = (newValue > 12_000 ? 12_000 : newValue)
+      newValue = (newValue < 50 ? 50 : newValue)
+    default:
+      newValue = (newValue > 12_000 ? 12_000 : newValue)
+      newValue = (newValue < 50 ? 50 : newValue)
     }
     return newValue
   }
@@ -295,21 +299,23 @@ public final class Memory                   : NSObject, DynamicModel {
     
     var newValue = (value > filterHigh - 10 ? filterHigh - 10 : value)
     
-    if let modeType = xLib6000.Slice.Mode(rawValue: mode.lowercased()) {
-      switch modeType {
-        
-      case .CW:
-        newValue = (newValue < -12_000 - _radio.transmit.cwPitch ? -12_000 - _radio.transmit.cwPitch : newValue)
-      case .RTTY:
-        newValue = (newValue < -12_000 ? -12_000 : newValue)
-      case .AM, .SAM, .FM, .NFM, .DFM:
-        newValue = (newValue < -12_000 ? -12_000 : newValue)
-        newValue = (newValue > -10 ? -10 : newValue)
-      case .LSB, .DIGL:
-        newValue = (newValue < -12_000 ? -12_000 : newValue)
-      case .USB, .DIGU:
-        newValue = (newValue < 0 ? 0 : newValue)
-      }
+    switch mode.uppercased() {
+      
+    case "CW":
+      newValue = (newValue < -12_000 - _radio.transmit.cwPitch ? -12_000 - _radio.transmit.cwPitch : newValue)
+    case "RTTY":
+      newValue = (newValue < -12_000 ? -12_000 : newValue)
+    case "AM", "SAM", "DFM", "FM", "NFM":
+      newValue = (newValue < -12_000 ? -12_000 : newValue)
+      newValue = (newValue > -10 ? -10 : newValue)
+    case "LSB", "DIGL":
+      newValue = (newValue < -12_000 ? -12_000 : newValue)
+    case "USB", "DIGU":
+      newValue = (newValue < 0 ? 0 : newValue)
+    case "RAW", "ARQ":
+      newValue = (newValue < 0 ? 0 : newValue)
+    default:
+      newValue = (newValue < 0 ? 0 : newValue)
     }
     return newValue
   }

@@ -125,7 +125,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     @objc dynamic public var rfGainHigh   : Int       { _rfGainHigh }
     @objc dynamic public var rfGainLow    : Int       { _rfGainLow }
     @objc dynamic public var rfGainStep   : Int       { _rfGainStep }
-    @objc dynamic public var rfGainValues : String    {_rfGainValues }
+    @objc dynamic public var rfGainValues : String    { _rfGainValues }
     @objc dynamic public var waterfallId  : UInt32    { _waterfallId }
     @objc dynamic public var wide         : Bool      { _wide }
     @objc dynamic public var wnbUpdating  : Bool      { _wnbUpdating }
@@ -477,7 +477,55 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
         // notify all observers
         //    NC.post(.panadapterWillBeRemoved, object: self as Any?)
     }
-    /// Process the Panadapter Vita struct
+
+struct Previous {
+  var startingBin: Int
+  var binsInThisFrame: Int
+  var binSize: Int
+  var totalBins: Int
+  var receivedFrame: Int
+  
+  init(_ startingBin: Int = -1, _ binsInThisFrame: Int = -1, _ binSize: Int = -1, _ totalBins: Int = -1, _ receivedFrame: Int = -1) {
+    self.startingBin = startingBin
+    self.binsInThisFrame = binsInThisFrame
+    self.binSize = binSize
+    self.totalBins = totalBins
+    self.receivedFrame = receivedFrame
+  }
+}
+
+private var _previous: [Previous] = [
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+  Previous(),
+]
+
+  
+  
+  
+  
+  
+  
+  
+  
+  /// Process the Panadapter Vita struct
     ///   VitaProcessor protocol method, executes on the streamQ
     ///      The payload of the incoming Vita struct is converted to a PanadapterFrame and
     ///      passed to the Panadapter Stream Handler
@@ -505,8 +553,26 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
             _frames[index].binSize = Int(CFSwapInt16BigToHost(hdr[0].binSize))
             _frames[index].totalBins = Int(CFSwapInt16BigToHost(hdr[0].totalBins))
             _frames[index].receivedFrame = Int(CFSwapInt32BigToHost(hdr[0].frameIndex))
+
+//          print(_frames[index].startingBin, _frames[index].binsInThisFrame, _frames[index].totalBins, _frames[index].receivedFrame)
+
+//          for i in 0...18 {
+//            _previous[i+1] = _previous[i]
+//          }
+//          _previous[0] = Previous(_frames[index].startingBin,
+//                                  _frames[index].binsInThisFrame ,
+//                                  _frames[index].binSize,
+//                                  _frames[index].totalBins,
+//                                  _frames[index].receivedFrame)
         }
-        // validate the packet (could be incomplete at startup)
+
+      
+
+      print(_frames[index].receivedFrame, _frames[index].startingBin, _frames[index].binsInThisFrame, _frames[index].totalBins)
+      
+      
+      
+      // validate the packet (could be incomplete at startup)
         if _frames[index].totalBins == 0 { return }
         if _frames[index].startingBin + _frames[index].binsInThisFrame > _frames[index].totalBins { return }
 
